@@ -1,5 +1,6 @@
 {
     "editor.fontSize": 16,
     "diffEditor.wordWrap": "on",
-    "editor.wordWrapColumn": 120
+    "editor.wordWrapColumn": 120,
+    "editor.wordWrap": "wordWrapColumn"
 }
