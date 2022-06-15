@@ -1,0 +1,13 @@
+title: "入門 OpenTelemetry"
+summary: "OpenTelemetryとはオブザーバビリティの主要テレメトリーの計装と収集を標準化・共通化することを目的としたプロジェクトで、現在はCNCF incubating projectとなっています。本書ではOpenTelemetryの利用方法を中心として解説し、補足としてその歴史的背景を紹介します。"
+topics: ["OpenTelemetry", "Observability", "Trace", "Metric", "Log"]
+published: false
+price: 2000 # 有料の場合200〜5000
+# 本に含めるチャプターを順番に並べましょう
+chapters:
+  - introduction
+  - trace
+  - metric
+  - log
+  - collector
+  - history
