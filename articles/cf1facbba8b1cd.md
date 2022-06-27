@@ -15,7 +15,7 @@ published: true
 
 Hypothesisで特定のiterable（たとえばリスト）からexampleを生成するストラテジーを作りたい場合は `sampled_from` を使う。
 
-https://hypothesis.readthedocs.io/en/latest/data.html#hypothesis.strategies.sampled_from
+@[card](https://hypothesis.readthedocs.io/en/latest/data.html#hypothesis.strategies.sampled_from)
 
 たとえば次のようにできる。
 
