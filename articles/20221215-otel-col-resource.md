@@ -3,7 +3,7 @@ title: "OpenTelemetry CollectorでGKEのリソース情報を自動で埋め込�
 emoji: "📰"
 type: "tech" # tech: 技術記事 / idea: アイデア
 topics: ["GoogleCloud", "GCP", "OpenTelemetry", "GKE", "CloudTrace"]
-published: false
+published: true
 published_at: 2022-12-15 09:00
 ---
 
@@ -127,6 +127,22 @@ service:
         exporters: [logging, googlecloud]
 ```
 
+この設定はどうなっているかというと次のようなパイプラインになっています。
+
+```mermaid
+flowchart LR
+    id1(service A) --> idA(OTLP receiver)
+    id2(service B) --> idA
+    subgraph OpenTelemetry Collector
+    idA --> idB(batch processor)
+    subgraph processor
+    idB --> idC(resourcedetection processor)
+    end
+    idC --> idD(googlecloud exporter)
+    end
+    idD --> idX(Cloud Trace)
+```
+
 このデモを実際に動作させてみるとどうなるか見てましょう。
 
 ![](/images/20221215-1.png)
@@ -137,7 +153,7 @@ service:
 
 ここに載っている次の属性はすべて自動で追加されたものになっています！！
 
-* cloud.account.id: development-215403
+* cloud.account.id: <プロジェクトID>
 * cloud.platform: gcp_kubernetes_engine
 * cloud.provider: gcp
 * cloud.region: asia-east1
@@ -145,5 +161,30 @@ service:
 * g.co/r/k8s_cluster/location: asia-east1
 * k8s.cluster.name: otel-sample
 
+実際にCollectorに `resourcedetection` を追加する前は次のようになっていました。
 
+![](/images/20221215-3.png)
 
+## まとめ
+
+OpenTelemetry Collectorのprocessorによって属性を追加する方法について書きました。OpenTelemetryは活発に開発が続けられています。いまも新たな機能が日々追加されています。2023年はいよいよログも本格的に扱えるようになることが期待されています。ぜひ皆様のプロジェクトでも使ってみてください。
+
+もしGoogle CloudでOpenTelemetryを使っていて疑問に思ったことがあったら私（[@ymotongpoo](https://twitter.com/ymotongpoo)）までご連絡ください。
+
+## 補足
+
+今回のデモではOpenTelemetry Collector Releasesからリリースされているものから `opeltelemetry-collector-contrib` のイメージを使用しました。
+
+@[card](https://github.com/open-telemetry/opentelemetry-collector-releases)
+
+@[card](https://hub.docker.com/r/otel/opentelemetry-collector-contrib)
+
+このイメージは、[opentelemetry-collector-contrib](https://github.com/open-telemetry/opentelemetry-collector-contrib) レポジトリの中にあるすべてのプラグインを全部盛り込んだごった煮のCollectorなので、テストする場合には便利ですが、実用する場合にはサイズが大きくなりすぎてしまいます。
+
+本番環境で使用する場合にはぜひ[OpenTelemetry Collector Builder (`odb`)](https://github.com/open-telemetry/opentelemetry-collector/tree/main/cmd/builder)を使って、必要なプラグインだけを同梱した専用Collectorを作成して使用してください。
+
+Cloud Buildを使って作成するサンプルに関しては下記のブログポストおよびサンプルレポジトリを参照してください。
+
+@[card](https://opentelemetry.io/blog/2022/collector-builder-sample/)
+
+@[card](https://github.com/GoogleCloudPlatform/opentelemetry-collector-builder-sample)
