@@ -182,7 +182,7 @@ OpenTelemetry Collectorのprocessorによって属性を追加する方法につ
 
 このイメージは、[opentelemetry-collector-contrib](https://github.com/open-telemetry/opentelemetry-collector-contrib) レポジトリの中にあるすべてのプラグインを全部盛り込んだごった煮のCollectorなので、テストする場合には便利ですが、実用する場合にはサイズが大きくなりすぎてしまいます。
 
-本番環境で使用する場合にはぜひ[OpenTelemetry Collector Builder (`odb`)](https://github.com/open-telemetry/opentelemetry-collector/tree/main/cmd/builder)を使って、必要なプラグインだけを同梱した専用Collectorを作成して使用してください。
+本番環境で使用する場合にはぜひ[OpenTelemetry Collector Builder (`ocb`)](https://github.com/open-telemetry/opentelemetry-collector/tree/main/cmd/builder)を使って、必要なプラグインだけを同梱した専用Collectorを作成して使用してください。
 
 Cloud Buildを使って作成するサンプルに関しては下記のブログポストおよびサンプルレポジトリを参照してください。
 
