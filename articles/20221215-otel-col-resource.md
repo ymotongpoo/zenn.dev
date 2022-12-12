@@ -5,9 +5,10 @@ type: "tech" # tech: 技術記事 / idea: アイデア
 topics: ["GoogleCloud", "GCP", "OpenTelemetry", "GKE", "CloudTrace"]
 published: true
 published_at: 2022-12-15 09:00
+publication_name: google_cloud_jp
 ---
 
-こんにちは！Google Cloudでオブザーバビリティを担当しているものです！この記事は[Google Cloud Japan Advent Calender 2022](https://zenn.dev/google_cloud_jp/articles/12bd83cd5b3370)の15日目の記事です。
+こんにちは！Google Cloudでオブザーバビリティを担当しているものです！この記事は[Google Cloud Japan Advent Calender 2022](https://zenn.dev/google_cloud_jp/articles/12bd83cd5b3370)の15日目の記事です。（あと空いてたので[OpenTelemetry Advent Calender](https://qiita.com/advent-calendar/2022/opentelemetry)の8日目の記事とします。）
 
 ## TL;DR
 
@@ -32,7 +33,7 @@ OpenTelemetry Collectorはログ、メトリクス、トレースといったテ
 
 OpenTelemetryを使いたくなる状況というのは、アプリケーションに対して計装をし、テレメトリーデータを生成して、モニタリングバックエンドに送信したいときなわけですが、その際に課題となってくるのは計装に必要なコード量です。
 
-たとえば次はトレースを生成する際のサンプルコードですが、非常に多くの属性が宣言されています。
+たとえば次はトレースを生成する際に書いたサンプルコードの一部ですが、非常に多くの属性が宣言されています。
 
 ```go
     ...
@@ -89,7 +90,7 @@ OpenTelemetry Collectorは大きく分けて3つのコンポーネントで構�
 
 説明のためにサンプルプロジェクトを用意しました。（TODO: PRがマージされたらURLを置き換える）
 
-@[card](https://github.com/ymotongpoo/devrel-demos/tree/otel-gke-add-labels/devops/otel-collector/gke-add-labels)
+@[card](https://github.com/ymotongpoo/devrel-demos/tree/otel-gke-add-labels/devops/otel-col-gke-add-labels)
 
 ```mermaid
 flowchart LR
@@ -169,7 +170,7 @@ flowchart LR
 
 OpenTelemetry Collectorのprocessorによって属性を追加する方法について書きました。OpenTelemetryは活発に開発が続けられています。いまも新たな機能が日々追加されています。2023年はいよいよログも本格的に扱えるようになることが期待されています。ぜひ皆様のプロジェクトでも使ってみてください。
 
-もしGoogle CloudでOpenTelemetryを使っていて疑問に思ったことがあったら私（[@ymotongpoo](https://twitter.com/ymotongpoo)）までご連絡ください。
+もしGoogle Cloud上に限らず、OpenTelemetryを使っていて疑問に思ったことがあったら私（[@ymotongpoo](https://twitter.com/ymotongpoo)）までご連絡ください。お答えできるかもしれません。
 
 ## 補足
 
