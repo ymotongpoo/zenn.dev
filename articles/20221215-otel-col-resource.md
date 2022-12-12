@@ -62,7 +62,7 @@ OpenTelemetryを使いたくなる状況というのは、アプリケーショ�
 
 1に関しては、いくつか自動計装用のライブラリがあるので、それをインポートさえすればある程度カバーできるのですが、一方でアプリケーションの依存ライブラリが増えますし、すべてのアプリケーションに依存ライブラリを追加しなければなりません。
 
-2に関しては、アプリケーション側のコードを編集すること無いため便利ではあるのですが、一方でテレメトリーのメタデータの編集のための追加の層が必要になってきます。
+2に関しては、アプリケーション側のコードを編集することがないため便利ではあるのですが、一方でテレメトリーのメタデータの編集のための追加の層が必要になってきます。
 
 一長一短ではありますが、OpenTelemetryを使った計装の場合、Collectorを使う構成が推奨されていることもあり、この記事では2番めの方法を紹介したいと思います。
 
@@ -88,9 +88,9 @@ OpenTelemetry Collectorは大きく分けて3つのコンポーネントで構�
 
 ## サンプルプロジェクト
 
-説明のためにサンプルプロジェクトを用意しました。（TODO: PRがマージされたらURLを置き換える）
+説明のためにサンプルプロジェクトを用意しました。
 
-@[card](https://github.com/ymotongpoo/devrel-demos/tree/otel-gke-add-labels/devops/otel-col-gke-add-labels)
+@[card](https://github.com/GoogleCloudPlatform/devrel-demos/tree/main/devops/otel-col-gke-add-labels)
 
 ```mermaid
 flowchart LR
@@ -158,6 +158,8 @@ flowchart LR
 * cloud.platform: gcp_kubernetes_engine
 * cloud.provider: gcp
 * cloud.region: asia-east1
+* host.id: <random id>
+* host.name: gke-otel-sample-default-pool-<random_id>
 * g.co/r/k8s_cluster/cluster_name: otel-sample
 * g.co/r/k8s_cluster/location: asia-east1
 * k8s.cluster.name: otel-sample
