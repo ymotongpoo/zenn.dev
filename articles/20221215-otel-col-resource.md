@@ -21,9 +21,15 @@ OpenTelemetry Collectorを使えば、GKEなどの複数のサービスで共通
 * OpenTelemetry for Go for Trace: v1.11
 :::
 
+## Cloud TraceとOpenTelemetry
+
+[Cloud Trace](https://cloud.google.com/trace)は本番環境においてレイテンシーのボトルネックを発見するための分散トレースバックエンドです。Cloud Traceを使うことによって、特定の属性を持ったリクエストがシステム内のどこでレイテンシーの問題を起こすかを可視化して発見できます。
+
+Googleは分散トレースの仕組みとして広く普及するきっかけになった[Dapper](https://research.google/pubs/pub36356/)のために、社内でCensusと呼ばれるライブラリを用いてサービスに計装（テレメトリーを生成するための実装）を行ってきました。OpenTelemetryは計装のためのライブラリやテレメトリー収集のための仕組みを多く提供しており、これはCensusから多くの影響を受けています。またGoogleもOpenTelemetryプロジェクトに最初期から貢献しています。
+
 ## OpenTelemetry Collectorとは
 
-「そもそも[OpenTelemetry Collector](https://opentelemetry.io/docs/collector/)なんて知らないよ！」っていう方もいらっしゃると思います。というか、「[OpenTelemetry](https://opentelemetry.io/)自体知らないよ！」という方もいらっしゃるかもしれません。そういう方については手前味噌ですが、こちらをご参照ください。
+「そもそも[OpenTelemetry Collector](https://opentelemetry.io/docs/collector/)なんて知らないよ！」っていう方もいらっしゃると思います。「[OpenTelemetry](https://opentelemetry.io/)自体も上の説明で今知ったよ！」という方もいらっしゃるかもしれません。しかし本記事でOpenTelemetryについて詳細を解説すると長大になってしまうため、手前味噌ですがそういった解説はこちらの記事に譲ります。
 
 @[card](https://ymotongpoo.hatenablog.com/entry/2020/06/01/164221)
 
