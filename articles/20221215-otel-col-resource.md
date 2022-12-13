@@ -25,7 +25,7 @@ OpenTelemetry Collectorを使えば、GKEなどの複数のサービスで共通
 
 [Cloud Trace](https://cloud.google.com/trace)は本番環境においてレイテンシーのボトルネックを発見するための分散トレースバックエンドです。Cloud Traceを使うことによって、特定の属性を持ったリクエストがシステム内のどこでレイテンシーの問題を起こすかを可視化して発見できます。
 
-Googleは分散トレースの仕組みとして広く普及するきっかけになった[Dapper](https://research.google/pubs/pub36356/)のために、社内でCensusと呼ばれるライブラリを用いてサービスに計装（テレメトリーを生成するための実装）を行ってきました。OpenTelemetryは計装のためのライブラリやテレメトリー収集のための仕組みを多く提供しており、これはCensusから多くの影響を受けています。またGoogleもOpenTelemetryプロジェクトに最初期から貢献しています。
+Googleは分散トレースの仕組みとして広く普及するきっかけになった[Dapper](https://research.google/pubs/pub36356/)のために、社内でCensusと呼ばれるライブラリを用いてサービスに計装（テレメトリーを生成するための実装）を行ってきました。OpenTelemetryは計装のためのライブラリやテレメトリー収集のための仕組みを多く提供しており、これはCensusから多くの影響を受けています。またGoogleもOpenTelemetryプロジェクトに最初期から貢献しています。またGoogle Cloud向けのプラグインも開発していて、Cloud Traceではそちらを利用します。
 
 ## OpenTelemetry Collectorとは
 
@@ -105,7 +105,7 @@ flowchart LR
     collector --> idT(Cloud Trace)
 ```
 
-サービスAとサービスBがそれぞれトレースをCollectorに向かって送信していて、Collector内部でGKEやGoogle Cloud関連のメタデータをトレースに埋め込んでいます。
+サービスAとサービスBがそれぞれトレースをCollectorに向かって送信していて、Collector内部でGKEやGoogle Cloud関連のメタデータをトレースに埋め込んでいます。そしてCloud Trace向けのエクスポーターを使用して、Cloud Traceに送信します。
 
 Collector用の設定ファイルは次のとおりです。（デモではこの設定ファイルはKubernetesのConfigMapになっています。）
 
@@ -120,18 +120,17 @@ processors:
         detectors: [gke, gce]
         override: false
 exporters:
-    logging:
     googlecloud:
-    retry_on_failure:
-        enabled: true
-    log:
-        default_log_name: opentelemetry.io/collector-exported-log
+        retry_on_failure:
+            enabled: true
+        log:
+            default_log_name: opentelemetry.io/collector-exported-log
 service:
     pipelines:
     traces:
         receivers: [otlp]
         processors: [batch, resourcedetection]
-        exporters: [logging, googlecloud]
+        exporters: [googlecloud]
 ```
 
 この設定はどうなっているかというと次のようなパイプラインになっています。
