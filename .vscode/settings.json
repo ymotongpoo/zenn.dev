@@ -3,6 +3,6 @@
     "editor.wordWrapColumn": 80,
     "editor.wordWrap": "wordWrapColumn",
     "pasteImage.defaultName": "YYYYMMDDHHmmss",
-    "pasteImage.path": "${projectRoot}/images",
+    "pasteImage.path": "/images",
     "pasteImage.showFilePathConfirmInputBox": true
 }
