@@ -28,12 +28,16 @@ zenn.devの記事をGitHubで管理しているわけだけれども、画像の
 ```json
 {
     "pasteImage.defaultName": "YYYYMMDDHHmmss",
-    "pasteImage.path": "${projectRoot}/images",
+    "pasteImage.path": "/images",
     "pasteImage.showFilePathConfirmInputBox": true
 }
 ```
 
 ユーザー設定にしてもいいんだけども、パスとかはプロジェクトごとに違うのでひとまずワークスペース設定にしておいた。また画像ファイル名のデフォルトは日付日時によるものだけど、自分で設定したいときもあるかもしれないので、プロンプトで名前を指定する設定も入れた。
+
+Zennの場合、画像は必ずプロジェクトルートを `/` として `/images` からのパスで指定しないといけないので、この点もワークスペース固有になると思う。
+
+@[card](https://zenn.dev/zenn/articles/deploy-github-images)
 
 ### Zenn CLIをショートカットで起動
 
@@ -90,8 +94,8 @@ Zenn CLIはターミナルで起動してもたいして時間はかからない
 
 適当に `Ctrl+Shift+Meta+a` を押してみると次のようにプロンプトが開いた。デフォルト値は "hello" にしてある。
 
-![slug名のプロンプト](../images/20230117102129.png)
+![slug名のプロンプト](/images/20230117102129.png)
 
 このファイル名でそのまま設定すると設定したnpxのコマンドが無事実行されてファイルが作成された。
 
-![npxが実行される](../images/20230117102350.png)
+![npxが実行される](/images/20230117102350.png)
