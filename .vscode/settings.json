@@ -1,5 +1,8 @@
 {
     "editor.fontSize": 20,
-    "editor.wordWrapColumn": 120,
-    "editor.wordWrap": "wordWrapColumn"
+    "editor.wordWrapColumn": 80,
+    "editor.wordWrap": "wordWrapColumn",
+    "pasteImage.defaultName": "YYYYMMDDHHmmss",
+    "pasteImage.path": "${projectRoot}/images",
+    "pasteImage.showFilePathConfirmInputBox": true
 }
