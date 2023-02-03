@@ -13,6 +13,8 @@ publication_name: google_cloud_jp
 
 日本標準時間2023年2月3日でGoogle Compute Engine上でもOpsAgent経由でPrometheus形式（OpenMetrics形式）の指標を簡単に取得できるようになりました。
 
+@[card](https://cloud.google.com/blog/products/devops-sre/monitor-gce-instances-with-prometheus-and-ops-agent)
+
 @[card](https://cloud.google.com/monitoring/agent/ops-agent/prometheus)
 
 ## OpsAgentとは
