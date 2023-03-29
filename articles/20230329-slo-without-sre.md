@@ -1,5 +1,5 @@
 ---
-title: "SREでなくてもSLOを活用しよう"
+title: "SLOをもっとカジュアルに活用しよう"
 emoji: "🍣"
 type: "idea" # tech: 技術記事 / idea: アイデア
 topics: ["SLO", "SLI", "SRE", "Observability"]
