@@ -1,6 +1,6 @@
 ---
 title: "SLOをもっとカジュアルに活用しよう"
-emoji: "🍣"
+emoji: "🚥"
 type: "idea" # tech: 技術記事 / idea: アイデア
 topics: ["SLO", "SLI", "SRE", "Observability"]
 published: true
