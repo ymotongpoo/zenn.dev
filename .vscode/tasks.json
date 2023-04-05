@@ -6,7 +6,8 @@
         {
             "label": "newArticle",
             "type": "shell",
-            "command": "npx zenn new:article --slug=$(date +%Y%m%d)-${input:slug}"
+            "command": "npx zenn new:article --slug=$(date +%Y%m%d)-${input:slug}",
+            "problemMatcher": []
         }
     ],
     "inputs": [
