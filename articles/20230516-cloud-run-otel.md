@@ -3,7 +3,7 @@ title: "Cloud RunでOpenTelemetry Collectorをサイドカーとして動かす"
 emoji: "🔭"
 type: "tech" # tech: 技術記事 / idea: アイデア
 topics: ["GoogleCloud", "GCP", "CloudRun", "OpenTelemetry"]
-published: false
+published: true
 publication_name: google_cloud_jp
 ---
 
