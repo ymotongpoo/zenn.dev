@@ -25,7 +25,7 @@ Goでは計測のための仕組みとして（ `testing.B` あるいは `go tes
 
 たとえば[`runtime/metrics`](https://pkg.go.dev/runtime/metrics)は[design #37112](https://github.com/golang/proposal/blob/master/design/37112-unstable-runtime-metrics.md)で提案されてGo 1.16から導入されました。これによってランタイムのメトリクスにもとづいたプログラムの制御などが少しやりやすくなりました。
 
-そして計測というのはパフォーマンスやシステムメトリクスだけではありません。Goには様々な標準ツールがあり、そういったツールの改善を効率よく行うためには、各ツールがどういったユーザーにどれくらい使われているかを統計的に取得する必要があります。
+そして計測というのはパフォーマンスやシステムのメトリクスだけではありません。Goには様々な標準ツールがあり、そういったツールの改善を効率よく行うためには、各ツールがどういったユーザーにどれくらい使われているかを統計的に取得する必要があります。
 今日は、そうした目的に対して、新しく追加されたGo Telemetryというパッケージについて紹介します。
 
 ## Go Telemetry
@@ -40,11 +40,11 @@ Go Telemetryというパッケージをご存知でしょうか。
 
 @[card](https://telemetry.go.dev/)
 
-これはRuss Coxが2023年2月に投稿した ["Transparent Telemetry for Open-Source Projects"](https://research.swtch.com/telemetry-intro) という記事[^rsc]にあるように、OSSを改善していくためにはバグレポートだけでなく、テレメトリーが有効で必要であるという思想から推進されたパッケージです。
+これはRuss Coxが2023年2月に投稿した ["Transparent Telemetry for Open-Source Projects"](https://research.swtch.com/telemetry-intro) という記事[^rsc]にあるように、OSSを改善していくためにはバグレポートだけでなく、テレメトリーが有効で必要であるという思想から[推進された](https://github.com/golang/go/issues/58894)パッケージです。
 
 [^rsc]: [日本語で解説された記事](https://zenn.dev/a2not/articles/transparent-telemetry)があるので、興味がある人はぜひこちらも参照してください。
 
-Go Telemetryは現在、GoのLanguage Serverである[gopls](https://github.com/golang/tools/tree/master/gopls)で[実装されています](https://github.com/golang/tools/blob/gopls/v0.14.2/gopls/main.go#L27)。`gopls` v0.14.0からこのテレメトリーの収集は自動で行われていて、もし使っていれば皆さんのローカルストレージにすでにテレメトリーデータが収集されているはずです。デフォルトのテレメトリーの保存先は `os.UserConfigDir()/go/telemetry/local` なので、各環境でアクセスしてみてください。ちなみに、 [`os.UserConfigDir()`](https://pkg.go.dev/os#UserConfigDir) は次のとおりです。
+Go Telemetryは現在、GoのLanguage Serverである[gopls](https://github.com/golang/tools/tree/master/gopls)で[計装されています](https://github.com/golang/tools/blob/gopls/v0.14.2/gopls/main.go#L27)。`gopls` v0.14.0からこのテレメトリーの収集は自動で行われていて、もし使っていれば皆さんのローカルストレージにすでにテレメトリーデータが収集されているはずです。デフォルトのテレメトリーの保存先は `os.UserConfigDir()/go/telemetry/local` なので、各環境でアクセスしてみてください。ちなみに、 [`os.UserConfigDir()`](https://pkg.go.dev/os#UserConfigDir) は次のとおりです。
 
 * Linux: `$XDG_CONFIG_HOME` あるいは `$HOME/.config`
 * macOS: `$HOME/Library/Application Support`
@@ -58,7 +58,9 @@ Visual Studio Codeでアップデートの際にREADMEを注意深く読んで�
 
 > VS Code Go extension relies on the [Go Telemetry](https://telemetry.go.dev/) to learn insights about the performance and stability of the extension and the language server (`gopls`). **Go Telemetry data uploading is disabled by default** and can be enabled with the following command:
 
-というわけで、記録はされているけれど、Go teamにはまだ共有されていないことになります。ここまで読んだみなさんであれば「え、自分も協力したい！どうやったら共有できるの？」と思ったことでしょう！
+というわけで、記録はされているけれど、Go teamにはまだ共有されていないことになります。ここまで読んだみなさんであれば「え、自分も協力したい！どうやったら共有できるの？」と思ったことでしょう[^prompt]！
+
+[^prompt]: すでに[goplsから出されるプロンプト](https://github.com/golang/go/issues/62576)にしたがってopt-inしている方は以下の節をすでに実施しているかもしれません。
 
 というわけで、本原稿執筆時点でのその方法をご紹介します。
 
