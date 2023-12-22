@@ -44,13 +44,7 @@ Go Telemetryというパッケージをご存知でしょうか。
 
 [^rsc]: [日本語で解説された記事](https://zenn.dev/a2not/articles/transparent-telemetry)があるので、興味がある人はぜひこちらも参照してください。
 
-Go Telemetryは現在、GoのLanguage Serverである[gopls](https://github.com/golang/tools/tree/master/gopls)で[計装されています](https://github.com/golang/tools/blob/gopls/v0.14.2/gopls/main.go#L27)。`gopls` v0.14.0からこのテレメトリーの収集は自動で行われていて、もし使っていれば皆さんのローカルストレージにすでにテレメトリーデータが収集されているはずです。デフォルトのテレメトリーの保存先は `os.UserConfigDir()/go/telemetry/local` なので、各環境でアクセスしてみてください。ちなみに、 [`os.UserConfigDir()`](https://pkg.go.dev/os#UserConfigDir) は次のとおりです。
-
-* Linux: `$XDG_CONFIG_HOME` あるいは `$HOME/.config`
-* macOS: `$HOME/Library/Application Support`
-* Windows: `%AppData%`
-
-Visual Studio Codeでアップデートの際にREADMEを注意深く読んでいる人であれば、すでに気がついているかもしれません。
+Go Telemetryは現在、GoのLanguage Serverである[gopls](https://github.com/golang/tools/tree/master/gopls)で[計装されています](https://github.com/golang/tools/blob/gopls/v0.14.2/gopls/main.go#L27)。`gopls` v0.14.0からこのテレメトリーの収集は自動で行われていて、もし使っていればすでにテレメトリーデータが収集されているはずです。Visual Studio Codeでアップデートの際にREADMEを注意深く読んでいる人であれば、すでに気がついていたかもしれません。
 
 @[card](https://github.com/golang/vscode-go/tree/v0.40.0?tab=readme-ov-file#telemetry)
 
@@ -58,7 +52,24 @@ Visual Studio Codeでアップデートの際にREADMEを注意深く読んで�
 
 > VS Code Go extension relies on the [Go Telemetry](https://telemetry.go.dev/) to learn insights about the performance and stability of the extension and the language server (`gopls`). **Go Telemetry data uploading is disabled by default** and can be enabled with the following command:
 
-というわけで、記録はされているけれど、Go teamにはまだ共有されていないことになります。ここまで読んだみなさんであれば「え、自分も協力したい！どうやったら共有できるの？」と思ったことでしょう[^prompt]！
+というわけで、記録はされているけれど、Go teamにはまだ共有されていないことになります。じゃあどこに記録されているのかというと、皆さんのローカルストレージに記録されています。デフォルトのテレメトリーの保存先は `os.UserConfigDir()/go/telemetry/local` なので、各環境でアクセスしてみてください。ちなみに、 [`os.UserConfigDir()`](https://pkg.go.dev/os#UserConfigDir) は次のとおりです。
+
+* Linux: `$XDG_CONFIG_HOME` あるいは `$HOME/.config`
+* macOS: `$HOME/Library/Application Support`
+* Windows: `%AppData%`
+
+記録されている場合はこういったファイルが存在しています。
+
+```console
+$ ls ~/Library/Application\ Support/go/telemetry/local/
+gopls@v0.14.2-go1.21.4-darwin-arm64-2023-12-19.v1.count local.2023-11-21.json
+gopls@v0.14.2-go1.21.4-darwin-arm64-2023-12-20.v1.count local.2023-11-28.json
+gopls@v0.14.2-go1.21.4-darwin-arm64-2023-12-21.v1.count local.2023-12-05.json
+local.2023-11-07.json                                   local.2023-12-19.json
+local.2023-11-14.json                                   weekends
+```
+
+ここまで読んだみなさんであれば「え、自分も協力したい！どうやったら共有できるの？」と思ったことでしょう[^prompt]！
 
 [^prompt]: すでに[goplsから出されるプロンプト](https://github.com/golang/go/issues/62576)にしたがってopt-inしている方は以下の節をすでに実施しているかもしれません。
 
@@ -89,7 +100,14 @@ This data is collected in accordance with the Google Privacy Policy (https://pol
 To disable telemetry uploading, run “gotelemetry off”.
 ```
 
-実際に送信されるデータは、直接先に確認した `os.UserConfigDir()/go/telemetry/local` の中身を確認しても良いですが、Go Telemetryのウェブサイトと同様のUIで可視化したい場合には次のコマンドでウェブサーバーを起動して、ブラウザでアクセスしてみましょう。
+テレメトリーの送信をopt-inしたあとに、 `mode` という新しいファイルが生成されています。
+
+```console
+$ cat ~/Library/Application\ Support/go/telemetry/mode
+on 2023-11-19
+```
+
+実際に送信されるデータは、直接先に確認した `os.UserConfigDir()/go/telemetry/local` の中身を確認しても良いですが、Go Telemetryのウェブサイトと同様のUIで可視化したい場合には次のコマンドでウェブサーバーを起動して、ブラウザで `http://127.0.0.1:4040` にアクセスしてみましょう。
 
 ```console
 gotelemetry view
@@ -105,6 +123,6 @@ gotelemetry view
 
 Go teamが開発しているツールはさまざまにあります。たとえばGoのコンパイラ自体もそうですし、 `go doc` を始めとする `go` ツールや [`govulncheck`](https://pkg.go.dev/golang.org/x/vuln/cmd/govulncheck) などもそうです。
 
-今後、こういったツールでも計装が行われるようになることでしょう。ただRuss Coxが記事でも書いている通り、コミュニティではopt-inが好まれていて、これはプライバシーに関する懸念の表れでもあります。
+今後、こういったツールでも計装が行われるようになることでしょう。ただRuss Coxが記事でも書いている通り、コミュニティではopt-inが好まれていて、これはプライバシーに関する懸念の表れでもあります。導入を急いでせっかくの試みが頓挫しないよう、慎重に取り組んでいることがわかります。
 
 Go teamが課題のトリアージをしやすくしたり、バグレポートに現れない情報を得やすくするためにも、これらのテレメトリーが広く認知されて使われるようになることを期待しています。
