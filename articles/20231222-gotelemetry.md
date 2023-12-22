@@ -42,9 +42,11 @@ Go Telemetryというパッケージをご存知でしょうか。
 
 これはRuss Coxが2023年2月に投稿した ["Transparent Telemetry for Open-Source Projects"](https://research.swtch.com/telemetry-intro) という記事[^rsc]にあるように、OSSを改善していくためにはバグレポートだけでなく、テレメトリーが有効で必要であるという思想から[推進された](https://github.com/golang/go/issues/58894)パッケージです。
 
+https://www.youtube.com/watch?v=BNmxtp26I5s
+
 [^rsc]: [日本語で解説された記事](https://zenn.dev/a2not/articles/transparent-telemetry)があるので、興味がある人はぜひこちらも参照してください。
 
-Go Telemetryは現在、GoのLanguage Serverである[gopls](https://github.com/golang/tools/tree/master/gopls)で[計装されています](https://github.com/golang/tools/blob/gopls/v0.14.2/gopls/main.go#L27)。`gopls` v0.14.0からこのテレメトリーの収集は自動で行われていて、もし使っていればすでにテレメトリーデータが収集されているはずです。Visual Studio Codeでアップデートの際にREADMEを注意深く読んでいる人であれば、すでに気がついていたかもしれません。
+Go Telemetryは現在、GoのLanguage Serverである[gopls](https://github.com/golang/tools/tree/master/gopls)で[計装されています](https://github.com/golang/tools/blob/gopls/v0.14.2/gopls/main.go#L27)。`gopls` v0.40.0からこのテレメトリーの収集は自動で行われていて、もし使っていればすでにテレメトリーデータが収集されているはずです。Visual Studio Codeでアップデートの際にREADMEを注意深く読んでいる人であれば、すでに気がついていたかもしれません。
 
 @[card](https://github.com/golang/vscode-go/tree/v0.40.0?tab=readme-ov-file#telemetry)
 
