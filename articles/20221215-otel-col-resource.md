@@ -1,6 +1,6 @@
 ---
 title: "OpenTelemetry CollectorでGKEのリソース情報を自動で埋め込む"
-emoji: "📰"
+emoji: "🔭"
 type: "tech" # tech: 技術記事 / idea: アイデア
 topics: ["GoogleCloud", "GCP", "OpenTelemetry", "GKE", "CloudTrace"]
 published: true
@@ -43,17 +43,17 @@ OpenTelemetryを使いたくなる状況というのは、アプリケーショ�
 
 ```go
     ...
-	res, err := resource.New(
-		context.Background(),
-		resource.WithAttributes(
-			semconv.ServiceNameKey.String("service-a"),
-			semconv.ServiceVersionKey.String("1.0.0"),
-			semconv.DeploymentEnvironmentKey.String("production"),
-			semconv.TelemetrySDKNameKey.String("opentelemetry"),
-			semconv.TelemetrySDKLanguageKey.String("go"),
-			semconv.TelemetrySDKVersionKey.String("0.13.0"),
-		),
-	)
+ res, err := resource.New(
+  context.Background(),
+  resource.WithAttributes(
+   semconv.ServiceNameKey.String("service-a"),
+   semconv.ServiceVersionKey.String("1.0.0"),
+   semconv.DeploymentEnvironmentKey.String("production"),
+   semconv.TelemetrySDKNameKey.String("opentelemetry"),
+   semconv.TelemetrySDKLanguageKey.String("go"),
+   semconv.TelemetrySDKVersionKey.String("0.13.0"),
+  ),
+ )
     ...
 ```
 
