@@ -35,7 +35,7 @@ published_at: 2024-03-08 12:30
 
 ## エグザンプラーとは
 
-そもそもエグザンプラー（Exemplar）とは何かについて紹介すると、集約されたメトリクス（ヒストグラム、合計値、平均値、最小値、最小値など）をアノテートする何らかの標本のことをいいます。オブザーバビリティの文脈では、特徴的な標本としてトレースやエラーログなどが標本として使われます。特にメトリクスとトレースの連携が一番多いので、トレースエグザンプラーのことを代表的にエグザンプラーと呼ぶことが多いです。
+そもそもエグザンプラー（Exemplar）とは何かについて紹介すると、集約されたメトリクス（ヒストグラム、合計値、平均値、最小値、最小値など）をアノテートする何らかの標本のことをいいます。オブザーバビリティの文脈では、特徴的な標本としてトレースやエラーログなどが使われます。特にメトリクスとトレースの連携が一番多いので、トレースエグザンプラーのことを代表的にエグザンプラーと呼ぶことが多いです。
 
 Google CloudではCloud Monitoringでチャートの中に関連するトレースの情報を表示する機能があります。逆井さんがGoogle Managed Service for Prometheus (GMP)を使ってそれを試してくれた記事がありますので、興味があればそちらもご覧ください。
 
@@ -63,7 +63,7 @@ flowchart LR
 
 ## 計装
 
-計装は特に変わったことをする必要はありません。`v1.24.0` 以上のバージョンのOpenTelemetry for Goのライブラリを使ってトレースとメトリクスの計装を普通に行うだけです。するとメトリクスにトレースエグザンプラーが自動で挿入されます。今回のデモでは [`otelhttp`](https://pkg.go.dev/go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp@v0.49.0)を使っているので、メトリクスに関しては `http.server.duration`、`http.server.response.size`、`http.server.request.size` というGoのHTTPサーバーに関するメトリクスをいくつか自動で生成してる[^otelhttp]ので、メトリクスプロバイダーの設定だけしてあげれば試せます。
+計装は特に変わったことをする必要はありません。`v1.24.0` 以上のバージョンのOpenTelemetry for Goのライブラリを使ってトレースとメトリクスの計装を普通に行うだけです。するとメトリクスにトレースエグザンプラーが自動で挿入されます。今回のデモでは [`otelhttp`](https://pkg.go.dev/go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp@v0.49.0)を使っていて、メトリクスに関しては `http.server.duration`、`http.server.response.size`、`http.server.request.size` というGoのHTTPサーバーに関するメトリクスがいくつか自動で生成されている[^otelhttp]ので、メトリクスプロバイダーの設定だけしてあげれば試せます。
 
 [^otelhttp]: <https://github.com/open-telemetry/opentelemetry-go-contrib/blob/v1.24.0/instrumentation/net/http/otelhttp/common.go#L32-L37>
 
