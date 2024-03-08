@@ -3,7 +3,9 @@ title: "OpenTelemetry for Go + Cloud MonitoringでTrace Exemplarを使う"
 emoji: "🔭"
 type: "tech" # tech: 技術記事 / idea: アイデア
 topics: ["OpenTelemetry", "Metrics", "GoogleCloud", "GCP", "CloudMonitoring"]
-published: false
+published: true
+publication_name: google_cloud_jp
+published_at: 2024-03-08 12:30
 ---
 
 :::message
@@ -25,7 +27,9 @@ published: false
 
 ## TL;DR
 
-デモを用意しました。Google Cloudのアカウントがあれば割と簡単に試せるはずです。詳細はREADMEを読んでみてください。
+トレースエグザンプラーの取得をOpenTelemetryで行うデモを用意しました。Google Cloudのアカウントがあれば割と簡単に試せるはずです。ローカルやKubernetesでも動かす場合も手元での修正はそんなに難しくないと思います。
+
+詳細はREADMEを読んでみてください。
 
 @[card](https://github.com/GoogleCloudPlatform/devrel-demos/tree/trace-exemplar/devops/otel-trace-exemplar)
 
@@ -59,7 +63,7 @@ flowchart LR
 
 ## 計装
 
-計装は特に変わったことをする必要はありません。`v1.24.0` 以上のバージョンのOpenTelemetry for Goのライブラリを使ってトレースとメトリクスの計装を普通に行うだけです。今回のデモでは [`otelhttp`](https://pkg.go.dev/go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp@v0.49.0)を使っているので、メトリクスに関しては `http.server.duration`、`http.server.response.size`、`http.server.request.size`というGoのHTTPサーバーに関するメトリクスをいくつか自動で生成してる[^otelhttp]ので、メトリクスプロバイダーの設定だけしてあげれば試せます。
+計装は特に変わったことをする必要はありません。`v1.24.0` 以上のバージョンのOpenTelemetry for Goのライブラリを使ってトレースとメトリクスの計装を普通に行うだけです。今回のデモでは [`otelhttp`](https://pkg.go.dev/go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp@v0.49.0)を使っているので、メトリクスに関しては `http.server.duration`、`http.server.response.size`、`http.server.request.size` というGoのHTTPサーバーに関するメトリクスをいくつか自動で生成してる[^otelhttp]ので、メトリクスプロバイダーの設定だけしてあげれば試せます。Cloud Monitoringではメトリクス型が `DISTRIBUTION` のものだけエグザンプラーに対応しているので、ここでは `http.server.duration` を見てあげてください。
 
 [^otelhttp]: <https://github.com/open-telemetry/opentelemetry-go-contrib/blob/v1.24.0/instrumentation/net/http/otelhttp/common.go#L32-L37>
 
@@ -107,10 +111,22 @@ spec:
 
 ## 試してみる
 
-早速デプロイして、継続的にリクエストしてメトリクスとトレースを生成し続けてみると、Cloud Monitoringで次のようにヒストグラムを可視化したヒートマップ内にトレースの標本を表す点が表示されるようになりました。
+早速デプロイして、継続的にリクエストしてメトリクスとトレースを生成し続けてみると、Cloud Monitoringで次のようにヒストグラムを可視化したヒートマップ内にトレースの標本を表す点が表示されるようになりました[^mr]。
+
+[^mr]: メトリクスを探すときは `workload.googleapis.com/http.server.duration` で検索すると、 Generic Task のモニタードリソース内に見つかります。
 
 ![Cloud Monitoringのヒートマップ](/images/20240306153300.png)
 
 この点をダブルクリックすると右からトレースのウォータフォールチャートがスライドして見れました。
 
 ![トレースのウォータフォールチャート](/images/20240306153600.png)
+
+## おわりに
+
+オブザーバビリティにおいて重要な点としてテレメトリーシグナル同士の相関（correlation）があります。Cloud MonitoringやPrometheus以外のモニタリングSaaSでもエグザンプラーはサポートされていると思いますので、ぜひ試してみてください。
+
+## 補足
+
+この記事を書いている最中に `googlecloud` エクスポーターのバグで `int64` のメトリクスにエグザンプラーがちゃんとアノテートされない問題を発見してしまったのですが、報告して無事に解決したので、次の `googlecloud` エクスポーターのリリースで修正が入ると思います。
+
+@[card](https://github.com/GoogleCloudPlatform/opentelemetry-operations-go/pull/810)
