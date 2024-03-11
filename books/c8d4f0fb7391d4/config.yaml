@@ -1,9 +1,0 @@
-title: "PropErではじめる属性テスト 付録:Hypothesis"
-summary: "書籍「Property-Based Testing with PropEr, Erlang, and Elixir」の日本語訳「PropErではじめる属性テスト」の内容をPython版の属性テストツールであるHypothesisで履修するための付録です。"
-topics: ["PropertyBasedTesting", "PBT", "テスト", "ファジング"]
-published: false
-price: 0 # 有料の場合200〜5000
-# 本に含めるチャプターを順番に並べましょう
-chapters:
-  - foundations
-  - writing-properties
