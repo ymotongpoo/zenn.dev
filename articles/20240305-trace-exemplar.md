@@ -31,7 +31,7 @@ published_at: 2024-03-08 12:30
 
 詳細はREADMEを読んでみてください。
 
-@[card](https://github.com/GoogleCloudPlatform/devrel-demos/tree/trace-exemplar/devops/otel-trace-exemplar)
+@[card](https://github.com/GoogleCloudPlatform/devrel-demos/tree/main/devops/otel-trace-exemplar)
 
 ## エグザンプラーとは
 
