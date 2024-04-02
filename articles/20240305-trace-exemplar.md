@@ -173,8 +173,14 @@ Exemplar #3
 
 オブザーバビリティにおいて重要な点としてテレメトリーシグナル同士の相関（correlation）があります。Cloud MonitoringやPrometheus以外のモニタリングSaaSでもエグザンプラーはサポートされていると思いますので、ぜひ試してみてください。
 
-## 補足
+## 補足1 2024.03.08
 
 この記事を書いている最中に `googlecloud` エクスポーターのバグで `int64` のメトリクスにエグザンプラーがちゃんとアノテートされない問題を発見してしまったのですが、報告して無事に解決したので、次の `googlecloud` エクスポーターのリリースで修正が入ると思います。
 
 @[card](https://github.com/GoogleCloudPlatform/opentelemetry-operations-go/pull/810)
+
+## 補足2 2024.04.02
+
+これらの修正が入ったバージョン（v0.46.0）のエクスポーターがcontribレポジトリーの方でも取り込まれました。
+
+@[card](https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/exporter/googlecloudexporter)
