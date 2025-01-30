@@ -1,5 +1,5 @@
 ---
-title: "（オープン）手動計装をしないテレメトリー"
+title: "OTEP-0001: （オープン）手動計装をしないテレメトリー"
 topics: ["otel", "OpenTelemetry"]
 published: true
 revision: 02531b0
