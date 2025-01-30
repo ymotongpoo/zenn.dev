@@ -1,5 +1,5 @@
 ---
-title: "グローバルなSDKの初期化"
+title: "OTEP-0005: グローバルなSDKの初期化"
 topics: ["otel", "OpenTelemetry"]
 published: true
 revision: 8469f08
