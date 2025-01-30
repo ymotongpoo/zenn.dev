@@ -5,7 +5,7 @@ published: true
 revision: 8469f08
 ---
 
-# Global SDK initialization
+# OTEP-0005: グローバルなSDKの初期化
 
 **ステータス**: 提案中
 
