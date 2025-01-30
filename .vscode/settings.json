@@ -4,5 +4,6 @@
     "editor.wordWrap": "wordWrapColumn",
     "pasteImage.defaultName": "YYYYMMDDHHmmss",
     "pasteImage.path": "../images",
-    "pasteImage.showFilePathConfirmInputBox": true
+    "pasteImage.showFilePathConfirmInputBox": true,
+    "vscodemacros.macroFilePath": "'{HOME}/personal/vscodemacros/macros.js'"
 }
