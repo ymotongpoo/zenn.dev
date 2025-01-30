@@ -1,10 +1,8 @@
 title: "オブザーバビリティ概要"
 summary: "オブザーバビリティおよびその周辺知識を整理する"
 topics: ["observability", "sre", "slo", "alert"]
-slug: "observability-overview"
 published: false
 price: 2000 # 有料の場合200〜5000
 # 本に含めるチャプターを順番に並べましょう
 chapters:
   - toc
-  - example2
