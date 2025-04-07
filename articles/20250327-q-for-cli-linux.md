@@ -1,5 +1,5 @@
 ---
-title: "Amazon Q for command lineをLinux上のVS Codeで使ったら捗る"
+title: "Amazon Q Developer for CLIをLinux上のVS Codeで使ったら捗る"
 emoji: "💻️"
 type: "tech" # tech: 技術記事 / idea: アイデア
 topics: ["amazonq", "awscli", "AWS", "AI", "VSCode"]
