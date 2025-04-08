@@ -1,6 +1,6 @@
 ---
 title: "Amazon Q Developer for CLIをLinux上のVS Codeで使ったら捗る"
-emoji: "💻️"
+emoji: "🤖"
 type: "tech" # tech: 技術記事 / idea: アイデア
 topics: ["amazonq", "awscli", "AWS", "AI", "VSCode"]
 published: true
