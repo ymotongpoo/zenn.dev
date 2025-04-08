@@ -3,7 +3,7 @@ title: "Amazon Q Developer for CLIでプロファイルとコンテキストの�
 emoji: "🤖"
 type: "tech" # tech: 技術記事 / idea: アイデア
 topics: ["amazonq", "awscli", "AWS", "AI"]
-published: false
+published: true
 ---
 
 ## はじめに
