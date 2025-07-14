@@ -16,16 +16,16 @@ published: true
 
 ## 必要なObsidianプラグインのインストール
 
-ObisidianをMCPサーバーして使うにはいくつか方法がありますが、Obisidianのコミュニティプラグインの[MCP Tools](https://github.com/jacksteamdev/obsidian-mcp-tools)を使うのが簡単です。（直接Obisidianの画面に飛ぶなら[ここから](obsidian://show-plugin?id=mcp-tools)）
+ObisidianをMCPサーバーして使うにはいくつか方法がありますが、Obisidianのコミュニティプラグインの[MCP Tools](https://github.com/jacksteamdev/obsidian-mcp-tools)を使うのが簡単です。（直接ObisidianのプラグインIDはmcp-tools）
 
 これをインストールするための準備として、まず以下の3つのコミュニティプラグインをインストールします。
 
-* [Local REST API](https://github.com/coddingtonbear/obsidian-local-rest-api)　（[Obsidianの共有リンク](obsidian://show-plugin?id=obsidian-local-rest-api)）
-* [Smart Connections](https://github.com/brianpetro/obsidian-smart-connections) （[Obsidianの共有リンク](obsidian://show-plugin?id=smart-connections)）
-* [Templater（オプション）](https://github.com/SilentVoid13/Templater)（[Obsidianの共有リンク](obsidian://show-plugin?id=templater-obsidian)）
+* [Local REST API](https://github.com/coddingtonbear/obsidian-local-rest-api)　（id: obsidian-local-rest-api）
+* [Smart Connections](https://github.com/brianpetro/obsidian-smart-connections) （id: smart-connections）
+* [Templater（オプション）](https://github.com/SilentVoid13/Templater)（id: templater-obsidian）
 
 これらをインストールして、有効化します。Templaterはインストールしなくても使えます。
-これらのインストールが完了したら、次に[MCP Tools](obsidian://show-plugin?id=mcp-tools)をインストールして、有効化します。
+これらのインストールが完了したら、次に"MCP Tools" (id: mcp-tools)をインストールして、有効化します。
 
 ![MCP Toolsの設定画面](/images/20250714-1.png)
 
