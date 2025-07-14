@@ -34,7 +34,7 @@ ObisidianをMCPサーバーして使うにはいくつか方法があります�
 ## Amazon Q Developer CLIでのMCPサーバーの設定
 
 これでObsidian側のMCPサーバー化の設定は終わったので、次はAmazon Q Developer CLIから呼び出します。
-上のMCP Toolsの設定のスクリーンショットにある、Resourcesセクションの「Server install folder」をクリックすると、FinderでMCPサーバーの実行用ツールのパスを開いてくれるのでこれをメモしておきます（おそらく `/Users/<ユーザー名>/<Vault名>/.obsidian/plugins/mcp-tools/bin/mcp-server` となっている）。
+上のMCP Toolsの設定のスクリーンショットにある、Resourcesセクションの「Server install folder」をクリックすると、FinderでMCPサーバーの実行用ツールのパスを開いてくれるのでこれをメモしておきます（おそらく `/path/to/vault/.obsidian/plugins/mcp-tools/bin/mcp-server` となっている）。
 
 次にLocal REST APIのプラグインの設定画面にあるAPIキーをコピーします（下のスクリーンショットの中の赤くマスクしたところの値です）。
 ![Local REST APIの設定画面](/images/20250714-2.png)
