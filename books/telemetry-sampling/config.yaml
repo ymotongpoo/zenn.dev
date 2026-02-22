@@ -1,0 +1,13 @@
+title: "実践 テレメトリーシグナルサンプリング"
+summary: "オブザーバビリティを獲得し、テレメトリーシグナルを活用する中で、テレメトリーの保存がコスト面、運用面で課題となります。その解決のためにテレメトリーシグナルのサンプリングを実施することになりますが、目的に沿った手法を行わないとせっかくのテレメトリーが活用できません。本書ではサンプリング（アグリゲーション）に焦点を当て、各サンプリング手法を解説します。"
+topics: ["observability", "sampling", "telemetr", "trace", "metric"]
+published: false
+price: 0 # 有料の場合200〜5000
+# 本に含めるチャプターを順番に並べましょう
+chapters:
+  - 00-why_sampling
+  - 10-glossary
+  - 20-implementing_with_otel
+  - 30-advanced_sampling
+  - 40-case_study
+  - 99-checklist
