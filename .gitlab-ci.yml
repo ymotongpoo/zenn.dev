@@ -12,7 +12,7 @@ build:telemetry-sampling:
   script:
     - cd books/telemetry-sampling
     - |
-      chapters=$(yq eval '.chapters[]' config.yaml | sed 's/^//' | sed 's/$/.md/')
+      chapters=$(yq eval '.chapters[]' config.yaml | sed 's/$/.md/')
       pandoc $chapters -o telemetry-sampling.pdf \
         --pdf-engine=xelatex \
         -V CJKmainfont="Noto Sans CJK JP" \
