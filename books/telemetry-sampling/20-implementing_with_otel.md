@@ -175,7 +175,7 @@ export OTEL_TRACES_SAMPLER_ARG="0.1"
 ### 2. 仕分け層（Load Balancing Exporter）
 
 テイルサンプリングを成功させるための「鍵」となる層です。OpenTelemetry Collectorの `loadbalancingexporter` を使用します。
-テイルサンプリングを行うためには、**同じTrace IDを持つすべてのスパンが、同じ判定用のCollectorノードに到達する** 必要があります。`loadbalancingexporter` はTrace IDに基づいたコンシステント・ハッシュを使用して、特定のトレースを特定のノードへ確実にルーティングします。
+テイルサンプリングを行うためには、**同じTrace IDを持つすべてのスパンが、同じ判定用のCollectorノードに到達する** 必要があります。`loadbalancingexporter` はTrace IDに基づいたコンシステントハッシュを使用して、特定のトレースを特定のノードへ確実にルーティングします。
 
 ### 3. 判定層（Tail Sampling Processor）
 
@@ -584,7 +584,7 @@ Gateway層では、`filter` processorによるノイズ除去と`spanmetrics` co
 
 仕分け層については、テイルサンプリングの成否を左右する重要な層であるため、次節で詳しく解説します。
 
-#### 仕分け層とコンシステント・ハッシュ
+#### 仕分け層とコンシステントハッシュ
 
 テイルサンプリングが正しく機能するためには、同じTrace IDを持つすべてのスパンが、同じ判定層ノードに集約される必要があります。1つのトレースを構成するスパンが複数の判定層ノードに分散してしまうと、各ノードはトレースの一部しか見えず、正確なサンプリング判定ができません。
 
@@ -608,11 +608,11 @@ OTLPでは、1回のgRPC/HTTPリクエストの中に複数のスパンがバッ
 
 `loadbalancing` exporterは、OTLPのペイロードを解析し、バッチ内のスパンをTrace IDごとに分解してから、各Trace IDに対応する判定層ノードにルーティングします。つまり、1つの受信バッチを複数の送信バッチに再構成するという、テレメトリーデータの構造を理解したルーティングを行います。これは汎用ロードバランサーには実現できない、OTel Collector固有の機能です。
 
-##### コンシステント・ハッシュの仕組み
+##### コンシステントハッシュの仕組み
 
-`loadbalancing` exporterは、Trace IDごとのルーティング先をコンシステント・ハッシュ（Consistent Hashing）[^consistent-hashing]によって決定しています。
+`loadbalancing` exporterは、Trace IDごとのルーティング先をコンシステントハッシュ（Consistent Hashing）[^consistent-hashing]によって決定しています。
 
-コンシステント・ハッシュは、分散システムにおいてデータを複数のノードに均等に振り分けるためのアルゴリズムです。通常のハッシュ（`hash(key) mod N`）では、ノード数 $N$ が変わるとほぼすべてのキーの割り当て先が変わってしまいます。コンシステント・ハッシュでは、ノードの追加・削除時に再配置されるキーの数を最小限に抑えられます。
+コンシステントハッシュは、分散システムにおいてデータを複数のノードに均等に振り分けるためのアルゴリズムです。通常のハッシュ（`hash(key) mod N`）では、ノード数 $N$ が変わるとほぼすべてのキーの割り当て先が変わってしまいます。コンシステントハッシュでは、ノードの追加・削除時に再配置されるキーの数を最小限に抑えられます。
 
 動作の概要は以下のとおりです。
 
@@ -627,9 +627,9 @@ OTLPでは、1回のgRPC/HTTPリクエストの中に複数のスパンがバッ
 
 図のとおり、仕分け層のCollectorは複数台で構成されています。ここで疑問になるのは、「仕分け層のCollector #1に届いたスパンと、Collector #2に届いたスパンが、同じTrace IDであれば同じ判定層ノードに送られるのか」という点です。
 
-答えは「送られる」です。コンシステント・ハッシュは純粋な関数であり、同じ入力（Trace ID）と同じノードリスト（判定層のアドレス一覧）が与えられれば、どの仕分け層Collectorで計算しても同じ出力（ルーティング先）を返します。
+答えは「送られる」です。コンシステントハッシュは純粋な関数であり、同じ入力（Trace ID）と同じノードリスト（判定層のアドレス一覧）が与えられれば、どの仕分け層Collectorで計算しても同じ出力（ルーティング先）を返します。
 
-`loadbalancing` exporterは、判定層ノードの一覧をDNS解決（またはKubernetesのService Discovery）で取得します。すべての仕分け層Collectorが同じDNSエントリを参照するため、同じノードリストを持ちます。したがって、あるTrace IDのスパンがどの仕分け層Collectorに到着しても、コンシステント・ハッシュの計算結果は同一となり、同じ判定層ノードにルーティングされます。
+`loadbalancing` exporterは、判定層ノードの一覧をDNS解決（またはKubernetesのService Discovery）で取得します。すべての仕分け層Collectorが同じDNSエントリを参照するため、同じノードリストを持ちます。したがって、あるTrace IDのスパンがどの仕分け層Collectorに到着しても、コンシステントハッシュの計算結果は同一となり、同じ判定層ノードにルーティングされます。
 
 ```yaml
 # 仕分け層のCollector設定例
@@ -652,7 +652,7 @@ exporters:
         port: 4317
 ```
 
-[^consistent-hashing]: David Karger et al., "Consistent Hashing and Random Trees: Distributed Caching Protocols for Relieving Hot Spots on the World Wide Web," Proceedings of the 29th Annual ACM Symposium on Theory of Computing (STOC '97), 1997, pp.654-663. コンシステント・ハッシュの原論文。`loadbalancing` exporterの実装については <https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/exporter/loadbalancingexporter> を参照。
+[^consistent-hashing]: David Karger et al., "Consistent Hashing and Random Trees: Distributed Caching Protocols for Relieving Hot Spots on the World Wide Web," Proceedings of the 29th Annual ACM Symposium on Theory of Computing (STOC '97), 1997, pp.654-663. コンシステントハッシュの原論文。`loadbalancing` exporterの実装については <https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/exporter/loadbalancingexporter> を参照。
 
 #### 利点と制約
 
@@ -660,7 +660,7 @@ exporters:
 
 一方で、3層構造の運用は複雑になります。判定層のメモリ管理（`decision_wait`と`num_traces`の調整）、仕分け層のハッシュ分散の均一性、Gateway層のスループットなど、各層のチューニングが必要です。また、`decision_wait`の分だけデータの到着に遅延が生じます。
 
-判定層のノード追加・削除時には、コンシステント・ハッシュの再配置が発生します。再配置中は一部のTrace IDのルーティング先が変わるため、一時的にトレースの分断が起こりえます。この影響を最小化するには、ノード変更をトラフィックの少ない時間帯に行い、`decision_wait`の2倍程度の間隔を空けて段階的に実施するのが望ましいです。
+判定層のノード追加・削除時には、コンシステントハッシュの再配置が発生します。再配置中は一部のTrace IDのルーティング先が変わるため、一時的にトレースの分断が起こりえます。この影響を最小化するには、ノード変更をトラフィックの少ない時間帯に行い、`decision_wait`の2倍程度の間隔を空けて段階的に実施するのが望ましいです。
 
 ### パターンの選択指針
 
@@ -742,7 +742,7 @@ $$
 
 #### ノード追加時の注意点
 
-`loadbalancing` exporterはコンシステント・ハッシュを使用しているため、ノードの追加・削除時にTrace IDの再分散が発生します。再分散中は、同じTrace IDのスパンが異なるノードに送信される可能性があり、一時的にサンプリング判定の精度が低下します。
+`loadbalancing` exporterはコンシステントハッシュを使用しているため、ノードの追加・削除時にTrace IDの再分散が発生します。再分散中は、同じTrace IDのスパンが異なるノードに送信される可能性があり、一時的にサンプリング判定の精度が低下します。
 
 この影響を最小化するために、以下の点に注意します。
 
