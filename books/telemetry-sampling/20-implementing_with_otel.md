@@ -652,6 +652,8 @@ exporters:
         port: 4317
 ```
 
+[^consistent-hashing]: David Karger et al., "Consistent Hashing and Random Trees: Distributed Caching Protocols for Relieving Hot Spots on the World Wide Web," Proceedings of the 29th Annual ACM Symposium on Theory of Computing (STOC '97), 1997, pp.654-663. コンシステント・ハッシュの原論文。`loadbalancing` exporterの実装については <https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/exporter/loadbalancingexporter> を参照。
+
 #### 利点と制約
 
 この構成の利点は、トレース全体の情報に基づく高度なサンプリング判定が可能な点です。エラートレースの100%保持、レイテンシ閾値に基づく保持、特定サービスのトレース優先保持など、柔軟なポリシーを設定できます。また、`spanmetrics` connectorにより、サンプリング前の全量データに基づくメトリクスも確保できます。
