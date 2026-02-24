@@ -453,7 +453,7 @@ $$
 
 サンプリングされたトレースは、レイテンシの統計量を計算するためではなく、個別のリクエストの詳細な分析（どのスパンがボトルネックか、どのサービス間の呼び出しが遅いか）に使用します。
 
-#### 監視クエリ例
+#### モニタリングクエリ例
 
 ```promql
 # P50レイテンシ（spanmetricsconnectorで生成したヒストグラムから算出）
@@ -484,7 +484,7 @@ sum(rate(traces_duration_count{service_name="api-gateway"}[5m])) by (http_route)
 
 2つ目は、サンプリングされたトレースからサンプリング率の逆数を用いて復元する方法です。前節の統計量復元の手法を適用します。
 
-#### 監視クエリ例
+#### モニタリングクエリ例
 
 ```promql
 # 秒あたりのリクエスト数（spanmetricsconnectorのカウンターから算出）
@@ -507,7 +507,7 @@ sum(rate(traces_calls_total{service_name="api-gateway"}[5m])) by (http_response_
 
 エラー率の計算には、`spanmetricsconnector` で生成したメトリクスを使用します。`status.code` ラベルでエラーと成功を区別できるため、正確なエラー率を算出できます。
 
-#### 監視クエリ例
+#### モニタリングクエリ例
 
 ```promql
 # エラー率（spanmetricsconnectorのカウンターから算出）
@@ -534,7 +534,7 @@ sum(rate(traces_calls_total{http_response_status_code=~"5.."}[5m])) by (http_res
 
 特にテイルサンプリングの判定層では、`decision_wait` の間トレースデータをメモリに保持するため、メモリ使用量の監視が重要です。
 
-#### 監視クエリ例
+#### モニタリングクエリ例
 
 ```promql
 # Collectorのメモリ使用率
@@ -668,4 +668,4 @@ OpenTelemetry Collectorによる自前実装と、ベンダーが提供するサ
 [^elastic-tail]: Elastic, "Tail-based sampling", <https://www.elastic.co/guide/en/observability/current/tail-based-samling-config.html>
 [^xray-sampling]: AWS, "Configuring sampling rules", <https://docs.aws.amazon.com/xray/latest/devguide/xray-console-sampling.html>
 
-サンプリングは単なるデータ削減手段ではなく、監視のニーズに合わせて「情報の密度」を最適化する戦略なのです。
+サンプリングは単なるデータ削減手段ではなく、モニタリングのニーズに合わせて「情報の密度」を最適化する戦略なのです。
