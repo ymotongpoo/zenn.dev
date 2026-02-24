@@ -16,22 +16,6 @@ OpenTelemetry（OTel）におけるサンプリングは、アプリケーショ
 ### Python
 
 ```python
-# Copyright 2026 Yoshi Yamaguchi <ymotongpoo@gmail.com>
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-#
-# SPDX-License-Identifier: Apache-2.0
-
 from opentelemetry import trace
 from opentelemetry.sdk.trace import TracerProvider
 from opentelemetry.sdk.trace.sampling import (
@@ -70,22 +54,6 @@ trace.set_tracer_provider(provider)
 ### Go
 
 ```go
-// Copyright 2026 Yoshi Yamaguchi <ymotongpoo@gmail.com>
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-//
-// SPDX-License-Identifier: Apache-2.0
-
 package main
 
 import (
@@ -140,22 +108,6 @@ func initTracer() func() {
 ### Java
 
 ```java
-// Copyright 2026 Yoshi Yamaguchi <ymotongpoo@gmail.com>
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-//
-// SPDX-License-Identifier: Apache-2.0
-
 import io.opentelemetry.api.OpenTelemetry;
 import io.opentelemetry.api.trace.Tracer;
 import io.opentelemetry.exporter.otlp.trace.OtlpGrpcSpanExporter;
@@ -214,7 +166,7 @@ export OTEL_TRACES_SAMPLER_ARG="0.1"
 
 ## テイルサンプリングの3層構造（実践的設計）
 
-大規模な分散システムでテイルサンプリングを確実に行うためには、単一のCollectorではリソースや可用性の面で限界があります。そのため、通常は以下の **3層構造** のアーキテクチャを採用します。
+大規模な分散システムでテイルサンプリングを確実に行うためには、単一のCollectorではリソースや可用性の面で限界があります。そのため、通常は以下の3層構造のアーキテクチャを採用します。
 
 ### 1. Gateway層（トラフィックの集約）
 
@@ -569,6 +521,8 @@ graph LR
 
 前節で解説した3層構造を用いた、テイルサンプリングの構成です。エラーやレイテンシなどトレース全体の特徴に基づいたサンプリング判定が可能になります。
 
+各層は単一障害点（SPoF）を避けるために複数台で構成します。特に仕分け層は、1台に障害が発生してもトレースデータの流入が途絶えないよう、冗長化が必要です。
+
 ```mermaid
 graph LR
     subgraph アプリケーション群
@@ -579,10 +533,12 @@ graph LR
 
     subgraph "Gateway層"
         G1["OTel Collector<br/>(filter processor<br/>+ spanmetrics<br/>connector)"]
+        G2["OTel Collector<br/>(filter processor<br/>+ spanmetrics<br/>connector)"]
     end
 
     subgraph "仕分け層"
-        L1["OTel Collector<br/>(loadbalancing<br/>exporter)"]
+        L1["OTel Collector #1<br/>(loadbalancing<br/>exporter)"]
+        L2["OTel Collector #2<br/>(loadbalancing<br/>exporter)"]
     end
 
     subgraph "判定層"
@@ -598,12 +554,17 @@ graph LR
 
     A1 -->|"全トレース"| G1
     A2 -->|"全トレース"| G1
-    A3 -->|"全トレース"| G1
+    A3 -->|"全トレース"| G2
     G1 -->|"フィルタ済み<br/>トレース"| L1
+    G2 -->|"フィルタ済み<br/>トレース"| L2
     G1 -->|"全量メトリクス"| B2
+    G2 -->|"全量メトリクス"| B2
     L1 -->|"Trace ID<br/>ハッシュ分散"| T1
     L1 -->|"Trace ID<br/>ハッシュ分散"| T2
     L1 -->|"Trace ID<br/>ハッシュ分散"| T3
+    L2 -->|"Trace ID<br/>ハッシュ分散"| T1
+    L2 -->|"Trace ID<br/>ハッシュ分散"| T2
+    L2 -->|"Trace ID<br/>ハッシュ分散"| T3
     T1 -->|"サンプリング済み"| B1
     T2 -->|"サンプリング済み"| B1
     T3 -->|"サンプリング済み"| B1
@@ -617,17 +578,69 @@ graph LR
 
 #### 各層の役割
 
-Gateway層では、`filter` processorによるノイズ除去と`spanmetrics` connectorによる全量メトリクスの生成を行います。SDKは`AlwaysOn`（全量送信）に設定し、サンプリング判定はCollector側に委ねます。
-
-仕分け層では、`loadbalancing` exporterがTrace IDのコンシステント・ハッシュに基づいて、同じTrace IDを持つすべてのスパンを同じ判定層ノードにルーティングします。
+Gateway層では、`filter` processorによるノイズ除去と`spanmetrics` connectorによる全量メトリクスの生成を行います。SDKは`AlwaysOn`（全量送信）に設定し、サンプリング判定はCollector側に委ねます。Gateway層もロードバランサーの背後に複数台配置し、可用性を確保します。
 
 判定層では、`tail_sampling` processorが定義されたポリシーに従ってサンプリング判定を行います。判定層は水平スケールが可能で、トラフィック量に応じてノード数を増減できます。
+
+仕分け層については、テイルサンプリングの成否を左右する重要な層であるため、次節で詳しく解説します。
+
+#### 仕分け層とコンシステント・ハッシュ
+
+テイルサンプリングが正しく機能するためには、同じTrace IDを持つすべてのスパンが、同じ判定層ノードに集約される必要があります。1つのトレースを構成するスパンが複数の判定層ノードに分散してしまうと、各ノードはトレースの一部しか見えず、正確なサンプリング判定ができません。
+
+仕分け層の`loadbalancing` exporterは、この要件をコンシステント・ハッシュ（Consistent Hashing）[^consistent-hashing]によって実現しています。
+
+##### コンシステント・ハッシュの仕組み
+
+コンシステント・ハッシュは、分散システムにおいてデータを複数のノードに均等に振り分けるためのアルゴリズムです。通常のハッシュ（`hash(key) mod N`）では、ノード数 $N$ が変わるとほぼすべてのキーの割り当て先が変わってしまいます。コンシステント・ハッシュでは、ノードの追加・削除時に再配置されるキーの数を最小限に抑えられます。
+
+動作の概要は以下のとおりです。
+
+1. ハッシュ空間を論理的なリング（0〜$2^{32}-1$の円環）として扱う
+2. 各判定層ノードのアドレスをハッシュ関数に通し、リング上の位置を決定する
+3. ルーティング対象のTrace IDをハッシュ関数に通し、リング上の位置を決定する
+4. Trace IDの位置からリングを時計回りに探索し、最初に見つかったノードにルーティングする
+
+この仕組みにより、判定層のノードが追加・削除された場合でも、影響を受けるのはリング上で隣接するノードが担当していたTrace IDの一部だけです。たとえば判定層が3ノードから4ノードに増えた場合、再配置されるTrace IDは全体の約25%（$1/4$）に留まります。
+
+##### 仕分け層が複数台でも正しく動作する理由
+
+図のとおり、仕分け層のCollectorは複数台で構成されています。ここで疑問になるのは、「仕分け層のCollector #1に届いたスパンと、Collector #2に届いたスパンが、同じTrace IDであれば同じ判定層ノードに送られるのか」という点です。
+
+答えは「送られる」です。コンシステント・ハッシュは純粋な関数であり、同じ入力（Trace ID）と同じノードリスト（判定層のアドレス一覧）が与えられれば、どの仕分け層Collectorで計算しても同じ出力（ルーティング先）を返します。
+
+`loadbalancing` exporterは、判定層ノードの一覧をDNS解決（またはKubernetesのService Discovery）で取得します。すべての仕分け層Collectorが同じDNSエントリを参照するため、同じノードリストを持ちます。したがって、あるTrace IDのスパンがどの仕分け層Collectorに到着しても、コンシステント・ハッシュの計算結果は同一となり、同じ判定層ノードにルーティングされます。
+
+```yaml
+# 仕分け層のCollector設定例
+# すべての仕分け層Collectorで同一の設定を使用する。
+exporters:
+  loadbalancing:
+    routing_key: "traceID"
+    protocol:
+      otlp:
+        timeout: 1s
+        tls:
+          insecure: true
+    resolver:
+      dns:
+        # すべての仕分け層CollectorがこのDNSエントリを参照する。
+        # Headless Serviceにより、判定層の全Podアドレスが返される。
+        # どの仕分け層Collectorでも同じノードリストが得られるため、
+        # 同じTrace IDは必ず同じ判定層ノードにルーティングされる。
+        hostname: otel-tail-sampler-headless.observability.svc.cluster.local
+        port: 4317
+```
+
+[^consistent-hashing]: David Karger et al., "Consistent Hashing and Random Trees: Distributed Caching Protocols for Relieving Hot Spots on the World Wide Web," Proceedings of the 29th Annual ACM Symposium on Theory of Computing (STOC '97), 1997, pp.654-663. コンシステント・ハッシュの原論文。`loadbalancing` exporterの実装については <https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/exporter/loadbalancingexporter> を参照。
 
 #### 利点と制約
 
 この構成の利点は、トレース全体の情報に基づく高度なサンプリング判定が可能な点です。エラートレースの100%保持、レイテンシ閾値に基づく保持、特定サービスのトレース優先保持など、柔軟なポリシーを設定できます。また、`spanmetrics` connectorにより、サンプリング前の全量データに基づくメトリクスも確保できます。
 
 一方で、3層構造の運用は複雑になります。判定層のメモリ管理（`decision_wait`と`num_traces`の調整）、仕分け層のハッシュ分散の均一性、Gateway層のスループットなど、各層のチューニングが必要です。また、`decision_wait`の分だけデータの到着に遅延が生じます。
+
+判定層のノード追加・削除時には、コンシステント・ハッシュの再配置が発生します。再配置中は一部のTrace IDのルーティング先が変わるため、一時的にトレースの分断が起こりえます。この影響を最小化するには、ノード変更をトラフィックの少ない時間帯に行い、`decision_wait`の2倍程度の間隔を空けて段階的に実施するのが望ましいです。
 
 ### パターンの選択指針
 
