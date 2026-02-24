@@ -588,9 +588,29 @@ Gateway層では、`filter` processorによるノイズ除去と`spanmetrics` co
 
 テイルサンプリングが正しく機能するためには、同じTrace IDを持つすべてのスパンが、同じ判定層ノードに集約される必要があります。1つのトレースを構成するスパンが複数の判定層ノードに分散してしまうと、各ノードはトレースの一部しか見えず、正確なサンプリング判定ができません。
 
-仕分け層の`loadbalancing` exporterは、この要件をコンシステント・ハッシュ（Consistent Hashing）[^consistent-hashing]によって実現しています。
+##### なぜ汎用ロードバランサーでは不十分なのか
+
+「判定層の前にEnvoyやNginxなどの汎用ロードバランサーを置けばよいのでは」と考えるかもしれません。しかし、汎用ロードバランサーではテイルサンプリングに必要なルーティングを実現できません。その理由を理解するには、OTLPのデータ構造を知る必要があります。
+
+OTLPでは、1回のgRPC/HTTPリクエストの中に複数のスパンがバッチとしてまとめて送信されます。たとえば、あるサービスのSDKが`BatchSpanProcessor`を使用している場合、一定時間内に生成された複数のスパンが1つのリクエストにまとめられます。このバッチの中には、異なるTrace IDを持つスパンが混在しています。
+
+```text
+1つのOTLPリクエスト（バッチ）:
+├── スパンA (Trace ID: abc123)
+├── スパンB (Trace ID: def456)  ← 別のトレース
+├── スパンC (Trace ID: abc123)  ← スパンAと同じトレース
+└── スパンD (Trace ID: ghi789)  ← さらに別のトレース
+```
+
+汎用ロードバランサーはリクエスト単位でルーティングを行います。ラウンドロビンやランダム、あるいはリクエストヘッダに基づくルーティングは可能ですが、リクエストのペイロード（ボディ）の中身を解析して、スパンごとに異なる宛先に振り分けることはできません。つまり、上記のバッチ全体が1つの判定層ノードに送られるか、あるいはリクエスト単位で別のノードに送られるかのどちらかです。
+
+後者の場合、Trace ID `abc123` のスパンAを含むバッチがノード1に、別のリクエストに含まれるTrace ID `abc123` の別のスパンがノード2に送られる可能性があります。これではトレースが分断されてしまいます。
+
+`loadbalancing` exporterは、OTLPのペイロードを解析し、バッチ内のスパンをTrace IDごとに分解してから、各Trace IDに対応する判定層ノードにルーティングします。つまり、1つの受信バッチを複数の送信バッチに再構成するという、テレメトリーデータの構造を理解したルーティングを行います。これは汎用ロードバランサーには実現できない、OTel Collector固有の機能です。
 
 ##### コンシステント・ハッシュの仕組み
+
+`loadbalancing` exporterは、Trace IDごとのルーティング先をコンシステント・ハッシュ（Consistent Hashing）[^consistent-hashing]によって決定しています。
 
 コンシステント・ハッシュは、分散システムにおいてデータを複数のノードに均等に振り分けるためのアルゴリズムです。通常のハッシュ（`hash(key) mod N`）では、ノード数 $N$ が変わるとほぼすべてのキーの割り当て先が変わってしまいます。コンシステント・ハッシュでは、ノードの追加・削除時に再配置されるキーの数を最小限に抑えられます。
 
@@ -631,8 +651,6 @@ exporters:
         hostname: otel-tail-sampler-headless.observability.svc.cluster.local
         port: 4317
 ```
-
-[^consistent-hashing]: David Karger et al., "Consistent Hashing and Random Trees: Distributed Caching Protocols for Relieving Hot Spots on the World Wide Web," Proceedings of the 29th Annual ACM Symposium on Theory of Computing (STOC '97), 1997, pp.654-663. コンシステント・ハッシュの原論文。`loadbalancing` exporterの実装については <https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/exporter/loadbalancingexporter> を参照。
 
 #### 利点と制約
 
