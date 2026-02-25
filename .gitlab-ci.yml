@@ -8,13 +8,7 @@ build:telemetry-sampling:
   stage: build
   image: ubuntu:24.04
   before_script:
-    - apt-get update && apt-get install -y --no-install-recommends
-        pandoc
-        texlive-xetex
-        texlive-lang-japanese
-        texlive-fonts-recommended
-        fonts-noto-cjk
-        yq
+    - apt-get update && apt-get install -y --no-install-recommends pandoc texlive-xetex texlive-lang-japanese texlive-fonts-recommended fonts-noto-cjk yq
   script:
     - cd books/telemetry-sampling
     - |
