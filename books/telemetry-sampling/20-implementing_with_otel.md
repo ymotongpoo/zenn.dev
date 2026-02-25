@@ -384,6 +384,7 @@ connectors:
   spanmetrics:
     # ヒストグラムの設定。
     # レイテンシ分布を記録するためのバケット境界を定義する。
+    # ここではexplicit（手動定義）モードを使用している[^spanmetrics-histogram]。
     histogram:
       explicit:
         buckets:
@@ -452,6 +453,73 @@ processors:
 `filter` プロセッサーで事前に除去することで、サンプリングの判定対象を実際のユーザーリクエストに絞り込めます。
 
 [^filter-processor]: opentelemetry-collector-contrib, "Filter Processor", <https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/processor/filterprocessor>
+
+#### OTTL（OpenTelemetry Transformation Language）
+
+上記の`filter` プロセッサーの設定例で使用している条件式は、OTTL（OpenTelemetry Transformation Language）と呼ばれるDSLで記述されています[^ottl-spec]。
+OTTLはOpenTelemetry Collectorの複数のプロセッサー（`filter`、`transform`、`routing`など）で共通して使用される式言語であり、テレメトリーデータの属性やフィールドに対する条件判定や変換を柔軟に記述できます。
+
+ここでは、`filter` プロセッサーで使用頻度の高いOTTLの基本構文と具体例を紹介します。
+
+##### パス式
+
+テレメトリーデータのフィールドにアクセスするためのパス式です。
+
+* `name`: スパン名
+* `status.code`: スパンのステータスコード（`STATUS_CODE_OK`、`STATUS_CODE_ERROR`など）
+* `kind`: スパンの種別（`SPAN_KIND_SERVER`、`SPAN_KIND_CLIENT`など）
+* `attributes["key"]`: スパン属性へのアクセス
+* `resource.attributes["key"]`: リソース属性へのアクセス
+
+##### 比較演算子と論理演算子
+
+* 比較演算子: `==`、`!=`、`>`、`<`、`>=`、`<=`
+* 論理演算子: `and`、`or`、`not`
+
+##### 文字列関数
+
+* `IsMatch(value, pattern)`: 正規表現によるマッチング
+
+##### 具体例
+
+以下に、`filter` プロセッサーで使用可能なOTTL式の具体例を示します。
+
+```yaml
+processors:
+  # 例1: 特定のサービスのスパンを除外する
+  filter/service:
+    error_mode: ignore
+    traces:
+      span:
+        - 'resource.attributes["service.name"] == "internal-proxy"'
+
+  # 例2: 正規表現によるURLパスのマッチング
+  filter/url-pattern:
+    error_mode: ignore
+    traces:
+      span:
+        - 'IsMatch(attributes["url.path"], "^/api/v[0-9]+/health")'
+
+  # 例3: 複合条件（正常系かつ特定パスのスパンを除外）
+  filter/normal-health:
+    error_mode: ignore
+    traces:
+      span:
+        - 'attributes["http.response.status_code"] >= 200 and attributes["http.response.status_code"] < 300 and attributes["url.path"] == "/healthz"'
+
+  # 例4: スパン名によるフィルタリング
+  filter/span-name:
+    error_mode: ignore
+    traces:
+      span:
+        - 'name == "health-check"'
+        - 'IsMatch(name, "^internal\\..*")'
+```
+
+OTTLは`filter` プロセッサー以外にも、`transform` プロセッサーでの属性の書き換えや、`routing` プロセッサーでの条件分岐にも使用されます。
+より高度な構文や利用可能な関数の一覧については、公式ドキュメントを参照してください。
+
+[^ottl-spec]: opentelemetry-collector-contrib, "OpenTelemetry Transformation Language (OTTL)", <https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/pkg/ottl>
 
 ### count コネクター
 
@@ -860,3 +928,20 @@ $$
 リアルタイム性が求められるアラートには、テイルサンプリングの遅延は許容できない場合が多いです。
 この場合、前述の`spanmetrics` コネクターを使用して、サンプリング前の全量データからメトリクスを生成し、メトリクスベースのアラートを設定するのが適切です。
 テイルサンプリングは、アラート発火後の障害調査やパフォーマンス分析に活用する、という役割分担が現実的です。
+
+## まとめ
+
+本章では、OpenTelemetryを使ったサンプリングの実装方法とアーキテクチャについて解説しました。
+
+まず、SDKによるヘッドサンプリングの実装例として、Python、Go、Javaの3言語で`ParentBased(TraceIdRatioBased)`サンプラーの設定方法を示しました。
+環境変数による設定も紹介し、コード変更なしにサンプリング率を切り替える方法を確認しました。
+
+次に、テイルサンプリングの3層構造（ゲートウェイ層、仕分け層、判定層）の設計と、仕分け層におけるコンシステントハッシュの仕組みを解説しました。
+サンプリング関連のCollectorコンポーネントとして、`tail_sampling` プロセッサー、`probabilistic_sampler` プロセッサー、`loadbalancing` エクスポーター、`spanmetrics` コネクター、`filter` プロセッサー（OTTLによる条件記述を含む）、`count` コネクターの設定例と使い分けを示しました。
+
+さらに、SDKのみのヘッドサンプリングと3層テイルサンプリングの2つのアーキテクチャパターンを比較し、システム規模やトラフィック特性に応じた選択指針を提示しました。
+パフォーマンスチューニングでは、`decision_wait`と`num_traces`の推奨設定値、メモリ見積もり方法、スケーリング戦略、データ鮮度への影響について解説しました。
+
+次章では、ここまでに学んだサンプリングの基礎と実装をさらに発展させ、高度な戦略について解説します。
+トラフィック量の変動に応じてサンプリング率を自動調整する動的サンプリングアルゴリズム（EMAなど）、サンプリングされたデータから元の統計量を復元する方法、サンプリング環境下で4つの黄金シグナル（レイテンシー、トラフィック、エラー、サチュレーション）を維持する方法を取り上げます。
+また、主要なオブザーバビリティSaaSベンダーが提供するサンプリング機能についても紹介し、自前実装との比較を行います。
