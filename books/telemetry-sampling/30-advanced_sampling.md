@@ -172,7 +172,6 @@ flowchart TD
 ```python
 import time
 
-
 class TokenBucketSampler:
     def __init__(self, rate, burst_size):
         self.rate = rate  # 秒あたりのトークン補充数
