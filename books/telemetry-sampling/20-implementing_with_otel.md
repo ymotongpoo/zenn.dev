@@ -377,14 +377,14 @@ Kubernetes環境では、Headless Serviceを使用することで、判定層の
 ### span metrics コネクター
 
 `spanmetrics` コネクターは、スパンデータからメトリクスを自動生成するコンポーネントです[^spanmetrics-connector]。
-サンプリングの前段に配置することで、サンプリングによってトレースが間引かれても、全量のトラフィックに基づいたメトリクス（リクエスト数、レイテンシ分布など）を確保できます。
+サンプリングの前段に配置することで、サンプリングによってトレースが間引かれても、全量のトラフィックに基づいたメトリクス（リクエスト数、レイテンシ分布など）を確保できます[^spanmetrics-histogram]。
 
 ```yaml
 connectors:
   spanmetrics:
     # ヒストグラムの設定。
     # レイテンシ分布を記録するためのバケット境界を定義する。
-    # ここではexplicit（手動定義）モードを使用している[^spanmetrics-histogram]。
+    # ここではexplicit（手動定義）モードを使用している。
     histogram:
       explicit:
         buckets:
@@ -426,6 +426,8 @@ service:
 これにより、サンプリング後のトレースデータからは失われる情報（全リクエストの正確なカウントやレイテンシ分布）を、メトリクスとして保持できます。
 
 [^spanmetrics-connector]: opentelemetry-collector-contrib, "Span Metrics Connector", <https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/connector/spanmetricsconnector>
+
+[^spanmetrics-histogram]: `spanmetrics` コネクターは手動バケット定義（explicit buckets）に加えて、指数ヒストグラム（exponential histogram）もサポートしています。指数ヒストグラムはバケット境界を自動的に決定するため、手動でバケットを定義する必要がありません。レイテンシー分布が既知でバケット境界を最適化したい場合はexplicitモード、分布が不明な場合や広範囲のレイテンシーをカバーしたい場合はexponentialモードが適しています。設定例: `histogram: { exponential: { max_size: 160 } }`。詳細は公式ドキュメント（<https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/connector/spanmetricsconnector>）の「Exponential Histogram」セクションを参照してください。
 
 ### filter プロセッサー
 
