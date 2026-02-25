@@ -250,6 +250,366 @@ $\alpha$ の値はトラフィックパターンに応じて調整します。
 [^refinery]: Honeycomb, "Honeycomb Refinery", <https://docs.honeycomb.io/manage-data-volume/refinery/>
 [^refinery-sampling-example]: Honeycomb, "Specify Sampling Methods - Sampling Example", <https://docs.honeycomb.io/manage-data-volume/sample/honeycomb-refinery/sampling-methods/>
 
+## コンテキストベースサンプリング
+
+前節の動的サンプリングでは、トラフィック量の変動に応じてサンプリング率を自動調整する手法を解説しました。しかし、実際のプロダクション環境では「どのトレースを保持するか」の判断基準として、トラフィック量だけでなく、リクエストの内容やビジネス上の重要度も考慮する必要があります。
+
+**コンテキストベースサンプリング** は、トレースに付与された属性（コンテキスト）に基づいてサンプリング判定を行う手法です。この手法により、ビジネス上重要なトレースを優先的に保持しつつ、ルーティンなトラフィックを効率的に削減できます。
+
+コンテキストベースサンプリングは、使用する属性の種類に応じて以下の3つに分類されます。
+
+* **リクエストコンテキスト**: HTTPメソッド、パス、ステータスコードなどのリクエスト属性に基づく判定
+* **ユーザーコンテキスト**: ユーザーID、セッションID、顧客セグメントなどのユーザー属性に基づく判定
+* **ビジネスコンテキスト**: 取引金額、重要度フラグ、SLAティアなどのビジネス属性に基づく判定
+
+これらを組み合わせることで、「エラーは全量保持」「プレミアム顧客のトレースは高い率で保持」「ヘルスチェックは最小限に抑える」といった、ビジネス要件に即したサンプリング戦略を実現できます。
+
+### リクエストコンテキストベースサンプリング
+
+リクエストコンテキストベースサンプリングは、HTTPリクエストの属性に基づいてサンプリング判定を行います。最も基本的なコンテキストベースサンプリングであり、多くのサービスで最初に導入される手法です。
+
+判定に使用する主な属性は以下のとおりです。
+
+| 属性名 | データ型 | 説明 | 例 |
+| --- | --- | --- | --- |
+| `http.request.method` | string | HTTPメソッド | "GET", "POST", "PUT", "DELETE" |
+| `http.route` | string | 正規化されたURLパス | "/api/users/{id}", "/health" |
+| `http.response.status_code` | int | HTTPレスポンスステータスコード | 200, 404, 500 |
+
+リクエストコンテキストに基づくサンプリング判定の典型的なルールは以下のとおりです。
+
+1. **エラーレスポンス（5xx）は全量保持**: サーバーエラーは障害調査に不可欠であり、発生頻度も低いため、全量保持してもデータ量への影響は小さい
+2. **重要エンドポイントは高い率で保持**: 決済や認証など、ビジネス上重要なエンドポイントのトレースは50%程度保持する
+3. **ヘルスチェックは最小限に抑える**: `/health` や `/readiness` などのヘルスチェックエンドポイントは大量のトラフィックを生成するが、分析価値は低いため1%程度に抑える
+4. **その他のリクエストはデフォルト率で保持**: 上記に該当しないリクエストは10%程度で保持する
+
+以下は、OpenTelemetry Collectorの `tail_sampling` プロセッサーを使用したリクエストコンテキストベースサンプリングの設定例です。
+
+```yaml
+# OpenTelemetry Collector設定例: リクエストコンテキストベースサンプリング
+processors:
+  tail_sampling:
+    decision_wait: 10s
+    num_traces: 100000
+    policies:
+      # ポリシー1: サーバーエラー（5xx）は全量保持
+      - name: error-traces
+        type: status_code
+        status_code:
+          status_codes:
+            - ERROR
+
+      # ポリシー2: 重要エンドポイントは50%保持
+      - name: critical-endpoints
+        type: and
+        and:
+          and_sub_policy:
+            - name: is-critical-route
+              type: string_attribute
+              string_attribute:
+                key: http.route
+                values:
+                  - /api/checkout
+                  - /api/payment
+                  - /api/auth/login
+            - name: critical-rate
+              type: probabilistic
+              probabilistic:
+                sampling_percentage: 50
+
+      # ポリシー3: ヘルスチェックは1%保持
+      - name: health-check
+        type: and
+        and:
+          and_sub_policy:
+            - name: is-health-check
+              type: string_attribute
+              string_attribute:
+                key: http.route
+                values:
+                  - /health
+                  - /readiness
+                  - /liveness
+            - name: health-rate
+              type: probabilistic
+              probabilistic:
+                sampling_percentage: 1
+
+      # ポリシー4: その他のリクエストは10%保持
+      - name: default-rate
+        type: probabilistic
+        probabilistic:
+          sampling_percentage: 10
+```
+
+この設定では、`tail_sampling` プロセッサーのポリシーが上から順に評価されます。いずれかのポリシーで「保持」と判定されたトレースは保持されます。`and` タイプのポリシーを使用することで、「特定のエンドポイントかつ確率的サンプリング」のような複合条件を表現できます。
+
+### ユーザーコンテキストベースサンプリング
+
+ユーザーコンテキストベースサンプリングは、リクエストを発行したユーザーの属性に基づいてサンプリング判定を行います。ユーザーの重要度や契約プランに応じて、トレースの保持率を変えることで、重要な顧客の体験を詳細に分析できます。
+
+判定に使用する主な属性は以下のとおりです。
+
+| 属性名 | データ型 | 説明 | 例 |
+| --- | --- | --- | --- |
+| `user.id` | string | ユーザーの一意識別子 | "user-12345" |
+| `session.id` | string | セッションの一意識別子 | "sess-abcde-12345" |
+| `customer.segment` | string | 顧客セグメント | "premium", "standard", "free" |
+
+ユーザーコンテキストに基づくサンプリング判定の典型的なルールは以下のとおりです。
+
+1. **プレミアム顧客は全量保持**: 有料プランの顧客のトレースは全量保持し、パフォーマンス問題を迅速に検出・対応する
+2. **テストユーザーは全量保持**: QAチームやE2Eテストで使用するテストユーザーのトレースは、テスト結果の検証のために全量保持する
+3. **セッションベースの一貫したサンプリング**: セッションIDのハッシュ値に基づいてサンプリング判定を行うことで、同一セッション内のトレースを一貫して保持または破棄する
+4. **その他のユーザーはデフォルト率で保持**: 上記に該当しないユーザーのトレースは5%程度で保持する
+
+以下は、OpenTelemetry Collectorの `tail_sampling` プロセッサーを使用したユーザーコンテキストベースサンプリングの設定例です。
+
+```yaml
+# OpenTelemetry Collector設定例: ユーザーコンテキストベースサンプリング
+processors:
+  tail_sampling:
+    decision_wait: 10s
+    num_traces: 100000
+    policies:
+      # ポリシー1: プレミアム顧客は全量保持
+      - name: premium-customers
+        type: string_attribute
+        string_attribute:
+          key: customer.segment
+          values:
+            - premium
+            - enterprise
+
+      # ポリシー2: テストユーザーは全量保持
+      - name: test-users
+        type: string_attribute
+        string_attribute:
+          key: user.id
+          values:
+            - test-user-1
+            - test-user-2
+            - qa-automation
+
+      # ポリシー3: その他のユーザーは5%保持
+      - name: default-user-rate
+        type: probabilistic
+        probabilistic:
+          sampling_percentage: 5
+```
+
+セッションベースの一貫したサンプリングを実現するには、`trace_id_ratio` ポリシーの代わりに `string_attribute` と `probabilistic` を組み合わせるか、ヘッドサンプリング側でセッションIDに基づく判定を行います。テイルサンプリングでは、同一トレース内のスパンは常に同じ判定結果になるため、トレース単位での一貫性は自動的に保証されます。
+
+### ビジネスコンテキストベースサンプリング
+
+ビジネスコンテキストベースサンプリングは、トランザクションのビジネス上の重要度に基づいてサンプリング判定を行います。取引金額やSLAティアなど、ビジネスに直結する属性を判定基準とすることで、ビジネスインパクトの大きいトレースを優先的に保持できます。
+
+判定に使用する主な属性は以下のとおりです。
+
+| 属性名 | データ型 | 説明 | 例 |
+| --- | --- | --- | --- |
+| `transaction.amount` | float | 取引金額 | 15000.50, 250.00 |
+| `priority.flag` | string | 重要度フラグ | "high", "normal", "low" |
+| `sla.tier` | string | SLAティア | "gold", "silver", "bronze" |
+
+ビジネスコンテキストに基づくサンプリング判定の典型的なルールは以下のとおりです。
+
+1. **高額取引は全量保持**: 一定金額（例: 10,000円）を超える取引のトレースは、不正検知や障害時の影響調査のために全量保持する
+2. **高優先度トランザクションは全量保持**: `priority.flag` が "high" に設定されたトランザクションは、ビジネスクリティカルな処理として全量保持する
+3. **ゴールドSLAは高い率で保持**: SLAティアが "gold" の顧客に関連するトランザクションは50%保持し、SLA違反の早期検出に備える
+4. **その他のトランザクションはデフォルト率で保持**: 上記に該当しないトランザクションは10%程度で保持する
+
+以下は、OpenTelemetry Collectorの `tail_sampling` プロセッサーを使用したビジネスコンテキストベースサンプリングの設定例です。
+
+```yaml
+# OpenTelemetry Collector設定例: ビジネスコンテキストベースサンプリング
+processors:
+  tail_sampling:
+    decision_wait: 10s
+    num_traces: 100000
+    policies:
+      # ポリシー1: 高優先度トランザクションは全量保持
+      - name: high-priority
+        type: string_attribute
+        string_attribute:
+          key: priority.flag
+          values:
+            - high
+
+      # ポリシー2: ゴールドSLAは50%保持
+      - name: gold-sla
+        type: and
+        and:
+          and_sub_policy:
+            - name: is-gold-sla
+              type: string_attribute
+              string_attribute:
+                key: sla.tier
+                values:
+                  - gold
+            - name: gold-rate
+              type: probabilistic
+              probabilistic:
+                sampling_percentage: 50
+
+      # ポリシー3: その他のトランザクションは10%保持
+      - name: default-business-rate
+        type: probabilistic
+        probabilistic:
+          sampling_percentage: 10
+```
+
+なお、`transaction.amount` のような数値属性に基づくフィルタリングは、`tail_sampling` プロセッサーの標準ポリシーでは直接サポートされていません。数値条件に基づくサンプリングを実現するには、`filter` プロセッサーと `tail_sampling` プロセッサーを組み合わせるか、OpenTelemetry Collector の `transform` プロセッサーで数値属性を文字列属性に変換してから `tail_sampling` で判定する方法があります。
+
+### ユースケースと実装ガイド
+
+コンテキストベースサンプリングの3つの分類は、それぞれ異なるシナリオで効果を発揮します。ここでは、各コンテキストタイプが適用される実際のシナリオと、3つを統合した完全な設定例を示します。
+
+#### リクエストコンテキストが有効なシナリオ
+
+* **マイクロサービスアーキテクチャのAPIゲートウェイ**: 大量のヘルスチェックやメトリクスエンドポイントへのリクエストを低い率でサンプリングし、決済や認証などの重要エンドポイントを高い率で保持する
+* **障害調査の迅速化**: 5xxエラーを全量保持することで、障害発生時にエラートレースを即座に分析できる
+* **コスト最適化**: トラフィックの大部分を占めるGETリクエストのサンプリング率を下げ、データ量とストレージコストを削減する
+
+#### ユーザーコンテキストが有効なシナリオ
+
+* **SaaS プラットフォーム**: 有料プランの顧客のトレースを優先的に保持し、パフォーマンス問題を迅速に検出・対応する
+* **A/Bテストの分析**: テスト対象のユーザーセグメントのトレースを全量保持し、機能変更がパフォーマンスに与える影響を正確に測定する
+* **カスタマーサポート**: 特定の顧客から問い合わせがあった場合に、そのユーザーのトレースを一時的に全量保持に切り替えて問題を調査する
+
+#### ビジネスコンテキストが有効なシナリオ
+
+* **ECサイトの決済処理**: 高額取引のトレースを全量保持し、決済失敗や不正取引の調査に備える
+* **金融サービスのコンプライアンス**: 規制対象のトランザクション（一定金額以上の送金など）のトレースを全量保持し、監査証跡として活用する
+* **SLA管理**: ゴールドティアの顧客に関連するトランザクションを高い率で保持し、SLA違反の早期検出と根本原因分析を可能にする
+
+#### 統合設定例
+
+以下は、リクエストコンテキスト、ユーザーコンテキスト、ビジネスコンテキストの3つを組み合わせた完全なOpenTelemetry Collector設定例です。
+
+```yaml
+# OpenTelemetry Collector設定例: コンテキストベースサンプリング統合設定
+receivers:
+  otlp:
+    protocols:
+      grpc:
+        endpoint: 0.0.0.0:4317
+      http:
+        endpoint: 0.0.0.0:4318
+
+processors:
+  batch:
+    timeout: 1s
+    send_batch_size: 1024
+
+  tail_sampling:
+    decision_wait: 10s
+    num_traces: 100000
+    policies:
+      # --- ビジネスコンテキスト（最優先） ---
+      - name: high-priority-transactions
+        type: string_attribute
+        string_attribute:
+          key: priority.flag
+          values:
+            - high
+
+      - name: gold-sla-transactions
+        type: and
+        and:
+          and_sub_policy:
+            - name: is-gold-sla
+              type: string_attribute
+              string_attribute:
+                key: sla.tier
+                values:
+                  - gold
+            - name: gold-rate
+              type: probabilistic
+              probabilistic:
+                sampling_percentage: 50
+
+      # --- リクエストコンテキスト ---
+      - name: error-traces
+        type: status_code
+        status_code:
+          status_codes:
+            - ERROR
+
+      - name: critical-endpoints
+        type: and
+        and:
+          and_sub_policy:
+            - name: is-critical-route
+              type: string_attribute
+              string_attribute:
+                key: http.route
+                values:
+                  - /api/checkout
+                  - /api/payment
+                  - /api/auth/login
+            - name: critical-rate
+              type: probabilistic
+              probabilistic:
+                sampling_percentage: 50
+
+      - name: health-check
+        type: and
+        and:
+          and_sub_policy:
+            - name: is-health-check
+              type: string_attribute
+              string_attribute:
+                key: http.route
+                values:
+                  - /health
+                  - /readiness
+                  - /liveness
+            - name: health-rate
+              type: probabilistic
+              probabilistic:
+                sampling_percentage: 1
+
+      # --- ユーザーコンテキスト ---
+      - name: premium-customers
+        type: string_attribute
+        string_attribute:
+          key: customer.segment
+          values:
+            - premium
+            - enterprise
+
+      - name: test-users
+        type: string_attribute
+        string_attribute:
+          key: user.id
+          values:
+            - test-user-1
+            - test-user-2
+            - qa-automation
+
+      # --- デフォルト ---
+      - name: default-rate
+        type: probabilistic
+        probabilistic:
+          sampling_percentage: 10
+
+exporters:
+  otlp/backend:
+    endpoint: tempo:4317
+    tls:
+      insecure: true
+
+service:
+  pipelines:
+    traces:
+      receivers: [otlp]
+      processors: [tail_sampling, batch]
+      exporters: [otlp/backend]
+```
+
+この統合設定では、ポリシーの評価順序が重要です。ビジネスコンテキストのポリシーを最初に配置し、次にリクエストコンテキスト、最後にユーザーコンテキストとデフォルトポリシーを配置しています。`tail_sampling` プロセッサーでは、いずれかのポリシーで「保持」と判定されたトレースは保持されるため、優先度の高いポリシーを先に配置することで、重要なトレースが確実に保持されます。
+
 ## アグリゲーション（集約）
 
 サンプリングは「データを捨てる」行為ですが、**アグリゲーション（集約）** は「詳細を捨てる代わりに、傾向（統計量）を残す」行為です。
