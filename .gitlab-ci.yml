@@ -6,13 +6,19 @@ stages:
 
 build:telemetry-sampling:
   stage: build
-  image: pandoc/latex:latest
+  image: ubuntu:24.04
   before_script:
-    - apk add --no-cache yq
+    - apt-get update && apt-get install -y --no-install-recommends
+        pandoc
+        texlive-xetex
+        texlive-lang-japanese
+        fonts-noto-cjk
+        yq
   script:
     - cd books/telemetry-sampling
     - |
-      chapters=$(yq eval '.chapters[]' config.yaml | sed 's/$/.md/')
+      chapters=$(yq eval '.chapters[]' config.yaml | sed 's/$/.md/' | tr '\n' ' ')
+      echo "Building with chapters: $chapters"
       pandoc $chapters -o telemetry-sampling.pdf \
         --pdf-engine=xelatex \
         -V CJKmainfont="Noto Sans CJK JP" \
@@ -29,3 +35,4 @@ build:telemetry-sampling:
       changes:
         - books/telemetry-sampling/**/*.md
         - books/telemetry-sampling/config.yaml
+
