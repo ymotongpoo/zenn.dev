@@ -17,7 +17,7 @@ build:telemetry-sampling:
   script:
     - cd books/telemetry-sampling
     - |
-      chapters=$(yq eval '.chapters[]' config.yaml | sed 's/$/.md/' | tr '\n' ' ')
+      chapters=$(yq -r '.chapters[]' config.yaml | sed 's/$/.md/' | tr '\n' ' ')
       echo "Building with chapters: $chapters"
       pandoc $chapters -o telemetry-sampling.pdf \
         --pdf-engine=xelatex \
@@ -25,7 +25,7 @@ build:telemetry-sampling:
         -V geometry:margin=1in \
         --toc \
         --number-sections \
-        --metadata title="$(yq eval '.title' config.yaml)"
+        --metadata title="$(yq -r '.title' config.yaml)"
   artifacts:
     paths:
       - books/telemetry-sampling/telemetry-sampling.pdf
