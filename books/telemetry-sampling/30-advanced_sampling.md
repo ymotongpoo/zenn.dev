@@ -154,6 +154,64 @@ flowchart TD
     K --> H
 ```
 
+#### トークンバケット（Token Bucket）アルゴリズム
+
+トークンバケットは、レートリミッティングで広く使われるアルゴリズムを動的サンプリングに応用したものです。
+一定のレートでトークンを補充し、トレースを保持するたびにトークンを1つ消費します。
+トークンが残っていればトレースを保持し、トークンがなければ破棄します。
+
+基本的な動作は以下のとおりです。
+
+1. バケットに一定容量（バーストサイズ）のトークンを保持できる
+2. 一定間隔（補充レート）でトークンが追加される
+3. トレースが到着するたびにトークンを1つ消費する
+4. トークンが0の場合、トレースは破棄される
+
+以下は、トークンバケットを用いた動的サンプリングのPythonの擬似コードです。
+
+```python
+import time
+
+
+class TokenBucketSampler:
+    def __init__(self, rate, burst_size):
+        self.rate = rate  # 秒あたりのトークン補充数
+        self.burst_size = burst_size  # バケットの最大容量
+        self.tokens = burst_size  # 初期トークン数
+        self.last_refill = time.monotonic()
+
+    def _refill(self):
+        """経過時間に応じてトークンを補充する"""
+        now = time.monotonic()
+        elapsed = now - self.last_refill
+        new_tokens = elapsed * self.rate
+        self.tokens = min(self.burst_size, self.tokens + new_tokens)
+        self.last_refill = now
+
+    def should_sample(self):
+        """トレースを保持するかどうかを判定する"""
+        self._refill()
+        if self.tokens >= 1:
+            self.tokens -= 1
+            return True
+        return False
+```
+
+```mermaid
+flowchart TD
+    A[トレース到着] --> B[経過時間に応じてトークンを補充]
+    B --> C{トークンが残っている?}
+    C -- はい --> D[トークンを1つ消費]
+    D --> E[トレースを保持]
+    C -- いいえ --> F[トレースを破棄]
+```
+
+トークンバケットの利点は、実装がシンプルでありながら、バースト的なトラフィックにも対応できる点です。
+バーストサイズを設定することで、短時間のトラフィックスパイク時にも一定数のトレースを保持できます。
+一方で、EMAベースの動的サンプリングのようにキーごとの頻度に基づく優先度付けはできないため、均一なレートリミッティングが目的の場合に適しています。
+
+OpenTelemetry Collectorの`tail_sampling` プロセッサーでは、`rate_limiting` ポリシーとしてトークンバケットに類似した機能が提供されています。
+
 #### パラメータ調整の指針
 
 動的サンプリングの効果を最大化するには、パラメータの適切な調整が重要です。
