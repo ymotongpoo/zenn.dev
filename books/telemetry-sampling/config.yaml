@@ -9,5 +9,6 @@ chapters:
   - 10-glossary
   - 20-implementing_with_otel
   - 30-advanced_sampling
+  - 31-aggregation_and_monitoring
   - 40-case_study
   - 99-checklist
