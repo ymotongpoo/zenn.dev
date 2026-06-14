@@ -28,7 +28,7 @@ published_at: 2026-06-15 09:00
 
 そこでどうせならということで、そういったオブザーバビリティSaaSのデモを簡単に作れるようにテレメトリー生成器を作ろうと考えて `xk6-otel-gen` を作りました。
 
-@[card](https://github.com/ymotongpoo/xk6-otel-gen)
+@[card](https://ymotongpoo.github.io/xk6-otel-gen/ja/)
 
 これは名前からわかるようにk6拡張です。リポジトリを見れば一目瞭然で、AIコーディングエージェントに全部実装してもらいました。
 サービス間の呼び出し関係をYAMLで宣言すると、それに沿った擬似的なトレース、メトリクス、ログをOpenTelemetry形式で合成し、OTLPエンドポイントに送信します。実際のサービスは1つも必要ありません。
