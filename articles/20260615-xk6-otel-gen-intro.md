@@ -1,5 +1,5 @@
 ---
-title: "OpenTelemetry形式でテレメトリーデータを自動生成するk6拡張を作った"
+title: "OpenTelemetry形式でテレメトリーデータを合成するk6拡張を作った"
 emoji: "⛰️"
 type: "tech"
 topics: ["k6", "OpenTelemetry", "grafana"]
