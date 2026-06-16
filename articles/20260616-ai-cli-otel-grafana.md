@@ -241,7 +241,7 @@ $ gcx api /api/dashboards/db -d @codex-cli.json
 
 これで Claude Code と Codex の専用ダッシュボードが Grafana Cloud に並びました。
 
-![Claude Code CLI用ダッシュボード](/images/20260616-claude-code-dash)
+![Claude Code CLI用ダッシュボード](/images/20260616-claude-code-dash.png)
 
 :::message
 `rate()` / `increase()` は窓の中に2点以上のサンプルが必要です。単発実行直後はパネルが空に見えることがありますが、使い続けてサンプルが溜まれば埋まります。
