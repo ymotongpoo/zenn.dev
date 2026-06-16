@@ -4,7 +4,7 @@ emoji: "🤖"
 type: "tech"
 topics: ["OpenTelemetry", "grafana", "ClaudeCode", "Codex", "Alloy"]
 published: true
-published_at: 2026-06-16 17:00
+published_at: 2026-06-16 16:45
 ---
 
 ## はじめに
