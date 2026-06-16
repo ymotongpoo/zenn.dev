@@ -2,7 +2,7 @@
 title: "Claude CodeとCodex CLIのテレメトリーをGrafana Cloudで見る"
 emoji: "🤖"
 type: "tech"
-topics: ["OpenTelemetry", "grafana", "ClaudeCode", "Codex", "Observability"]
+topics: ["OpenTelemetry", "grafana", "ClaudeCode", "Codex", "Alloy"]
 published: true
 published_at: 2026-06-16 17:00
 ---
