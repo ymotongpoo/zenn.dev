@@ -41,8 +41,7 @@ Claude Code ─┐
 Codex ───────┘                            (トークンはAlloyだけが持つ)
 ```
 
-理由はシンプルで、「認証トークンを各CLIの設定ファイルに平文で置きたくなかった」からです。Alloy [^alloy] を1段挟めば、トークンは Alloy の設定にだけ存在し、CLI側の設定はすべて `localhost` 宛て・認証なしで済みます。
-また、このマシンには元々 Grafana Alloy でLinuxホストの諸々のテレメトリーを送っていたので、そういった都合もあります。なので新しいCollectorを立てるのではなく、既存のAlloyにOTLPの受信口を1つ足すだけで対応できました。
+理由はシンプルで、「認証トークンを各CLIの設定ファイルに平文で置きたくなかった」からです。Alloy [^alloy] を1段挟めば、トークンは Alloy の設定にだけ存在し、CLI側の設定はすべて `localhost` 宛て・認証なしで済みます。また、このマシンには元々 Grafana Alloy でLinuxホストの諸々のテレメトリーを送っていたので、そういった都合もあります。そうした都合から、新しいCollectorを立てるのではなく、既存のAlloyにOTLPの受信口を1つ足すだけで対応できました。
 
 [^alloy]: ここでは Grafana Alloyを使っていますが、OTLPレシーバーとOTLPエクスポーターがあるOpenTelemetry Collectorディストリビューションであればなんでも良いです。
 
@@ -92,7 +91,7 @@ trace_exporter = { otlp-http = { endpoint = "http://127.0.0.1:4318/v1/traces", p
 
 既存の `/etc/alloy/config.alloy` に、OTLPの受信口と Grafana Cloud への送信口を追記します。
 
-```river
+```hcl
 // ローカルのCLI（Claude Code / Codex）からOTLPを受ける
 otelcol.receiver.otlp "ai_clis" {
 	grpc { endpoint = "127.0.0.1:4317" }
@@ -131,7 +130,7 @@ otelcol.auth.basic "ai_grafana_cloud" {
 ## はまったポイント
 ### Codexのconfig.tomlは環境変数を展開しない
 
-ドキュメントには `headers = { "Authorization" = "Bearer ${OTLP_TOKEN}" }` のように `${VAR}` で環境変数を参照できる、と書いてあるものがありました。これを信じてトークンを環境変数経由にしようとしたのですが、実際には展開されませんでした。
+Codexの公式ドキュメント [Advanced Configuration](https://developers.openai.com/codex/config-advanced) の「Observability and telemetry」のセクションには、`headers = { "x-otlp-api-key" = "${OTLP_TOKEN}" }` のように `[otel]` の `headers` で `${VAR}` を使って環境変数を参照する例が載っています。これを信じてトークンを環境変数経由にしようとしたのですが、実際には（少なくとも検証した `codex-cli 0.139.0` では）展開されませんでした。
 
 ローカルのキャプチャ用Collectorに向けて検証したところ、送られてきた認証ヘッダーは文字どおり `Basic ${GRAFANA_OTLP_BASIC}` でした。`${...}` がそのまま文字列として飛んでいます。エンドポイント側でも `invalid URI ${...}` というエラーになりました。
 
