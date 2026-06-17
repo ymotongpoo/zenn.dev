@@ -1,5 +1,5 @@
 ---
-title: "Claude DesktopとCodex AppのテレメトリーをGrafana Cloudで見る"
+title: "Claude DesktopとCodex AppのテレメトリーをGrafana Cloudで見る (2026年6月)"
 emoji: "🖥️"
 type: "tech"
 topics: ["OpenTelemetry", "grafana", "ClaudeCode", "Codex", "Alloy"]
