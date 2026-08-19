@@ -4,7 +4,7 @@ title: "サードパーティの回避策"
 
 ## 速度を追求したライブラリ
 
-標準ライブラリが動けない14年のあいだ、JSONを扱うGoユーザーが黙って待っていたわけではありません。とくに性能については、外部ライブラリが次々に生まれました。アプローチはさまざまに分かれました。
+標準ライブラリの `encoding/json` の修正ができない14年のあいだ、JSONを扱うGoユーザーが黙って待っていたわけではありません。とくに性能については、外部ライブラリが次々に生まれました。アプローチはさまざまに分かれました。
 
 * [`mailru/easyjson`](https://github.com/mailru/easyjson) はコード生成をしました。`easyjson -all foo.go` を走らせて、型ごとに専用のエンコーダとデコーダを吐かせます。リフレクションを一切使わないので速い代わりに、ビルド手順に生成ステップが増え、`encoding/json` の差し替えとしては使えません。
 * [`json-iterator/go`](https://github.com/json-iterator/go) は、リフレクションを使いつつ型ごとの処理をキャッシュして高速化し、importパスを差し替えるだけで使える形を取りました。
@@ -13,13 +13,13 @@ title: "サードパーティの回避策"
 
 これらのライブラリの動機は、README を読むと明確です。[`segmentio/encoding`](https://github.com/segmentio/encoding) は「我々が扱う規模では、プログラムを組み立てる道具の選択がシステム全体の効率に大きく影響する」と書いています。[`buger/jsonparser`](https://github.com/buger/jsonparser) は違う不満から出発していて、構造が事前に分からないJSONを扱うとき、`encoding/json` は構造体を用意することを要求し、`map[string]interface{}` で受けると非常に遅い、と書いています。
 
-## drop-inであるための制約
+## 差し替え可能であることの代償
 
-ここで、`goccy/go-json` の README にある一文を引用します。
+ここで、[`goccy/go-json` の README](https://github.com/goccy/go-json/blob/v0.10.6/README.md#how-it-works)にある一文を引用します。
 
 > It's easier to implement by using automatic code generation for performance or by using a dedicated interface, but `go-json` dares to stick to compatibility with `encoding/json` and is the simple interface. Despite this, we are developing with the aim of being the fastest library.
 >
-> （性能のために自動コード生成を使ったり専用のインターフェースを使ったりすれば実装は楽になる。それでも `go-json` はあえて `encoding/json` との互換性にこだわり、単純なインターフェースを保つ。それにもかかわらず、最速のライブラリになることを目指して開発している）
+> （性能のために自動コード生成を使ったり専用のインターフェースを使ったりすれば実装は楽になります。それでも `go-json` はあえて `encoding/json` との互換性にこだわり、単純なインターフェースを保ちます。それにもかかわらず、最速のライブラリになることを目指して開発しています。）
 
 この「あえて」が、外部ライブラリ群が背負った制約です。importパスを差し替えるだけで動く、という価値を提供する以上、v1と同じ結果を返さなければなりません。そしてv1と同じ結果には、前章で見た欠陥が全部含まれます。
 
@@ -33,7 +33,7 @@ title: "サードパーティの回避策"
 
 境界の16は、先ほど触れたビットマップ最適化の上限です。フィールド数が16以下ならビットマップでフィールドを特定でき、マップ引きが要りません。17個目からは別の経路に落ちます。そしてその別の経路が、v1の大文字小文字を無視するマッチを落としていました。
 
-最適化とv1への忠実さが同じコードの中で衝突しています。しかも壊れ方が、フィールドを1つ足した瞬間に切り替わるという分かりにくい形です。同じリポジトリには、入れ子の構造体で大文字小文字マッチが効かない [`#470`](https://github.com/goccy/go-json/issues/470) も未解決で残っています。
+最適化とv1への忠実さが同じコードの中で衝突しています。しかも問題の起き方が、フィールドを1つ足した瞬間に切り替わるという分かりにくい形です。同じリポジトリには、入れ子の構造体で大文字小文字マッチが効かない[`#470`](https://github.com/goccy/go-json/issues/470)も未解決で残っています。
 
 ## ランタイム内部への依存
 
@@ -43,11 +43,11 @@ title: "サードパーティの回避策"
 
 > For example, https://go.dev/cl/583756 broke github.com/goccy/go-json because it turns out that package copied most of the runtime's internal type API. Now we can't change _anything_ in that list, despite that being an ostensibly internal package, without breaking goccy/go-json. And goccy is used by many packages, including Kubernetes... This situation is unsustainable.
 >
-> （たとえば https://go.dev/cl/583756 は github.com/goccy/go-json を壊した。そのパッケージがランタイムの内部型APIのほとんどをコピーしていたことが分かったからだ。いまや、名目上は内部のパッケージであるにもかかわらず、goccy/go-json を壊さずにはその一覧の何一つ変えられない。しかも goccy はKubernetesを含む多くのパッケージから使われている。この状況は維持できない）
+> （たとえば https://go.dev/cl/583756 は github.com/goccy/go-json を壊しました。そのパッケージがランタイムの内部型APIのほとんどをコピーしていたことが分かったからです。いまや、名目上は内部のパッケージであるにもかかわらず、goccy/go-json を壊さずにはその一覧の何一つ変えられません。しかも goccy はKubernetesを含む多くのパッケージから使われています。この状況は維持できません。）
 
 ここで名指しされているのは、[ランタイム内部の小さな整理をしたCL](https://go-review.googlesource.com/c/go/+/583756)です。
 
-構図が反転しています。標準ライブラリのほうでは後方互換性保証が `encoding/json` を修正から妨げていました。ここでは、外部ライブラリの内部依存が、ランタイムの変更の自由を縛っています。速度のために借りていたのは、v1の欠陥への忠実さだけではなく、ランタイム内部が動かないという前提でもありました。
+構図が反転しています。標準ライブラリのほうでは後方互換性保証が `encoding/json` を修正から妨げていました。ここでは、外部ライブラリの内部依存が、ランタイムの変更の自由を縛っています。`goccy/go-json` が背負っていたのは、互換性のための、v1の欠陥への忠実さだけではありませんでした。速度のために、ランタイムの内部は変わらないという、保証のない前提にも依存していました。
 
 ## なぜ標準に取り込まなかったのか
 
@@ -55,7 +55,7 @@ title: "サードパーティの回避策"
 
 > There are many community forks or reimplementations of v1 'json'. While they provide impressive performance gains, they cannot be adopted into the standard library on the basis of their extensive use of package 'unsafe'. The 2021 Go Developer Survey shows that the assurance of reliability and security is a higher priority than CPU or memory performance.
 >
-> （v1のjsonには、コミュニティによるフォークや再実装が多数ある。目を見張る性能向上を提供している一方で、`unsafe` パッケージを多用しているという理由から、標準ライブラリには採用できない。2021年の Go Developer Survey は、信頼性と安全性の保証がCPUやメモリの性能より優先度が高いことを示している）
+> （v1のjsonには、コミュニティによるフォークや再実装が多数あります。目を見張る性能向上を提供している一方で、`unsafe` パッケージを多用しているという理由から、標準ライブラリには採用できません。2021年の Go Developer Survey は、信頼性と安全性の保証がCPUやメモリの性能より優先度が高いことを示しています。）
 
 判断の根拠が[2021年の Go Developer Survey](https://go.dev/blog/survey2021-results#prioritization)に置かれているのが、個人的にGoの特徴をよく表していると思います。速さと安全性のどちらを取るかを、設計者の好みではなく、利用者に聞いた結果として扱っています。
 

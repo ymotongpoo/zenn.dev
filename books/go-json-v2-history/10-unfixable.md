@@ -72,7 +72,7 @@ title: "修正できなかったもの"
 
 ここが転換点でした。「直せない」は諦めではなく、書いて、動かして、測ったうえでの結論でした。そしてこの結論が出た年の後半に、v2の構想が書かれ始めます。
 
-## v1とv2に同じ入力を与える
+## v1とv2での挙動の違い
 
 go1.27では `encoding/json` と `encoding/json/v2` の両方が使えます。同じ入力を、両方に渡してみます。
 
@@ -109,11 +109,13 @@ v1: {Name:gopher}  err=<nil>
 v2: {Name:}  err=<nil>
 ```
 
-v2はマッチしません。注意したいのは、v2が**エラーを返しているわけではない**ことです。`NAME` は単に知らないメンバー名として無視され、`Name` フィールドは空のまま残ります。エラーにしたい場合は `RejectUnknownMembers` を指定します。
+v2はマッチしません。注意したいのは、v2が「エラーを返しているわけではない」ことです。`NAME` は単に知らないメンバー名として無視され、`Name` フィールドは空のまま残ります。エラーにしたい場合は `RejectUnknownMembers` を指定します。
 
 ## 重複キーと不正なUTF-8
 
 大文字小文字だけではありません。重複キーと不正なUTF-8も見ておきます。
+
+* https://go.dev/play/p/hKjc4kyhrvF?v=gotip
 
 ```go
 dup := []byte(`{"name":"alice","role":"user","role":"admin"}`)
@@ -129,9 +131,9 @@ v1 utf8: err=<nil> -> "go�pher"
 v2 utf8: err=jsontext: invalid UTF-8 within "/name" after offset 11
 ```
 
-v1はどちらも黙って受け入れます。重複キーは後勝ちで上書きし、不正なUTF-8はUnicodeの置換文字に差し替えます。呼び出し側は、入力が壊れていたことを知る手段を持ちません。
+v1はどちらもエラーを出さずに受け入れます。重複キーは後勝ちで上書きし、不正なUTF-8はUnicodeの置換文字に差し替えます。呼び出し側は、入力が壊れていたことを知る手段を持ちません。
 
-重複キーが問題になるのは、JSONを読む主体が複数あるときです。認証プロキシが `"role":"user"` を見て通し、その後ろのアプリケーションが `"role":"admin"` を読む。両者が同じ仕様に従っていても、片方が先勝ち、もう片方が後勝ちなら、判定が食い違います。2023年に起票された[Discussion #63397](https://github.com/golang/go/discussions/63397)はこれを「攻撃者に悪用されうるし、実際に深刻な結果を伴って悪用されてきた」と書いています。
+重複キーが問題になるのは、JSONを読む主体が複数あるときです。認証プロキシが `"role":"user"` を見て通し、その後ろのアプリケーションが `"role":"admin"` を読むようなケースです。両者が同じ仕様に従っていても、片方が先勝ち、もう片方が後勝ちなら、判定が食い違います。2023年に起票された[Discussion #63397](https://github.com/golang/go/discussions/63397)はこれを「攻撃者に悪用されうるし、実際に深刻な結果を伴って悪用されてきた」と書いています。
 
 エラーメッセージの先頭に `jsontext:` と付いています。`encoding/json/jsontext` という別のパッケージが出したエラーです。v2ではJSONの構文を扱う層と、JSONとGoの値の対応づけを扱う層が分かれています。重複キーも不正なUTF-8も、Goの型に触れる前の、構文の段階で弾かれています。ではなぜ、JSONを読み書きする層がわざわざ別パッケージに切り出されているのか。性能のためだと考えるのが自然に思えますが、そうではありませんでした。
 
@@ -139,13 +141,30 @@ v1はどちらも黙って受け入れます。重複キーは後勝ちで上書
 
 Discussion #63397は、冒頭でv1の問題を4つに分類しています。当時の issue 番号が添えられているので、14年分の記録としても有用な議論です。
 
-機能不足として挙げられているのは、`time.Time` の書式を指定する手段（[#21990](https://github.com/golang/go/issues/21990)）、特定の値を出力から省く方法（[#22480](https://github.com/golang/go/issues/22480)、[#50480](https://github.com/golang/go/issues/50480) ほか）、nilのスライスやマップを `null` ではなく `[]` や `{}` として出す方法（[#37711](https://github.com/golang/go/issues/37711)、[#27589](https://github.com/golang/go/issues/27589)）、埋め込みを使わずに構造体を展開する `inline` タグ（[#6213](https://github.com/golang/go/issues/6213)）です。
+機能不足として挙げられているのは
 
-APIの欠陥として挙げられているのは、`json.NewDecoder(r).Decode(v)` が入力の末尾にゴミが残っていても黙って成功すること（[#36225](https://github.com/golang/go/issues/36225)）、オプションを `Marshal` や `Unmarshal` に渡せず、ネストした型の奥まで伝えられないこと（[#41144](https://github.com/golang/go/issues/41144)）です。
+* `time.Time` の書式を指定する手段（[#21990](https://github.com/golang/go/issues/21990)）
+* 特定の値を出力から省く方法（[#22480](https://github.com/golang/go/issues/22480)、[#50480](https://github.com/golang/go/issues/50480) ほか）
+* nilのスライスやマップを `null` ではなく `[]` や `{}` として出す方法（[#37711](https://github.com/golang/go/issues/37711)、[#27589](https://github.com/golang/go/issues/27589)）
+* 埋め込みを使わずに構造体を展開する `inline` タグ（[#6213](https://github.com/golang/go/issues/6213)）
+ 
+です。
+
+APIの欠陥として挙げられているのは
+
+* `json.NewDecoder(r).Decode(v)` が入力の末尾にゴミが残っていても黙って成功すること（[#36225](https://github.com/golang/go/issues/36225)）
+* オプションを `Marshal` や `Unmarshal` に渡せず、ネストした型の奥まで伝えられないこと（[#41144](https://github.com/golang/go/issues/41144)）
+
+です。
 
 性能の限界は、設計に根ざしたものです。`MarshalJSON` は `[]byte` を返す形なので、実装は必ず一度バイト列を確保します。呼び出す側は返ってきたバイト列を再度パースして、妥当性を検査し、インデントを付け直します。`UnmarshalJSON` はさらに厄介で、完全な値を渡す必要があるため、呼ぶ前に値全体をパースし、メソッドの中でもう一度パースすることになります。入れ子になった型がそれぞれ `UnmarshalJSON` を持っていると、この二度手間が階層の分だけ掛け算になります。実際に、[Kubernetes の OpenAPI 仕様の読み込みで実際に問題になった例](https://github.com/kubernetes/kube-openapi/issues/315)が挙げられています。
 
-そして挙動の欠陥がありました。不正なUTF-8を受け入れること、重複キーを受け入れること（[#43664](https://github.com/golang/go/issues/43664)）、大文字小文字を無視するマッチ（#14750）に加えて、値がアドレス可能かどうかで `MarshalJSON` が呼ばれたり呼ばれなかったりすること（[#22967](https://github.com/golang/go/issues/22967) ほか）が挙がっています。
+そして挙動の欠陥がありました。
+
+* 不正なUTF-8を受け入れること、重複キーを受け入れること（[#43664](https://github.com/golang/go/issues/43664)）
+* 大文字小文字を無視するマッチ（#14750）に加えて、値がアドレス可能かどうかで `MarshalJSON` が呼ばれたり呼ばれなかったりすること（[#22967](https://github.com/golang/go/issues/22967) ほか）
+
+が挙がっています。
 
 最後の項目は、短いコードで再現できます。
 
