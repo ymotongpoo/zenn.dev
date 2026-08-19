@@ -1,0 +1,17 @@
+title: "encoding/json/v2 に至る14年"
+summary: "encoding/json は Go 1.0 から14年間、大文字小文字を区別しないフィールド一致のような既知の問題を抱えたまま修正されませんでした。Go 1.27 で正式化された encoding/json/v2 に至るまでの経緯を、issue、提案、Gerritの変更、標準ライブラリのソースを追いながら整理します。"
+topics: ["go", "json", "golang", "oss"]
+published: false
+price: 0 # 有料の場合200〜5000
+# 本に含めるチャプターを順番に並べましょう
+chapters:
+  - 00-introduction
+  - 10-unfixable
+  - 20-third_party
+  - 30-v2_draft
+  - 40-proposal
+  - 50-v1_on_v2
+  - 60-verification
+  - 70-after_v2
+  - 80-why_v2
+  - 99-references
