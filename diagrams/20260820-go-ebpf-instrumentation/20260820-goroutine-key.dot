@@ -1,0 +1,53 @@
+// 図3: uprobe 発火時に OBI が読むもの
+digraph fig3 {
+  graph [
+    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=13,
+    rankdir=TB, compound=true, splines=true,
+    nodesep=0.5, ranksep=0.8, pad=0.25,
+    bgcolor="white", newrank=true
+  ];
+  node [
+    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=12,
+    shape=box, style="rounded,filled",
+    fillcolor="#F1F5F9", color="#475569", penwidth=1.6,
+    margin="0.2,0.14"
+  ];
+  edge [
+    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=11,
+    color="#334155", penwidth=1.4, arrowsize=0.9,
+    fontcolor="#1E293B"
+  ];
+
+  fire [label=<<b>uprobe 発火</b><br align="left"/>レジスタの写し pt_regs<br align="left"/>>, fillcolor="#EDF1F5"];
+
+  subgraph cluster_regs {
+    label=<<b>OBI が読むレジスタ</b>>;
+    style="rounded"; labeljust="l"; penwidth=1.6; margin=14;
+    color="#38638F"; fontcolor="#2E4D6E"; bgcolor="#EFF5FB";
+
+    r14 [label=<<b>R14</b>（amd64）/ <b>R28</b>（arm64）<br align="left"/>g 構造体の先頭アドレス<br align="left"/>>,
+         fillcolor="#D9E7F4", color="#38638F"];
+    args [label=<<b>AX, BX, CX, …</b><br align="left"/>関数の引数<br align="left"/>>,
+          fillcolor="#D9E7F4", color="#38638F"];
+  }
+
+  key [shape=plain, style="", label=<
+    <table border="0" cellborder="1" cellspacing="0" cellpadding="7" color="#75589C">
+      <tr><td align="left" bgcolor="#F5F1F9"><b>go_addr_key_t</b>（goroutine の識別子）</td></tr>
+      <tr><td align="left" bgcolor="#E9DFF2">addr = 0xc000102000</td></tr>
+      <tr><td align="left" bgcolor="#E9DFF2">pid&nbsp;&nbsp;= 12345</td></tr>
+    </table>>];
+
+  values [label=<<b>引数の値</b><br align="left"/>HTTPメソッド、URLなど<br align="left"/>>, fillcolor="#EDF1F5"];
+
+  gstruct [label=<<b>g 構造体の中身</b><br align="left"/>stack.lo / stack.hi / goid …<br align="left"/>>,
+           style="rounded,filled,dashed", fillcolor="#FBEFEF", color="#A04848"];
+
+  fire -> r14;
+  fire -> args;
+  r14 -> key [label=" 値をそのまま使う", penwidth=1.8];
+  args -> values;
+  r14 -> gstruct [label=" 読まない", style=dashed, color="#A04848", fontcolor="#7A3030", arrowhead=odot];
+
+  { rank=same; key; values; gstruct; }
+}

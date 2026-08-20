@@ -1,0 +1,40 @@
+// オフセット解決の2段構え
+digraph offset_resolution {
+  graph [
+    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=13,
+    rankdir=TB, compound=true, splines=true,
+    nodesep=0.5, ranksep=0.7, pad=0.25,
+    bgcolor="white", newrank=true
+  ];
+  node [
+    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=12,
+    shape=box, style="rounded,filled",
+    fillcolor="#F1F5F9", color="#475569", penwidth=1.6,
+    margin="0.2,0.14"
+  ];
+  edge [
+    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=11,
+    color="#334155", penwidth=1.4, arrowsize=0.9,
+    fontcolor="#1E293B"
+  ];
+
+  bin [label=<<b>計装対象のバイナリ</b>>, fillcolor="#EDF1F5"];
+  dwarf [label=<<b>DWARFデバッグ情報を読む</b>>, fillcolor="#D9E7F4", color="#38638F"];
+  check [shape=diamond, style="filled", margin="0.05,0.05",
+         label=<必要なフィールドが<br/>すべてそろったか>, fillcolor="#F1F5F9", color="#475569"];
+  ok [label=<<b>そのバイナリに書いてある事実を使う</b><br align="left"/>バージョン追従が要らない<br align="left"/>>,
+      fillcolor="#D6E8D6", color="#3F6E3F"];
+  table [label=<<b>offsets.json を引く</b><br align="left"/>go-offsets-tracker が自動更新する表<br align="left"/>>,
+         fillcolor="#F3E8CE", color="#96742E"];
+  ver [label=<<b>ビルド情報から版を割り出す</b><br align="left"/>Goと依存ライブラリのバージョン<br align="left"/>>,
+       fillcolor="#F3E8CE", color="#96742E"];
+  miss [label=<<b>その項目の計装は静かに欠ける</b>>, fillcolor="#F5DEDE", color="#A04848"];
+
+  bin -> dwarf;
+  dwarf -> check;
+  check -> ok [label=" そろった"];
+  check -> table [label=" 1つでも欠けた"];
+  bin -> table [label=" DWARFが無い（-w でビルド）", style=dashed, color="#7C8DA3"];
+  table -> ver [label=" どの版でビルドされたかを調べる"];
+  ver -> miss [label=" 表にその版が無い", style=dashed, color="#A04848", fontcolor="#7A3030"];
+}

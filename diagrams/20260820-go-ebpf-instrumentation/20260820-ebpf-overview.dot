@@ -1,0 +1,51 @@
+// eBPFの全体像
+digraph ebpf_overview {
+  graph [
+    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=13,
+    rankdir=TB, compound=true, splines=true,
+    nodesep=0.5, ranksep=0.7, pad=0.25,
+    bgcolor="white", newrank=true
+  ];
+  node [
+    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=12,
+    shape=box, style="rounded,filled",
+    fillcolor="#F1F5F9", color="#475569", penwidth=1.6,
+    margin="0.2,0.14"
+  ];
+  edge [
+    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=11,
+    color="#334155", penwidth=1.4, arrowsize=0.9,
+    fontcolor="#1E293B"
+  ];
+
+  subgraph cluster_user {
+    label=<<b>ユーザー空間</b>>;
+    style="rounded"; labeljust="l"; penwidth=1.6; margin=14;
+    color="#475569"; fontcolor="#334155"; bgcolor="#F4F6F8";
+
+    loader [label=<<b>ローダー</b><br align="left"/>Goで書かれる（cilium/ebpf）<br align="left"/>>,
+            fillcolor="#D9E7F4", color="#38638F"];
+    app [label=<<b>計装対象のGoバイナリ</b><br align="left"/>無改変のまま動く<br align="left"/>>,
+         fillcolor="#EDF1F5"];
+  }
+
+  subgraph cluster_kernel {
+    label=<<b>カーネル空間</b>>;
+    style="rounded"; labeljust="l"; penwidth=1.6; margin=14;
+    color="#75589C"; fontcolor="#5B4370"; bgcolor="#F5F1F9";
+
+    verifier [label=<<b>検証器</b><br align="left"/>停止性とメモリ安全を静的に検査<br align="left"/>>,
+              fillcolor="#E9DFF2", color="#75589C"];
+    prog [label=<<b>eBPFプログラム</b><br align="left"/>イベントごとに実行されて終わる<br align="left"/>>,
+          fillcolor="#D9E7F4", color="#38638F"];
+    maps [label=<<b>マップ</b><br align="left"/>イベントをまたぐ状態を持つ<br align="left"/>>,
+          fillcolor="#F3E8CE", color="#96742E"];
+  }
+
+  loader -> verifier [label=" バイトコードをロード"];
+  verifier -> prog [label=" 通れば常駐\l 通らなければロード失敗\l"];
+  loader -> app [label=" uprobeを命令アドレスに置く", style=dashed, color="#7C8DA3"];
+  app -> prog [label=" そのアドレスに到達すると発火", penwidth=1.8];
+  prog -> maps [label=" 読み書き", dir=both];
+  loader -> maps [label=" マップを読み出す", dir=back, style=dashed, color="#7C8DA3"];
+}

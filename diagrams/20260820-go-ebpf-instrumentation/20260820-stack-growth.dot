@@ -1,0 +1,46 @@
+// 図2: スタック伸長による移動と uretprobe の破綻
+digraph fig2 {
+  graph [
+    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=13,
+    rankdir=TB, compound=true, splines=true,
+    nodesep=0.45, ranksep=0.9, pad=0.25,
+    bgcolor="white", newrank=true
+  ];
+  node [
+    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=12,
+    shape=box, style="rounded,filled",
+    fillcolor="#F1F5F9", color="#475569", penwidth=1.6,
+    margin="0.2,0.14"
+  ];
+  edge [
+    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=11,
+    color="#334155", penwidth=1.4, arrowsize=0.9,
+    fontcolor="#1E293B"
+  ];
+
+  before [shape=plain, style="", label=<
+    <table border="0" cellborder="1" cellspacing="0" cellpadding="7" color="#38638F">
+      <tr><td align="left" bgcolor="#EFF5FB"><b>伸長前のスタック（0x7000_0000〜）</b></td></tr>
+      <tr><td align="left" bgcolor="#D9E7F4">…</td></tr>
+      <tr><td align="left" bgcolor="#D9E7F4" port="ra">戻りアドレス <b>0xTRAMPOLINE</b></td></tr>
+    </table>>];
+
+  after [shape=plain, style="", label=<
+    <table border="0" cellborder="1" cellspacing="0" cellpadding="7" color="#38638F">
+      <tr><td align="left" bgcolor="#EFF5FB"><b>伸長後のスタック（0x9000_0000〜）</b></td></tr>
+      <tr><td align="left" bgcolor="#D9E7F4">…</td></tr>
+      <tr><td align="left" bgcolor="#F5DEDE" port="ra">戻りアドレス <b>0xTRAMPOLINE</b></td></tr>
+    </table>>];
+
+  runtime [label=<<table border="0" cellborder="0" cellspacing="0" cellpadding="1">
+      <tr><td align="left"><b>Goランタイム</b></td></tr>
+      <tr><td align="left">自分が置いたポインタは新アドレスへ補正する</td></tr>
+      <tr><td align="left">カーネルが仕込んだ 0xTRAMPOLINE の素性は知らない</td></tr>
+    </table>>, fillcolor="#EDF1F5"];
+
+  crash [label=<<b>fatal error: unknown caller pc</b>>, fillcolor="#F5DEDE", color="#A04848"];
+
+  before -> after [label=" まるごとコピー\l ＋ ポインタ補正\l", penwidth=1.8];
+  runtime -> after:ra [label=" 補正の対象外", style=dashed, color="#A04848", fontcolor="#7A3030"];
+  after:ra -> crash [label=" 戻り先を解決できない"];
+}

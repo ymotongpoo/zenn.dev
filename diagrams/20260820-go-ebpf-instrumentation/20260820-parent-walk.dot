@@ -1,0 +1,34 @@
+// 親を6段まで遡る
+digraph parent_walk {
+  graph [
+    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=13,
+    rankdir=TB, compound=true, splines=true,
+    nodesep=0.5, ranksep=0.7, pad=0.25,
+    bgcolor="white", newrank=true
+  ];
+  node [
+    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=12,
+    shape=box, style="rounded,filled",
+    fillcolor="#F1F5F9", color="#475569", penwidth=1.6,
+    margin="0.2,0.14"
+  ];
+  edge [
+    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=11,
+    color="#334155", penwidth=1.4, arrowsize=0.9,
+    fontcolor="#1E293B"
+  ];
+  nodesep=0.4;
+
+  cur [label=<<b>送信 goroutine</b><br align="left"/>いまここ<br align="left"/>>, fillcolor="#D9E7F4", color="#38638F"];
+  p1 [label=<1段目の親>, fillcolor="#EDF1F5"];
+  p2 [label=<2段目の親>, fillcolor="#EDF1F5"];
+  dots [label=<…（6段目まで）>, fillcolor="#EDF1F5"];
+  root [label=<<b>受信 goroutine</b><br align="left"/>トレースの起点が見つかる<br align="left"/>>, fillcolor="#D6E8D6", color="#3F6E3F"];
+  over [label=<<b>7段以上は届かない</b><br align="left"/>検証器がループの上界を求めるため<br align="left"/>>, fillcolor="#F5DEDE", color="#A04848"];
+
+  cur -> p1 [label=" 親を引く"];
+  p1 -> p2;
+  p2 -> dots;
+  dots -> root [label=" 見つかれば終わり"];
+  dots -> over [label=" 見つからなければ打ち切り", style=dashed, color="#A04848", fontcolor="#7A3030"];
+}

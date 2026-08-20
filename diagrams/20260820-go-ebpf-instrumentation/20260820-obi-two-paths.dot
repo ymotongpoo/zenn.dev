@@ -1,0 +1,38 @@
+// OBIの2つの計装経路
+digraph obi_paths {
+  graph [
+    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=13,
+    rankdir=TB, compound=true, splines=true,
+    nodesep=0.6, ranksep=0.7, pad=0.25,
+    bgcolor="white", newrank=true
+  ];
+  node [
+    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=12,
+    shape=box, style="rounded,filled",
+    fillcolor="#F1F5F9", color="#475569", penwidth=1.6,
+    margin="0.2,0.14"
+  ];
+  edge [
+    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=11,
+    color="#334155", penwidth=1.4, arrowsize=0.9,
+    fontcolor="#1E293B"
+  ];
+
+  obi [label=<<b>OBI</b>>, fillcolor="#EDF1F5"];
+
+  proto [label=<<b>プロトコル計装</b><br align="left"/>ソケットを流れるバイト列を解釈<br align="left"/>HTTP/1.1、HTTP/2、gRPC、MySQL、Redis<br align="left"/>>,
+         fillcolor="#D6E8D6", color="#3F6E3F"];
+  lib [label=<<b>ランタイムとライブラリの計装</b><br align="left"/>対象の環境ごとに個別の実装が要る<br align="left"/>関数計装を持つのはGoだけ<br align="left"/>>,
+       fillcolor="#D9E7F4", color="#38638F"];
+
+  proto_res [label=<<b>言語に依存しない</b>>, fillcolor="#F0F7F0", color="#3F6E3F"];
+  lib_res [label=<<b>本記事が扱う4つの難所</b><br align="left"/>可動スタック、レジスタABI<br align="left"/>オフセット追従、goroutine<br align="left"/>>,
+           fillcolor="#EFF5FB", color="#38638F"];
+
+  obi -> proto;
+  obi -> lib [penwidth=1.8];
+  proto -> proto_res [style=dashed, color="#7C8DA3"];
+  lib -> lib_res [penwidth=1.8];
+
+  { rank=same; proto -> lib [style=invis]; }
+}

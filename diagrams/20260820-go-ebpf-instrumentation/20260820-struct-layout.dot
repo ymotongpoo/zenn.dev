@@ -1,0 +1,43 @@
+// 構造体はメモリ上でどう並ぶか
+digraph struct_layout {
+  graph [
+    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=13,
+    rankdir=TB, compound=true, splines=true,
+    nodesep=0.5, ranksep=0.7, pad=0.25,
+    bgcolor="white", newrank=true
+  ];
+  node [
+    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=12,
+    shape=box, style="rounded,filled",
+    fillcolor="#F1F5F9", color="#475569", penwidth=1.6,
+    margin="0.2,0.14"
+  ];
+  edge [
+    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=11,
+    color="#334155", penwidth=1.4, arrowsize=0.9,
+    fontcolor="#1E293B"
+  ];
+  ranksep=1.0;
+
+  src [shape=plain, style="", label=<
+    <table border="0" cellborder="1" cellspacing="0" cellpadding="6" color="#3F6E3F">
+      <tr><td align="left" bgcolor="#F0F7F0"><b>ソースに書いた構造体</b></td></tr>
+      <tr><td align="left" bgcolor="#D6E8D6">type S struct {</td></tr>
+      <tr><td align="left" bgcolor="#D6E8D6">&nbsp;&nbsp;&nbsp;&nbsp;a bool</td></tr>
+      <tr><td align="left" bgcolor="#D6E8D6">&nbsp;&nbsp;&nbsp;&nbsp;b int64</td></tr>
+      <tr><td align="left" bgcolor="#D6E8D6">&nbsp;&nbsp;&nbsp;&nbsp;c int32</td></tr>
+      <tr><td align="left" bgcolor="#D6E8D6">}</td></tr>
+    </table>>];
+
+  mem [shape=plain, style="", label=<
+    <table border="0" cellborder="1" cellspacing="0" cellpadding="6" color="#38638F">
+      <tr><td colspan="2" align="left" bgcolor="#EFF5FB"><b>メモリ上の並び</b>（合計24バイト）</td></tr>
+      <tr><td align="left" bgcolor="#D9E7F4">+0</td><td align="left" bgcolor="#D9E7F4">a（1バイト）</td></tr>
+      <tr><td align="left" bgcolor="#F3E8CE">+1 〜 +7</td><td align="left" bgcolor="#F3E8CE">詰め物（8バイト境界に合わせる）</td></tr>
+      <tr><td align="left" bgcolor="#D9E7F4">+8</td><td align="left" bgcolor="#D9E7F4">b（8バイト）</td></tr>
+      <tr><td align="left" bgcolor="#D9E7F4">+16</td><td align="left" bgcolor="#D9E7F4">c（4バイト）</td></tr>
+      <tr><td align="left" bgcolor="#F3E8CE">+20 〜 +23</td><td align="left" bgcolor="#F3E8CE">詰め物</td></tr>
+    </table>>];
+
+  src -> mem [label=" コンパイルすると名前は消え、\l バイト位置だけが残る\l", penwidth=1.8];
+}

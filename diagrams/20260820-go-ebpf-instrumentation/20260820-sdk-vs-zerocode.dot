@@ -1,0 +1,45 @@
+// 誰が traceparent を書き込むのか
+digraph sdk_vs_zerocode {
+  graph [
+    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=13,
+    rankdir=TB, compound=true, splines=true,
+    nodesep=0.5, ranksep=0.7, pad=0.25,
+    bgcolor="white", newrank=true
+  ];
+  node [
+    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=12,
+    shape=box, style="rounded,filled",
+    fillcolor="#F1F5F9", color="#475569", penwidth=1.6,
+    margin="0.2,0.14"
+  ];
+  edge [
+    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=11,
+    color="#334155", penwidth=1.4, arrowsize=0.9,
+    fontcolor="#1E293B"
+  ];
+
+  subgraph cluster_sdk {
+    label=<<b>SDK計装</b>>;
+    style="rounded"; labeljust="l"; penwidth=1.6; margin=14;
+    color="#3F6E3F"; fontcolor="#2C4F2C"; bgcolor="#F0F7F0";
+
+    app1 [label=<<b>アプリのコード</b><br align="left"/>ctx と req を手元に持っている<br align="left"/>>,
+          fillcolor="#D6E8D6", color="#3F6E3F"];
+    hdr1 [label=<<b>リクエストのヘッダ</b>>, fillcolor="#EDF1F5"];
+    app1 -> hdr1 [label=" Inject で自分で書く", penwidth=1.8];
+  }
+
+  subgraph cluster_zero {
+    label=<<b>ゼロコード計装</b>>;
+    style="rounded"; labeljust="l"; penwidth=1.6; margin=14;
+    color="#38638F"; fontcolor="#2E4D6E"; bgcolor="#EFF5FB";
+
+    app2 [label=<<b>アプリのコード</b><br align="left"/>traceparent の存在を知らない<br align="left"/>>,
+          fillcolor="#EDF1F5"];
+    hdr2 [label=<<b>リクエストのヘッダ</b>>, fillcolor="#EDF1F5"];
+    obi [label=<<b>OBI</b>（カーネル側のフック）>, fillcolor="#D9E7F4", color="#38638F"];
+
+    app2 -> hdr2 [label=" 何も書かない", style=dashed, color="#A04848", fontcolor="#7A3030", arrowhead=tee];
+    obi -> hdr2 [label=" 外から代行して書く", penwidth=1.8];
+  }
+}

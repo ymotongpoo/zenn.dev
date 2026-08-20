@@ -1,0 +1,29 @@
+// 図6: 外からの観測と内からの観測
+digraph fig6 {
+  graph [
+    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=13,
+    rankdir=TB, compound=true, splines=true,
+    nodesep=0.6, ranksep=0.9, pad=0.25,
+    bgcolor="white", newrank=true
+  ];
+  node [
+    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=12,
+    shape=box, style="rounded,filled",
+    fillcolor="#F1F5F9", color="#475569", penwidth=1.6,
+    margin="0.2,0.14"
+  ];
+  edge [
+    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=11,
+    color="#334155", penwidth=1.4, arrowsize=0.9,
+    fontcolor="#1E293B"
+  ];
+
+  out [label=<<b>外からの観測：eBPF / OBI</b><br align="left"/>uprobe、レジスタの読み取り、オフセット追従<br align="left"/>>,
+       fillcolor="#D9E7F4", color="#38638F"];
+  in [label=<<b>内からの観測：Goランタイム</b><br align="left"/>flight recording、goroutine leak profile<br align="left"/>>,
+      fillcolor="#D6E8D6", color="#3F6E3F"];
+  app [label=<<b>Goアプリケーション</b>>, fillcolor="#EDF1F5"];
+
+  out -> app [label=" アプリ改変は不要\l だが内部構造への\l 追従コストを負う\l", penwidth=1.6];
+  in -> app [label=" 正確で壊れにくい\l だがコードとビルドへの\l 関与が要る\l", penwidth=1.6];
+}
