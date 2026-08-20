@@ -16,7 +16,7 @@ title: "v2以後のエコシステム"
 
 **型付き構造体タグ**という言語機能が入るのを待つ、という判断です。
 
-型付き構造体タグは [`golang/go#74472`](https://github.com/golang/go/issues/74472) で Axel Wagner が2025年7月に提案したもので、現在の文字列タグに加えて、型の付いた定数式を書けるようにする言語変更です。`time.Time \`json:",format:RFC3339"\`` が `time.Time {json.Format(time.RFC3339)}` のように書けるようになります。文字列の中に小さな独自言語を作り込むのをやめて、コンパイラに検査させる方向です。
+型付き構造体タグは [`golang/go#74472`](https://github.com/golang/go/issues/74472) で Axel Wagner が2025年7月に提案したもので、現在の文字列タグに加えて、型の付いた定数式を書けるようにする言語変更です。`` time.Time `json:",format:RFC3339"` `` が `time.Time {json.Format(time.RFC3339)}` のように書けるようになります。文字列の中に小さな独自言語を作り込むのをやめて、コンパイラに検査させる方向です。
 
 この提案は2025年11月に「調査する価値はあるが、いま追う余力がない」として保留になりました。ところが2026年4月20日、[Austin Clements が次のように書きます](https://github.com/golang/go/issues/74472#issuecomment-4284572415)。
 
@@ -26,7 +26,7 @@ title: "v2以後のエコシステム"
 
 その10日後に `#79071` が立ち、`format` タグが取り下げられます。言語側の未確定な提案が、標準ライブラリの提案から機能を1つ削る形で作用しました。
 
-4章で引いた [Damien Neil のコメント](https://github.com/golang/go/issues/71497#issuecomment-4224664008)、「新しいものを足すより、初回リリースから機能を一時的に取り下げるほうがずっとありそうだ」は、比喩ではありませんでした。
+4章で引用した [Damien Neil のコメント](https://github.com/golang/go/issues/71497#issuecomment-4224664008)、「新しいものを足すより、初回リリースから機能を一時的に取り下げるほうがずっとありそうだ」は、比喩ではありませんでした。
 
 ## time.Durationに残された問題
 
@@ -67,7 +67,7 @@ v2 format:units:   err=json: cannot marshal from Go main.ConfigTagged: Go struct
 
 構図が一周しました。標準ライブラリが動けないから外部にプロトタイプが作られ、それが標準に取り込まれ、そして標準から外された機能に触るために、また同じ外部モジュールを使うことになっています。
 
-なお、この `format` タグの取り下げも、`time.Duration` がエラーになることも、[Go 1.27のリリースノート](https://go.dev/doc/go1.27)には書かれていません。リリースノートが `encoding/json` そのものを扱っているのは、["New encoding/json/v2 and encoding/json/jsontext packages"の節](https://go.dev/doc/go1.27#jsonv2)にある、5章で引いた「v2の実装に支えられるようになった」の段落だけです。
+なお、この `format` タグの取り下げも、`time.Duration` がエラーになることも、[Go 1.27のリリースノート](https://go.dev/doc/go1.27)には書かれていません。リリースノートが `encoding/json` そのものを扱っているのは、["New encoding/json/v2 and encoding/json/jsontext packages"の節](https://go.dev/doc/go1.27#jsonv2)にある、5章で引用した「v2の実装に支えられるようになった」の段落だけです。
 
 ## サードパーティの対応
 
@@ -122,7 +122,9 @@ json.Marshal(v,
 
 `proto.Message` をフィールドに含む大きなGoの値を、その部分だけ `protojson` に任せながら一度にシリアライズする形です。
 
-Go Protobuf のメンテナである Michael Stapelberg は、当時「依存を増やしたくないし、vendoringも面倒なので、標準ライブラリに入るのを待つ」という選択をしました。[2026年7月20日のコメント](https://github.com/golang/protobuf/issues/1673#issuecomment-5020103523)には「json/v2 が今月リリースされます。待つという判断は報われたと思う」とあります。
+Go Protobuf のメンテナであるMichael Stapelberg[^stapelberg]は、当時「依存を増やしたくないし、vendoringも面倒なので、標準ライブラリに入るのを待つ」という選択をしました。[2026年7月20日のコメント](https://github.com/golang/protobuf/issues/1673#issuecomment-5020103523)には「json/v2 が今月リリースされます。待つという判断は報われたと思う」とあります。
+
+[^stapelberg]: Michael StapelbergはGoパッケージのDebian向けリリース（aptパッケージ化）やi3wmの開発で有名です
 
 ただし現時点で、protobuf-goのソースに `jsontext` への参照はありません。`internal/encoding/json` も手書きのまま残っています。Go Protobuf は複数の古いGoバージョンを支える方針なので、実際に乗り換えられるのはもう少し先になります。
 

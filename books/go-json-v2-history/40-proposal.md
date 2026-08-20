@@ -20,7 +20,7 @@ Discussion #63397 には多くのコメントやThumb upが集まりました。
 
 | 論点 | v1 | v2 | 議論 |
 |---|---|---|---|
-| マップの出力順序 | キーをソートして決定的な順序 | 非決定的な順序 | テストや差分の取りやすさを重視する立場から反対が多く出た。ソートのコストを既定で全員に負わせない判断になり、必要な人は `Deterministic` オプションを指定する形に落ち着いた |
+| マップの出力順序 | キーをソートして決定的な順序 | 非決定的な順序 | テストや差分の取りやすさを重視する立場から反対が多く出た。ソートのコストをデフォルトで全員に負わせない判断になり、必要な人は `Deterministic` オプションを指定する形に落ち着いた |
 | nilのスライスとマップ | `null` | `[]` と `{}` | 往復変換が崩れる、Goのnilという情報が消える、という反対があった |
 | `omitempty` の判定基準 | Goの値として空か（`false`、`0`、nilポインタ、空文字列など） | JSONとして空の値になるか | 判定の基準が、Goの型システムからJSONの型システムへ移った |
 | `null` をnullableでないGoの型に入れたとき | エラーにしない | エラーにしない | 拒否すべきだという意見が出たが、「妥当なJSONを、Goの型システムの都合で拒否すべきではない」として退けられた |
@@ -33,7 +33,7 @@ Discussion #63397 には多くのコメントやThumb upが集まりました。
 
 > All new usages of "json" in Go should use the v2 package, but the v1 package will forever remain supported.
 >
-> （Goで新しくjsonを使う場合はすべてv2パッケージを使うべきだが、v1パッケージは永久にサポートされ続ける）
+> （Goで新しくjsonを使う場合はすべてv2パッケージを使うべきですが、v1パッケージは永久にサポートされ続けます。）
 
 同じ2023年10月、GopherCon 2023 で Joe Tsai が["The Future of JSON in Go" という講演](https://www.youtube.com/watch?v=avilmOcHKHE)を行っています。Discussion が開かれたのと同じ週です[^gophercon2023]。
 
@@ -90,7 +90,7 @@ JSONを受け取る側がJavaScriptなら、104日を超える期間は精度を
 >
 > （私たちの結論は、古いデフォルト値であるナノ秒を保ちたくはないが、duration の表現を黙って変えたくもない、というものです。したがって `encoding/json/v2` は、利用者に形式の指定を要求すべきです。）
 
-新たな提案が出ました。v2で `time.Duration` をそのまま `Marshal` するとエラーになります。形式を明示したときだけ通ります。「間違った既定を引き継ぐ」でも「黙って正しい既定に変える」でもなく、「既定を持たないことにして、書き手に選ばせる」という結果になりました。
+新たな提案が出ました。v2で `time.Duration` をそのまま `Marshal` するとエラーになります。形式を明示したときだけ通ります。「間違ったデフォルトを引き継ぐ」でも「黙って正しいデフォルトに変える」でもなく、「既定を持たないことにして、書き手に選ばせる」という結果になりました。
 
 ## 提案の受理
 
@@ -112,7 +112,7 @@ JSONを受け取る側がJavaScriptなら、104日を超える期間は精度を
 > **json/v2** — UnmarshalRead will always read to EOF. This is in contrast to v1, where it was a common mistake to call `Decode(io.Reader)` and not check that the reader had reached EOF.
 > **Struct tags** — `omitempty` is now defined in terms of the JSON type system instead of the Go type system.
 > 👍 all around the room.
->
+> ---
 > @dsnet が参加し、API全体を通して説明しました。
 > **jsontext** は絶対的な安全性より性能に寄せています。APIはメモリ確保よりエイリアシングを好む傾向があります。このパッケージが広く使われることは想定しておらず、本当に特殊なことや、本当に高性能が要ることをするためだけのものです。
 > **Options** はエンコードとデコードの両方で、また構文層と意味層のあいだでも共有されます。ワーキンググループは代案の検討に多くの時間を費やし、最終的にこの設計に戻ってきました。

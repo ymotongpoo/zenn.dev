@@ -10,7 +10,7 @@ mvdanが[修正パッチ](https://go-review.googlesource.com/c/go/+/224079)を�
 
 > Please note that these are mostly my personal opinions as one of the maintainers of encoding/json. In no way are they a formal proposal (yet) or endorsed by the Go project.
 >
-> （これらは大部分が、encoding/json のメンテナの一人としての私個人の意見であることに留意してほしい。決して（まだ）正式な提案ではなく、Goプロジェクトが承認したものでもない）
+> （これらは大部分が、encoding/json のメンテナの一人としての私個人の意見であることに留意してください。決して（まだ）正式な提案ではなく、Goプロジェクトが承認したものでもありません。）
 
 個人の意見だと断りつつ、謝辞には Philip Pearl、Matt Layher、Dave Cheney、Chris Hines、Roger Peppe、Joe Tsai 等の名が並んでいます。`encoding/json` の遅さを連載で解剖した人、高速なJSONトークナイザを書いた人、Goが公開された日からのコントリビュータ、標準ライブラリの外側でシリアライズと性能の改善を続けてきた人という錚々たる面々です。そのうちの一人、GoチームのメンバーであるJoe Tsaiが、この数週間後にv2のプロトタイプの最初のコミットをすることになります。
 
@@ -29,7 +29,7 @@ mvdanが[修正パッチ](https://go-review.googlesource.com/c/go/+/224079)を�
 
 そうしたサードパーティライブラリからも学びもあります。「Previous work」という節に、[`json-iterator/go`](https://github.com/json-iterator/go) のアロケーションを減らすAPI設計、Phil Pearl による `Marshaler` の性能限界の分析、Dave Cheney による高速なトークナイザの実装が挙げられています。設計原則としては採用しないが、問題の捉え方としては参照する、というスタンスになっています。
 
-そして、この文書にはコメントが残っています。
+そして、この文書には[コメント](https://docs.google.com/document/d/1WQGoM44HLinH4NGBEv5drGlw5_RNW-GP7DdGEpm7Y3o/edit?disco=AAAAKW8Yr2s)が残っています。
 
 > another: make a list of v1 semantics that we want to bury/hide from the new API, and only keep working from the old API entrypoints
 >
@@ -70,7 +70,7 @@ API として最初に足されたのが["syntactic JSON serialization"](https:/
 
 Joe Tsai は Protocol Buffers のGo実装に関わっていました。そのなかに [`protojson`](https://pkg.go.dev/google.golang.org/protobuf/encoding/protojson) という、protobufのメッセージとJSONを相互変換するパッケージがあります。
 
-Go公式ブログの記述です。
+Go公式ブログ["A new experimental Go API for JSON"](https://go.dev/blog/jsonv2-exp)の記述です。
 
 > After previous work on the Go API for Protocol Buffers, Joe Tsai was disappointed that the `protojson` package needed to use a custom JSON implementation because `encoding/json` was neither capable of adhering to the stricter JSON standard that the Protocol Buffer specification required, nor of efficiently serializing JSON in a streaming manner.
 >
@@ -80,7 +80,7 @@ Go公式ブログの記述です。
 
 ## READMEに書かれた6つの目標
 
-`go-json-experiment/json` のREADMEには、初期から6つの目標が並んでいました。このうち2つが、その後の開発方針を決めています。
+`go-json-experiment/json` の[最初のREADME](https://github.com/go-json-experiment/json/blob/10e1c1dd5a0849500339d90175566ebb98e1c245/README.md)には、6つの目標が並んでいました。このうち2つが、その後の開発方針を決めています。
 
 1つは互換性の扱いです。
 
@@ -94,7 +94,7 @@ v1で修正できなかったものを、ここで初めて「誤り」と呼ん
 >
 > （v1の実装は永久に残さなければならないのですから、v1がv2を使って内部的に実装できるなら好都合でしょう。）
 
-2020年11月の時点で、7年後に実際に採用される形が書かれています（あとで解説します）。当時のREADMEには「Expectations」という節もあり[^expectations]、想定される結果が5つ並んでいて、その第1案は「この試みを断念する」でした。うまくいく前提で書かれた文書ではないことがわかります。
+2020年10月の時点で、6年後に実際に採用される形が書かれています（あとで解説します）。当時のREADMEには「Expectations」という節もあり[^expectations]、想定される結果が5つ並んでいて、その第1案は「この試みを断念する」でした。うまくいく前提で書かれた文書ではないことがわかります。
 
 [^expectations]: 現在は削除されています。
 
@@ -102,7 +102,7 @@ v1で修正できなかったものを、ここで初めて「誤り」と呼ん
 
 構想と実装があっても、それだけでは標準ライブラリに入る根拠になりません。このプロトタイプは実際に使われました。
 
-Joe Tsai は2021年7月にTailscaleへ転職し、2022年10月に[自分の手でこのモジュールを依存に加えています](https://github.com/tailscale/tailscale/pull/6108)。外部の誰かが評価して採用したのではなく、作者が移った先で使い始めた、という順序です。
+Joe Tsai は2021年7月にTailscaleへ転職し、2022年10月に[自分の手でこのモジュールを依存に加えています](https://github.com/tailscale/tailscale/pull/6108/changes)。外部の誰かが評価して本番採用したのではなく、作者が転職先で使い始めたわけです。
 
 [Discussion #63397](https://github.com/golang/go/discussions/63397) のStability という節に、次の記述があります。
 
