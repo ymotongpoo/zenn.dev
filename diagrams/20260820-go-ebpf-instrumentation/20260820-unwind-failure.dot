@@ -1,0 +1,46 @@
+// 戻りアドレスから関数を引けないと、スタックを辿れない
+digraph unwind_failure {
+  graph [
+    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=13,
+    rankdir=TB, compound=true, splines=true,
+    nodesep=0.5, ranksep=0.7, pad=0.25,
+    bgcolor="white", newrank=true
+  ];
+  node [
+    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=12,
+    shape=box, style="rounded,filled",
+    fillcolor="#F1F5F9", color="#475569", penwidth=1.6,
+    margin="0.2,0.14"
+  ];
+  edge [
+    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=11,
+    color="#334155", penwidth=1.4, arrowsize=0.9,
+    fontcolor="#1E293B"
+  ];
+
+  stack [shape=plain, style="", label=<
+    <table border="0" cellborder="1" cellspacing="0" cellpadding="6" color="#38638F">
+      <tr><td align="left" bgcolor="#EFF5FB"><b>移動中のスタック</b></td></tr>
+      <tr><td align="left" bgcolor="#D9E7F4">いま見ているフレーム</td></tr>
+      <tr><td align="left" bgcolor="#F5DEDE" port="ra">戻りアドレス <b>0xTRAMPOLINE</b></td></tr>
+      <tr><td align="left" bgcolor="#D9E7F4">呼び出し元のフレーム …</td></tr>
+    </table>>];
+
+  walk [label=<<b>ランタイムがフレームを1つずつ辿る</b><br align="left"/>スタックの移動時とGCの走査時<br align="left"/>>,
+        fillcolor="#EDF1F5"];
+  lookup [label=<<b>戻りアドレスから関数を引く</b><br align="left"/>findfunc が .gopclntab を検索する<br align="left"/>>,
+          fillcolor="#F3E8CE", color="#96742E"];
+  ok [label=<<b>Go関数が見つかる</b><br align="left"/>フレームの大きさとポインタの位置が分かり、補正できる<br align="left"/>>,
+      fillcolor="#D6E8D6", color="#3F6E3F"];
+  ng [label=<<b>トランポリンは表に無い</b><br align="left"/>どの関数のフレームか分からない<br align="left"/>>,
+      fillcolor="#F5DEDE", color="#A04848"];
+  crash [label=<<b>throw("unknown caller pc")</b>>, fillcolor="#F5DEDE", color="#A04848"];
+
+  walk -> lookup [penwidth=1.8];
+  stack:ra:e -> lookup [label=" この値を渡す", style=dashed, color="#7C8DA3"];
+  lookup -> ok [label=" 通常の戻りアドレス"];
+  lookup -> ng [label=" uretprobeが書き換えた値"];
+  ng -> crash [label=" 失敗が許されない文脈なので"];
+
+  { rank=same; stack; walk; }
+}

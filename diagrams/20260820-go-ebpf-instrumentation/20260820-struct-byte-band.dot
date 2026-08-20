@@ -1,0 +1,42 @@
+// フィールドを1つ足すと後ろがずれる
+digraph struct_band {
+  graph [
+    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=13,
+    rankdir=TB, compound=true, splines=true,
+    nodesep=0.5, ranksep=0.7, pad=0.25,
+    bgcolor="white", newrank=true
+  ];
+  node [
+    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=12,
+    shape=box, style="rounded,filled",
+    fillcolor="#F1F5F9", color="#475569", penwidth=1.6,
+    margin="0.2,0.14"
+  ];
+  edge [
+    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=11,
+    color="#334155", penwidth=1.4, arrowsize=0.9,
+    fontcolor="#1E293B"
+  ];
+  ranksep=1.0;
+
+  v1 [shape=plain, style="", label=<
+    <table border="0" cellborder="1" cellspacing="0" cellpadding="6" color="#38638F">
+      <tr><td colspan="2" align="left" bgcolor="#EFF5FB"><b>streamV1</b>（合計40バイト）</td></tr>
+      <tr><td align="left" bgcolor="#D9E7F4">+0 〜 +15</td><td align="left" bgcolor="#D9E7F4">ctx any（型ポインタ8 ＋ データポインタ8）</td></tr>
+      <tr><td align="left" bgcolor="#D9E7F4">+16 〜 +19</td><td align="left" bgcolor="#D9E7F4">id uint32</td></tr>
+      <tr><td align="left" bgcolor="#F3E8CE">+20 〜 +23</td><td align="left" bgcolor="#F3E8CE">詰め物</td></tr>
+      <tr><td align="left" bgcolor="#D9E7F4">+24 〜 +39</td><td align="left" bgcolor="#D9E7F4">method string（ポインタ8 ＋ 長さ8）</td></tr>
+    </table>>];
+
+  v2 [shape=plain, style="", label=<
+    <table border="0" cellborder="1" cellspacing="0" cellpadding="6" color="#A04848">
+      <tr><td colspan="2" align="left" bgcolor="#FBEFEF"><b>streamV2</b>（合計48バイト）</td></tr>
+      <tr><td align="left" bgcolor="#D9E7F4">+0 〜 +15</td><td align="left" bgcolor="#D9E7F4">ctx any</td></tr>
+      <tr><td align="left" bgcolor="#D6E8D6">+16 〜 +23</td><td align="left" bgcolor="#D6E8D6">cancel func()（足したフィールド）</td></tr>
+      <tr><td align="left" bgcolor="#F5DEDE">+24 〜 +27</td><td align="left" bgcolor="#F5DEDE">id uint32（16から24へ動いた）</td></tr>
+      <tr><td align="left" bgcolor="#F3E8CE">+28 〜 +31</td><td align="left" bgcolor="#F3E8CE">詰め物</td></tr>
+      <tr><td align="left" bgcolor="#F5DEDE">+32 〜 +47</td><td align="left" bgcolor="#F5DEDE">method string（24から32へ動いた）</td></tr>
+    </table>>];
+
+  v1 -> v2 [label=" ctx の後ろに cancel を1つ足す", penwidth=1.8];
+}
