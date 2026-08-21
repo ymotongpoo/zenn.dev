@@ -29,7 +29,7 @@ digraph stack_move {
   check [label=<<b>関数の入口でスタックの残りを調べる</b><br align="left"/>足りなければ runtime.morestack へ飛ぶ<br align="left"/>>,
          fillcolor="#F3E8CE", color="#96742E"];
   alloc [label=<<b>より大きい領域を確保する</b>>, fillcolor="#F3E8CE", color="#96742E"];
-  copy [label=<<b>中身をまるごとコピーし、ポインタを補正する</b><br align="left"/>ランタイムが自分で置いたポインタを新アドレスへ書き換える<br align="left"/>>,
+  copy [label=<<b>中身をまるごとコピーし、ポインタを補正する</b><br align="left"/>戻りアドレスからどの関数のフレームかを引き、1フレームずつ辿って書き換える<br align="left"/>>,
         fillcolor="#F3E8CE", color="#96742E"];
 
   after [shape=plain, style="", label=<

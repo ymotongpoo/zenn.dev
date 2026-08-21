@@ -1,9 +1,9 @@
-// プロセスに与えられるメモリ
-digraph process_memory {
+// プロセスのメモリとCPU
+digraph memory_and_cpu {
   graph [
     fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=13,
-    rankdir=TB, compound=true, splines=true,
-    nodesep=0.5, ranksep=0.7, pad=0.25,
+    rankdir=LR, compound=true, splines=true,
+    nodesep=0.5, ranksep=1.1, pad=0.25,
     bgcolor="white", newrank=true
   ];
   node [
@@ -18,18 +18,35 @@ digraph process_memory {
     fontcolor="#1E293B"
   ];
 
+  subgraph cluster_cpu {
+    label=<<b>CPU</b>>;
+    style="rounded"; labeljust="l"; penwidth=1.6; margin=14;
+    color="#38638F"; fontcolor="#2E4D6E"; bgcolor="#EFF5FB";
+
+    regs [shape=plain, style="", label=<
+      <table border="0" cellborder="1" cellspacing="0" cellpadding="6" color="#38638F">
+        <tr><td colspan="2" align="left" bgcolor="#EFF5FB"><b>レジスタ</b>（CPUの中の小さな入れ物）</td></tr>
+        <tr><td align="left" bgcolor="#D9E7F4">AX、BX、CX …</td><td align="left" bgcolor="#D9E7F4">計算に使う汎用レジスタ</td></tr>
+        <tr><td align="left" bgcolor="#D9E7F4">SP</td><td port="sp" align="left" bgcolor="#D9E7F4">スタックの先端のアドレス</td></tr>
+        <tr><td align="left" bgcolor="#D9E7F4">PC</td><td port="pc" align="left" bgcolor="#D9E7F4">次に実行する命令のアドレス</td></tr>
+      </table>>];
+  }
+
   mem [shape=plain, style="", label=<
     <table border="0" cellborder="1" cellspacing="0" cellpadding="7" color="#475569">
       <tr><td colspan="2" align="left" bgcolor="#F4F6F8"><b>1つのプロセスに見えているメモリ</b>（仮想アドレス空間）</td></tr>
       <tr><td colspan="2" align="left" bgcolor="#FFFFFF"><i>高いアドレス</i></td></tr>
-      <tr><td align="left" bgcolor="#D9E7F4"><b>スタック</b></td>
+      <tr><td port="stk" align="left" bgcolor="#D9E7F4"><b>スタック</b></td>
           <td align="left" bgcolor="#D9E7F4">関数の引数とローカル変数。呼び出しで低いアドレスへ伸び、抜けると縮む</td></tr>
       <tr><td align="left" bgcolor="#F3E8CE"><b>ヒープ</b></td>
           <td align="left" bgcolor="#F3E8CE">明示的に確保する領域。関数を抜けても残り、GCが回収する</td></tr>
       <tr><td align="left" bgcolor="#E9DFF2"><b>データ</b></td>
           <td align="left" bgcolor="#E9DFF2">グローバル変数や定数。プログラムの実行中ずっとある</td></tr>
-      <tr><td align="left" bgcolor="#D6E8D6"><b>テキスト</b></td>
+      <tr><td port="txt" align="left" bgcolor="#D6E8D6"><b>テキスト</b></td>
           <td align="left" bgcolor="#D6E8D6">機械語そのもの。読み取り専用で、命令はここに並ぶ</td></tr>
       <tr><td colspan="2" align="left" bgcolor="#FFFFFF"><i>低いアドレス</i></td></tr>
     </table>>];
+
+  regs:sp:e -> mem:stk:w [label=" 指している"];
+  regs:pc:e -> mem:txt:w [label=" 指している"];
 }

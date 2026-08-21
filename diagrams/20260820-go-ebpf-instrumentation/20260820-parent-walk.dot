@@ -23,8 +23,8 @@ digraph parent_walk {
   p1 [label=<1段目の親>, fillcolor="#EDF1F5"];
   p2 [label=<2段目の親>, fillcolor="#EDF1F5"];
   dots [label=<…（6段目まで）>, fillcolor="#EDF1F5"];
-  root [label=<<b>受信 goroutine</b><br align="left"/>トレースの起点が見つかる<br align="left"/>>, fillcolor="#D6E8D6", color="#3F6E3F"];
-  over [label=<<b>7段以上は届かない</b><br align="left"/>検証器がループの上界を求めるため<br align="left"/>>, fillcolor="#F5DEDE", color="#A04848"];
+  root [label=<<b>受信 goroutine</b><br align="left"/>go_trace_map にトレース情報を持つ<br align="left"/>>, fillcolor="#D6E8D6", color="#3F6E3F"];
+  over [label=<<b>7段目で打ち切り</b><br align="left"/>上界の存在は検証器の要請、6という値は実装の選択<br align="left"/>>, fillcolor="#F5DEDE", color="#A04848"];
 
   cur -> p1 [label=" 親を引く"];
   p1 -> p2;
