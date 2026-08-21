@@ -1,0 +1,37 @@
+// OBIの処理パイプライン
+digraph obi_pipeline {
+  graph [
+    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=13,
+    rankdir=TB, compound=true, splines=true,
+    nodesep=0.5, ranksep=0.7, pad=0.25,
+    bgcolor="white", newrank=true
+  ];
+  node [
+    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=12,
+    shape=box, style="rounded,filled",
+    fillcolor="#F1F5F9", color="#475569", penwidth=1.6,
+    margin="0.2,0.14"
+  ];
+  edge [
+    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=11,
+    color="#334155", penwidth=1.4, arrowsize=0.9,
+    fontcolor="#1E293B"
+  ];
+  ranksep=0.5;
+
+  discover [label=<<b>1. 発見</b><br align="left"/>/proc を走査し、設定の条件に合うプロセスを選ぶ<br align="left"/>>, fillcolor="#D9E7F4", color="#38638F"];
+  analyze [label=<<b>2. ELF解析</b><br align="left"/>シンボル、.gopclntab、DWARF、オフセット表から<br align="left"/>関数アドレスとフィールド位置を割り出す<br align="left"/>>, fillcolor="#D9E7F4", color="#38638F"];
+  attach [label=<<b>3. ロードとアタッチ</b><br align="left"/>eBPFプログラムを検証器に通し、uprobeを結び付ける<br align="left"/>>, fillcolor="#D9E7F4", color="#38638F"];
+  collect [label=<<b>4. イベント収集</b><br align="left"/>フック発火→リングバッファ→スパンの組み立て<br align="left"/>>, fillcolor="#D9E7F4", color="#38638F"];
+  export [label=<<b>5. エクスポート</b><br align="left"/>メタデータを付けてOTLP / Prometheusで送る<br align="left"/>>, fillcolor="#D6E8D6", color="#3F6E3F"];
+
+  hA [label=<<b>難所1と難所3</b><br align="left"/>どこにフックを置き、どこを読むか<br align="left"/>>, fillcolor="#F5DEDE", color="#A04848"];
+  hB [label=<<b>難所2と難所4</b><br align="left"/>発火の瞬間に何をどう読み書きするか<br align="left"/>>, fillcolor="#F5DEDE", color="#A04848"];
+
+  discover -> analyze -> attach -> collect -> export;
+  hA -> analyze [style=dashed, color="#A04848", fontcolor="#7A3030", label=" ここで現れる"];
+  hA -> attach [style=dashed, color="#A04848"];
+  hB -> collect [style=dashed, color="#A04848", fontcolor="#7A3030", label=" ここで現れる"];
+  { rank=same; analyze; hA; }
+  { rank=same; collect; hB; }
+}

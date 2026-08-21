@@ -1,0 +1,41 @@
+// 仮想アドレスと物理メモリ
+digraph virtual_to_physical {
+  graph [
+    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=13,
+    rankdir=TB, compound=true, splines=true,
+    nodesep=0.5, ranksep=0.7, pad=0.25,
+    bgcolor="white", newrank=true
+  ];
+  node [
+    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=12,
+    shape=box, style="rounded,filled",
+    fillcolor="#F1F5F9", color="#475569", penwidth=1.6,
+    margin="0.2,0.14"
+  ];
+  edge [
+    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=11,
+    color="#334155", penwidth=1.4, arrowsize=0.9,
+    fontcolor="#1E293B"
+  ];
+  rankdir=LR;
+  ranksep=0.9;
+
+  va1 [label=<<b>プロセスAの仮想アドレス空間</b><br align="left"/>0x0000… から連続して見える<br align="left"/>>, fillcolor="#D9E7F4", color="#38638F"];
+  va2 [label=<<b>プロセスBの仮想アドレス空間</b><br align="left"/>0x0000… から連続して見える<br align="left"/>>, fillcolor="#D6E8D6", color="#3F6E3F"];
+
+  table_ [label=<<b>カーネルの対応表</b><br align="left"/>仮想アドレス → 物理アドレス<br align="left"/>>, fillcolor="#E9DFF2", color="#75589C"];
+
+  phys [shape=plain, style="", label=<
+    <table border="0" cellborder="1" cellspacing="0" cellpadding="7" color="#96742E">
+      <tr><td align="left" bgcolor="#FAF4E4"><b>物理メモリ</b></td></tr>
+      <tr><td port="a" align="left" bgcolor="#D9E7F4">Aに割り当てた部分</td></tr>
+      <tr><td align="left" bgcolor="#FFFFFF">空き</td></tr>
+      <tr><td port="b" align="left" bgcolor="#D6E8D6">Bに割り当てた部分</td></tr>
+      <tr><td align="left" bgcolor="#FFFFFF">空き</td></tr>
+    </table>>];
+
+  va1 -> table_;
+  va2 -> table_;
+  table_ -> phys:a:w [label=" Aの番地はここへ"];
+  table_ -> phys:b:w [label=" Bの番地はここへ"];
+}

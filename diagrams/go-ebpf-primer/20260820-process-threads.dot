@@ -1,0 +1,37 @@
+// プロセスとスレッド
+digraph process_threads {
+  graph [
+    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=13,
+    rankdir=TB, compound=true, splines=true,
+    nodesep=0.5, ranksep=0.7, pad=0.25,
+    bgcolor="white", newrank=true
+  ];
+  node [
+    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=12,
+    shape=box, style="rounded,filled",
+    fillcolor="#F1F5F9", color="#475569", penwidth=1.6,
+    margin="0.2,0.14"
+  ];
+  edge [
+    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=11,
+    color="#334155", penwidth=1.4, arrowsize=0.9,
+    fontcolor="#1E293B"
+  ];
+
+  subgraph cluster_proc {
+    label=<<b>1つのプロセス</b>>;
+    style="rounded"; labeljust="l"; penwidth=1.6; margin=14;
+    color="#38638F"; fontcolor="#2E4D6E"; bgcolor="#EFF5FB";
+
+    t1 [label=<<b>スレッド1</b><br align="left"/>専用のスタック<br align="left"/>>, fillcolor="#D9E7F4", color="#38638F"];
+    t2 [label=<<b>スレッド2</b><br align="left"/>専用のスタック<br align="left"/>>, fillcolor="#D9E7F4", color="#38638F"];
+    t3 [label=<<b>スレッド3</b><br align="left"/>専用のスタック<br align="left"/>>, fillcolor="#D9E7F4", color="#38638F"];
+
+    shared [label=<<b>共有の領域</b><br align="left"/>ヒープ、データ、テキスト。どのスレッドからも見える<br align="left"/>>, fillcolor="#F3E8CE", color="#96742E"];
+
+    { rank=same; t1; t2; t3; }
+    t1 -> shared [style=invis];
+    t2 -> shared [style=invis];
+    t3 -> shared [style=invis];
+  }
+}

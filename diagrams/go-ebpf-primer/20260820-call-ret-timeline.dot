@@ -1,0 +1,42 @@
+// CALLとRETによる戻りアドレスの受け渡し
+digraph call_ret_timeline {
+  graph [
+    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=13,
+    rankdir=TB, compound=true, splines=true,
+    nodesep=0.5, ranksep=0.7, pad=0.25,
+    bgcolor="white", newrank=true
+  ];
+  node [
+    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=12,
+    shape=box, style="rounded,filled",
+    fillcolor="#F1F5F9", color="#475569", penwidth=1.6,
+    margin="0.2,0.14"
+  ];
+  edge [
+    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=11,
+    color="#334155", penwidth=1.4, arrowsize=0.9,
+    fontcolor="#1E293B"
+  ];
+  ranksep=0.55;
+
+  s1 [shape=plain, style="", label=<
+    <table border="0" cellborder="1" cellspacing="0" cellpadding="6" color="#38638F">
+      <tr><td colspan="2" align="left" bgcolor="#EFF5FB"><b>1. CALLの直前</b>（PC = 0x49e1b3）</td></tr>
+      <tr><td align="left" bgcolor="#D9E7F4">スタック</td><td align="left" bgcolor="#FFFFFF">mainのフレームまで</td></tr>
+    </table>>];
+
+  s2 [shape=plain, style="", label=<
+    <table border="0" cellborder="1" cellspacing="0" cellpadding="6" color="#38638F">
+      <tr><td colspan="2" align="left" bgcolor="#EFF5FB"><b>2. doubleを実行中</b>（CALLがジャンプした先）</td></tr>
+      <tr><td align="left" bgcolor="#D9E7F4">スタック</td><td align="left" bgcolor="#F3E8CE">戻りアドレス <b>0x49e1b8</b>（CALLが積んだ）</td></tr>
+    </table>>];
+
+  s3 [shape=plain, style="", label=<
+    <table border="0" cellborder="1" cellspacing="0" cellpadding="6" color="#38638F">
+      <tr><td colspan="2" align="left" bgcolor="#EFF5FB"><b>3. RETの直後</b>（PC = 0x49e1b8）</td></tr>
+      <tr><td align="left" bgcolor="#D9E7F4">スタック</td><td align="left" bgcolor="#FFFFFF">スロットは取り出されて元どおり</td></tr>
+    </table>>];
+
+  s1 -> s2 [label=" CALL main.double\l 　次の命令のアドレスを積んでからジャンプ\l"];
+  s2 -> s3 [label=" RET\l 　積まれた値を取り出してそこへジャンプ\l"];
+}

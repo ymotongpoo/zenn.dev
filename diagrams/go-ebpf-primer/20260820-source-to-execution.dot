@@ -19,15 +19,15 @@ digraph source_to_execution {
   ];
 
   src [label=<<b>Goのソースコード</b>>, fillcolor="#D6E8D6", color="#3F6E3F"];
-  mc [label=<<b>機械語</b><br align="left"/>「機械語、命令アドレス、シンボル」の節<br align="left"/>>,
+  mc [label=<<b>機械語</b><br align="left"/>4章「ソースコードが実行ファイルになるまで」<br align="left"/>>,
       fillcolor="#F3E8CE", color="#96742E"];
-  elf [label=<<b>ELF形式の実行ファイル</b><br align="left"/>「ELFバイナリの中身」の節<br align="left"/>>,
+  elf [label=<<b>ELF形式の実行ファイル</b><br align="left"/>4章「ソースコードが実行ファイルになるまで」<br align="left"/>>,
        fillcolor="#F3E8CE", color="#96742E"];
-  proc [label=<<b>プロセスとしてメモリに置かれる</b><br align="left"/>「プロセスに与えられるメモリ」の節<br align="left"/>>,
+  proc [label=<<b>プロセスとしてメモリに置かれる</b><br align="left"/>3章「OSとカーネル」<br align="left"/>>,
         fillcolor="#D9E7F4", color="#38638F"];
-  cpu [label=<<b>CPUがPCの指す命令を実行する</b><br align="left"/>「CPUとレジスタ」の節<br align="left"/>>,
+  cpu [label=<<b>CPUがPCの指す命令を実行する</b><br align="left"/>2章「コンピュータはプログラムをどう実行するか」<br align="left"/>>,
        fillcolor="#D9E7F4", color="#38638F"];
-  call [label=<<b>関数呼び出しでレジスタとスタックを使う</b><br align="left"/>「関数呼び出しとスタックフレーム」の節<br align="left"/>>,
+  call [label=<<b>関数呼び出しでレジスタとスタックを使う</b><br align="left"/>5章「関数呼び出しの仕組み」<br align="left"/>>,
         fillcolor="#D9E7F4", color="#38638F"];
 
   src -> mc [label=" コンパイラが変換する"];
