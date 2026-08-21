@@ -112,7 +112,7 @@ JSONを受け取る側がJavaScriptなら、104日を超える期間は精度を
 > **json/v2** — UnmarshalRead will always read to EOF. This is in contrast to v1, where it was a common mistake to call `Decode(io.Reader)` and not check that the reader had reached EOF.
 > **Struct tags** — `omitempty` is now defined in terms of the JSON type system instead of the Go type system.
 > 👍 all around the room.
-> ---
+>
 > @dsnet が参加し、API全体を通して説明しました。
 > **jsontext** は絶対的な安全性より性能に寄せています。APIはメモリ確保よりエイリアシングを好む傾向があります。このパッケージが広く使われることは想定しておらず、本当に特殊なことや、本当に高性能が要ることをするためだけのものです。
 > **Options** はエンコードとデコードの両方で、また構文層と意味層のあいだでも共有されます。ワーキンググループは代案の検討に多くの時間を費やし、最終的にこの設計に戻ってきました。
