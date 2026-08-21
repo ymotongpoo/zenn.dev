@@ -25,9 +25,9 @@ digraph ret_uprobes {
     <table border="0" cellborder="1" cellspacing="0" cellpadding="6" color="#38638F">
       <tr><td colspan="2" align="left" bgcolor="#EFF5FB"><b>main.Lookup の機械語</b>（return は1つ）</td></tr>
       <tr><td align="left" bgcolor="#D9E7F4">…</td><td align="left" bgcolor="#D9E7F4">…</td></tr>
-      <tr><td align="left" bgcolor="#D6E8D6">0x49e050</td><td align="left" bgcolor="#D6E8D6" port="r1"><b>RET</b>（通常の経路）</td></tr>
-      <tr><td align="left" bgcolor="#D9E7F4">0x49e051</td><td align="left" bgcolor="#D9E7F4">CALL runtime.deferreturn</td></tr>
-      <tr><td align="left" bgcolor="#D6E8D6">0x49e060</td><td align="left" bgcolor="#D6E8D6" port="r2"><b>RET</b>（defer 経由の経路）</td></tr>
+      <tr><td align="left" bgcolor="#D6E8D6">0x49e290</td><td align="left" bgcolor="#D6E8D6" port="r1"><b>RET</b>（通常の経路）</td></tr>
+      <tr><td align="left" bgcolor="#D9E7F4">0x49e291</td><td align="left" bgcolor="#D9E7F4">CALL runtime.deferreturn</td></tr>
+      <tr><td align="left" bgcolor="#D6E8D6">0x49e2a0</td><td align="left" bgcolor="#D6E8D6" port="r2"><b>RET</b>（defer 経由の経路）</td></tr>
     </table>>];
 
   up1 [label=<<b>uprobe</b><br align="left"/>通常の出口<br align="left"/>>, fillcolor="#D6E8D6", color="#3F6E3F"];

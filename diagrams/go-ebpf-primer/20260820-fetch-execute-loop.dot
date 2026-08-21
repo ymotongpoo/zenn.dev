@@ -26,14 +26,14 @@ digraph fetch_execute_loop {
   mem [shape=plain, style="", label=<
     <table border="0" cellborder="1" cellspacing="0" cellpadding="6" color="#475569">
       <tr><td colspan="2" align="left" bgcolor="#F4F6F8"><b>メモリ（テキスト領域）</b></td></tr>
-      <tr><td port="a" align="left" bgcolor="#FFFFFF">アドレス100</td><td align="left" bgcolor="#D6E8D6">命令A</td></tr>
-      <tr><td port="b" align="left" bgcolor="#FFFFFF">アドレス103</td><td align="left" bgcolor="#D6E8D6">命令B</td></tr>
-      <tr><td port="c" align="left" bgcolor="#FFFFFF">アドレス104</td><td align="left" bgcolor="#D6E8D6">命令C</td></tr>
+      <tr><td port="a" align="left" bgcolor="#FFFFFF">0x100</td><td align="left" bgcolor="#D6E8D6">命令A</td></tr>
+      <tr><td port="b" align="left" bgcolor="#FFFFFF">0x103</td><td align="left" bgcolor="#D6E8D6">命令B</td></tr>
+      <tr><td port="c" align="left" bgcolor="#FFFFFF">0x104</td><td align="left" bgcolor="#D6E8D6">命令C</td></tr>
       <tr><td align="left" bgcolor="#FFFFFF">…</td><td align="left" bgcolor="#EDF1F5">…</td></tr>
     </table>>];
 
   t1 -> t2 -> t3;
-  t1 -> mem:a:w [style=dashed, color="#7C8DA3", label=" PCは100を指す", fontcolor="#5B6B80"];
-  t2 -> mem:b:w [style=dashed, color="#7C8DA3", label=" PCは103を指す", fontcolor="#5B6B80"];
-  t3 -> mem:c:w [style=dashed, color="#7C8DA3", label=" PCは104を指す", fontcolor="#5B6B80"];
+  t1 -> mem:a:w [style=dashed, color="#7C8DA3", label=" PCは0x100を指す", fontcolor="#5B6B80"];
+  t2 -> mem:b:w [style=dashed, color="#7C8DA3", label=" PCは0x103を指す", fontcolor="#5B6B80"];
+  t3 -> mem:c:w [style=dashed, color="#7C8DA3", label=" PCは0x104を指す", fontcolor="#5B6B80"];
 }

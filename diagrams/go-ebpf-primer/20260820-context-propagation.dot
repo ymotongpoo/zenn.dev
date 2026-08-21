@@ -1,5 +1,5 @@
-// 図5: goroutine の親子追跡（プロセス内）と traceparent 注入（プロセス間）
-digraph fig5 {
+// goroutine の親子追跡（プロセス内）と traceparent 注入（プロセス間）
+digraph context_propagation {
   graph [
     fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=13,
     rankdir=TB, compound=true, splines=true,
@@ -33,7 +33,7 @@ digraph fig5 {
 
   p1 [label=<<b>経路1</b><br align="left"/>bufio.Writer のバッファに<br align="left"/>bpf_probe_write_user で追記<br align="left"/>>,
       fillcolor="#E9DFF2", color="#75589C"];
-  p2 [label=<<b>経路2</b><br align="left"/>sk_msg でパケットを伸ばす<br align="left"/>>,
+  p2 [label=<<b>経路2</b><br align="left"/>sk_msg で送出されるバイト列を伸ばす<br align="left"/>>,
       fillcolor="#E9DFF2", color="#75589C"];
 
   svcb [label=<<b>サービスB</b><br align="left"/>traceparent を受け取る<br align="left"/>>, fillcolor="#EDF1F5"];

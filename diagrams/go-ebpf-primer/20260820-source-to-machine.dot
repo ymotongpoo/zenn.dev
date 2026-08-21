@@ -19,27 +19,29 @@ digraph source_to_machine {
   ];
   ranksep=0.9;
 
-  src [label=<<b>Goのソース</b><br align="left"/>func Lookup(key string) int<br align="left"/>>,
+  src [label=<<b>Goのソース</b><br align="left"/>func double(n int) int<br align="left"/>>,
        fillcolor="#D6E8D6", color="#3F6E3F"];
 
-  bytes [label=<<b>機械語のバイト列</b><br align="left"/>49 3b 66 10 76 …<br align="left"/>>,
+  bytes [label=<<b>機械語のバイト列</b><br align="left"/>48 01 c0 c3<br align="left"/>>,
          fillcolor="#F3E8CE", color="#96742E"];
 
   insns [shape=plain, style="", label=<
     <table border="0" cellborder="1" cellspacing="0" cellpadding="6" color="#38638F">
       <tr><td colspan="2" align="left" bgcolor="#EFF5FB"><b>命令の並び</b>（1命令ごとにアドレスが付く）</td></tr>
-      <tr><td align="left" bgcolor="#D9E7F4" port="head">0x49df80</td><td align="left" bgcolor="#D9E7F4">CMPQ SP, 0x10(R14)</td></tr>
-      <tr><td align="left" bgcolor="#D9E7F4">0x49df84</td><td align="left" bgcolor="#D9E7F4">JBE 0x49e061</td></tr>
-      <tr><td align="left" bgcolor="#D9E7F4">0x49e050</td><td align="left" bgcolor="#D9E7F4">RET</td></tr>
+      <tr><td port="head" align="left" bgcolor="#D9E7F4">0x49e180</td>
+          <td align="left" bgcolor="#D9E7F4">ADDQ AX, AX</td></tr>
+      <tr><td align="left" bgcolor="#D9E7F4">0x49e183</td>
+          <td align="left" bgcolor="#D9E7F4">RET</td></tr>
     </table>>];
 
-  sym [shape=plain, style="", label=<
-    <table border="0" cellborder="1" cellspacing="0" cellpadding="6" color="#475569">
-      <tr><td colspan="2" align="left" bgcolor="#F4F6F8"><b>シンボルテーブル</b></td></tr>
-      <tr><td align="left" bgcolor="#EDF1F5">main.Lookup</td><td align="left" bgcolor="#EDF1F5">0x49df80</td></tr>
+  symtab [shape=plain, style="", label=<
+    <table border="0" cellborder="1" cellspacing="0" cellpadding="6" color="#96742E">
+      <tr><td colspan="2" align="left" bgcolor="#FAF4E4"><b>シンボルテーブル</b>（go tool nm で覗ける）</td></tr>
+      <tr><td align="left" bgcolor="#F3E8CE">main.double</td>
+          <td port="addr" align="left" bgcolor="#F3E8CE">0x49e180</td></tr>
     </table>>];
 
-  src -> bytes [label=" コンパイルとリンク", penwidth=1.8];
-  bytes -> insns [label=" 逆アセンブルで読み戻す", penwidth=1.8];
-  sym -> insns:head:w [label=" 名前から先頭アドレスを引く", style=dashed, color="#7C8DA3"];
+  src -> bytes [label=" コンパイルする"];
+  bytes -> insns [label=" 先頭から解釈すると命令になる"];
+  symtab:addr:w -> insns:head:w [label=" 名前から先頭アドレスを引く", style=dashed, color="#7C8DA3", fontcolor="#5B6B80"];
 }

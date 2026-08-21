@@ -1,5 +1,5 @@
-// 図1: uretprobe による戻りアドレスの書き換え
-digraph fig1 {
+// uretprobe による戻りアドレスの書き換え
+digraph uretprobe_rewrite {
   graph [
     fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=13,
     rankdir=TB, compound=true, splines=true,
@@ -26,9 +26,9 @@ digraph fig1 {
     stack_n [shape=plain, style="", label=<
       <table border="0" cellborder="1" cellspacing="0" cellpadding="7" color="#38638F" bgcolor="#D9E7F4">
         <tr><td align="left">ローカル変数 …</td></tr>
-        <tr><td align="left" port="ra">戻りアドレス <b>0x401050</b></td></tr>
+        <tr><td align="left" port="ra">戻りアドレス <b>0x49e31f</b></td></tr>
       </table>>];
-    caller_n [label=<<b>呼び出し元 0x401050</b>>, fillcolor="#EDF1F5"];
+    caller_n [label=<<b>呼び出し元 0x49e31f</b>>, fillcolor="#EDF1F5"];
     stack_n:ra:s -> caller_n [label=" RET でここへ"];
   }
 
@@ -44,7 +44,7 @@ digraph fig1 {
       </table>>];
     hook [label=<<b>カーネルのフック</b><br align="left"/>（トランポリン）<br align="left"/>>,
           fillcolor="#F5DEDE", color="#A04848"];
-    caller_u [label=<<b>本物の 0x401050</b>>, fillcolor="#EDF1F5"];
+    caller_u [label=<<b>本物の 0x49e31f</b>>, fillcolor="#EDF1F5"];
 
     stack_u:ra:s -> hook [label=" RET でここへ"];
     hook -> caller_u [label=" 処理後にジャンプし直す", style=dashed, color="#7C8DA3"];

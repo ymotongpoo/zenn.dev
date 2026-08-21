@@ -1,5 +1,5 @@
-// 図3: uprobe 発火時に OBI が読むもの
-digraph fig3 {
+// uprobe 発火時に OBI が読むもの
+digraph goroutine_key {
   graph [
     fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=13,
     rankdir=TB, compound=true, splines=true,

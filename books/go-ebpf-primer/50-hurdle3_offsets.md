@@ -16,6 +16,8 @@ Goのソース上では `req.Method` のようにフィールド名でアクセ�
 
 このオフセットは、Goからも `unsafe.Offsetof` で取り出せます。
 
+* [Go Playgroundで実行する](https://go.dev/play/p/WkccXeBRibC)
+
 ```go
 package main
 
@@ -68,6 +70,8 @@ ContentLength = 88
 ## フィールドが1つ増えたときのずれ
 
 構造体の途中にフィールドを1つ足して、前後を比べます。
+
+* [Go Playgroundで実行する](https://go.dev/play/p/HDiUH0QUv3Q)
 
 ```go
 package main

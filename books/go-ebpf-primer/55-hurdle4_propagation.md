@@ -227,6 +227,8 @@ static __always_inline u64 find_parent_goroutine(go_addr_key_t *current) {
 
 OBIが狙うのは、リクエストがバイト列に直列化される直前です。送信直前のHTTP/1.1リクエストがどんなバイト列なのかは、標準ライブラリだけで手元でも確かめられます。
 
+* [Go Playgroundで実行する](https://go.dev/play/p/oo1fSXUKumn)
+
 ```go
 package main
 

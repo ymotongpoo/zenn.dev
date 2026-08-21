@@ -17,19 +17,23 @@ digraph stack_frame {
     color="#334155", penwidth=1.4, arrowsize=0.9,
     fontcolor="#1E293B"
   ];
-
-  caller [label=<<b>main</b>（呼び出し元）<br align="left"/>0x401050 は Lookup の次の命令<br align="left"/>>,
-          fillcolor="#EDF1F5"];
-  callee [label=<<b>Lookup</b>（呼び出し先）>, fillcolor="#D9E7F4", color="#38638F"];
-
-  frame [shape=plain, style="", label=<
-    <table border="0" cellborder="1" cellspacing="0" cellpadding="7" color="#38638F">
-      <tr><td align="left" bgcolor="#EFF5FB"><b>Lookup のスタックフレーム</b></td></tr>
-      <tr><td align="left" bgcolor="#D9E7F4">戻りアドレス <b>0x401050</b>（main の次の命令）</td></tr>
-      <tr><td align="left" bgcolor="#D9E7F4">ローカル変数</td></tr>
+  stack [shape=plain, style="", label=<
+    <table border="0" cellborder="1" cellspacing="0" cellpadding="7" color="#475569">
+      <tr><td colspan="3" align="left" bgcolor="#F4F6F8"><b>goroutine のスタック</b>（呼び出しが深くなるほど低いアドレスへ積まれる）</td></tr>
+      <tr><td colspan="3" align="left" bgcolor="#FFFFFF"><i>高いアドレス</i></td></tr>
+      <tr><td align="left" bgcolor="#EDF1F5"><b>main</b> のフレーム</td>
+          <td align="left" bgcolor="#EDF1F5">descend(0) を呼ぶ</td>
+          <td align="left" bgcolor="#EDF1F5"></td></tr>
+      <tr><td align="left" bgcolor="#D9E7F4"><b>descend(0)</b> のフレーム</td>
+          <td align="left" bgcolor="#D9E7F4">local は 0x…eeb8</td>
+          <td rowspan="4" align="left" bgcolor="#F3E8CE">1フレーム<br/>= 176バイト</td></tr>
+      <tr><td align="left" bgcolor="#D9E7F4"><b>descend(1)</b> のフレーム</td>
+          <td align="left" bgcolor="#D9E7F4">local は 0x…ee08</td></tr>
+      <tr><td align="left" bgcolor="#D9E7F4"><b>descend(2)</b> のフレーム</td>
+          <td align="left" bgcolor="#D9E7F4">local は 0x…ed58</td></tr>
+      <tr><td align="left" bgcolor="#D9E7F4"><b>descend(3)</b> のフレーム</td>
+          <td align="left" bgcolor="#D9E7F4">local は 0x…eca8</td></tr>
+      <tr><td colspan="3" align="left" bgcolor="#FFFFFF">まだ使われていない領域</td></tr>
+      <tr><td colspan="3" align="left" bgcolor="#FFFFFF"><i>低いアドレス</i></td></tr>
     </table>>];
-
-  caller -> callee [label=" CALL：戻りアドレスを積んでジャンプ", penwidth=1.8];
-  callee -> frame [label=" フレームが積まれる", style=dotted, color="#7C8DA3", arrowhead=none];
-  callee -> caller [label=" RET：積んだ戻りアドレスへ戻る", penwidth=1.8];
 }

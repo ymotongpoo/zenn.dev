@@ -1,5 +1,5 @@
-// 図4: バージョン間でオフセットがずれる
-digraph fig4 {
+// バージョン間でオフセットがずれる
+digraph offset_shift {
   graph [
     fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=13,
     rankdir=TB, compound=true, splines=true,
