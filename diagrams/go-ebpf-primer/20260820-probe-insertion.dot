@@ -1,0 +1,67 @@
+// uprobeとuretprobeの挿し込み
+digraph probe_insertion {
+  graph [
+    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=13,
+    rankdir=TB, compound=true, splines=true,
+    nodesep=0.5, ranksep=0.55, pad=0.25,
+    bgcolor="white", newrank=true
+  ];
+  node [
+    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=12,
+    shape=box, style="rounded,filled",
+    fillcolor="#F1F5F9", color="#475569", penwidth=1.6,
+    margin="0.2,0.14"
+  ];
+  edge [
+    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=11,
+    color="#334155", penwidth=1.4, arrowsize=0.9,
+    fontcolor="#1E293B"
+  ];
+
+  subgraph cluster_up {
+    label=<<b>uprobe（スタックには触らない）</b>>;
+    style="rounded"; labeljust="l"; penwidth=1.6; margin=14;
+    color="#38638F"; fontcolor="#2E4D6E"; bgcolor="#EFF5FB";
+
+    code [shape=plain, style="", label=<
+      <table border="0" cellborder="1" cellspacing="0" cellpadding="6" color="#38638F">
+        <tr><td colspan="2" align="left" bgcolor="#EFF5FB"><b>コード領域 0x49e180</b></td></tr>
+        <tr><td align="left" bgcolor="#D9E7F4">差し替え前</td><td align="left" bgcolor="#D9E7F4">48 01 c0</td></tr>
+        <tr><td align="left" bgcolor="#F3E8CE">差し替え後</td><td align="left" bgcolor="#F3E8CE" port="bp"><b>cc</b> 01 c0</td></tr>
+      </table>>];
+    trap_u [label=<<b>トラップしてカーネルへ</b>>, fillcolor="#F3E8CE", color="#96742E"];
+    prog_u [label=<<b>eBPFプログラムが走る</b>>, fillcolor="#D9E7F4", color="#38638F"];
+    xol [label=<<b>控えた元の命令を実行</b><br align="left"/>カーネルが用意した別領域で<br align="left"/>>,
+         fillcolor="#F3E8CE", color="#96742E"];
+    next_u [label=<<b>続きの命令へ戻る</b>>, fillcolor="#D6E8D6", color="#3F6E3F"];
+
+    code:bp:s -> trap_u [label=" CPUが到達"];
+    trap_u -> prog_u;
+    prog_u -> xol;
+    xol -> next_u;
+  }
+
+  subgraph cluster_uret {
+    label=<<b>uretprobe（スタックの値を書き換える）</b>>;
+    style="rounded"; labeljust="l"; penwidth=1.6; margin=14;
+    color="#A04848"; fontcolor="#7A3030"; bgcolor="#FBEFEF";
+
+    entry [label=<<b>入口のuprobeが発火</b>>, fillcolor="#F3E8CE", color="#96742E"];
+    stack [shape=plain, style="", label=<
+      <table border="0" cellborder="1" cellspacing="0" cellpadding="6" color="#38638F">
+        <tr><td align="left" bgcolor="#EFF5FB"><b>スタック</b></td></tr>
+        <tr><td align="left" bgcolor="#D9E7F4">ローカル変数 …</td></tr>
+        <tr><td align="left" bgcolor="#F5DEDE" port="ra">戻りアドレス <b>トランポリン</b><br align="left"/><font color="#7A3030" point-size="11">本物の 0x49e1b8 はカーネルが退避</font><br align="left"/></td></tr>
+      </table>>];
+    tramp [label=<<b>トランポリンでトラップ</b>>, fillcolor="#F5DEDE", color="#A04848"];
+    prog_r [label=<<b>eBPFプログラムが走る</b>>, fillcolor="#D9E7F4", color="#38638F"];
+    caller [label=<<b>本物の 0x49e1b8 へ</b>>, fillcolor="#EDF1F5"];
+
+    entry -> stack [label=" 戻りアドレスを\l 書き換える\l"];
+    stack:ra:s -> tramp [label=" RET でここへ"];
+    tramp -> prog_r;
+    prog_r -> caller [label=" 退避した値へ\l ジャンプし直す\l", style=dashed, color="#7C8DA3"];
+  }
+
+  { rank=same; code; entry; }
+}
