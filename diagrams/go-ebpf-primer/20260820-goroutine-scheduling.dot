@@ -1,10 +1,9 @@
 // OSスレッドとgoroutine
 digraph goroutine_scheduling {
   graph [
+    layout=neato, inputscale=72, splines=line,
     fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=13,
-    rankdir=TB, compound=true, splines=true,
-    nodesep=0.5, ranksep=0.7, pad=0.25,
-    bgcolor="white", newrank=true
+    bgcolor="white", pad=0.25
   ];
   node [
     fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=12,
@@ -17,24 +16,51 @@ digraph goroutine_scheduling {
     color="#334155", penwidth=1.4, arrowsize=0.9,
     fontcolor="#1E293B"
   ];
-  nodesep=0.35;
 
-  g1 [label=<goroutine <b>g1</b>>, fillcolor="#D9E7F4", color="#38638F"];
-  g2 [label=<goroutine <b>g2</b>>, fillcolor="#D9E7F4", color="#38638F"];
-  g3 [label=<goroutine <b>g3</b>>, fillcolor="#D9E7F4", color="#38638F"];
-  g4 [label=<goroutine <b>g4</b>>, fillcolor="#D9E7F4", color="#38638F"];
+  g1 [pos="90,440!",  label=<goroutine <b>g1</b>>, fillcolor="#D9E7F4", color="#38638F"];
+  g2 [pos="255,440!", label=<goroutine <b>g2</b>>, fillcolor="#D9E7F4", color="#38638F"];
+  g3 [pos="455,440!", label=<goroutine <b>g3</b>>, fillcolor="#D9E7F4", color="#38638F"];
+  g4 [pos="620,440!", label=<goroutine <b>g4</b>>, fillcolor="#D9E7F4", color="#38638F"];
 
-  p1 [label=<<b>p</b>（実行資源と待ち行列）>, fillcolor="#E9DFF2", color="#75589C"];
-  p2 [label=<<b>p</b>（実行資源と待ち行列）>, fillcolor="#E9DFF2", color="#75589C"];
+  a1 [pos="90,385!",  shape=point, width=0.01, style=invis];
+  a2 [pos="255,385!", shape=point, width=0.01, style=invis];
+  j1 [pos="172,385!", shape=point, width=0.01, style=invis];
+  a3 [pos="455,385!", shape=point, width=0.01, style=invis];
+  a4 [pos="620,385!", shape=point, width=0.01, style=invis];
+  j2 [pos="537,385!", shape=point, width=0.01, style=invis];
 
-  m1 [label=<<b>m</b>（OSスレッド）>, fillcolor="#F3E8CE", color="#96742E"];
-  m2 [label=<<b>m</b>（OSスレッド）>, fillcolor="#F3E8CE", color="#96742E"];
+  p1 [pos="172,320!", label=<<b>p</b>（実行資源と待ち行列）>, fillcolor="#E9DFF2", color="#75589C"];
+  p2 [pos="537,320!", label=<<b>p</b>（実行資源と待ち行列）>, fillcolor="#E9DFF2", color="#75589C"];
 
-  cpu [label=<<b>CPU</b>（コアの数だけ同時に走る）>, fillcolor="#EDF1F5"];
+  L1 [pos="235,270!", shape=plaintext, style="", label="実行を任される"];
+  L2 [pos="600,270!", shape=plaintext, style="", label="実行を任される"];
 
-  g1 -> p1; g2 -> p1; g3 -> p2; g4 -> p2;
-  p1 -> m1 [label=" 実行を任される"];
-  p2 -> m2 [label=" 実行を任される"];
-  m1 -> cpu [label=" OSが割り当てる"];
-  m2 -> cpu;
+  m1 [pos="172,220!", label=<<b>m</b>（OSスレッド）>, fillcolor="#F3E8CE", color="#96742E"];
+  m2 [pos="537,220!", label=<<b>m</b>（OSスレッド）>, fillcolor="#F3E8CE", color="#96742E"];
+
+  b1 [pos="172,135!", shape=point, width=0.01, style=invis];
+  b2 [pos="537,135!", shape=point, width=0.01, style=invis];
+  jc [pos="355,135!", shape=point, width=0.01, style=invis];
+
+  cpu [pos="355,65!", label=<<b>CPU</b>（コアの数だけ同時に走る）>, fillcolor="#EDF1F5"];
+
+  L3 [pos="418,180!", shape=plaintext, style="", label="OSが割り当てる"];
+
+  g1 -> a1 [dir=none];
+  g2 -> a2 [dir=none];
+  a1 -> j1 [dir=none];
+  a2 -> j1 [dir=none];
+  j1 -> p1;
+  g3 -> a3 [dir=none];
+  g4 -> a4 [dir=none];
+  a3 -> j2 [dir=none];
+  a4 -> j2 [dir=none];
+  j2 -> p2;
+  p1 -> m1;
+  p2 -> m2;
+  m1 -> b1 [dir=none];
+  m2 -> b2 [dir=none];
+  b1 -> jc [dir=none];
+  b2 -> jc [dir=none];
+  jc -> cpu;
 }

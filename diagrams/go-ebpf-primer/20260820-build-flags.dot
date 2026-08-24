@@ -1,10 +1,9 @@
 // ビルド設定と計装の関係
 digraph build_flags {
   graph [
+    layout=neato, inputscale=72, splines=line,
     fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=13,
-    rankdir=TB, compound=true, splines=true,
-    nodesep=0.5, ranksep=0.7, pad=0.25,
-    bgcolor="white", newrank=true
+    bgcolor="white", pad=0.25
   ];
   node [
     fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=12,
@@ -18,7 +17,7 @@ digraph build_flags {
     fontcolor="#1E293B"
   ];
 
-  info [shape=plain, style="", label=<
+  info [pos="410,330!", shape=plain, style="", label=<
     <table border="0" cellborder="1" cellspacing="0" cellpadding="6" color="#475569">
       <tr><td align="left" bgcolor="#F4F6F8"><b>バイナリに残るもの</b></td>
           <td align="left" bgcolor="#F0F7F0"><b>通常ビルド</b></td>
@@ -26,21 +25,32 @@ digraph build_flags {
       <tr><td align="left" bgcolor="#EDF1F5">シンボルテーブル</td>
           <td align="left" bgcolor="#D6E8D6">あり</td>
           <td align="left" bgcolor="#F5DEDE">なし</td></tr>
-      <tr><td align="left" bgcolor="#EDF1F5" port="pcln">.gopclntab とビルド情報</td>
+      <tr><td port="pcln" align="left" bgcolor="#EDF1F5">.gopclntab とビルド情報</td>
           <td align="left" bgcolor="#D6E8D6">あり</td>
           <td align="left" bgcolor="#D6E8D6">あり</td></tr>
       <tr><td align="left" bgcolor="#EDF1F5">DWARF</td>
-          <td align="left" bgcolor="#D6E8D6" port="dw_ok">あり</td>
-          <td align="left" bgcolor="#F5DEDE" port="dw_ng">なし</td></tr>
+          <td align="left" bgcolor="#D6E8D6">あり</td>
+          <td align="left" bgcolor="#F5DEDE">なし</td></tr>
     </table>>];
 
-  addr [label=<<b>関数のアドレスは特定できる</b><br align="left"/>.gopclntab を自前で解析する<br align="left"/>>,
+  j  [pos="410,230!", shape=point, width=0.01, style=invis];
+  jl [pos="130,230!", shape=point, width=0.01, style=invis];
+  jr [pos="700,230!", shape=point, width=0.01, style=invis];
+
+  addr [pos="130,140!", label=<<b>関数のアドレスは特定できる</b><br align="left"/>.gopclntab を自前で解析する<br align="left"/>>,
         fillcolor="#D6E8D6", color="#3F6E3F"];
-  off_ok [label=<<b>オフセットはバイナリから読める</b>>, fillcolor="#D6E8D6", color="#3F6E3F"];
-  off_ng [label=<<b>オフセットは offsets.json 頼み</b><br align="left"/>表に無い版は静かに欠ける<br align="left"/>>,
+  off_ok [pos="410,140!", label=<<b>オフセットはバイナリから読める</b>>, fillcolor="#D6E8D6", color="#3F6E3F"];
+  off_ng [pos="700,140!", label=<<b>オフセットは offsets.json 頼み</b><br align="left"/>表に無い版は静かに欠ける<br align="left"/>>,
           fillcolor="#F5DEDE", color="#A04848"];
 
-  info:pcln:w -> addr [label=" 残る"];
-  info:dw_ok:s -> off_ok;
-  info:dw_ng:s -> off_ng;
+  L1 [pos="212,190!", shape=plaintext, style="", label="どちらでも残る"];
+  L2 [pos="475,190!", shape=plaintext, style="", label="DWARFがあれば"];
+  L3 [pos="774,190!", shape=plaintext, style="", label="DWARFが無いと"];
+
+  info -> j [dir=none];
+  j -> jl [dir=none];
+  j -> jr [dir=none];
+  jl -> addr;
+  j -> off_ok;
+  jr -> off_ng;
 }

@@ -1,10 +1,9 @@
 // ユーザー空間とカーネル空間
-digraph user_kernel {
+digraph user_kernel_space {
   graph [
+    layout=neato, inputscale=72, splines=line,
     fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=13,
-    rankdir=TB, compound=true, splines=true,
-    nodesep=0.5, ranksep=0.7, pad=0.25,
-    bgcolor="white", newrank=true
+    bgcolor="white", pad=0.25
   ];
   node [
     fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=12,
@@ -18,29 +17,35 @@ digraph user_kernel {
     fontcolor="#1E293B"
   ];
 
-  subgraph cluster_user {
-    label=<<b>ユーザー空間</b>（できることが制限される）>;
-    style="rounded"; labeljust="l"; penwidth=1.6; margin=14;
-    color="#475569"; fontcolor="#334155"; bgcolor="#F4F6F8";
+  bgU [pos="230,402!", shape=box, style="rounded,filled", fillcolor="#F4F6F8", color="#475569",
+       label="", width=6.0, height=1.5, fixedsize=true];
+  bgK [pos="230,205!", shape=box, style="rounded,filled", fillcolor="#F5F1F9", color="#75589C",
+       label="", width=6.0, height=1.95, fixedsize=true];
 
-    app [label=<<b>アプリケーション</b><br align="left"/>Goで書いたプログラムもここで動く<br align="left"/>>,
-         fillcolor="#D9E7F4", color="#38638F"];
-  }
+  tU [pos="160,437!", shape=plaintext, style="", label=<<b>ユーザー空間</b>（できることが制限される）>, fontcolor="#334155"];
+  tK [pos="160,252!", shape=plaintext, style="", label=<<b>カーネル空間</b>（ハードウェアに触れる）>, fontcolor="#5B4370"];
 
-  subgraph cluster_kernel {
-    label=<<b>カーネル空間</b>（ハードウェアに触れる）>;
-    style="rounded"; labeljust="l"; penwidth=1.6; margin=14;
-    color="#75589C"; fontcolor="#5B4370"; bgcolor="#F5F1F9";
+  app [pos="300,383!", label=<<b>アプリケーション</b><br align="left"/>Goで書いたプログラムもここで動く<br align="left"/>>, fillcolor="#D9E7F4", color="#38638F"];
+  kernel [pos="300,180!", label=<<b>カーネル</b><br align="left"/>ファイル、ネットワーク、メモリを管理する<br align="left"/>>, fillcolor="#E9DFF2", color="#75589C"];
 
-    kernel [label=<<b>カーネル</b><br align="left"/>ファイル、ネットワーク、メモリを管理する<br align="left"/>>,
-            fillcolor="#E9DFF2", color="#75589C"];
-  }
+  d1 [pos="230,359!", shape=point, width=0.01, style=invis];
+  d2 [pos="230,204!", shape=point, width=0.01, style=invis];
+  u1 [pos="370,204!", shape=point, width=0.01, style=invis];
+  u2 [pos="370,359!", shape=point, width=0.01, style=invis];
 
-  hw [label=<<b>ハードウェア</b><br align="left"/>CPU、メモリ、ディスク、ネットワークカード<br align="left"/>>,
-      fillcolor="#EDF1F5"];
+  L1 [pos="122,312!", shape=plaintext, style="", label="システムコールで頼む\n（read、write、socket など）"];
+  L2 [pos="440,312!", shape=plaintext, style="", label="結果を返す", fontcolor="#5B6B80"];
 
-  app -> kernel [label=" システムコールで頼む\l （read、write、socket など）\l", penwidth=1.8];
-  kernel -> app [label=" 結果を返す", style=dashed, color="#7C8DA3"];
+  hw [pos="300,50!", label=<<b>ハードウェア</b><br align="left"/>CPU、メモリ、ディスク、ネットワークカード<br align="left"/>>, fillcolor="#EDF1F5"];
+
+  r1 [pos="660,383!", shape=point, width=0.01, style=invis];
+  r2 [pos="660,50!", shape=point, width=0.01, style=invis];
+  L3 [pos="745,222!", shape=plaintext, style="", label="直接は触れない", fontcolor="#7A3030"];
+
+  d1 -> d2 [penwidth=1.8];
+  u1 -> u2 [style=dashed, color="#7C8DA3"];
   kernel -> hw [label=" 直接操作する"];
-  app -> hw [label=" 直接は触れない", style=dashed, color="#A04848", fontcolor="#7A3030", arrowhead=tee];
+  app -> r1 [dir=none, style=dashed, color="#A04848"];
+  r1 -> r2 [dir=none, style=dashed, color="#A04848"];
+  r2 -> hw [style=dashed, color="#A04848", arrowhead=tee];
 }

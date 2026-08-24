@@ -32,7 +32,7 @@ digraph abi_shift {
       </table>>];
     read_old [label=<<b>外から読む側</b><br align="left"/>SPからの固定オフセットで足りる<br align="left"/>>,
               fillcolor="#D6E8D6", color="#3F6E3F"];
-    stack:p:s -> read_old [label=" 位置が決まっている"];
+    stack -> read_old [label=" 位置が決まっている"];
   }
 
   subgraph cluster_new {
@@ -50,7 +50,7 @@ digraph abi_shift {
       </table>>];
     read_new [label=<<b>外から読む側</b><br align="left"/>アーキテクチャ別のレジスタ対応表が要る<br align="left"/>>,
               fillcolor="#F3E8CE", color="#96742E"];
-    regs:p:s -> read_new [label=" どのレジスタかを知らないと読めない"];
+    regs -> read_new [label=" どのレジスタかを\l 知らないと読めない\l"];
   }
 
   { rank=same; stack; regs; }

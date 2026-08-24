@@ -1,10 +1,9 @@
 // 親を6段まで遡る
 digraph parent_walk {
   graph [
+    layout=neato, inputscale=72, splines=line,
     fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=13,
-    rankdir=TB, compound=true, splines=true,
-    nodesep=0.5, ranksep=0.7, pad=0.25,
-    bgcolor="white", newrank=true
+    bgcolor="white", pad=0.25
   ];
   node [
     fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=12,
@@ -17,18 +16,29 @@ digraph parent_walk {
     color="#334155", penwidth=1.4, arrowsize=0.9,
     fontcolor="#1E293B"
   ];
-  nodesep=0.4;
 
-  cur [label=<<b>送信 goroutine</b><br align="left"/>いまここ<br align="left"/>>, fillcolor="#D9E7F4", color="#38638F"];
-  p1 [label=<1段目の親>, fillcolor="#EDF1F5"];
-  p2 [label=<2段目の親>, fillcolor="#EDF1F5"];
-  dots [label=<…（6段目まで）>, fillcolor="#EDF1F5"];
-  root [label=<<b>受信 goroutine</b><br align="left"/>go_trace_map にトレース情報を持つ<br align="left"/>>, fillcolor="#D6E8D6", color="#3F6E3F"];
-  over [label=<<b>7段目で打ち切り</b><br align="left"/>上界の存在は検証器の要請、6という値は実装の選択<br align="left"/>>, fillcolor="#F5DEDE", color="#A04848"];
+  cur [pos="300,560!", label=<<b>送信 goroutine</b>　いまここ>, fillcolor="#D9E7F4", color="#38638F"];
+  L0 [pos="365,515!", shape=plaintext, style="", label="親を引く"];
+  p1 [pos="300,470!", label=<1段目の親>, fillcolor="#EDF1F5"];
+  p2 [pos="300,395!", label=<2段目の親>, fillcolor="#EDF1F5"];
+  dots [pos="300,320!", label=<…（6段目まで）>, fillcolor="#EDF1F5"];
 
-  cur -> p1 [label=" 親を引く"];
+  j  [pos="300,250!", shape=point, width=0.01, style=invis];
+  jl [pos="120,250!", shape=point, width=0.01, style=invis];
+  jr [pos="530,250!", shape=point, width=0.01, style=invis];
+
+  root [pos="120,150!", label=<<b>受信 goroutine</b><br align="left"/>go_trace_map にトレース情報を持つ<br align="left"/>>, fillcolor="#D6E8D6", color="#3F6E3F"];
+  over [pos="530,150!", label=<<b>7段目で打ち切り</b><br align="left"/>上界の存在は検証器の要請、6という値は実装の選択<br align="left"/>>, fillcolor="#F5DEDE", color="#A04848"];
+
+  L1 [pos="188,205!", shape=plaintext, style="", label="見つかれば終わり"];
+  L2 [pos="430,205!", shape=plaintext, style="", label="見つからなければ打ち切り", fontcolor="#7A3030"];
+
+  cur -> p1;
   p1 -> p2;
   p2 -> dots;
-  dots -> root [label=" 見つかれば終わり"];
-  dots -> over [label=" 見つからなければ打ち切り", style=dashed, color="#A04848", fontcolor="#7A3030"];
+  dots -> j [dir=none];
+  j -> jl [dir=none];
+  j -> jr [dir=none, style=dashed, color="#A04848"];
+  jl -> root;
+  jr -> over [style=dashed, color="#A04848"];
 }

@@ -44,22 +44,18 @@ otel.GetTextMapPropagator().Inject(ctx, propagation.HeaderCarrier(req.Header))
 ![レジスタは読めるが、文脈は追えない](/images/20260820-context-not-traceable.png)
 *図2: 矢印はOBIにできることとできないことを表す。丸で止まっている破線が、できないほうである。点線はその理由を並べたもので、処理の流れではない。*
 
-OBIがフックを置くのは、goroutineの生成そのものです。`go f()` と書いたときに最終的に呼ばれるランタイム関数が `runtime.newproc1` で、その簡略化したシグネチャは次のようになっています。
+OBIがフックを置くのは、goroutineの生成そのものです。呼び方を先にそろえておきます。`go f()` を実行してgoroutineを作る側を**親**、作られる側を**子**と呼びます。`go f()` と書いたときに最終的に呼ばれるランタイム関数が `runtime.newproc1` で、その簡略化したシグネチャは次のようになっています。
 
 ```go
-// 新しい goroutine を作って返す。callergp は作成元の goroutine
+// 子の goroutine を作って返す。callergp は親の g
 func newproc1(fn *funcval, callergp *g, callerpc uintptr, parked bool, waitreason waitReason) *g
 ```
 
-第2引数が作成元のgoroutine、戻り値が新しく作られたgoroutineです。だからOBIは、入口と出口の両方を捕まえます。やることは次の2行に尽きます。
+第2引数が親、戻り値が子です。ただし戻り値は、関数が終わるまで存在しません。入口だけを見ても親子の組は作れないので、OBIは入口と出口の両方を捕まえます。やることは次の2行に尽きます。
 
 ```text
-goroutineを作り始めたとき:
-    作成元goroutineを一時保存する
-
-goroutineを作り終えたとき:
-    戻り値から新しいgoroutineを得る
-    新しいgoroutine -> 親goroutine をマップへ保存する
+入口: 親を控える（子はまだ存在しない）
+出口: 控えておいた親と、戻り値の子を、組にして記録する
 ```
 
 以下のコードは、この2行に対応する部分だけを追えば足ります。
@@ -82,29 +78,29 @@ int obi_uprobe_runtime_newproc1(struct pt_regs *ctx) {
 }
 ```
 
-入口では、第2引数（`GO_PARAM2`、つまり `BX`）に入っている親goroutineを控えておきます。新しいgoroutineはまだ存在しないので、この時点では記録できません。
+入口では、第2引数（`GO_PARAM2`、つまり `BX`）に入っている親を、`newproc1` という一時的なマップに控えておきます。コードに出てくる `creator` は「いま `newproc1` を実行している側」を指す名前で、親そのものではなく、この控えを出口で引き取るためのキーとして使われています。
 
 ```c
 // 出口のフック。骨格だけを抜き出したもの
 int obi_uprobe_runtime_newproc1_return(struct pt_regs *ctx) {
-    void *creator_goroutine_addr = GOROUTINE_PTR(ctx);      // 呼び出した側のgoroutine
-    void *goroutine_addr = (void *)GO_PARAM1(ctx);          // 戻り値。新しいgoroutine
+    void *creator_goroutine_addr = GOROUTINE_PTR(ctx);      // 入口と対応づけるためのキー
+    void *goroutine_addr = (void *)GO_PARAM1(ctx);          // 戻り値。子の g のアドレス
 
     // 入口で控えておいた親を取り出す
     new_func_invocation_t *invocation = bpf_map_lookup_elem(&newproc1, &c_key);
     void *parent_goroutine = (void *)invocation->parent;
 
-    // 「子 -> 親」をマップに記録する
+    // 「子 -> 親」を ongoing_goroutines マップに記録する
     goroutine_metadata metadata = {.timestamp = bpf_ktime_get_ns(), .parent = p_key};
     bpf_map_update_elem(&ongoing_goroutines, &g_key, &metadata, BPF_ANY);
     return 0;
 }
 ```
 
-戻りでは、戻り値（`GO_PARAM1`、つまり `AX`）に新しい `g` のアドレスが入っています。入口で控えた親と組にして、`ongoing_goroutines` マップに親子関係を記録します。これで「このgoroutineは、あのリクエストを処理しているgoroutineの子だ」と辿れるようになります。
+出口では、戻り値（`GO_PARAM1`、つまり `AX`）に子の `g` のアドレスが入っています。入口で控えた親と組にして、「子 → 親」の対応を `ongoing_goroutines` マップに記録します。これで「このgoroutineは、あのリクエストを処理しているgoroutineの子だ」と辿れるようになります。
 
 ![newproc1 の入口と出口で親子を記録する](/images/20260820-newproc1-map.png)
-*図3: 矢印は時間の前後を表す。入口では親しか分からないので一時的に控え、出口で新しいgoroutineのアドレスが判明してから、親子の組として記録する。*
+*図3: 矢印は時間の前後を表す。入口では親しか分からないので一時的に控え、出口で子のアドレスが判明してから、「子 → 親」の組として記録する。*
 
 :::details 実装の全文（PIDの組み立て、循環の回避、古いエントリの削除を含む）
 ```c
@@ -278,7 +274,7 @@ HTTP/1.1のリクエストは、ただの1本の文字列です。ヘッダは1�
 `net/http` はヘッダを書き出すときに `Header.writeSubset` を通り、その先の `bufio.Writer` のバッファに、いま見たような文字列を積んでいきます。`bufio.Writer` は書き込みをためておくための入れ物で、`buf` がバイト列の置き場、`n` が「そのうち何バイトまで使っているか」を持ちます。OBIはこの関数の入口と戻りの両方にフックを置き、戻りのほうで、ためられた文字列の末尾に1行を書き足します。プローブの登録はGo側の `pkg/internal/ebpf/gotracer/gotracer.go` にあります。
 
 ![traceparent をどこへ書き込むか](/images/20260820-header-injection.png)
-*図5: 縦に並ぶ矢印は書き出しの経路、OBIから伸びる矢印は書き込み先を表し、丸印の付いた破線は書き込めない相手を指す。`http.Header` のmapには外から書き込めないため、直列化の直前にある `bufio.Writer` のバッファへ `Traceparent` を書き、`n` を進める。*
+*図5: 縦に並ぶ矢印は書き出しの経路、OBIから伸びる矢印は書き込み先を表し、先が塞がれた破線は書き込めない相手を指す。`http.Header` のmapには外から書き込めないため、直列化の直前にある `bufio.Writer` のバッファへ `Traceparent` を書き、`n` を進める。*
 
 ```go
 	if p.headerPropagationEnabled() {
@@ -346,7 +342,7 @@ kernel lockdownが有効な環境やSecure Bootの下では、このヘルパー
 
 1つ目が動いたときは、同じヘッダが二重に入らないよう、2つ目が対象を飛ばすようにマップの登録を消しています。2つの経路が同じ送信に対して走らないための調停が要るわけです。
 
-なお、コンテキスト伝搬は既定では無効です。`OTEL_EBPF_BPF_CONTEXT_PROPAGATION` の既定値は `disabled` で、`headers`、`tcp`、`all` から明示的に選びます。プロセスのメモリを書き換える、あるいは送信されるバイト列を書き換える機能である以上、有効化は利用者の判断に委ねられています。
+なお、コンテキスト伝搬はデフォルトでは無効です。`OTEL_EBPF_BPF_CONTEXT_PROPAGATION` のデフォルト値は `disabled` で、`headers`、`tcp`、`all` から明示的に選びます。プロセスのメモリを書き換える、あるいは送信されるバイト列を書き換える機能である以上、有効化は利用者の判断に委ねられています。
 
 難所4でOBIがしているのは、goroutineの生成にフックを置いて親子関係を記録し、送信の直前に6段まで遡ってトレースIDを見つけ、直列化直前のバッファか、ソケットへ出ていくバイト列にそれを書き足すことです。
 

@@ -1,10 +1,9 @@
 // 外からの観測と内からの観測
 digraph outside_inside {
   graph [
+    layout=neato, inputscale=72, splines=line,
     fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=13,
-    rankdir=TB, compound=true, splines=true,
-    nodesep=0.6, ranksep=0.9, pad=0.25,
-    bgcolor="white", newrank=true
+    bgcolor="white", pad=0.25
   ];
   node [
     fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=12,
@@ -18,12 +17,23 @@ digraph outside_inside {
     fontcolor="#1E293B"
   ];
 
-  out [label=<<b>外からの観測：eBPF / OBI</b><br align="left"/>uprobe、レジスタの読み取り、オフセット追従<br align="left"/>>,
-       fillcolor="#D9E7F4", color="#38638F"];
-  in [label=<<b>内からの観測：Goランタイム</b><br align="left"/>flight recording、goroutine leak profile<br align="left"/>>,
-      fillcolor="#D6E8D6", color="#3F6E3F"];
-  app [label=<<b>Goアプリケーション</b>>, fillcolor="#EDF1F5"];
+  outside [pos="170,300!", label=<<b>外からの観測：eBPF / OBI</b><br align="left"/>uprobe、レジスタの読み取り、オフセット追従<br align="left"/>>,
+           fillcolor="#D9E7F4", color="#38638F"];
+  inside [pos="640,300!", label=<<b>内からの観測：Goランタイム</b><br align="left"/>flight recording、goroutine leak profile<br align="left"/>>,
+          fillcolor="#D6E8D6", color="#3F6E3F"];
 
-  out -> app [label=" アプリ改変は不要\l だが内部構造への\l 追従コストを負う\l", penwidth=1.6];
-  in -> app [label=" 正確で壊れにくい\l だがコードとビルドへの\l 関与が要る\l", penwidth=1.6];
+  e1 [pos="170,130!", shape=point, width=0.01, style=invis];
+  e2 [pos="640,130!", shape=point, width=0.01, style=invis];
+  j  [pos="405,130!", shape=point, width=0.01, style=invis];
+
+  app [pos="405,60!", label=<<b>Goアプリケーション</b>>, fillcolor="#EDF1F5"];
+
+  L1 [pos="238,215!", shape=plaintext, style="", label="アプリ改変は不要\nだが内部構造への\n追従コストを負う"];
+  L2 [pos="568,215!", shape=plaintext, style="", label="正確で壊れにくい\nだがコードとビルドへの\n関与が要る"];
+
+  outside -> e1 [dir=none];
+  inside -> e2 [dir=none];
+  e1 -> j [dir=none];
+  e2 -> j [dir=none];
+  j -> app;
 }

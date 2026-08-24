@@ -1,10 +1,9 @@
-// スタックを移すときの1フレームずつの走査
+// ランタイムがスタックを辿る手順
 digraph stack_walk {
   graph [
+    layout=neato, inputscale=72, splines=line,
     fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=13,
-    rankdir=TB, compound=true, splines=true,
-    nodesep=0.5, ranksep=0.55, pad=0.25,
-    bgcolor="white", newrank=true
+    bgcolor="white", pad=0.25
   ];
   node [
     fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=12,
@@ -18,7 +17,7 @@ digraph stack_walk {
     fontcolor="#1E293B"
   ];
 
-  old [shape=plain, style="", label=<
+  old [pos="300,880!", shape=plain, style="", label=<
     <table border="0" cellborder="1" cellspacing="0" cellpadding="6" color="#38638F">
       <tr><td colspan="2" align="left" bgcolor="#EFF5FB"><b>旧スタック</b>（上が高いアドレス）</td></tr>
       <tr><td align="left" bgcolor="#D9E7F4">…</td><td align="left" bgcolor="#D9E7F4">さらに上の呼び出し元</td></tr>
@@ -29,22 +28,26 @@ digraph stack_walk {
       <tr><td align="left" bgcolor="#D9E7F4">SP →</td><td align="left" bgcolor="#D9E7F4">スタックの先端</td></tr>
     </table>>];
 
-  move [label=<<b>0. 新しい領域を確保して</b><br align="left"/><b>　 中身を丸ごとコピーする</b><br align="left"/>>,
+  move [pos="300,690!", label=<<b>0. 新しい領域を確保して</b><br align="left"/><b>　 中身を丸ごとコピーする</b><br align="left"/>>,
         fillcolor="#F3E8CE", color="#96742E"];
-  read [label=<<b>1. 戻りアドレスを読む</b>>, fillcolor="#D9E7F4", color="#38638F"];
-  lookup [label=<<b>2. どの関数のフレームか引く</b><br align="left"/>.gopclntab で命令アドレス→関数<br align="left"/>>,
+  read [pos="300,600!", label=<<b>1. 戻りアドレスを読む</b>>, fillcolor="#D9E7F4", color="#38638F"];
+  lookup [pos="300,510!", label=<<b>2. どの関数のフレームか引く</b><br align="left"/>.gopclntab で命令アドレス→関数<br align="left"/>>,
           fillcolor="#F3E8CE", color="#96742E"];
-  info [label=<<b>3. フレームの大きさと</b><br align="left"/><b>　 ポインタの位置が分かる</b><br align="left"/>>,
+  info [pos="300,415!", label=<<b>3. フレームの大きさと</b><br align="left"/><b>　 ポインタの位置が分かる</b><br align="left"/>>,
         fillcolor="#F3E8CE", color="#96742E"];
-  copy [label=<<b>4. そのフレームのポインタを</b><br align="left"/><b>　 新しいアドレスへ書き換える</b><br align="left"/>>,
+  copy [pos="300,320!", label=<<b>4. そのフレームのポインタを</b><br align="left"/><b>　 新しいアドレスへ書き換える</b><br align="left"/>>,
         fillcolor="#D6E8D6", color="#3F6E3F"];
 
-  new [shape=plain, style="", label=<
+  new [pos="300,170!", shape=plain, style="", label=<
     <table border="0" cellborder="1" cellspacing="0" cellpadding="6" color="#3F6E3F">
       <tr><td align="left" bgcolor="#F0F7F0"><b>新スタック</b>（別の領域、より大きい）</td></tr>
       <tr><td align="left" bgcolor="#D6E8D6">フレームの中身はそのまま</td></tr>
       <tr><td align="left" bgcolor="#D6E8D6">スタックを指すポインタは新しい値に</td></tr>
     </table>>];
+
+  w1 [pos="560,320!", shape=point, width=0.01, style=invis];
+  w2 [pos="560,600!", shape=point, width=0.01, style=invis];
+  Lloop [pos="682,460!", shape=plaintext, style="", label="呼び出し元のフレームで\n同じことを繰り返す", fontcolor="#5B6B80"];
 
   old -> move;
   move -> read;
@@ -52,5 +55,7 @@ digraph stack_walk {
   lookup -> info;
   info -> copy;
   copy -> new;
-  copy -> read [label=" 呼び出し元のフレームで\l 同じことを繰り返す\l", style=dashed, color="#7C8DA3", constraint=false];
+  copy -> w1 [dir=none, style=dashed, color="#7C8DA3"];
+  w1 -> w2 [dir=none, style=dashed, color="#7C8DA3"];
+  w2 -> read [style=dashed, color="#7C8DA3"];
 }

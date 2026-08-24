@@ -1,10 +1,9 @@
 // 誰が traceparent を書き込むのか
 digraph sdk_vs_zerocode {
   graph [
+    layout=neato, inputscale=72, splines=line,
     fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=13,
-    rankdir=TB, compound=true, splines=true,
-    nodesep=0.5, ranksep=0.7, pad=0.25,
-    bgcolor="white", newrank=true
+    bgcolor="white", pad=0.25
   ];
   node [
     fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=12,
@@ -18,28 +17,35 @@ digraph sdk_vs_zerocode {
     fontcolor="#1E293B"
   ];
 
-  subgraph cluster_sdk {
-    label=<<b>SDK計装</b>>;
-    style="rounded"; labeljust="l"; penwidth=1.6; margin=14;
-    color="#3F6E3F"; fontcolor="#2C4F2C"; bgcolor="#F0F7F0";
+  bgL [pos="215,300!", shape=box, style="rounded,filled", fillcolor="#F0F7F0", color="#3F6E3F",
+       label="", width=4.4, height=3.5, fixedsize=true];
+  tL [pos="120,405!", shape=plaintext, style="", label=<<b>SDK計装</b>>, fontcolor="#2C4F2C"];
 
-    app1 [label=<<b>アプリのコード</b><br align="left"/>ctx と req を手元に持っている<br align="left"/>>,
-          fillcolor="#D6E8D6", color="#3F6E3F"];
-    hdr1 [label=<<b>リクエストのヘッダ</b>>, fillcolor="#EDF1F5"];
-    app1 -> hdr1 [label=" Inject で自分で書く", penwidth=1.8];
-  }
+  bgR [pos="700,300!", shape=box, style="rounded,filled", fillcolor="#EFF5FB", color="#38638F",
+       label="", width=6.6, height=3.5, fixedsize=true];
+  tR [pos="580,405!", shape=plaintext, style="", label=<<b>ゼロコード計装</b>>, fontcolor="#2E4D6E"];
 
-  subgraph cluster_zero {
-    label=<<b>ゼロコード計装</b>>;
-    style="rounded"; labeljust="l"; penwidth=1.6; margin=14;
-    color="#38638F"; fontcolor="#2E4D6E"; bgcolor="#EFF5FB";
+  appL [pos="215,355!", label=<<b>アプリのコード</b><br align="left"/>ctx と req を手元に持っている<br align="left"/>>,
+        fillcolor="#D6E8D6", color="#3F6E3F"];
+  hdrL [pos="215,205!", label=<<b>リクエストのヘッダ</b>>, fillcolor="#EDF1F5"];
+  LL [pos="310,280!", shape=plaintext, style="", label="Inject で自分で書く"];
 
-    app2 [label=<<b>アプリのコード</b><br align="left"/>traceparent の存在を知らない<br align="left"/>>,
-          fillcolor="#EDF1F5"];
-    hdr2 [label=<<b>リクエストのヘッダ</b>>, fillcolor="#EDF1F5"];
-    obi [label=<<b>OBI</b>（カーネル側のフック）>, fillcolor="#D9E7F4", color="#38638F"];
+  appR [pos="570,355!", label=<<b>アプリのコード</b><br align="left"/>traceparent の存在を知らない<br align="left"/>>,
+        fillcolor="#EDF1F5"];
+  obiR [pos="860,355!", label=<<b>OBI</b>（カーネル側のフック）>, fillcolor="#D9E7F4", color="#38638F"];
+  hdrR [pos="700,205!", label=<<b>リクエストのヘッダ</b>>, fillcolor="#EDF1F5"];
 
-    app2 -> hdr2 [label=" 何も書かない", style=dashed, color="#A04848", fontcolor="#7A3030", arrowhead=tee];
-    obi -> hdr2 [label=" 外から代行して書く", penwidth=1.8];
-  }
+  d1 [pos="570,205!", shape=point, width=0.01, style=invis];
+  s0 [pos="860,335.9!", shape=point, width=0.01, style=invis];
+  s1 [pos="860,205!", shape=point, width=0.01, style=invis];
+  dt [pos="623,205!", shape=point, width=0.01, style=invis];
+
+  LD [pos="512,272!", shape=plaintext, style="", label="何も書かない", fontcolor="#7A3030"];
+  LS [pos="780,272!", shape=plaintext, style="", label="外から代行して書く"];
+
+  appL -> hdrL;
+  appR -> d1 [dir=none, style=dashed, color="#A04848"];
+  d1 -> dt [style=dashed, color="#A04848", arrowhead=tee];
+  s0 -> s1 [dir=none, penwidth=1.8];
+  s1 -> hdrR [penwidth=1.8];
 }

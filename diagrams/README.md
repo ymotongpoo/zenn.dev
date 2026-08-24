@@ -19,9 +19,19 @@ images/{同じ名前}.png                              # 出力（Git管理、Ze
 ./diagrams/render.sh 20260820   # 名前に 20260820 を含むものだけ
 ```
 
-必要なのは `dot`（graphviz）と日本語のゴシック体フォント。`.dot` の `fontname` は
+必要なのは `dot`（graphviz）、`rsvg-convert`（librsvg）、`python3`、そして日本語の
+ゴシック体フォント。`.dot` の `fontname` は
 `"Harano Aji Gothic,Noto Sans CJK JP,IPAGothic"` の順にフォールバックする。
 書き出したPNGは必ず目視して、はみ出し・重なり・不自然な折り返しがないことを確認する。
+
+`render.sh` はPNGを直接書き出さず、いったんSVGに出してから `round.py` と `elbow.py` に通し、
+`rsvg-convert` でPNGにしている。graphvizの角丸半径は12pt固定で属性からは変えられず、
+そのままでは角が大きすぎるため、`round.py` がノードとクラスタの角丸矩形を検出して
+`<rect rx>` に描き直している。半径は `render.sh` の `RADIUS`（既定4pt）で決まる。
+`elbow.py` は経由点方式の折れ線を仕上げる後処理で、経由点ノードの手前で約1pt切れる
+エッジ端点を交点にスナップし、同じ見た目の2本が突き合う角は1本のパスに結合して
+角を丸め（半径6pt）、3本以上が集まるT字は丸い線端で隙間を埋める。角が切れて
+見えるときは .dot 側をいじる前に、この後処理を通した結果を確認する。
 
 ## 図の役割
 
@@ -91,6 +101,12 @@ edge [
 
 グループ枠（cluster）は `style="rounded"`、`labeljust="l"`、`penwidth=1.6`、`margin=14`、
 タイトルは `label=<<b>タイトル</b>>` で太字にする。
+
+## 線の引き方
+
+矢印や線は直線を基本とし、水平と垂直の組み合わせで引く。斜め線や曲線を使わない。エッジのラベルは、線にも図形にも重ねない。
+
+縦一列のチェーンは既定の dot レイアウトのままで直線になる。分岐、合流、横接続、側注を含む図は `graph [layout=neato, inputscale=72, splines=line]` にして全ノードを `pos="x,y!"` で固定し、折れ位置は `shape=point, style=invis, width=0.01` の経由点で組む（矢頭は最終区間だけに付け、途中区間は `dir=none`）。ラベルは `shape=plaintext, style=""` のノードとして線の横の空白に置く（線の座標とラベル中心の座標をずらす）。`dpi` は付けない（render.sh がSVG経由で処理する）。neatoはクラスタを描けないので、枠が要るときは `fixedsize=true` の背景ノードを先に定義し、タイトルはplaintextノードを枠の左上に置く。
 
 ## 矢印の意味
 

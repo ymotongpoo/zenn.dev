@@ -1,0 +1,33 @@
+// コピーオンライトによるページの差し替え
+digraph cow_page_swap {
+  graph [
+    layout=neato, inputscale=72, splines=line,
+    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=13,
+    bgcolor="white", pad=0.25
+  ];
+  node [
+    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=12,
+    shape=box, style="rounded,filled",
+    fillcolor="#F1F5F9", color="#475569", penwidth=1.6,
+    margin="0.2,0.14"
+  ];
+  edge [
+    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=11,
+    color="#334155", penwidth=1.4, arrowsize=0.9,
+    fontcolor="#1E293B"
+  ];
+
+  pa [pos="140,260!", label=<<b>プロセスAの対応表</b>>, fillcolor="#D9E7F4", color="#38638F"];
+  pb [pos="140,90!", label=<<b>プロセスBの対応表</b><br align="left"/>（Bの機械語を書き換えたい）<br align="left"/>>, fillcolor="#D6E8D6", color="#3F6E3F"];
+
+  orig [pos="490,260!", label=<<b>共有ページ</b><br align="left"/>変わらない<br align="left"/>>, fillcolor="#D9E7F4", color="#38638F"];
+  copy [pos="490,90!", label=<<b>B専用のコピー</b><br align="left"/>この1ページだけ書き換えた<br align="left"/>>, fillcolor="#F5DEDE", color="#A04848"];
+
+  LA [pos="310,278!", shape=plaintext, style="", label="指したまま"];
+  LB [pos="310,108!", shape=plaintext, style="", label="指す先が差し替わる"];
+  LC [pos="613,175!", shape=plaintext, style="", label="1ページぶんコピーしてから\n書き換える", fontcolor="#5B6B80"];
+
+  pa -> orig [label=""];
+  pb -> copy;
+  orig -> copy [style=dashed, color="#7C8DA3"];
+}

@@ -1,10 +1,9 @@
 // バージョン間でオフセットがずれる
 digraph offset_shift {
   graph [
+    layout=neato, inputscale=72, splines=line,
     fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=13,
-    rankdir=TB, compound=true, splines=true,
-    nodesep=0.6, ranksep=0.75, pad=0.25,
-    bgcolor="white", newrank=true
+    bgcolor="white", pad=0.25
   ];
   node [
     fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=12,
@@ -18,30 +17,38 @@ digraph offset_shift {
     fontcolor="#1E293B"
   ];
 
-  reader [label=<<b>+88 を読む計装コード</b><br align="left"/>オフセットをハードコード<br align="left"/>>,
-          fillcolor="#F3E8CE", color="#96742E"];
+  code [pos="470,560!", label=<<b>+88 を読む計装コード</b><br align="left"/>オフセットをハードコード<br align="left"/>>,
+        fillcolor="#F3E8CE", color="#96742E"];
 
-  v166 [shape=plain, style="", label=<
-    <table border="0" cellborder="1" cellspacing="0" cellpadding="7" color="#3F6E3F">
+  c1 [pos="420,538!", shape=point, width=0.01, style=invis];
+  c1v [pos="420,355!", shape=point, width=0.01, style=invis];
+  c2 [pos="520,538!", shape=point, width=0.01, style=invis];
+  c2v [pos="520,324!", shape=point, width=0.01, style=invis];
+
+  L1 [pos="340,450!", shape=plaintext, style="", label="method が取れる"];
+  L2 [pos="665,505!", shape=plaintext, style="", label="別のフィールドを\nmethod として拾う", fontcolor="#7A3030"];
+
+  t166 [pos="200,390!", shape=plain, style="", label=<
+    <table border="0" cellborder="1" cellspacing="0" cellpadding="6" color="#3F6E3F">
       <tr><td colspan="2" align="left" bgcolor="#F0F7F0"><b>grpc 1.66 の Stream</b></td></tr>
       <tr><td align="left" bgcolor="#D6E8D6">…</td><td align="left" bgcolor="#D6E8D6">…</td></tr>
-      <tr><td align="left" bgcolor="#D6E8D6" port="m">+88</td><td align="left" bgcolor="#D6E8D6"><b>method</b></td></tr>
+      <tr><td align="left" bgcolor="#D6E8D6">+88</td><td port="p88" align="left" bgcolor="#D6E8D6"><b>method</b></td></tr>
     </table>>];
 
-  v169 [shape=plain, style="", label=<
-    <table border="0" cellborder="1" cellspacing="0" cellpadding="7" color="#A04848">
+  t169 [pos="740,375!", shape=plain, style="", label=<
+    <table border="0" cellborder="1" cellspacing="0" cellpadding="6" color="#A04848">
       <tr><td colspan="2" align="left" bgcolor="#FBEFEF"><b>grpc 1.69 の Stream</b>（並びが変わった）</td></tr>
       <tr><td align="left" bgcolor="#D6E8D6">+24</td><td align="left" bgcolor="#D6E8D6"><b>method</b>（本当はここ）</td></tr>
       <tr><td align="left" bgcolor="#F5DEDE">…</td><td align="left" bgcolor="#F5DEDE">…</td></tr>
-      <tr><td align="left" bgcolor="#F5DEDE" port="w">+88</td><td align="left" bgcolor="#F5DEDE">別のフィールド</td></tr>
+      <tr><td port="p88" align="left" bgcolor="#F5DEDE">+88</td><td align="left" bgcolor="#F5DEDE">別のフィールド</td></tr>
     </table>>];
 
-  bad [label=<<b>クラッシュせず「それらしく動く」</b><br align="left"/>トレースは出るが中身が誤る<br align="left"/>>,
-       fillcolor="#F5DEDE", color="#A04848"];
+  crash [pos="740,140!", label=<<b>クラッシュせず「それらしく動く」</b><br align="left"/>トレースは出るが中身が誤る<br align="left"/>>,
+         fillcolor="#F5DEDE", color="#A04848"];
 
-  reader -> v166:m [label=" method が取れる", penwidth=1.6];
-  reader -> v169:w [label=" 別のフィールドを\l method として拾う\l", style=dashed, color="#A04848", fontcolor="#7A3030", penwidth=1.6];
-  v169:w -> bad [style=dashed, color="#A04848"];
-
-  { rank=same; v166; v169; }
+  c1 -> c1v [dir=none, penwidth=1.8];
+  c1v -> t166:p88:e [penwidth=1.8];
+  c2 -> c2v [dir=none, style=dashed, color="#A04848"];
+  c2v -> t169:p88:w [style=dashed, color="#A04848"];
+  t169 -> crash [style=dashed, color="#A04848"];
 }

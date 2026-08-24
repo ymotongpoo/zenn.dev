@@ -1,10 +1,9 @@
 // 静的リンクされたGoバイナリと動的リンク
 digraph static_link {
   graph [
+    layout=neato, inputscale=72, splines=line,
     fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=13,
-    rankdir=TB, compound=true, splines=true,
-    nodesep=0.5, ranksep=0.7, pad=0.25,
-    bgcolor="white", newrank=true
+    bgcolor="white", pad=0.25
   ];
   node [
     fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=12,
@@ -18,17 +17,27 @@ digraph static_link {
     fontcolor="#1E293B"
   ];
 
-  cprog [label=<<b>Cで書いたプログラム</b><br align="left"/>自分のコードだけを持つ<br align="left"/>>,
-         fillcolor="#EDF1F5"];
-  libc [label=<<b>libc.so</b>（共有ライブラリ）<br align="left"/>起動時に結び付けられ、置き場所は環境で変わる<br align="left"/>>,
+  cprog [pos="160,400!", label=<<b>Cで書いたプログラム</b><br align="left"/>自分のコードだけを持つ<br align="left"/>>, fillcolor="#EDF1F5"];
+  L0 [pos="235,332!", shape=plaintext, style="", label="実行時に解決する依存"];
+  libc [pos="160,260!", label=<<b>libc.so</b>（共有ライブラリ）<br align="left"/>起動時に結び付けられ、置き場所は環境で変わる<br align="left"/>>,
         fillcolor="#F3E8CE", color="#96742E"];
 
-  goprog [label=<<b>Goで書いたプログラム</b><br align="left"/>自分のコード、標準ライブラリ、ランタイムを<br align="left"/>1つのバイナリに同梱する<br align="left"/>>,
+  goprog [pos="580,260!", label=<<b>Goで書いたプログラム</b><br align="left"/>自分のコード、標準ライブラリ、ランタイムを<br align="left"/>1つのバイナリに同梱する<br align="left"/>>,
           fillcolor="#D9E7F4", color="#38638F"];
 
-  kernel [label=<<b>カーネル</b>>, fillcolor="#E9DFF2", color="#75589C"];
+  e1 [pos="160,130!", shape=point, width=0.01, style=invis];
+  e2 [pos="580,130!", shape=point, width=0.01, style=invis];
+  j  [pos="370,130!", shape=point, width=0.01, style=invis];
 
-  cprog -> libc [label=" 実行時に解決する依存"];
-  libc -> kernel [label=" システムコール"];
-  goprog -> kernel [label=" システムコール（libcを挟まない）", penwidth=1.8];
+  kernel [pos="370,60!", label=<<b>カーネル</b>>, fillcolor="#E9DFF2", color="#75589C"];
+
+  L1 [pos="222,180!", shape=plaintext, style="", label="システムコール"];
+  L2 [pos="466,180!", shape=plaintext, style="", label="システムコール（libcを挟まない）"];
+
+  cprog -> libc;
+  libc -> e1 [dir=none];
+  goprog -> e2 [dir=none];
+  e1 -> j [dir=none];
+  e2 -> j [dir=none];
+  j -> kernel;
 }

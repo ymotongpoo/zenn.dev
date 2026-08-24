@@ -1,10 +1,9 @@
 // 分散トレースの基本
-digraph trace_basics {
+digraph distributed_trace_basics {
   graph [
+    layout=neato, inputscale=72, splines=line,
     fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=13,
-    rankdir=TB, compound=true, splines=true,
-    nodesep=0.5, ranksep=0.7, pad=0.25,
-    bgcolor="white", newrank=true
+    bgcolor="white", pad=0.25
   ];
   node [
     fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=12,
@@ -18,26 +17,30 @@ digraph trace_basics {
     fontcolor="#1E293B"
   ];
 
-  a [label=<<b>サービスA</b><br align="left"/>リクエストを受けて処理し、Bを呼ぶ<br align="left"/>>,
-     fillcolor="#D9E7F4", color="#38638F"];
-  b [label=<<b>サービスB</b><br align="left"/>受け取ったリクエストを処理する<br align="left"/>>,
-     fillcolor="#D6E8D6", color="#3F6E3F"];
+  sa [pos="180,430!", label=<<b>サービスA</b><br align="left"/>リクエストを受けて処理し、Bを呼ぶ<br align="left"/>>, fillcolor="#D9E7F4", color="#38638F"];
+  L0 [pos="330,368!", shape=plaintext, style="", label="GET /items HTTP/1.1\nTraceparent: 00-4bf9…-00f0…-01"];
+  sb [pos="180,300!", label=<<b>サービスB</b><br align="left"/>受け取ったリクエストを処理する<br align="left"/>>, fillcolor="#D6E8D6", color="#3F6E3F"];
 
-  spans [shape=plain, style="", label=<
+  a1 [pos="500,430!", shape=point, width=0.01, style=invis];
+  a2 [pos="500,142.7!", shape=point, width=0.01, style=invis];
+  b1 [pos="460,300!", shape=point, width=0.01, style=invis];
+  b2 [pos="460,110.8!", shape=point, width=0.01, style=invis];
+
+  Ls [pos="580,320!", shape=plaintext, style="", label="記録を送る", fontcolor="#5B6B80"];
+
+  rec [pos="700,160!", shape=plain, style="", label=<
     <table border="0" cellborder="1" cellspacing="0" cellpadding="6" color="#75589C">
       <tr><td colspan="3" align="left" bgcolor="#F5F1F9"><b>バックエンドに集まる記録</b></td></tr>
-      <tr><td align="left" bgcolor="#F5F1F9"><b>スパン</b></td>
-          <td align="left" bgcolor="#F5F1F9"><b>トレースID</b></td>
-          <td align="left" bgcolor="#F5F1F9"><b>スパンID と親</b></td></tr>
-      <tr><td align="left" bgcolor="#E9DFF2" port="s1">Aの処理</td>
-          <td align="left" bgcolor="#E9DFF2">4bf9…</td>
-          <td align="left" bgcolor="#E9DFF2">00f0…（親なし）</td></tr>
-      <tr><td align="left" bgcolor="#E9DFF2" port="s2">Bの処理</td>
-          <td align="left" bgcolor="#E9DFF2">4bf9…（同じ）</td>
-          <td align="left" bgcolor="#E9DFF2">b7ad…（親は 00f0…）</td></tr>
+      <tr><td align="left" bgcolor="#E9DFF2"><b>スパン</b></td><td align="left" bgcolor="#E9DFF2"><b>トレースID</b></td><td align="left" bgcolor="#E9DFF2"><b>スパンID と親</b></td></tr>
+      <tr><td port="ra" align="left" bgcolor="#FFFFFF">Aの処理</td><td align="left" bgcolor="#FFFFFF">4bf9…</td><td align="left" bgcolor="#FFFFFF">00f0…（親なし）</td></tr>
+      <tr><td port="rb" align="left" bgcolor="#FFFFFF">Bの処理</td><td align="left" bgcolor="#FFFFFF">4bf9…（同じ）</td><td align="left" bgcolor="#FFFFFF">b7ad…（親は 00f0…）</td></tr>
     </table>>];
 
-  a -> b [label=" GET /items HTTP/1.1\l Traceparent: 00-4bf9…-00f0…-01\l", penwidth=1.8];
-  a -> spans:s1:w [label=" 記録を送る", style=dashed, color="#7C8DA3"];
-  b -> spans:s2:w [style=dashed, color="#7C8DA3"];
+  sa -> sb [penwidth=1.8];
+  sa -> a1 [dir=none, style=dashed, color="#7C8DA3"];
+  a1 -> a2 [dir=none, style=dashed, color="#7C8DA3"];
+  a2 -> rec:ra:w [style=dashed, color="#7C8DA3"];
+  sb -> b1 [dir=none, style=dashed, color="#7C8DA3"];
+  b1 -> b2 [dir=none, style=dashed, color="#7C8DA3"];
+  b2 -> rec:rb:w [style=dashed, color="#7C8DA3"];
 }

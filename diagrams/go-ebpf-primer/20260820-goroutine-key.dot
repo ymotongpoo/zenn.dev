@@ -1,10 +1,9 @@
 // uprobe 発火時に OBI が読むもの
 digraph goroutine_key {
   graph [
+    layout=neato, inputscale=72, splines=line,
     fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=13,
-    rankdir=TB, compound=true, splines=true,
-    nodesep=0.5, ranksep=0.8, pad=0.25,
-    bgcolor="white", newrank=true
+    bgcolor="white", pad=0.25
   ];
   node [
     fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=12,
@@ -18,36 +17,49 @@ digraph goroutine_key {
     fontcolor="#1E293B"
   ];
 
-  fire [label=<<b>uprobe 発火</b><br align="left"/>レジスタの写し pt_regs<br align="left"/>>, fillcolor="#EDF1F5"];
+  bg [pos="430,355!", shape=box, style="rounded,filled", fillcolor="#EFF5FB", color="#38638F",
+      label="", width=8.2, height=1.7, fixedsize=true];
+  tbg [pos="215,405!", shape=plaintext, style="", label=<<b>OBI が読むレジスタ</b>>, fontcolor="#2E4D6E"];
 
-  subgraph cluster_regs {
-    label=<<b>OBI が読むレジスタ</b>>;
-    style="rounded"; labeljust="l"; penwidth=1.6; margin=14;
-    color="#38638F"; fontcolor="#2E4D6E"; bgcolor="#EFF5FB";
+  fire [pos="458,500!", label=<<b>uprobe 発火</b>　レジスタの写し pt_regs>, fillcolor="#EDF1F5"];
 
-    r14 [label=<<b>R14</b>（amd64）/ <b>R28</b>（arm64）<br align="left"/>g 構造体の先頭アドレス<br align="left"/>>,
-         fillcolor="#D9E7F4", color="#38638F"];
-    args [label=<<b>AX, BX, CX, …</b><br align="left"/>関数の引数<br align="left"/>>,
-          fillcolor="#D9E7F4", color="#38638F"];
-  }
+  j  [pos="458,455!", shape=point, width=0.01, style=invis];
+  jl [pos="290,455!", shape=point, width=0.01, style=invis];
+  jr [pos="625,455!", shape=point, width=0.01, style=invis];
 
-  key [shape=plain, style="", label=<
+  r14 [pos="290,345!", label=<<b>R14</b>（amd64）/ <b>R28</b>（arm64）<br align="left"/>g 構造体の先頭アドレス<br align="left"/>>,
+       fillcolor="#D9E7F4", color="#38638F"];
+  args [pos="625,345!", label=<<b>AX, BX, CX, …</b><br align="left"/>関数の引数<br align="left"/>>,
+        fillcolor="#D9E7F4", color="#38638F"];
+
+  j2  [pos="290,285!", shape=point, width=0.01, style=invis];
+  j2l [pos="150,285!", shape=point, width=0.01, style=invis];
+  j2r [pos="410,285!", shape=point, width=0.01, style=invis];
+
+  key [pos="150,180!", shape=plain, style="", label=<
     <table border="0" cellborder="1" cellspacing="0" cellpadding="7" color="#75589C">
       <tr><td align="left" bgcolor="#F5F1F9"><b>go_addr_key_t</b>（goroutine の識別子）</td></tr>
       <tr><td align="left" bgcolor="#E9DFF2">addr = 0xc000102000</td></tr>
       <tr><td align="left" bgcolor="#E9DFF2">pid&nbsp;&nbsp;= 12345</td></tr>
     </table>>];
 
-  values [label=<<b>引数の値</b><br align="left"/>HTTPメソッド、URLなど<br align="left"/>>, fillcolor="#EDF1F5"];
-
-  gstruct [label=<<b>g 構造体の中身</b><br align="left"/>stack.lo / stack.hi / goid …<br align="left"/>>,
+  gstruct [pos="410,185!", label=<<b>g 構造体の中身</b><br align="left"/>stack.lo / stack.hi / goid …<br align="left"/>>,
            style="rounded,filled,dashed", fillcolor="#FBEFEF", color="#A04848"];
 
-  fire -> r14;
-  fire -> args;
-  r14 -> key [label=" 値をそのまま使う", penwidth=1.8];
-  args -> values;
-  r14 -> gstruct [label=" 読まない", style=dashed, color="#A04848", fontcolor="#7A3030", arrowhead=odot];
+  values [pos="625,185!", label=<<b>引数の値</b><br align="left"/>HTTPメソッド、URLなど<br align="left"/>>, fillcolor="#EDF1F5"];
 
-  { rank=same; key; values; gstruct; }
+  L1 [pos="212,240!", shape=plaintext, style="", label="値をそのまま使う"];
+  L2 [pos="452,240!", shape=plaintext, style="", label="読まない", fontcolor="#7A3030"];
+
+  fire -> j [dir=none];
+  j -> jl [dir=none];
+  j -> jr [dir=none];
+  jl -> r14;
+  jr -> args;
+  r14 -> j2 [dir=none, penwidth=1.8];
+  j2 -> j2l [dir=none, penwidth=1.8];
+  j2l -> key [penwidth=1.8];
+  j2 -> j2r [dir=none, style=dashed, color="#A04848"];
+  j2r -> gstruct [style=dashed, color="#A04848", arrowhead=odot];
+  args -> values;
 }
