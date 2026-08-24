@@ -25,7 +25,7 @@ mvdanが[修正パッチ](https://go-review.googlesource.com/c/go/+/224079)を�
 
 > We want to stick to the design principles of the standard library: correctness over performance by default, no `unsafe`, and no extra steps such as code generation. These rule out the majority of third-party JSON library designs.
 >
-> （標準ライブラリの設計原則は守りたい。既定では性能より正しさを取り、`unsafe` を使わず、コード生成のような追加の手順も要求しない。これらが、サードパーティのJSONライブラリの設計の大半を除外します。）
+> （標準ライブラリの設計原則は守りたい。デフォルトでは性能より正しさを取り、`unsafe` を使わず、コード生成のような追加の手順も要求しない。これらが、サードパーティのJSONライブラリの設計の大半を除外します。）
 
 そうしたサードパーティライブラリからも学びもあります。「Previous work」という節に、[`json-iterator/go`](https://github.com/json-iterator/go) のアロケーションを減らすAPI設計、Phil Pearl による `Marshaler` の性能限界の分析、Dave Cheney による高速なトークナイザの実装が挙げられています。設計原則としては採用しないが、問題の捉え方としては参照する、というスタンスになっています。
 

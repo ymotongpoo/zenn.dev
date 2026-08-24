@@ -19,7 +19,7 @@ title: "付録：参考リンク"
 | [#4712](https://github.com/golang/go/issues/4712) | `time.Duration` の表現（2017-02-17にクローズ） |
 | [#63397](https://github.com/golang/go/discussions/63397) | encoding/json/v2 の Discussion（2023-10-05） |
 | [#71497](https://github.com/golang/go/issues/71497) | 正式提案（2025-01-31、2026-05-13受理） |
-| [#71631](https://github.com/golang/go/issues/71631) | `time.Duration` の既定表現（2025-12-18クローズ） |
+| [#71631](https://github.com/golang/go/issues/71631) | `time.Duration` のデフォルトの表現（2025-12-18クローズ） |
 | [#79071](https://github.com/golang/go/issues/79071) | `format` タグの取り下げ（2026-04-30） |
 | [#74472](https://github.com/golang/go/issues/74472) | 型付き構造体タグの提案（保留中） |
 | [#76406](https://github.com/golang/go/issues/76406) | json/v2 ワーキンググループ議事録 |
@@ -50,7 +50,7 @@ title: "付録：参考リンク"
 | `format` タグの実装と有効化スイッチ | `src/encoding/json/v2/arshal_time.go`、`src/encoding/json/internal/jsonopts/options_format.go` |
 | エラー文言のHyrum対策 | `src/encoding/json/v2/errors.go` |
 | `any` へのデコードの最適化経路 | `src/encoding/json/v2/arshal_default.go` |
-| `GOEXPERIMENT` の既定値 | `src/internal/buildcfg/exp.go` |
+| `GOEXPERIMENT` のデフォルト値 | `src/internal/buildcfg/exp.go` |
 
 > 本書のベンチーマークの実行結果は go1.27 darwin/arm64（Apple M5 Pro）で確認したものです。
 > ベンチマークの値は環境とデータの形に強く依存するので、判断に使う際は自分のデータで計測し直してください。

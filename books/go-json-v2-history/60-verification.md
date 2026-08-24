@@ -56,7 +56,7 @@ $ head -1 $(go env GOROOT)/src/encoding/json/jsontext/doc.go
 
 このオプトアウトは、本当に等価なのでしょうか。
 
-* https://go.dev/play/p/LU764Er5F_G （Playgroundでは `GOEXPERIMENT` を指定できないため、既定側の出力だけが得られます）
+* https://go.dev/play/p/LU764Er5F_G （Playgroundでは `GOEXPERIMENT` を指定できないため、デフォルト側の出力だけが得られます）
 
 ```go
 package main
@@ -88,7 +88,7 @@ func main() {
 ```
 
 ```
---- 既定（v2バックエンド）---
+--- デフォルト（v2バックエンド）---
 {"name":}              -> invalid character '}' looking for beginning of value
 {"name":"a"            -> unexpected end of JSON input
 {"name":"a"} extra     -> invalid character 'e' after top-level value
@@ -236,7 +236,7 @@ v1がv2の上に載ったのだから、何もしなくても速くなる、と�
 | 重複キーを受け入れる | エラー |
 | `null` を非空の値に入れると、ゼロ化したりしなかったり | 常にゼロ化する |
 | 非ゼロの値へのマージ規則が一貫しない | JSONオブジェクトならマージ、そうでなければ置換 |
-| `time.Duration` はナノ秒の数値 | 既定の表現を持たず、エラー |
+| `time.Duration` はナノ秒の数値 | デフォルトの表現を持たず、エラー |
 | 構造上おかしな型でも実行時エラーにならない | 実行時エラーになる |
 
 v1の挙動には「一貫しない」「したりしなかったり」という記述が複数あります。アドレス可能性によって呼ばれたり呼ばれなかったりする問題がその一例です。バグと呼べるものでさえ、依存が積み上がった後では直せなくなっていました。
