@@ -34,14 +34,11 @@ digraph http_bytes_injection {
   p2 [label=<<b>経路2</b>：sk_msg プログラム<br align="left"/>アプリのメモリには触らない<br align="left"/>>,
       fillcolor="#E9DFF2", color="#75589C"];
 
-  jn [shape=point, width=0.01, style=invis];
-
   sock [label=<<b>ソケットへ出ていくバイトストリーム</b>>, fillcolor="#EDF1F5"];
 
   { rank=same; buf; p2; }
 
   p1 -> buf [penwidth=1.8];
-  buf -> jn [dir=none];
-  p2 -> jn [dir=none, penwidth=1.8];
-  jn -> sock;
+  buf -> sock;
+  p2 -> sock [penwidth=1.8];
 }
