@@ -3,7 +3,7 @@ digraph sdk_vs_zerocode {
   graph [
     rankdir=TB, compound=true, splines=ortho,
     fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=13,
-    nodesep=0.5, ranksep=0.6,
+    nodesep=0.5, ranksep=0.75,
     bgcolor="white", pad=0.25, newrank=true
   ];
   node [
@@ -44,7 +44,7 @@ digraph sdk_vs_zerocode {
 
     { rank=same; appR; obiR; }
 
-    appR -> hdrR [style=dashed, color="#A04848", arrowhead=tee];
+    appR -> hdrR [style=dashed, color="#A04848", arrowhead=tee, arrowsize=1.4];
     obiR -> hdrR [penwidth=1.8];
   }
 

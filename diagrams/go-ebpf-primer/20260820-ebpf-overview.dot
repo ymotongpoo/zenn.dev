@@ -3,6 +3,7 @@ digraph ebpf_overview {
   graph [
     rankdir=TB, splines=ortho, compound=true,
     fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=13,
+    nodesep=1.1, ranksep=0.7,
     bgcolor="white", pad=0.25
   ];
   node [

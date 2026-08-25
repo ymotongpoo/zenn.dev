@@ -39,7 +39,7 @@ digraph unwind_failure {
   crash [label=<<b>throw("unknown caller pc")</b>>, fillcolor="#F5DEDE", color="#A04848"];
 
   walk -> lookup [penwidth=1.8];
-  stack:ra:e -> lookup [style=dashed, color="#7C8DA3"];
+  stack -> lookup [style=dashed, color="#7C8DA3"];
   lookup -> ok;
   lookup -> ng;
   ng -> crash;

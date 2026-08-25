@@ -3,7 +3,7 @@ digraph user_kernel_space {
   graph [
     rankdir=TB, splines=ortho,
     fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=13,
-    nodesep=0.5, ranksep=0.9,
+    nodesep=0.9, ranksep=0.9,
     bgcolor="white", pad=0.25
   ];
   node [
@@ -32,11 +32,11 @@ digraph user_kernel_space {
 
   hw [label=<<b>ハードウェア</b><br align="left"/>CPU、メモリ、ディスク、ネットワークカード<br align="left"/>>, fillcolor="#EDF1F5"];
 
-  app:w -> kernel:w [penwidth=1.8, xlabel=" システムコールで頼む"];
-  kernel:e -> app:e [style=dashed, color="#7C8DA3", constraint=false, xlabel=" 結果を返す"];
+  app -> kernel [penwidth=1.8, xlabel=" システムコールで頼む"];
+  kernel -> app [style=dashed, color="#7C8DA3", constraint=false, xlabel=" 結果を返す"];
   kernel -> hw [xlabel=" 直接操作する"];
   // このエッジはcluster_kernelをまたぐため splines=ortho の直角配線が崩れ、
   // 単純な斜め線になる（クラスタをまたぐ辺の既知の制約）。1本の素直な斜め線
   // なので「触れない」という意味の破線としては許容する。
-  app -> hw [style=dashed, color="#A04848", arrowhead=tee, xlabel=" 直接は触れない"];
+  app -> hw [style=dashed, color="#A04848", arrowhead=tee, arrowsize=1.4, xlabel=" 直接は触れない"];
 }

@@ -29,7 +29,7 @@ digraph text_page_sharing {
   file [label=<<b>実行ファイルの .text</b><br align="left"/>ディスク上。変わらない<br align="left"/>>, fillcolor="#F3E8CE", color="#96742E"];
 
   pa -> phys:pg:w;
-  pb -> phys:pg:w;
+  pb -> phys:w;
   file -> phys [style=dashed, color="#7C8DA3"];
 
   { rank=same; pa; pb; file; }

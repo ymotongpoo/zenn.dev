@@ -3,6 +3,7 @@ digraph build_flags {
   graph [
     rankdir=TB, splines=ortho,
     fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=13,
+    ranksep=0.8,
     bgcolor="white", pad=0.25
   ];
   node [
@@ -25,7 +26,7 @@ digraph build_flags {
       <tr><td align="left" bgcolor="#EDF1F5">シンボルテーブル</td>
           <td align="left" bgcolor="#D6E8D6">あり</td>
           <td align="left" bgcolor="#F5DEDE">なし</td></tr>
-      <tr><td port="pcln" align="left" bgcolor="#EDF1F5">.gopclntab とビルド情報</td>
+      <tr><td align="left" bgcolor="#EDF1F5">.gopclntab とビルド情報</td>
           <td align="left" bgcolor="#D6E8D6">あり</td>
           <td align="left" bgcolor="#D6E8D6">あり</td></tr>
       <tr><td align="left" bgcolor="#EDF1F5">DWARF</td>
@@ -41,7 +42,7 @@ digraph build_flags {
 
   { rank=same; addr; off_ok; off_ng; }
 
-  info:pcln:s -> addr [xlabel="どちらでも残る"];
+  info -> addr [xlabel="どちらでも残る"];
   info -> off_ok [xlabel="DWARFがあれば"];
   info -> off_ng [xlabel="DWARFが無いと"];
 }

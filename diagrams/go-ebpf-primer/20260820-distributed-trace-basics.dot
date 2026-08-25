@@ -29,6 +29,6 @@ digraph distributed_trace_basics {
     </table>>];
 
   sa -> sb [penwidth=1.8];
-  sa -> rec:ra:w [style=dashed, color="#7C8DA3", xlabel="記録を送る"];
-  sb -> rec:rb:w [style=dashed, color="#7C8DA3"];
+  sa -> rec [style=dashed, color="#7C8DA3", xlabel="記録を送る"];
+  sb -> rec [style=dashed, color="#7C8DA3"];
 }

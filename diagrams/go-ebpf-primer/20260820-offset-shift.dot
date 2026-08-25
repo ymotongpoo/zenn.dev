@@ -39,8 +39,8 @@ digraph offset_shift {
   crash [label=<<b>クラッシュせず「それらしく動く」</b><br align="left"/>トレースは出るが中身が誤る<br align="left"/>>,
          fillcolor="#F5DEDE", color="#A04848"];
 
-  code -> t166:p88:n [penwidth=1.8];
-  code -> t169:p88:n [style=dashed, color="#A04848"];
+  code -> t166 [penwidth=1.8];
+  code -> t169 [style=dashed, color="#A04848"];
   t169 -> crash [style=dashed, color="#A04848"];
 
   { rank=same; t166; t169; }

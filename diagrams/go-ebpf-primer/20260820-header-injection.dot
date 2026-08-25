@@ -3,7 +3,7 @@ digraph header_injection {
   graph [
     rankdir=TB, splines=ortho, compound=true,
     fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=13,
-    nodesep=0.6, ranksep=0.5,
+    nodesep=0.6, ranksep=0.7,
     bgcolor="white", pad=0.25
   ];
   node [
@@ -35,6 +35,6 @@ digraph header_injection {
     bufw -> sock;
   }
 
-  obi -> hdr [style=dashed, color="#A04848", arrowhead=tee];
+  obi -> hdr [style=dashed, color="#A04848", arrowhead=tee, arrowsize=1.4];
   obi -> bufw [color="#75589C", penwidth=1.8];
 }

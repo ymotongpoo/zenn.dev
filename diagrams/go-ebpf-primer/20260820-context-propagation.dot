@@ -3,6 +3,7 @@ digraph context_propagation {
   graph [
     rankdir=TB, splines=ortho, compound=true,
     fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=13,
+    nodesep=0.7, ranksep=0.7,
     bgcolor="white", pad=0.25
   ];
   node [
@@ -41,7 +42,7 @@ digraph context_propagation {
 
   send -> p1;
   send -> p2;
-  lock -> p1 [style=dashed, color="#A04848", arrowhead=tee, xlabel="経路1を無効化"];
+  lock -> p1 [style=dashed, color="#A04848", arrowhead=tee, arrowsize=1.4, xlabel="経路1を無効化"];
   p1 -> svcb;
   p2 -> svcb;
 }

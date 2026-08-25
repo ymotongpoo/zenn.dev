@@ -3,6 +3,7 @@ digraph context_not_traceable {
   graph [
     rankdir=TB, splines=ortho,
     fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=13,
+    ranksep=0.7,
     bgcolor="white", pad=0.25
   ];
   node [
@@ -37,7 +38,7 @@ digraph context_not_traceable {
   { rank=same; can; cannot; alt; }
 
   top -> can;
-  top -> cannot [style=dashed, color="#A04848", arrowhead=tee];
+  top -> cannot [style=dashed, color="#A04848", arrowhead=tee, arrowsize=1.4];
   top -> alt [xlabel="値を解読せずに済ませる"];
   cannot -> reasons [style=dotted, color="#7C8DA3", arrowhead=none];
 }
