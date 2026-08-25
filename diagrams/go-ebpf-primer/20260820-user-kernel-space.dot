@@ -38,5 +38,5 @@ digraph user_kernel_space {
   // このエッジはcluster_kernelをまたぐため splines=ortho の直角配線が崩れ、
   // 単純な斜め線になる（クラスタをまたぐ辺の既知の制約）。1本の素直な斜め線
   // なので「触れない」という意味の破線としては許容する。
-  app -> hw [style=dashed, color="#A04848", arrowhead=tee, arrowsize=1.4, xlabel=" 直接は触れない"];
+  app -> hw [style=dashed, color="#A04848", arrowhead=tee, xlabel=" 直接は触れない"];
 }

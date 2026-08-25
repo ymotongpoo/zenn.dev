@@ -44,7 +44,7 @@ digraph sdk_vs_zerocode {
 
     { rank=same; appR; obiR; }
 
-    appR -> hdrR [style=dashed, color="#A04848", arrowhead=tee, arrowsize=1.4];
+    appR -> hdrR [style=dashed, color="#A04848", arrowhead=tee];
     obiR -> hdrR [penwidth=1.8];
   }
 

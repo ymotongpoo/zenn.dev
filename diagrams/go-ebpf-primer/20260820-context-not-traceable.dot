@@ -38,7 +38,7 @@ digraph context_not_traceable {
   { rank=same; can; cannot; alt; }
 
   top -> can;
-  top -> cannot [style=dashed, color="#A04848", arrowhead=tee, arrowsize=1.4];
+  top -> cannot [style=dashed, color="#A04848", arrowhead=tee];
   top -> alt [xlabel="値を解読せずに済ませる"];
   cannot -> reasons [style=dotted, color="#7C8DA3", arrowhead=none];
 }

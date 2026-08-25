@@ -35,6 +35,6 @@ digraph header_injection {
     bufw -> sock;
   }
 
-  obi -> hdr [style=dashed, color="#A04848", arrowhead=tee, arrowsize=1.4];
+  obi -> hdr [style=dashed, color="#A04848", arrowhead=tee];
   obi -> bufw [color="#75589C", penwidth=1.8];
 }
