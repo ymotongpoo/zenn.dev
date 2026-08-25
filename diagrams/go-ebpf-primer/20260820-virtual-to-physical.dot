@@ -1,7 +1,7 @@
 // 仮想アドレスと物理メモリ
 digraph virtual_to_physical {
   graph [
-    layout=neato, inputscale=72, splines=line,
+    rankdir=LR, splines=ortho,
     fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=13,
     bgcolor="white", pad=0.25
   ];
@@ -17,19 +17,14 @@ digraph virtual_to_physical {
     fontcolor="#1E293B"
   ];
 
-  va1 [pos="150,310!", label=<<b>プロセスAの仮想アドレス空間</b><br align="left"/>0x0000… から連続して見える<br align="left"/>>, fillcolor="#D9E7F4", color="#38638F"];
-  va2 [pos="150,130!", label=<<b>プロセスBの仮想アドレス空間</b><br align="left"/>0x0000… から連続して見える<br align="left"/>>, fillcolor="#D6E8D6", color="#3F6E3F"];
+  va1 [label=<<b>プロセスAの仮想アドレス空間</b><br align="left"/>0x0000… から連続して見える<br align="left"/>>, fillcolor="#D9E7F4", color="#38638F"];
+  va2 [label=<<b>プロセスBの仮想アドレス空間</b><br align="left"/>0x0000… から連続して見える<br align="left"/>>, fillcolor="#D6E8D6", color="#3F6E3F"];
 
-  w1 [pos="430,310!", shape=point, width=0.01, style=invis];
-  w2 [pos="430,130!", shape=point, width=0.01, style=invis];
+  { rank=same; va1; va2; }
 
-  table_ [pos="430,220!", label=<<b>カーネルの対応表</b><br align="left"/>仮想アドレス → 物理アドレス<br align="left"/>>, fillcolor="#E9DFF2", color="#75589C"];
+  table_ [label=<<b>カーネルの対応表</b><br align="left"/>仮想アドレス → 物理アドレス<br align="left"/>>, fillcolor="#E9DFF2", color="#75589C"];
 
-  e1a [pos="590,220!", shape=point, width=0.01, style=invis];
-  e1b [pos="590,254!", shape=point, width=0.01, style=invis];
-  e2b [pos="590,186!", shape=point, width=0.01, style=invis];
-
-  phys [pos="760,220!", shape=plain, style="", label=<
+  phys [shape=plain, style="", label=<
     <table border="0" cellborder="1" cellspacing="0" cellpadding="7" color="#96742E">
       <tr><td align="left" bgcolor="#FAF4E4"><b>物理メモリ</b></td></tr>
       <tr><td port="a" align="left" bgcolor="#D9E7F4">Aに割り当てた部分</td></tr>
@@ -38,16 +33,8 @@ digraph virtual_to_physical {
       <tr><td align="left" bgcolor="#FFFFFF">空き</td></tr>
     </table>>];
 
-  L1 [pos="585,268!", shape=plaintext, style="", label="Aの番地はここへ"];
-  L2 [pos="585,172!", shape=plaintext, style="", label="Bの番地はここへ"];
-
-  va1 -> w1 [dir=none];
-  w1 -> table_;
-  va2 -> w2 [dir=none];
-  w2 -> table_;
-  table_ -> e1a [dir=none];
-  e1a -> e1b [dir=none];
-  e1a -> e2b [dir=none];
-  e1b -> phys:a:w;
-  e2b -> phys:b:w;
+  va1 -> table_ [dir=none];
+  va2 -> table_ [dir=none];
+  table_ -> phys:a:w;
+  table_ -> phys:b:w;
 }

@@ -1,7 +1,7 @@
 // 戻りアドレスから関数を引けないと、スタックを辿れない
 digraph unwind_failure {
   graph [
-    layout=neato, inputscale=72, splines=line,
+    rankdir=TB, splines=ortho,
     fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=13,
     bgcolor="white", pad=0.25
   ];
@@ -17,7 +17,7 @@ digraph unwind_failure {
     fontcolor="#1E293B"
   ];
 
-  stack [pos="130,545!", shape=plain, style="", label=<
+  stack [shape=plain, style="", label=<
     <table border="0" cellborder="1" cellspacing="0" cellpadding="6" color="#38638F">
       <tr><td align="left" bgcolor="#EFF5FB"><b>移動中のスタック</b></td></tr>
       <tr><td align="left" bgcolor="#D9E7F4">いま見ているフレーム</td></tr>
@@ -25,39 +25,25 @@ digraph unwind_failure {
       <tr><td align="left" bgcolor="#D9E7F4">呼び出し元のフレーム …</td></tr>
     </table>>];
 
-  walk [pos="480,560!", label=<<b>ランタイムがフレームを1つずつ辿る</b><br align="left"/>スタックの移動時とGCの走査時<br align="left"/>>,
+  walk [label=<<b>ランタイムがフレームを1つずつ辿る</b><br align="left"/>スタックの移動時とGCの走査時<br align="left"/>>,
         fillcolor="#EDF1F5"];
 
-  d1 [pos="330,530!", shape=point, width=0.01, style=invis];
-  d2 [pos="330,453!", shape=point, width=0.01, style=invis];
-
-  lookup [pos="480,430!", label=<<b>戻りアドレスから関数を引く</b><br align="left"/>findfunc が .gopclntab を検索する<br align="left"/>>,
+  lookup [label=<<b>戻りアドレスから関数を引く</b><br align="left"/>findfunc が .gopclntab を検索する<br align="left"/>>,
           fillcolor="#F3E8CE", color="#96742E"];
 
-  Ld [pos="390,498!", shape=plaintext, style="", label="この値を渡す", fontcolor="#5B6B80"];
-
-  j  [pos="480,355!", shape=point, width=0.01, style=invis];
-  jl [pos="215,355!", shape=point, width=0.01, style=invis];
-  jr [pos="760,355!", shape=point, width=0.01, style=invis];
-
-  ok [pos="215,270!", label=<<b>Go関数が見つかる</b><br align="left"/>フレームの大きさとポインタの位置が分かり、補正できる<br align="left"/>>,
+  ok [label=<<b>Go関数が見つかる</b><br align="left"/>フレームの大きさとポインタの位置が分かり、補正できる<br align="left"/>>,
       fillcolor="#D6E8D6", color="#3F6E3F"];
-  ng [pos="760,270!", label=<<b>トランポリンは表に無い</b><br align="left"/>どの関数のフレームか分からない<br align="left"/>>,
+  ng [label=<<b>トランポリンは表に無い</b><br align="left"/>どの関数のフレームか分からない<br align="left"/>>,
       fillcolor="#F5DEDE", color="#A04848"];
 
-  L1 [pos="292,313!", shape=plaintext, style="", label="通常の戻りアドレス"];
-  L2 [pos="660,313!", shape=plaintext, style="", label="uretprobeが書き換えた値"];
-
-  crash [pos="760,140!", label=<<b>throw("unknown caller pc")</b>>, fillcolor="#F5DEDE", color="#A04848"];
-  L3 [pos="905,205!", shape=plaintext, style="", label="失敗が許されない\n文脈なので"];
+  crash [label=<<b>throw("unknown caller pc")</b>>, fillcolor="#F5DEDE", color="#A04848"];
 
   walk -> lookup [penwidth=1.8];
-  stack:ra:e -> d1 [dir=none, style=dashed, color="#7C8DA3"];
-  d1 -> d2 [style=dashed, color="#7C8DA3"];
-  lookup -> j [dir=none];
-  j -> jl [dir=none];
-  j -> jr [dir=none];
-  jl -> ok;
-  jr -> ng;
+  stack:ra:e -> lookup [style=dashed, color="#7C8DA3"];
+  lookup -> ok;
+  lookup -> ng;
   ng -> crash;
+
+  { rank=same; walk; stack; }
+  { rank=same; ok; ng; }
 }

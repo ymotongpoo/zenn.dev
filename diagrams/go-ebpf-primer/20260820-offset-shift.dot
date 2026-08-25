@@ -1,9 +1,10 @@
 // バージョン間でオフセットがずれる
 digraph offset_shift {
   graph [
-    layout=neato, inputscale=72, splines=line,
+    rankdir=TB, splines=ortho,
+    nodesep=0.6, ranksep=0.6, pad=0.25,
     fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=13,
-    bgcolor="white", pad=0.25
+    bgcolor="white"
   ];
   node [
     fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=12,
@@ -17,25 +18,17 @@ digraph offset_shift {
     fontcolor="#1E293B"
   ];
 
-  code [pos="470,560!", label=<<b>+88 を読む計装コード</b><br align="left"/>オフセットをハードコード<br align="left"/>>,
+  code [label=<<b>+88 を読む計装コード</b><br align="left"/>オフセットをハードコード<br align="left"/>>,
         fillcolor="#F3E8CE", color="#96742E"];
 
-  c1 [pos="420,538!", shape=point, width=0.01, style=invis];
-  c1v [pos="420,355!", shape=point, width=0.01, style=invis];
-  c2 [pos="520,538!", shape=point, width=0.01, style=invis];
-  c2v [pos="520,324!", shape=point, width=0.01, style=invis];
-
-  L1 [pos="340,450!", shape=plaintext, style="", label="method が取れる"];
-  L2 [pos="665,505!", shape=plaintext, style="", label="別のフィールドを\nmethod として拾う", fontcolor="#7A3030"];
-
-  t166 [pos="200,390!", shape=plain, style="", label=<
+  t166 [shape=plain, style="", label=<
     <table border="0" cellborder="1" cellspacing="0" cellpadding="6" color="#3F6E3F">
       <tr><td colspan="2" align="left" bgcolor="#F0F7F0"><b>grpc 1.66 の Stream</b></td></tr>
       <tr><td align="left" bgcolor="#D6E8D6">…</td><td align="left" bgcolor="#D6E8D6">…</td></tr>
       <tr><td align="left" bgcolor="#D6E8D6">+88</td><td port="p88" align="left" bgcolor="#D6E8D6"><b>method</b></td></tr>
     </table>>];
 
-  t169 [pos="740,375!", shape=plain, style="", label=<
+  t169 [shape=plain, style="", label=<
     <table border="0" cellborder="1" cellspacing="0" cellpadding="6" color="#A04848">
       <tr><td colspan="2" align="left" bgcolor="#FBEFEF"><b>grpc 1.69 の Stream</b>（並びが変わった）</td></tr>
       <tr><td align="left" bgcolor="#D6E8D6">+24</td><td align="left" bgcolor="#D6E8D6"><b>method</b>（本当はここ）</td></tr>
@@ -43,12 +36,12 @@ digraph offset_shift {
       <tr><td port="p88" align="left" bgcolor="#F5DEDE">+88</td><td align="left" bgcolor="#F5DEDE">別のフィールド</td></tr>
     </table>>];
 
-  crash [pos="740,140!", label=<<b>クラッシュせず「それらしく動く」</b><br align="left"/>トレースは出るが中身が誤る<br align="left"/>>,
+  crash [label=<<b>クラッシュせず「それらしく動く」</b><br align="left"/>トレースは出るが中身が誤る<br align="left"/>>,
          fillcolor="#F5DEDE", color="#A04848"];
 
-  c1 -> c1v [dir=none, penwidth=1.8];
-  c1v -> t166:p88:e [penwidth=1.8];
-  c2 -> c2v [dir=none, style=dashed, color="#A04848"];
-  c2v -> t169:p88:w [style=dashed, color="#A04848"];
+  code -> t166:p88:n [penwidth=1.8];
+  code -> t169:p88:n [style=dashed, color="#A04848"];
   t169 -> crash [style=dashed, color="#A04848"];
+
+  { rank=same; t166; t169; }
 }

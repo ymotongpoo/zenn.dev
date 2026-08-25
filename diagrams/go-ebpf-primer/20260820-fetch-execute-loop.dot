@@ -1,8 +1,8 @@
 // CPUは命令を1つずつ実行する
 digraph fetch_execute_loop {
   graph [
-    layout=neato, inputscale=72, splines=line,
     fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=13,
+    splines=ortho,
     bgcolor="white", pad=0.25
   ];
   node [

@@ -1,9 +1,10 @@
 // uprobeとuretprobeの挿し込み
 digraph probe_insertion {
   graph [
-    layout=neato, inputscale=72, splines=line,
+    rankdir=TB, compound=true, splines=ortho,
     fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=13,
-    bgcolor="white", pad=0.25
+    nodesep=0.5, ranksep=0.5,
+    bgcolor="white", pad=0.25, newrank=true
   ];
   node [
     fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=12,
@@ -17,50 +18,56 @@ digraph probe_insertion {
     fontcolor="#1E293B"
   ];
 
-  bgU [pos="172,370!", shape=box, style="rounded,filled", fillcolor="#EFF5FB", color="#38638F",
-       label="", width=3.0, height=8.06, fixedsize=true];
-  tU [pos="172,648!", shape=plaintext, style="", label=<<b>uprobe（スタックには触らない）</b>>, fontcolor="#2E4D6E"];
+  subgraph cluster_u {
+    label=<<b>uprobe（スタックには触らない）</b>>;
+    fontcolor="#2E4D6E";
+    style="rounded"; labeljust="l"; penwidth=1.6; margin=14;
+    color="#38638F"; bgcolor="#EFF5FB";
 
-  bgR [pos="505,370!", shape=box, style="rounded,filled", fillcolor="#FBEFEF", color="#A04848",
-       label="", width=4.3, height=8.06, fixedsize=true];
-  tR [pos="505,648!", shape=plaintext, style="", label=<<b>uretprobe（スタックの値を書き換える）</b>>, fontcolor="#7A3030"];
+    code [shape=plain, style="", label=<
+      <table border="0" cellborder="1" cellspacing="0" cellpadding="6" color="#38638F">
+        <tr><td colspan="2" align="left" bgcolor="#EFF5FB"><b>コード領域 0x49e180</b></td></tr>
+        <tr><td align="left" bgcolor="#D9E7F4">差し替え前</td><td align="left" bgcolor="#D9E7F4">48 01 c0</td></tr>
+        <tr><td align="left" bgcolor="#F3E8CE">差し替え後</td><td align="left" bgcolor="#F3E8CE"><b>cc</b> 01 c0</td></tr>
+      </table>>];
+    trap_u [label=<<b>トラップしてカーネルへ</b>>, fillcolor="#F3E8CE", color="#96742E"];
+    prog_u [label=<<b>eBPFプログラムが走る</b>>, fillcolor="#D9E7F4", color="#38638F"];
+    xol [label=<<b>控えた元の命令を実行</b><br align="left"/>カーネルが用意した別領域で<br align="left"/>>,
+         fillcolor="#F3E8CE", color="#96742E"];
+    next_u [label=<<b>続きの命令へ戻る</b>>, fillcolor="#D6E8D6", color="#3F6E3F"];
 
-  code [pos="172,560!", shape=plain, style="", label=<
-    <table border="0" cellborder="1" cellspacing="0" cellpadding="6" color="#38638F">
-      <tr><td colspan="2" align="left" bgcolor="#EFF5FB"><b>コード領域 0x49e180</b></td></tr>
-      <tr><td align="left" bgcolor="#D9E7F4">差し替え前</td><td align="left" bgcolor="#D9E7F4">48 01 c0</td></tr>
-      <tr><td align="left" bgcolor="#F3E8CE">差し替え後</td><td align="left" bgcolor="#F3E8CE"><b>cc</b> 01 c0</td></tr>
-    </table>>];
-  trap_u [pos="172,430!", label=<<b>トラップしてカーネルへ</b>>, fillcolor="#F3E8CE", color="#96742E"];
-  prog_u [pos="172,330!", label=<<b>eBPFプログラムが走る</b>>, fillcolor="#D9E7F4", color="#38638F"];
-  xol [pos="172,225!", label=<<b>控えた元の命令を実行</b><br align="left"/>カーネルが用意した別領域で<br align="left"/>>,
-       fillcolor="#F3E8CE", color="#96742E"];
-  next_u [pos="172,115!", label=<<b>続きの命令へ戻る</b>>, fillcolor="#D6E8D6", color="#3F6E3F"];
+    code -> trap_u;
+    trap_u -> prog_u;
+    prog_u -> xol;
+    xol -> next_u;
+  }
 
-  LC [pos="235,472!", shape=plaintext, style="", label="CPUが到達"];
+  subgraph cluster_r {
+    label=<<b>uretprobe（スタックの値を書き換える）</b>>;
+    fontcolor="#7A3030";
+    style="rounded"; labeljust="l"; penwidth=1.6; margin=14;
+    color="#A04848"; bgcolor="#FBEFEF";
 
-  entry [pos="505,615!", label=<<b>入口のuprobeが発火</b>>, fillcolor="#F3E8CE", color="#96742E"];
-  stack [pos="505,480!", shape=plain, style="", label=<
-    <table border="0" cellborder="1" cellspacing="0" cellpadding="6" color="#38638F">
-      <tr><td align="left" bgcolor="#EFF5FB"><b>スタック</b></td></tr>
-      <tr><td align="left" bgcolor="#D9E7F4">ローカル変数 …</td></tr>
-      <tr><td align="left" bgcolor="#F5DEDE">戻りアドレス <b>トランポリン</b><br align="left"/><font color="#7A3030" point-size="11">本物の 0x49e1b8 はカーネルが退避</font><br align="left"/></td></tr>
-    </table>>];
-  tramp [pos="505,330!", label=<<b>トランポリンでトラップ</b>>, fillcolor="#F5DEDE", color="#A04848"];
-  prog_r [pos="505,230!", label=<<b>eBPFプログラムが走る</b>>, fillcolor="#D9E7F4", color="#38638F"];
-  caller [pos="505,120!", label=<<b>本物の 0x49e1b8 へ</b>>, fillcolor="#EDF1F5"];
+    entry [label=<<b>入口のuprobeが発火</b>>, fillcolor="#F3E8CE", color="#96742E"];
+    stack [shape=plain, style="", label=<
+      <table border="0" cellborder="1" cellspacing="0" cellpadding="6" color="#38638F">
+        <tr><td align="left" bgcolor="#EFF5FB"><b>スタック</b></td></tr>
+        <tr><td align="left" bgcolor="#D9E7F4">ローカル変数 …</td></tr>
+        <tr><td align="left" bgcolor="#F5DEDE">戻りアドレス <b>トランポリン</b><br align="left"/><font color="#7A3030" point-size="11">本物の 0x49e1b8 はカーネルが退避</font><br align="left"/></td></tr>
+      </table>>];
+    tramp [label=<<b>トランポリンでトラップ</b>>, fillcolor="#F5DEDE", color="#A04848"];
+    prog_r [label=<<b>eBPFプログラムが走る</b>>, fillcolor="#D9E7F4", color="#38638F"];
+    caller [label=<<b>本物の 0x49e1b8 へ</b>>, fillcolor="#EDF1F5"];
 
-  LE [pos="585,575!", shape=plaintext, style="", label="戻りアドレスを\n書き換える"];
-  LT [pos="580,385!", shape=plaintext, style="", label="RET でここへ"];
-  LJ [pos="585,175!", shape=plaintext, style="", label="退避した値へ\nジャンプし直す", fontcolor="#5B6B80"];
+    entry -> stack;
+    stack -> tramp;
+    tramp -> prog_r;
+    prog_r -> caller [style=dashed, color="#7C8DA3"];
+  }
 
-  code -> trap_u;
-  trap_u -> prog_u;
-  prog_u -> xol;
-  xol -> next_u;
-
-  entry -> stack;
-  stack -> tramp;
-  tramp -> prog_r;
-  prog_r -> caller [style=dashed, color="#7C8DA3"];
+  { rank=same; code; entry; }
+  { rank=same; trap_u; stack; }
+  { rank=same; prog_u; tramp; }
+  { rank=same; xol; prog_r; }
+  { rank=same; next_u; caller; }
 }

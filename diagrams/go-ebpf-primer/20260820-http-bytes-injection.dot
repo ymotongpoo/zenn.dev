@@ -1,9 +1,10 @@
 // HTTPのバイト列と、traceparent を差し込む2つの位置
 digraph http_bytes_injection {
   graph [
-    layout=neato, inputscale=72, splines=line,
+    rankdir=TB, splines=ortho,
+    nodesep=0.5, ranksep=0.6, pad=0.25,
     fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=13,
-    bgcolor="white", pad=0.25
+    bgcolor="white"
   ];
   node [
     fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=12,
@@ -17,11 +18,10 @@ digraph http_bytes_injection {
     fontcolor="#1E293B"
   ];
 
-  p1 [pos="270,600!", label=<<b>経路1</b>：writeSubset の戻りフック<br align="left"/>アプリのメモリを書き換える<br align="left"/>>,
+  p1 [label=<<b>経路1</b>：writeSubset の戻りフック<br align="left"/>アプリのメモリを書き換える<br align="left"/>>,
       fillcolor="#E9DFF2", color="#75589C"];
-  Lw [pos="418,528!", shape=plaintext, style="", label="バッファの末尾に書き、n を進める"];
 
-  buf [pos="270,390!", shape=plain, style="", label=<
+  buf [shape=plain, style="", label=<
     <table border="0" cellborder="1" cellspacing="0" cellpadding="6" color="#96742E">
       <tr><td align="left" bgcolor="#FAF4E4"><b>bufio.Writer のバッファ</b>（このまま送られるバイト列）</td></tr>
       <tr><td align="left" bgcolor="#F3E8CE">GET /items HTTP/1.1</td></tr>
@@ -31,22 +31,17 @@ digraph http_bytes_injection {
       <tr><td align="left" bgcolor="#EFF5FB">n ＝ いま使っているバイト数。書き足したぶん進める</td></tr>
     </table>>];
 
-  p2 [pos="750,390!", label=<<b>経路2</b>：sk_msg プログラム<br align="left"/>アプリのメモリには触らない<br align="left"/>>,
+  p2 [label=<<b>経路2</b>：sk_msg プログラム<br align="left"/>アプリのメモリには触らない<br align="left"/>>,
       fillcolor="#E9DFF2", color="#75589C"];
 
-  b1 [pos="270,160!", shape=point, width=0.01, style=invis];
-  b2 [pos="750,160!", shape=point, width=0.01, style=invis];
-  jn [pos="520,160!", shape=point, width=0.01, style=invis];
+  jn [shape=point, width=0.01, style=invis];
 
-  sock [pos="520,80!", label=<<b>ソケットへ出ていくバイトストリーム</b>>, fillcolor="#EDF1F5"];
+  sock [label=<<b>ソケットへ出ていくバイトストリーム</b>>, fillcolor="#EDF1F5"];
 
-  L1 [pos="345,225!", shape=plaintext, style="", label="まとめて書き出す"];
-  L2 [pos="880,255!", shape=plaintext, style="", label="出ていくバイト列に\n同じ1行を差し込む"];
+  { rank=same; buf; p2; }
 
   p1 -> buf [penwidth=1.8];
-  buf -> b1 [dir=none];
-  p2 -> b2 [dir=none, penwidth=1.8];
-  b1 -> jn [dir=none];
-  b2 -> jn [dir=none, penwidth=1.8];
+  buf -> jn [dir=none];
+  p2 -> jn [dir=none, penwidth=1.8];
   jn -> sock;
 }

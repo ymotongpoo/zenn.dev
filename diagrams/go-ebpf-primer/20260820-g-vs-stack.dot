@@ -1,8 +1,9 @@
 // 動かない g 構造体と、動くスタック
 digraph g_vs_stack {
   graph [
-    layout=neato, inputscale=72, splines=line,
+    rankdir=TB, splines=ortho,
     fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=13,
+    nodesep=0.6, ranksep=0.6,
     bgcolor="white", pad=0.25
   ];
   node [
@@ -17,7 +18,7 @@ digraph g_vs_stack {
     fontcolor="#1E293B"
   ];
 
-  gtable [pos="300,340!", shape=plain, style="", label=<
+  gtable [shape=plain, style="", label=<
     <table border="0" cellborder="1" cellspacing="0" cellpadding="6" color="#75589C">
       <tr><td colspan="2" align="left" bgcolor="#F5F1F9"><b>g 構造体</b>（ヒープ上、0xc000102000）</td></tr>
       <tr><td align="left" bgcolor="#E9DFF2">stack.lo</td><td align="left" bgcolor="#E9DFF2">スタックの下端</td></tr>
@@ -25,15 +26,11 @@ digraph g_vs_stack {
       <tr><td colspan="2" align="left" bgcolor="#F5F1F9">goroutineが生きているあいだ、このアドレスは変わらない</td></tr>
     </table>>];
 
-  s1 [pos="180,282!", shape=point, width=0.01, style=invis];
-  s2 [pos="420,282!", shape=point, width=0.01, style=invis];
+  areaA [label=<<b>スタック領域A</b><br align="left"/>0x2522317ac000〜（伸長前）<br align="left"/>>, fillcolor="#EDF1F5"];
+  areaB [label=<<b>スタック領域B</b><br align="left"/>0x2522319df000〜（伸長後）<br align="left"/>>, fillcolor="#D9E7F4", color="#38638F"];
 
-  areaA [pos="180,130!", label=<<b>スタック領域A</b><br align="left"/>0x2522317ac000〜（伸長前）<br align="left"/>>, fillcolor="#EDF1F5"];
-  areaB [pos="420,130!", label=<<b>スタック領域B</b><br align="left"/>0x2522319df000〜（伸長後）<br align="left"/>>, fillcolor="#D9E7F4", color="#38638F"];
+  { rank=same; areaA; areaB; }
 
-  L1 [pos="265,210!", shape=plaintext, style="", label="stack.lo と stack.hi が\n伸長前に指していた先"];
-  L2 [pos="507,210!", shape=plaintext, style="", label="伸長後に指す先\n（値だけが書き換わる）"];
-
-  s1 -> areaA [style=dashed, color="#7C8DA3"];
-  s2 -> areaB [penwidth=1.8];
+  gtable -> areaA [style=dashed, color="#7C8DA3"];
+  gtable -> areaB [penwidth=1.8];
 }

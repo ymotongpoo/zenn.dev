@@ -1,8 +1,9 @@
 // traceparent をどこへ書き込むか
 digraph header_injection {
   graph [
-    layout=neato, inputscale=72, splines=line,
+    rankdir=TB, splines=ortho, compound=true,
     fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=13,
+    nodesep=0.6, ranksep=0.5,
     bgcolor="white", pad=0.25
   ];
   node [
@@ -17,30 +18,23 @@ digraph header_injection {
     fontcolor="#1E293B"
   ];
 
-  bg [pos="282,309!", shape=box, style="rounded,filled", fillcolor="#EFF5FB", color="#38638F",
-      label="", width=4.2, height=6.4, fixedsize=true];
-  tbg [pos="235,545!", shape=plaintext, style="", label=<<b>net/http がリクエストを書き出す経路</b>>, fontcolor="#2E4D6E"];
+  obi [label=<<b>OBI</b>（writeSubset の戻りフック）>, fillcolor="#E9DFF2", color="#75589C"];
 
-  hdr [pos="282,470!", label=<<b>http.Request.Header</b><br align="left"/>map[string][]string<br align="left"/>>, fillcolor="#EDF1F5"];
-  ws [pos="282,350!", label=<<b>Header.writeSubset</b><br align="left"/>ヘッダを文字列にして積む<br align="left"/>>, fillcolor="#D9E7F4", color="#38638F"];
-  bufw [pos="282,230!", label=<<b>bufio.Writer</b><br align="left"/>buf にバイト列、n に書き込み済みバイト数<br align="left"/>>, fillcolor="#F3E8CE", color="#96742E"];
-  sock [pos="282,110!", label=<<b>ソケット</b>>, fillcolor="#EDF1F5"];
+  subgraph cluster_path {
+    label=<<b>net/http がリクエストを書き出す経路</b><br align="left"/><br align="left"/>>;
+    style="rounded"; labeljust="l"; penwidth=1.6; margin=14;
+    color="#38638F"; fontcolor="#2E4D6E"; bgcolor="#EFF5FB";
 
-  obi [pos="680,560!", label=<<b>OBI</b>（writeSubset の戻りフック）>, fillcolor="#E9DFF2", color="#75589C"];
+    hdr [label=<<b>http.Request.Header</b><br align="left"/>map[string][]string<br align="left"/>>, fillcolor="#EDF1F5"];
+    ws [label=<<b>Header.writeSubset</b><br align="left"/>ヘッダを文字列にして積む<br align="left"/>>, fillcolor="#D9E7F4", color="#38638F"];
+    bufw [label=<<b>bufio.Writer</b><br align="left"/>buf にバイト列、n に書き込み済みバイト数<br align="left"/>>, fillcolor="#F3E8CE", color="#96742E"];
+    sock [label=<<b>ソケット</b>>, fillcolor="#EDF1F5"];
 
-  r1 [pos="600,540.9!", shape=point, width=0.01, style=invis];
-  r2 [pos="600,470!", shape=point, width=0.01, style=invis];
-  LR [pos="692,505!", shape=plaintext, style="", label="mapに新しいキーは\n追加できない", fontcolor="#7A3030"];
+    hdr -> ws;
+    ws -> bufw;
+    bufw -> sock;
+  }
 
-  q1 [pos="760,540.9!", shape=point, width=0.01, style=invis];
-  q2 [pos="760,230!", shape=point, width=0.01, style=invis];
-  LQ [pos="630,300!", shape=plaintext, style="", label="buf の末尾に Traceparent を書き、\nn を進める", fontcolor="#5B4370"];
-
-  hdr -> ws;
-  ws -> bufw;
-  bufw -> sock;
-  r1 -> r2 [dir=none, style=dashed, color="#A04848"];
-  r2 -> hdr [style=dashed, color="#A04848", arrowhead=tee];
-  q1 -> q2 [dir=none, color="#75589C", penwidth=1.8];
-  q2 -> bufw [color="#75589C", penwidth=1.8];
+  obi -> hdr [style=dashed, color="#A04848", arrowhead=tee];
+  obi -> bufw [color="#75589C", penwidth=1.8];
 }

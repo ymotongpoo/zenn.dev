@@ -1,7 +1,7 @@
 // 同じ物理ページを共有する2つのプロセス
 digraph text_page_sharing {
   graph [
-    layout=neato, inputscale=72, splines=line,
+    rankdir=LR, splines=ortho,
     fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=13,
     bgcolor="white", pad=0.25
   ];
@@ -17,29 +17,20 @@ digraph text_page_sharing {
     fontcolor="#1E293B"
   ];
 
-  pa [pos="150,300!", label=<<b>プロセスAの対応表</b><br align="left"/>.text の範囲 → 読み取り専用の印<br align="left"/>>, fillcolor="#D9E7F4", color="#38638F"];
-  pb [pos="150,130!", label=<<b>プロセスBの対応表</b><br align="left"/>.text の範囲 → 読み取り専用の印<br align="left"/>>, fillcolor="#D6E8D6", color="#3F6E3F"];
+  pa [label=<<b>プロセスAの対応表</b><br align="left"/>.text の範囲 → 読み取り専用の印<br align="left"/>>, fillcolor="#D9E7F4", color="#38638F"];
+  pb [label=<<b>プロセスBの対応表</b><br align="left"/>.text の範囲 → 読み取り専用の印<br align="left"/>>, fillcolor="#D6E8D6", color="#3F6E3F"];
 
-  a1 [pos="390,300!", shape=point, width=0.01, style=invis];
-  a2 [pos="390,130!", shape=point, width=0.01, style=invis];
-  jm [pos="390,200!", shape=point, width=0.01, style=invis];
-
-  phys [pos="580,215!", shape=plain, style="", label=<
+  phys [shape=plain, style="", label=<
     <table border="0" cellborder="1" cellspacing="0" cellpadding="7" color="#475569">
       <tr><td align="left" bgcolor="#F4F6F8"><b>物理メモリ</b></td></tr>
       <tr><td port="pg" align="left" bgcolor="#D9E7F4">.text のページ（4KBごと）<br align="left"/>読み取りと実行のみ可<br align="left"/></td></tr>
     </table>>];
 
-  Lp [pos="437,213!", shape=plaintext, style="", label="指す"];
+  file [label=<<b>実行ファイルの .text</b><br align="left"/>ディスク上。変わらない<br align="left"/>>, fillcolor="#F3E8CE", color="#96742E"];
 
-  file [pos="580,70!", label=<<b>実行ファイルの .text</b><br align="left"/>ディスク上。変わらない<br align="left"/>>, fillcolor="#F3E8CE", color="#96742E"];
-
-  Lf [pos="700,130!", shape=plaintext, style="", label="必要になったページから\n読み込まれる", fontcolor="#5B6B80"];
-
-  pa -> a1 [dir=none];
-  pb -> a2 [dir=none];
-  a1 -> jm [dir=none];
-  a2 -> jm [dir=none];
-  jm -> phys:pg:w;
+  pa -> phys:pg:w;
+  pb -> phys:pg:w;
   file -> phys [style=dashed, color="#7C8DA3"];
+
+  { rank=same; pa; pb; file; }
 }

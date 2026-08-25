@@ -1,9 +1,10 @@
 // OBIの2つの計装経路
 digraph obi_two_paths {
   graph [
-    layout=neato, inputscale=72, splines=line,
+    rankdir=TB, splines=ortho,
+    nodesep=0.5, ranksep=0.4, pad=0.25,
     fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=13,
-    bgcolor="white", pad=0.25
+    bgcolor="white"
   ];
   node [
     fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=12,
@@ -17,26 +18,22 @@ digraph obi_two_paths {
     fontcolor="#1E293B"
   ];
 
-  obi [pos="350,330!", label=<<b>OBI</b>>, fillcolor="#EDF1F5"];
+  obi [label=<<b>OBI</b>>, fillcolor="#EDF1F5"];
 
-  j  [pos="350,265!", shape=point, width=0.01, style=invis];
-  jl [pos="160,265!", shape=point, width=0.01, style=invis];
-  jr [pos="545,265!", shape=point, width=0.01, style=invis];
-
-  proto [pos="160,185!", label=<<b>プロトコル計装</b><br align="left"/>ソケットを流れるバイト列を解釈<br align="left"/>HTTP/1.1、HTTP/2、gRPC、MySQL、Redis<br align="left"/>>,
+  proto [label=<<b>プロトコル計装</b><br align="left"/>ソケットを流れるバイト列を解釈<br align="left"/>HTTP/1.1、HTTP/2、gRPC、MySQL、Redis<br align="left"/>>,
          fillcolor="#D6E8D6", color="#3F6E3F"];
-  lib [pos="545,185!", label=<<b>ランタイムとライブラリの計装</b><br align="left"/>対象の環境ごとに個別の実装が要る<br align="left"/>関数計装を持つのはGoだけ<br align="left"/>>,
+  lib [label=<<b>ランタイムとライブラリの計装</b><br align="left"/>対象の環境ごとに個別の実装が要る<br align="left"/>関数計装を持つのはGoだけ<br align="left"/>>,
        fillcolor="#D9E7F4", color="#38638F"];
 
-  proto_res [pos="160,60!", label=<<b>言語に依存しない</b>>, fillcolor="#F0F7F0", color="#3F6E3F"];
-  lib_res [pos="545,60!", label=<<b>本書が扱う4つの難所</b><br align="left"/>可動スタック、レジスタABI<br align="left"/>オフセット追従、goroutine<br align="left"/>>,
+  proto_res [label=<<b>言語に依存しない</b>>, fillcolor="#F0F7F0", color="#3F6E3F"];
+  lib_res [label=<<b>本書が扱う4つの難所</b><br align="left"/>可動スタック、レジスタABI<br align="left"/>オフセット追従、goroutine<br align="left"/>>,
            fillcolor="#EFF5FB", color="#38638F"];
 
-  obi -> j [dir=none];
-  j -> jl [dir=none];
-  j -> jr [dir=none];
-  jl -> proto;
-  jr -> lib [penwidth=1.8];
+  obi -> proto;
+  obi -> lib [penwidth=1.8];
   proto -> proto_res [style=dashed, color="#7C8DA3"];
   lib -> lib_res [penwidth=1.8];
+
+  { rank=same; proto; lib; }
+  { rank=same; proto_res; lib_res; }
 }

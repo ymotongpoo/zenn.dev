@@ -1,7 +1,7 @@
 // goroutine の親子追跡と traceparent 注入
 digraph context_propagation {
   graph [
-    layout=neato, inputscale=72, splines=line,
+    rankdir=TB, splines=ortho, compound=true,
     fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=13,
     bgcolor="white", pad=0.25
   ];
@@ -17,47 +17,31 @@ digraph context_propagation {
     fontcolor="#1E293B"
   ];
 
-  bg [pos="560,470!", shape=box, style="rounded,filled", fillcolor="#EFF5FB", color="#38638F",
-      label="", width=4.7, height=4.7, fixedsize=true];
-  tbg [pos="492,615!", shape=plaintext, style="", label=<<b>サービスA（1プロセス）</b>>, fontcolor="#2E4D6E"];
+  subgraph cluster_svca {
+    label=<<b>サービスA（1プロセス）</b>>;
+    style="rounded"; labeljust="l"; penwidth=1.6; margin=14;
+    color="#38638F"; fontcolor="#2E4D6E"; bgcolor="#EFF5FB";
 
-  recv [pos="560,565!", label=<<b>受信 goroutine</b>　トレース開始>, fillcolor="#D9E7F4", color="#38638F"];
-  L1 [pos="656,518!", shape=plaintext, style="", label="newproc1 で\n親子を記録"];
-  proc [pos="560,470!", label=<<b>処理 goroutine</b>>, fillcolor="#D9E7F4", color="#38638F"];
-  L2 [pos="652,422!", shape=plaintext, style="", label="遡れるのは6段まで"];
-  send [pos="560,375!", label=<<b>送信 goroutine</b><br align="left"/>writeSubset で直列化<br align="left"/>>, fillcolor="#D9E7F4", color="#38638F"];
+    recv [label=<<b>受信 goroutine</b>　トレース開始>, fillcolor="#D9E7F4", color="#38638F"];
+    proc [label=<<b>処理 goroutine</b>>, fillcolor="#D9E7F4", color="#38638F"];
+    send [label=<<b>送信 goroutine</b><br align="left"/>writeSubset で直列化<br align="left"/>>, fillcolor="#D9E7F4", color="#38638F"];
 
-  j  [pos="560,275!", shape=point, width=0.01, style=invis];
-  jl [pos="330,275!", shape=point, width=0.01, style=invis];
-  jr [pos="790,275!", shape=point, width=0.01, style=invis];
+    recv -> proc [xlabel="newproc1 で親子を記録"];
+    proc -> send [xlabel="遡れるのは6段まで"];
+  }
 
-  p1 [pos="330,185!", label=<<b>経路1</b><br align="left"/>bufio.Writer のバッファに<br align="left"/>bpf_probe_write_user で追記<br align="left"/>>,
+  p1 [label=<<b>経路1</b><br align="left"/>bufio.Writer のバッファに<br align="left"/>bpf_probe_write_user で追記<br align="left"/>>,
       fillcolor="#E9DFF2", color="#75589C"];
-  p2 [pos="790,185!", label=<<b>経路2</b><br align="left"/>sk_msg で送出される<br align="left"/>バイト列を伸ばす<br align="left"/>>,
+  p2 [label=<<b>経路2</b><br align="left"/>sk_msg で送出される<br align="left"/>バイト列を伸ばす<br align="left"/>>,
       fillcolor="#E9DFF2", color="#75589C"];
+  lock [label=<<b>kernel lockdown / Secure Boot</b>>, fillcolor="#F5DEDE", color="#A04848"];
+  svcb [label=<<b>サービスB</b>　traceparent を受け取る>, fillcolor="#EDF1F5"];
 
-  lock [pos="115,375!", label=<<b>kernel lockdown / Secure Boot</b>>, fillcolor="#F5DEDE", color="#A04848"];
-  k1 [pos="115,185!", shape=point, width=0.01, style=invis];
-  L3 [pos="180,290!", shape=plaintext, style="", label="経路1 を無効化", fontcolor="#7A3030"];
+  { rank=same; p1; p2; }
 
-  b1 [pos="330,100!", shape=point, width=0.01, style=invis];
-  b2 [pos="790,100!", shape=point, width=0.01, style=invis];
-  jb [pos="560,100!", shape=point, width=0.01, style=invis];
-
-  svcb [pos="560,40!", label=<<b>サービスB</b>　traceparent を受け取る>, fillcolor="#EDF1F5"];
-
-  recv -> proc;
-  proc -> send;
-  send -> j [dir=none];
-  j -> jl [dir=none];
-  j -> jr [dir=none];
-  jl -> p1;
-  jr -> p2;
-  lock -> k1 [dir=none, style=dashed, color="#A04848"];
-  k1 -> p1 [style=dashed, color="#A04848", arrowhead=tee];
-  p1 -> b1 [dir=none];
-  p2 -> b2 [dir=none];
-  b1 -> jb [dir=none];
-  b2 -> jb [dir=none];
-  jb -> svcb;
+  send -> p1;
+  send -> p2;
+  lock -> p1 [style=dashed, color="#A04848", arrowhead=tee, xlabel="経路1を無効化"];
+  p1 -> svcb;
+  p2 -> svcb;
 }

@@ -1,7 +1,8 @@
 // コピーオンライトによるページの差し替え
 digraph cow_page_swap {
   graph [
-    layout=neato, inputscale=72, splines=line,
+    rankdir=TB, splines=ortho,
+    nodesep=0.7, ranksep=0.7,
     fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=13,
     bgcolor="white", pad=0.25
   ];
@@ -17,17 +18,17 @@ digraph cow_page_swap {
     fontcolor="#1E293B"
   ];
 
-  pa [pos="140,260!", label=<<b>プロセスAの対応表</b>>, fillcolor="#D9E7F4", color="#38638F"];
-  pb [pos="140,90!", label=<<b>プロセスBの対応表</b><br align="left"/>（Bの機械語を書き換えたい）<br align="left"/>>, fillcolor="#D6E8D6", color="#3F6E3F"];
+  pa [label=<<b>プロセスAの対応表</b>>, fillcolor="#D9E7F4", color="#38638F"];
+  pb [label=<<b>プロセスBの対応表</b><br align="left"/>（Bの機械語を書き換えたい）<br align="left"/>>, fillcolor="#D6E8D6", color="#3F6E3F"];
 
-  orig [pos="490,260!", label=<<b>共有ページ</b><br align="left"/>変わらない<br align="left"/>>, fillcolor="#D9E7F4", color="#38638F"];
-  copy [pos="490,90!", label=<<b>B専用のコピー</b><br align="left"/>この1ページだけ書き換えた<br align="left"/>>, fillcolor="#F5DEDE", color="#A04848"];
+  orig [label=<<b>共有ページ</b><br align="left"/>変わらない<br align="left"/>>, fillcolor="#D9E7F4", color="#38638F"];
+  copy [label=<<b>B専用のコピー</b><br align="left"/>この1ページだけ書き換えた<br align="left"/>>, fillcolor="#F5DEDE", color="#A04848"];
 
-  LA [pos="310,278!", shape=plaintext, style="", label="指したまま"];
-  LB [pos="310,108!", shape=plaintext, style="", label="指す先が差し替わる"];
-  LC [pos="613,175!", shape=plaintext, style="", label="1ページぶんコピーしてから\n書き換える", fontcolor="#5B6B80"];
+  { rank=same; pa; pb; }
+  pa -> pb [style=invis];
+  { rank=same; orig; copy; }
 
-  pa -> orig [label=""];
-  pb -> copy;
-  orig -> copy [style=dashed, color="#7C8DA3"];
+  pa -> orig [xlabel="指したまま"];
+  pb -> copy [xlabel="差し替わる"];
+  orig -> copy [style=dashed, color="#7C8DA3", constraint=false];
 }

@@ -1,7 +1,7 @@
 // 全 RET 命令へのuprobe
 digraph ret_uprobes {
   graph [
-    layout=neato, inputscale=72, splines=line,
+    rankdir=TB, splines=ortho,
     fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=13,
     bgcolor="white", pad=0.25
   ];
@@ -17,28 +17,23 @@ digraph ret_uprobes {
     fontcolor="#1E293B"
   ];
 
-  decode [pos="300,560!", label=<<b>1命令ずつデコードする</b>>, fillcolor="#F3E8CE", color="#96742E"];
-  L0 [pos="390,505!", shape=plaintext, style="", label="RET のアドレスを\n洗い出す"];
+  decode [label=<<b>1命令ずつデコードする</b>>, fillcolor="#F3E8CE", color="#96742E"];
 
-  code [pos="300,390!", shape=plain, style="", label=<
+  code [shape=plain, style="", label=<
     <table border="0" cellborder="1" cellspacing="0" cellpadding="6" color="#38638F">
       <tr><td colspan="2" align="left" bgcolor="#EFF5FB"><b>main.Lookup の機械語</b>（return は1つ）</td></tr>
       <tr><td align="left" bgcolor="#D9E7F4">…</td><td align="left" bgcolor="#D9E7F4">…</td></tr>
-      <tr><td align="left" bgcolor="#D6E8D6">0x49e290</td><td align="left" bgcolor="#D6E8D6"><b>RET</b>（通常の経路）</td></tr>
+      <tr><td align="left" bgcolor="#D6E8D6" port="ret1">0x49e290</td><td align="left" bgcolor="#D6E8D6" port="ret1r"><b>RET</b>（通常の経路）</td></tr>
       <tr><td align="left" bgcolor="#D9E7F4">0x49e291</td><td align="left" bgcolor="#D9E7F4">CALL runtime.deferreturn</td></tr>
-      <tr><td align="left" bgcolor="#D6E8D6">0x49e2a0</td><td align="left" bgcolor="#D6E8D6"><b>RET</b>（defer 経由の経路）</td></tr>
+      <tr><td align="left" bgcolor="#D6E8D6" port="ret2">0x49e2a0</td><td align="left" bgcolor="#D6E8D6" port="ret2r"><b>RET</b>（defer 経由の経路）</td></tr>
     </table>>];
 
-  s1 [pos="180,295!", shape=point, width=0.01, style=invis];
-  s2 [pos="420,295!", shape=point, width=0.01, style=invis];
+  up1 [label=<<b>uprobe</b><br align="left"/>通常の出口（0x49e290）<br align="left"/>>, fillcolor="#D6E8D6", color="#3F6E3F"];
+  up2 [label=<<b>uprobe</b><br align="left"/>defer 経由の出口（0x49e2a0）<br align="left"/>>, fillcolor="#D6E8D6", color="#3F6E3F"];
 
-  up1 [pos="180,180!", label=<<b>uprobe</b><br align="left"/>通常の出口（0x49e290）<br align="left"/>>, fillcolor="#D6E8D6", color="#3F6E3F"];
-  up2 [pos="420,180!", label=<<b>uprobe</b><br align="left"/>defer 経由の出口（0x49e2a0）<br align="left"/>>, fillcolor="#D6E8D6", color="#3F6E3F"];
-
-  L1 [pos="210,240!", shape=plaintext, style="", label="置く"];
-  L2 [pos="450,240!", shape=plaintext, style="", label="置く"];
+  { rank=same; up1; up2; }
 
   decode -> code;
-  s1 -> up1;
-  s2 -> up2;
+  code:ret1:s -> up1;
+  code:ret2:s -> up2;
 }

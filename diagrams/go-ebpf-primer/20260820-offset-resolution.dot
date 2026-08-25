@@ -1,9 +1,10 @@
 // オフセットを2つの情報源から集める
 digraph offset_resolution {
   graph [
-    layout=neato, inputscale=72, splines=line,
+    rankdir=TB, splines=ortho,
+    nodesep=0.5, ranksep=0.5, pad=0.25,
     fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=13,
-    bgcolor="white", pad=0.25
+    bgcolor="white"
   ];
   node [
     fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=12,
@@ -17,57 +18,33 @@ digraph offset_resolution {
     fontcolor="#1E293B"
   ];
 
-  bin [pos="430,650!", label=<<b>計装対象のバイナリ</b>>, fillcolor="#EDF1F5"];
-  dwarf [pos="430,560!", label=<<b>DWARFデバッグ情報を読む</b><br align="left"/>コンパイラが書き残したフィールドの位置<br align="left"/>>,
+  bin [label=<<b>計装対象のバイナリ</b>>, fillcolor="#EDF1F5"];
+  dwarf [label=<<b>DWARFデバッグ情報を読む</b><br align="left"/>コンパイラが書き残したフィールドの位置<br align="left"/>>,
          fillcolor="#D9E7F4", color="#38638F"];
 
-  j1  [pos="430,490!", shape=point, width=0.01, style=invis];
-  j1l [pos="180,490!", shape=point, width=0.01, style=invis];
-  j1r [pos="560,490!", shape=point, width=0.01, style=invis];
-  LA [pos="238,517!", shape=plaintext, style="", label="取れた分"];
-  LB [pos="618,517!", shape=plaintext, style="", label="欠けた分"];
-
-  got [pos="180,420!", label=<<b>読めたフィールド</b><br align="left"/>目の前のバイナリの事実なので追従が要らない<br align="left"/>>,
+  got [label=<<b>読めたフィールド</b><br align="left"/>目の前のバイナリの事実なので追従が要らない<br align="left"/>>,
        fillcolor="#D6E8D6", color="#3F6E3F"];
-  miss [pos="560,420!", label=<<b>読めなかったフィールド</b>>, fillcolor="#F3E8CE", color="#96742E"];
+  miss [label=<<b>読めなかったフィールド</b>>, fillcolor="#F3E8CE", color="#96742E"];
 
-  Lc [pos="668,368!", shape=plaintext, style="", label="欠けた分だけ補う"];
-  json [pos="560,315!", label=<<b>offsets.json を引く</b><br align="left"/>go-offsets-tracker が自動更新する表<br align="left"/>>,
+  json [label=<<b>offsets.json を引く</b><br align="left"/>go-offsets-tracker が自動更新する表<br align="left"/>>,
         fillcolor="#F3E8CE", color="#96742E"];
 
-  Ld [pos="700,258!", shape=plaintext, style="", label="どの版でビルドされたかを調べる"];
-  ver [pos="560,205!", label=<<b>ビルド情報から版を割り出す</b><br align="left"/>Goと依存ライブラリのバージョン<br align="left"/>>,
+  ver [label=<<b>ビルド情報から版を割り出す</b><br align="left"/>Goと依存ライブラリのバージョン<br align="left"/>>,
        fillcolor="#F3E8CE", color="#96742E"];
 
-  g1 [pos="180,135!", shape=point, width=0.01, style=invis];
-  jv [pos="560,135!", shape=point, width=0.01, style=invis];
-  ju [pos="330,135!", shape=point, width=0.01, style=invis];
-  jf [pos="800,135!", shape=point, width=0.01, style=invis];
-
-  use [pos="330,60!", label=<<b>1つのオフセット表として使う</b>>, fillcolor="#EDF1F5"];
-  fail [pos="800,60!", label=<<b>表にも無ければ、その項目だけ欠ける</b>>, fillcolor="#F5DEDE", color="#A04848"];
-  Le [pos="700,100!", shape=plaintext, style="", label="表にその版が無い", fontcolor="#7A3030"];
-
-  d1 [pos="740,650!", shape=point, width=0.01, style=invis];
-  d2 [pos="740,315!", shape=point, width=0.01, style=invis];
-  Lf [pos="864,483!", shape=plaintext, style="", label="DWARFが無い（-w でビルド）\nこのときは全項目を表から", fontcolor="#5B6B80"];
+  use [label=<<b>1つのオフセット表として使う</b>>, fillcolor="#EDF1F5"];
+  fail [label=<<b>表にも無ければ、その項目だけ欠ける</b>>, fillcolor="#F5DEDE", color="#A04848"];
 
   bin -> dwarf;
-  dwarf -> j1 [dir=none];
-  j1 -> j1l [dir=none];
-  j1 -> j1r [dir=none];
-  j1l -> got;
-  j1r -> miss;
+  dwarf -> got;
+  dwarf -> miss;
+  bin -> json [style=dashed, color="#7C8DA3"];
   miss -> json;
   json -> ver;
-  got -> g1 [dir=none, penwidth=1.8];
-  g1 -> ju [dir=none, penwidth=1.8];
-  ver -> jv [dir=none];
-  jv -> ju [dir=none];
-  jv -> jf [dir=none, style=dashed, color="#A04848"];
-  ju -> use [penwidth=1.8];
-  jf -> fail [style=dashed, color="#A04848"];
-  bin -> d1 [dir=none, style=dashed, color="#7C8DA3"];
-  d1 -> d2 [dir=none, style=dashed, color="#7C8DA3"];
-  d2 -> json [style=dashed, color="#7C8DA3"];
+  got -> use [penwidth=1.8];
+  ver -> use;
+  ver -> fail [style=dashed, color="#A04848"];
+
+  { rank=same; got; miss; }
+  { rank=same; use; fail; }
 }

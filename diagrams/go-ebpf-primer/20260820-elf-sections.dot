@@ -1,8 +1,8 @@
 // ELFバイナリの中身と、それを読む側
 digraph elf_sections {
   graph [
-    layout=neato, inputscale=72, splines=line,
     fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=13,
+    splines=ortho,
     bgcolor="white", pad=0.25
   ];
   node [

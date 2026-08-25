@@ -1,9 +1,9 @@
 // uretprobe による戻りアドレスの書き換え
 digraph uretprobe_rewrite {
   graph [
-    layout=neato, inputscale=72, splines=line,
+    rankdir=TB, compound=true, splines=ortho,
     fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=13,
-    bgcolor="white", pad=0.25
+    bgcolor="white", pad=0.25, newrank=true
   ];
   node [
     fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=12,
@@ -17,35 +17,37 @@ digraph uretprobe_rewrite {
     fontcolor="#1E293B"
   ];
 
-  bgN [pos="165,292.5!", shape=box, style="rounded,filled", fillcolor="#F4F6F8", color="#475569",
-       label="", width=3.2, height=3.96, fixedsize=true];
-  tN [pos="165,420!", shape=plaintext, style="", label=<<b>通常の呼び出し</b>>, fontcolor="#334155"];
+  subgraph cluster_normal {
+    label=<<b>通常の呼び出し</b>>;
+    style="rounded"; labeljust="l"; penwidth=1.6; margin=14;
+    color="#475569"; fontcolor="#334155"; bgcolor="#F4F6F8";
 
-  bgR [pos="545,230!", shape=box, style="rounded,filled", fillcolor="#FBEFEF", color="#A04848",
-       label="", width=5.14, height=5.7, fixedsize=true];
-  tR [pos="545,420!", shape=plaintext, style="", label=<<b>uretprobe 設定後（関数entry時）</b>>, fontcolor="#7A3030"];
+    stack_n [shape=plain, style="", label=<
+      <table border="0" cellborder="1" cellspacing="0" cellpadding="7" color="#38638F" bgcolor="#D9E7F4">
+        <tr><td align="left">ローカル変数 …</td></tr>
+        <tr><td align="left">戻りアドレス <b>0x49e31f</b></td></tr>
+      </table>>];
+    caller_n [label=<<b>呼び出し元 0x49e31f</b>>, fillcolor="#EDF1F5"];
+    stack_n -> caller_n [label=" RET でここへ"];
+  }
 
-  stack_n [pos="165,330!", shape=plain, style="", label=<
-    <table border="0" cellborder="1" cellspacing="0" cellpadding="7" color="#38638F" bgcolor="#D9E7F4">
-      <tr><td align="left">ローカル変数 …</td></tr>
-      <tr><td align="left">戻りアドレス <b>0x49e31f</b></td></tr>
-    </table>>];
-  caller_n [pos="165,190!", label=<<b>呼び出し元 0x49e31f</b>>, fillcolor="#EDF1F5"];
-  LN [pos="225,255!", shape=plaintext, style="", label="RET でここへ"];
+  subgraph cluster_uret {
+    label=<<b>uretprobe 設定後（関数entry時）</b>>;
+    style="rounded"; labeljust="l"; penwidth=1.6; margin=14;
+    color="#A04848"; fontcolor="#7A3030"; bgcolor="#FBEFEF";
 
-  stack_u [pos="520,330!", shape=plain, style="", label=<
-    <table border="0" cellborder="1" cellspacing="0" cellpadding="7" color="#38638F" bgcolor="#D9E7F4">
-      <tr><td align="left">ローカル変数 …</td></tr>
-      <tr><td align="left" bgcolor="#F5DEDE">戻りアドレス <b>0xTRAMPOLINE</b><br align="left"/><font color="#7A3030" point-size="11">← カーネルが書き換えた</font><br align="left"/></td></tr>
-    </table>>];
-  hook [pos="520,180!", label=<<b>カーネルのフック</b><br align="left"/>（トランポリン）<br align="left"/>>,
-        fillcolor="#F5DEDE", color="#A04848"];
-  caller_u [pos="520,60!", label=<<b>本物の 0x49e31f</b>>, fillcolor="#EDF1F5"];
+    stack_u [shape=plain, style="", label=<
+      <table border="0" cellborder="1" cellspacing="0" cellpadding="7" color="#38638F" bgcolor="#D9E7F4">
+        <tr><td align="left">ローカル変数 …</td></tr>
+        <tr><td align="left" bgcolor="#F5DEDE">戻りアドレス <b>0xTRAMPOLINE</b><br align="left"/><font color="#7A3030" point-size="11">← カーネルが書き換えた</font><br align="left"/></td></tr>
+      </table>>];
+    hook [label=<<b>カーネルのフック</b><br align="left"/>（トランポリン）<br align="left"/>>,
+          fillcolor="#F5DEDE", color="#A04848"];
+    caller_u [label=<<b>本物の 0x49e31f</b>>, fillcolor="#EDF1F5"];
 
-  LU [pos="610,245!", shape=plaintext, style="", label="RET でここへ"];
-  LJ [pos="655,120!", shape=plaintext, style="", label="処理後にジャンプし直す", fontcolor="#5B6B80"];
+    stack_u -> hook [label=" RET でここへ"];
+    hook -> caller_u [label=" 処理後にジャンプし直す", style=dashed, color="#7C8DA3"];
+  }
 
-  stack_n -> caller_n;
-  stack_u -> hook;
-  hook -> caller_u [style=dashed, color="#7C8DA3"];
+  { rank=same; stack_n; stack_u; }
 }

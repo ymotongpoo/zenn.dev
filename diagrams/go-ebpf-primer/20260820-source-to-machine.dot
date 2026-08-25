@@ -1,7 +1,7 @@
 // ソースから機械語へ、そしてシンボル
 digraph source_to_machine {
   graph [
-    layout=neato, inputscale=72, splines=line,
+    rankdir=TB, splines=ortho,
     fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=13,
     bgcolor="white", pad=0.25
   ];
@@ -17,12 +17,10 @@ digraph source_to_machine {
     fontcolor="#1E293B"
   ];
 
-  src [pos="480,560!", label=<<b>Goのソース</b>　func double(n int) int>, fillcolor="#D6E8D6", color="#3F6E3F"];
-  L0 [pos="560,505!", shape=plaintext, style="", label="コンパイルする"];
-  bytes [pos="480,455!", label=<<b>機械語のバイト列</b>　48 01 c0 c3>, fillcolor="#F3E8CE", color="#96742E"];
-  L1 [pos="610,400!", shape=plaintext, style="", label="先頭から解釈すると命令になる"];
+  src [label=<<b>Goのソース</b>　func double(n int) int>, fillcolor="#D6E8D6", color="#3F6E3F"];
+  bytes [label=<<b>機械語のバイト列</b>　48 01 c0 c3>, fillcolor="#F3E8CE", color="#96742E"];
 
-  insns [pos="480,330!", shape=plain, style="", label=<
+  insns [shape=plain, style="", label=<
     <table border="0" cellborder="1" cellspacing="0" cellpadding="6" color="#38638F">
       <tr><td colspan="2" align="left" bgcolor="#EFF5FB"><b>命令の並び</b>（1命令ごとにアドレスが付く）</td></tr>
       <tr><td port="head" align="left" bgcolor="#D9E7F4">0x49e180</td>
@@ -31,16 +29,16 @@ digraph source_to_machine {
           <td align="left" bgcolor="#D9E7F4">RET</td></tr>
     </table>>];
 
-  symtab [pos="130,345!", shape=plain, style="", label=<
+  symtab [shape=plain, style="", label=<
     <table border="0" cellborder="1" cellspacing="0" cellpadding="6" color="#96742E">
       <tr><td colspan="2" align="left" bgcolor="#FAF4E4"><b>シンボルテーブル</b></td></tr>
       <tr><td align="left" bgcolor="#F3E8CE">main.double</td>
           <td port="addr" align="left" bgcolor="#F3E8CE">0x49e180</td></tr>
     </table>>];
 
-  L2 [pos="306,276!", shape=plaintext, style="", label="名前から先頭\nアドレスを引く", fontcolor="#5B6B80"];
-
   src -> bytes;
   bytes -> insns;
   symtab:addr:e -> insns:head:w [style=dashed, color="#7C8DA3"];
+
+  { rank=same; symtab; insns; }
 }

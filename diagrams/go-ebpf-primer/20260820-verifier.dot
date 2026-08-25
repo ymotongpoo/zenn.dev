@@ -1,7 +1,7 @@
 // 検証器が課す制約
 digraph verifier {
   graph [
-    layout=neato, inputscale=72, splines=line,
+    rankdir=TB, splines=ortho,
     fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=13,
     bgcolor="white", pad=0.25
   ];
@@ -17,10 +17,9 @@ digraph verifier {
     fontcolor="#1E293B"
   ];
 
-  prog [pos="250,480!", label=<<b>eBPFプログラム</b>（バイトコード）>, fillcolor="#D9E7F4", color="#38638F"];
-  L0 [pos="335,430!", shape=plaintext, style="", label="ロードを試みる"];
+  prog [label=<<b>eBPFプログラム</b>（バイトコード）>, fillcolor="#D9E7F4", color="#38638F"];
 
-  checks [pos="250,310!", shape=plain, style="", label=<
+  checks [shape=plain, style="", label=<
     <table border="0" cellborder="1" cellspacing="0" cellpadding="6" color="#75589C">
       <tr><td align="left" bgcolor="#F5F1F9"><b>検証器が調べること</b></td></tr>
       <tr><td align="left" bgcolor="#E9DFF2">必ず停止するか（ループの回数に上界があるか）</td></tr>
@@ -29,20 +28,10 @@ digraph verifier {
       <tr><td align="left" bgcolor="#E9DFF2">許可された範囲の外に触らないか</td></tr>
     </table>>];
 
-  j  [pos="250,160!", shape=point, width=0.01, style=invis];
-  jl [pos="90,160!",  shape=point, width=0.01, style=invis];
-  jr [pos="420,160!", shape=point, width=0.01, style=invis];
+  ok [label=<<b>カーネルに常駐する</b>>, fillcolor="#D6E8D6", color="#3F6E3F"];
+  ng [label=<<b>ロードが失敗する</b><br align="left"/>走らせる前に断られる<br align="left"/>>, fillcolor="#F5DEDE", color="#A04848"];
 
-  ok [pos="90,85!", label=<<b>カーネルに常駐する</b>>, fillcolor="#D6E8D6", color="#3F6E3F"];
-  ng [pos="420,85!", label=<<b>ロードが失敗する</b><br align="left"/>走らせる前に断られる<br align="left"/>>, fillcolor="#F5DEDE", color="#A04848"];
-
-  L1 [pos="146,125!", shape=plaintext, style="", label="すべて通った"];
-  L2 [pos="483,125!", shape=plaintext, style="", label="1つでも通らない"];
-
-  prog -> checks [penwidth=1.8];
-  checks -> j [dir=none];
-  j -> jl [dir=none];
-  j -> jr [dir=none];
-  jl -> ok;
-  jr -> ng;
+  prog -> checks [penwidth=1.8, xlabel=" ロードを試みる"];
+  checks -> ok [xlabel=" すべて通った"];
+  checks -> ng [xlabel=" 1つでも通らない"];
 }
