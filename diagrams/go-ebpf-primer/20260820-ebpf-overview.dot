@@ -48,6 +48,10 @@ digraph ebpf_overview {
   }
 
   loader -> verifier [penwidth=1.8];
-  target -> prog [penwidth=1.8, xlabel="そのアドレスに到達すると発火"];
-  map -> loader [style=dashed, color="#7C8DA3", xlabel="マップを読み出す"];
+  // この2本は経路が交差するため、xlabel の自動配置ではラベルが交差点の近くに
+  // 並んでどちらの矢印のものか読めなくなる。短い語に詰めたうえで head ラベルを
+  // labeldistance/labelangle で各矢印の到達点のそばに固定する（残りの説明は
+  // 本文とキャプションにある）。
+  target -> prog [penwidth=1.8, headlabel="発火", labeldistance=4.0, labelangle=-25];
+  map -> loader [style=dashed, color="#7C8DA3", headlabel="読み出す", labeldistance=4.0, labelangle=-45];
 }

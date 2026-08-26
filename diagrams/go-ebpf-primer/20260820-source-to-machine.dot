@@ -2,6 +2,9 @@
 digraph source_to_machine {
   graph [
     rankdir=TB, splines=ortho,
+    // symtab と insns は rank=same。既定の nodesep(0.25) だと
+    // 2つの箱の間の破線矢印が矢じりだけの切れ端に見えるので広げる。
+    nodesep=0.8,
     fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=13,
     bgcolor="white", pad=0.25
   ];

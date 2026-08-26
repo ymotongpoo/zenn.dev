@@ -2,8 +2,8 @@
 digraph cpu_registers {
   graph [
     fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=13,
-    rankdir=TB, compound=true, splines=true,
-    nodesep=0.5, ranksep=0.7, pad=0.25,
+    rankdir=TB, compound=true, splines=ortho,
+    nodesep=0.5, ranksep=0.85, pad=0.25,
     bgcolor="white", newrank=true
   ];
   node [
@@ -14,10 +14,9 @@ digraph cpu_registers {
   ];
   edge [
     fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=11,
-    color="#334155", penwidth=1.4, arrowsize=0.9,
+    color="#334155", penwidth=1.4, arrowsize=0.9, labeldistance=3.0,
     fontcolor="#1E293B"
   ];
-  rankdir=LR;
 
   subgraph cluster_cpu {
     label=<<b>CPU</b>>;
@@ -35,6 +34,9 @@ digraph cpu_registers {
 
   mem [label=<<b>メモリ</b><br align="left"/>レジスタより桁違いに遅い<br align="left"/>>, fillcolor="#F3E8CE", color="#96742E"];
 
-  mem -> regs [label=" 読み込む"];
-  regs -> mem [label=" 書き込む"];
+  // 往復する2本を splines=ortho で真下・真上の直線にする。ラベルは xlabel だと
+  // 2本の間（57.6pt）に収まらず、どちらの矢印のものか読み取れなくなるので、
+  // head/tail ラベルを labelangle で各矢印の外側へ振り分ける。
+  mem -> regs [taillabel="読み込む", labelangle=-40];
+  regs -> mem [headlabel="書き込む", labelangle=40];
 }
