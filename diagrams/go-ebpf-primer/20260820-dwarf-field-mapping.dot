@@ -31,6 +31,6 @@ digraph dwarf_field_mapping {
 
   mem [label=<<b>実行中のメモリの世界</b><br align="left"/>バイト列とアドレスだけ<br align="left"/>>, fillcolor="#D9E7F4", color="#38638F"];
 
-  src -> dwarf [label=" コンパイラが書き残す"];
-  dwarf -> mem [label=" 名前からバイト位置を引く", style=dashed, color="#7C8DA3", fontcolor="#5B6B80"];
+  src -> dwarf [label=" コンパイラが\l 書き残す\l"];
+  dwarf -> mem [label=" 名前から\l バイト位置を引く\l", style=dashed, color="#7C8DA3", fontcolor="#5B6B80"];
 }
