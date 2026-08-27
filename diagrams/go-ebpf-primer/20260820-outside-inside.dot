@@ -17,9 +17,9 @@ digraph outside_inside {
     fontcolor="#1E293B"
   ];
 
-  outside [label=<<b>外からの観測：eBPF / OBI</b><br align="left"/>uprobe、レジスタの読み取り、オフセット追従<br align="left"/>>,
+  outside [label=<<b>外からの観測：eBPF / OBI</b><br align="left"/>利点：アプリを変更せずに済む<br align="left"/>コスト：内部構造を追いかけ続ける宿命を負う<br align="left"/>>,
            fillcolor="#D9E7F4", color="#38638F"];
-  inside [label=<<b>内からの観測：Goランタイム</b><br align="left"/>flight recording、goroutine leak profile<br align="left"/>>,
+  inside [label=<<b>内からの観測：Goランタイム</b><br align="left"/>利点：正確で壊れにくい<br align="left"/>コスト：コードやビルドへの関与が要る<br align="left"/>>,
           fillcolor="#D6E8D6", color="#3F6E3F"];
 
   app [label=<<b>Goアプリケーション</b>>, fillcolor="#EDF1F5"];
