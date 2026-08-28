@@ -1,0 +1,29 @@
+// 実行ファイルとプロセス
+digraph program_vs_process {
+  graph [
+    rankdir=TB, splines=ortho,
+    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=13,
+    bgcolor="white", pad=0.25
+  ];
+  node [
+    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=12,
+    shape=box, style="rounded,filled",
+    fillcolor="#F1F5F9", color="#475569", penwidth=1.6,
+    margin="0.2,0.14"
+  ];
+  edge [
+    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=11,
+    color="#334155", penwidth=1.4, arrowsize=0.9,
+    fontcolor="#1E293B"
+  ];
+
+  file [label=<<b>実行ファイル</b><br align="left"/>ディスク上のただのファイル<br align="left"/>>, fillcolor="#F3E8CE", color="#96742E"];
+
+  p1 [label=<<b>プロセス（PID 25）</b><br align="left"/>専用の仮想アドレス空間を持つ<br align="left"/>>, fillcolor="#D9E7F4", color="#38638F"];
+  p2 [label=<<b>プロセス（PID 31）</b><br align="left"/>専用の仮想アドレス空間を持つ<br align="left"/>>, fillcolor="#D9E7F4", color="#38638F"];
+
+  { rank=same; p1; p2; }
+
+  file -> p1;
+  file -> p2;
+}

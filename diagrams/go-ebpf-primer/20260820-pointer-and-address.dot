@@ -1,0 +1,44 @@
+// ポインタは番地を値として持つ
+digraph pointer_and_address {
+  graph [
+    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=13,
+    // splines=ortho にすると dot が :v / :a のポートを無視して辺を行の
+    // 境界線の上に引いてしまう。この図は2つの箱を横に並べた1本の水平線
+    // だけなので、splines=true でも経路は水平のままになる。
+    rankdir=TB, compound=true, splines=true,
+    nodesep=0.5, ranksep=0.7, pad=0.25,
+    bgcolor="white", newrank=true
+  ];
+  node [
+    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=12,
+    shape=box, style="rounded,filled",
+    fillcolor="#F1F5F9", color="#475569", penwidth=1.6,
+    margin="0.2,0.14"
+  ];
+  edge [
+    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=11,
+    color="#334155", penwidth=1.4, arrowsize=0.9,
+    fontcolor="#1E293B"
+  ];
+  rankdir=LR;
+  ranksep=1.0;
+
+  p [shape=plain, style="", label=<
+    <table border="0" cellborder="1" cellspacing="0" cellpadding="7" color="#38638F">
+      <tr><td align="left" bgcolor="#EFF5FB"><b>変数 p</b>（ポインタ）</td></tr>
+      <tr><td port="v" align="left" bgcolor="#D9E7F4">値: 0x…08</td></tr>
+      <tr><td align="left" bgcolor="#FFFFFF">アドレス: 0x…40</td></tr>
+    </table>>];
+
+  x [shape=plain, style="", label=<
+    <table border="0" cellborder="1" cellspacing="0" cellpadding="7" color="#3F6E3F">
+      <tr><td align="left" bgcolor="#F0F7F0"><b>変数 x</b></td></tr>
+      <tr><td align="left" bgcolor="#D6E8D6">値: 42</td></tr>
+      <tr><td port="a" align="left" bgcolor="#FFFFFF">アドレス: 0x…08</td></tr>
+    </table>>];
+
+  // ラベルの箱は辺の上に中央揃えで置かれるため、そのまま書くと文字が矢印に
+  // 重なる。末尾に空行（半角スペースだけの行）を足して、見える文字を線より
+  // 上へ押し上げている。「pの値がxの番地と一致」の説明はキャプションにある。
+  p:v:e -> x:a:w [label="指している\n "];
+}

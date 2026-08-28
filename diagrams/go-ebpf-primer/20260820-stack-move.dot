@@ -1,0 +1,46 @@
+// goroutineのスタックが引っ越す手順
+digraph stack_move {
+  graph [
+    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=13,
+    rankdir=TB, compound=true, splines=true,
+    nodesep=0.5, ranksep=0.7, pad=0.25,
+    bgcolor="white", newrank=true
+  ];
+  node [
+    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=12,
+    shape=box, style="rounded,filled",
+    fillcolor="#F1F5F9", color="#475569", penwidth=1.6,
+    margin="0.2,0.14"
+  ];
+  edge [
+    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=11,
+    color="#334155", penwidth=1.4, arrowsize=0.9,
+    fontcolor="#1E293B"
+  ];
+
+  before [shape=plain, style="", label=<
+    <table border="0" cellborder="1" cellspacing="0" cellpadding="6" color="#38638F">
+      <tr><td align="left" bgcolor="#EFF5FB"><b>いまのスタック</b>（たとえば8KB）</td></tr>
+      <tr><td align="left" bgcolor="#D9E7F4">main のフレーム</td></tr>
+      <tr><td align="left" bgcolor="#D9E7F4">呼び出し先のフレーム …</td></tr>
+      <tr><td align="left" bgcolor="#F5DEDE">これ以上積む余地がない</td></tr>
+    </table>>];
+
+  check [label=<<b>関数の入口でスタックの残りを調べる</b><br align="left"/>足りなければ runtime.morestack へ飛ぶ<br align="left"/>>,
+         fillcolor="#F3E8CE", color="#96742E"];
+  alloc [label=<<b>より大きい領域を確保する</b>>, fillcolor="#F3E8CE", color="#96742E"];
+  copy [label=<<b>中身をまるごとコピーし、ポインタを補正する</b><br align="left"/>戻りアドレスからどの関数のフレームかを引き、1フレームずつ辿って書き換える<br align="left"/>>,
+        fillcolor="#F3E8CE", color="#96742E"];
+
+  after [shape=plain, style="", label=<
+    <table border="0" cellborder="1" cellspacing="0" cellpadding="6" color="#38638F">
+      <tr><td align="left" bgcolor="#EFF5FB"><b>引っ越し後のスタック</b>（16KB、別のアドレス）</td></tr>
+      <tr><td align="left" bgcolor="#D9E7F4">main のフレーム（アドレスが変わった）</td></tr>
+      <tr><td align="left" bgcolor="#D9E7F4">呼び出し先のフレーム …</td></tr>
+    </table>>];
+
+  before -> check;
+  check -> alloc;
+  alloc -> copy;
+  copy -> after;
+}

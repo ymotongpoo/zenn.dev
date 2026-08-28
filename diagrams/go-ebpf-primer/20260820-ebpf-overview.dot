@@ -1,0 +1,57 @@
+// eBPFの全体像
+digraph ebpf_overview {
+  graph [
+    rankdir=TB, splines=ortho, compound=true,
+    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=13,
+    nodesep=1.1, ranksep=0.7,
+    bgcolor="white", pad=0.25
+  ];
+  node [
+    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=12,
+    shape=box, style="rounded,filled",
+    fillcolor="#F1F5F9", color="#475569", penwidth=1.6,
+    margin="0.2,0.14"
+  ];
+  edge [
+    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=11,
+    color="#334155", penwidth=1.4, arrowsize=0.9,
+    fontcolor="#1E293B"
+  ];
+
+  subgraph cluster_user {
+    label=<<b>ユーザー空間</b>>;
+    style="rounded"; labeljust="l"; penwidth=1.6; margin=14;
+    color="#475569"; fontcolor="#334155"; bgcolor="#F4F6F8";
+
+    loader [label=<<b>ローダー</b><br align="left"/>Goで書かれる（cilium/ebpf）<br align="left"/>>,
+            fillcolor="#D9E7F4", color="#38638F"];
+    target [label=<<b>計装対象のGoバイナリ</b><br align="left"/>無改変のまま動く<br align="left"/>>,
+            fillcolor="#EDF1F5"];
+
+    loader -> target [dir=none, style=dashed, color="#7C8DA3", xlabel="uprobeを命令アドレスに置く"];
+  }
+
+  subgraph cluster_kernel {
+    label=<<b>カーネル空間</b>>;
+    style="rounded"; labeljust="l"; penwidth=1.6; margin=14;
+    color="#75589C"; fontcolor="#5B4370"; bgcolor="#F5F1F9";
+
+    verifier [label=<<b>検証器</b><br align="left"/>停止性とメモリ安全を静的に検査<br align="left"/>>,
+              fillcolor="#E9DFF2", color="#75589C"];
+    prog [label=<<b>eBPFプログラム</b><br align="left"/>イベントごとに実行されて終わる<br align="left"/>>,
+          fillcolor="#D9E7F4", color="#38638F"];
+    map [label=<<b>マップ</b><br align="left"/>イベントをまたぐ状態を持つ<br align="left"/>>,
+        fillcolor="#F3E8CE", color="#96742E"];
+
+    verifier -> prog;
+    prog -> map [dir=both, xlabel="読み書き"];
+  }
+
+  loader -> verifier [penwidth=1.8];
+  // この2本は経路が交差するため、xlabel の自動配置ではラベルが交差点の近くに
+  // 並んでどちらの矢印のものか読めなくなる。短い語に詰めたうえで head ラベルを
+  // labeldistance/labelangle で各矢印の到達点のそばに固定する（残りの説明は
+  // 本文とキャプションにある）。
+  target -> prog [penwidth=1.8, headlabel="発火", labeldistance=4.0, labelangle=-25];
+  map -> loader [style=dashed, color="#7C8DA3", headlabel="読み出す", labeldistance=4.0, labelangle=-45];
+}

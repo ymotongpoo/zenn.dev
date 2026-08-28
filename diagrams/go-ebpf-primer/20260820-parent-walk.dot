@@ -1,0 +1,35 @@
+// 親を6段まで遡る
+digraph parent_walk {
+  graph [
+    rankdir=TB, splines=ortho,
+    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=13,
+    bgcolor="white", pad=0.25
+  ];
+  node [
+    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=12,
+    shape=box, style="rounded,filled",
+    fillcolor="#F1F5F9", color="#475569", penwidth=1.6,
+    margin="0.2,0.14"
+  ];
+  edge [
+    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=11,
+    color="#334155", penwidth=1.4, arrowsize=0.9,
+    fontcolor="#1E293B"
+  ];
+
+  cur [label=<<b>送信 goroutine</b>　いまここ>, fillcolor="#D9E7F4", color="#38638F"];
+  p1 [label=<1段目の親>, fillcolor="#EDF1F5"];
+  p2 [label=<2段目の親>, fillcolor="#EDF1F5"];
+  dots [label=<…（6段目まで）>, fillcolor="#EDF1F5"];
+
+  root [label=<<b>受信 goroutine</b><br align="left"/>go_trace_map にトレース情報を持つ<br align="left"/>>, fillcolor="#D6E8D6", color="#3F6E3F"];
+  over [label=<<b>7段目で打ち切り</b><br align="left"/>上界の存在は検証器の要請、6という値は実装の選択<br align="left"/>>, fillcolor="#F5DEDE", color="#A04848"];
+
+  { rank=same; root; over; }
+
+  cur -> p1;
+  p1 -> p2;
+  p2 -> dots;
+  dots -> root;
+  dots -> over [style=dashed, color="#A04848"];
+}

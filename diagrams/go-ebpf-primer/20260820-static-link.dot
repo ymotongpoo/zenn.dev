@@ -1,0 +1,34 @@
+// 静的リンクされたGoバイナリと動的リンク
+digraph static_link {
+  graph [
+    rankdir=TB, splines=ortho,
+    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=13,
+    bgcolor="white", pad=0.25
+  ];
+  node [
+    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=12,
+    shape=box, style="rounded,filled",
+    fillcolor="#F1F5F9", color="#475569", penwidth=1.6,
+    margin="0.2,0.14"
+  ];
+  edge [
+    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=11,
+    color="#334155", penwidth=1.4, arrowsize=0.9,
+    fontcolor="#1E293B"
+  ];
+
+  cprog [label=<<b>Cで書いたプログラム</b><br align="left"/>自分のコードだけを持つ<br align="left"/>>, fillcolor="#EDF1F5"];
+  libc [label=<<b>libc.so</b>（共有ライブラリ）<br align="left"/>起動時に結び付けられ、置き場所は環境で変わる<br align="left"/>>,
+        fillcolor="#F3E8CE", color="#96742E"];
+
+  goprog [label=<<b>Goで書いたプログラム</b><br align="left"/>自分のコード、標準ライブラリ、ランタイムを<br align="left"/>1つのバイナリに同梱する<br align="left"/>>,
+          fillcolor="#D9E7F4", color="#38638F"];
+
+  kernel [label=<<b>カーネル</b>>, fillcolor="#E9DFF2", color="#75589C"];
+
+  cprog -> libc;
+  libc -> kernel;
+  goprog -> kernel;
+
+  { rank=same; libc; goprog; }
+}

@@ -1,0 +1,50 @@
+// オフセットを2つの情報源から集める
+digraph offset_resolution {
+  graph [
+    rankdir=TB, splines=ortho,
+    nodesep=0.5, ranksep=0.5, pad=0.25,
+    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=13,
+    bgcolor="white"
+  ];
+  node [
+    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=12,
+    shape=box, style="rounded,filled",
+    fillcolor="#F1F5F9", color="#475569", penwidth=1.6,
+    margin="0.2,0.14"
+  ];
+  edge [
+    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=11,
+    color="#334155", penwidth=1.4, arrowsize=0.9,
+    fontcolor="#1E293B"
+  ];
+
+  bin [label=<<b>計装対象のバイナリ</b>>, fillcolor="#EDF1F5"];
+  dwarf [label=<<b>DWARFデバッグ情報を読む</b><br align="left"/>コンパイラが書き残したフィールドの位置<br align="left"/>>,
+         fillcolor="#D9E7F4", color="#38638F"];
+
+  got [label=<<b>読めたフィールド</b><br align="left"/>目の前のバイナリの事実なので追従が要らない<br align="left"/>>,
+       fillcolor="#D6E8D6", color="#3F6E3F"];
+  miss [label=<<b>読めなかったフィールド</b>>, fillcolor="#F3E8CE", color="#96742E"];
+
+  json [label=<<b>offsets.json を引く</b><br align="left"/>go-offsets-tracker が自動更新する表<br align="left"/>>,
+        fillcolor="#F3E8CE", color="#96742E"];
+
+  ver [label=<<b>ビルド情報から版を割り出す</b><br align="left"/>Goと依存ライブラリのバージョン<br align="left"/>>,
+       fillcolor="#F3E8CE", color="#96742E"];
+
+  use [label=<<b>1つのオフセット表として使う</b>>, fillcolor="#EDF1F5"];
+  fail [label=<<b>表にも無ければ、その項目だけ欠ける</b>>, fillcolor="#F5DEDE", color="#A04848"];
+
+  bin -> dwarf;
+  dwarf -> got;
+  dwarf -> miss;
+  bin -> json [style=dashed, color="#7C8DA3"];
+  miss -> json;
+  json -> ver;
+  got -> use [penwidth=1.8];
+  ver -> use;
+  ver -> fail [style=dashed, color="#A04848"];
+
+  { rank=same; got; miss; }
+  { rank=same; use; fail; }
+}

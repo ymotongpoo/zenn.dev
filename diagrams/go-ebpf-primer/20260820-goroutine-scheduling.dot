@@ -1,0 +1,45 @@
+// OSスレッドとgoroutine
+digraph goroutine_scheduling {
+  graph [
+    rankdir=TB, splines=ortho,
+    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=13,
+    nodesep=0.5, ranksep=0.6,
+    bgcolor="white", pad=0.25
+  ];
+  node [
+    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=12,
+    shape=box, style="rounded,filled",
+    fillcolor="#F1F5F9", color="#475569", penwidth=1.6,
+    margin="0.2,0.14"
+  ];
+  edge [
+    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=11,
+    color="#334155", penwidth=1.4, arrowsize=0.9,
+    fontcolor="#1E293B"
+  ];
+
+  g1 [label=<goroutine <b>g1</b>>, fillcolor="#D9E7F4", color="#38638F"];
+  g2 [label=<goroutine <b>g2</b>>, fillcolor="#D9E7F4", color="#38638F"];
+  g3 [label=<goroutine <b>g3</b>>, fillcolor="#D9E7F4", color="#38638F"];
+  g4 [label=<goroutine <b>g4</b>>, fillcolor="#D9E7F4", color="#38638F"];
+  { rank=same; g1; g2; g3; g4; }
+
+  p1 [label=<<b>p</b>（実行資源と待ち行列）>, fillcolor="#E9DFF2", color="#75589C"];
+  p2 [label=<<b>p</b>（実行資源と待ち行列）>, fillcolor="#E9DFF2", color="#75589C"];
+  { rank=same; p1; p2; }
+
+  m1 [label=<<b>m</b>（OSスレッド）>, fillcolor="#F3E8CE", color="#96742E"];
+  m2 [label=<<b>m</b>（OSスレッド）>, fillcolor="#F3E8CE", color="#96742E"];
+  { rank=same; m1; m2; }
+
+  cpu [label=<<b>CPU</b>（コアの数だけ同時に走る）>, fillcolor="#EDF1F5"];
+
+  g1 -> p1;
+  g2 -> p1;
+  g3 -> p2;
+  g4 -> p2;
+  p1 -> m1;
+  p2 -> m2;
+  m1 -> cpu;
+  m2 -> cpu;
+}

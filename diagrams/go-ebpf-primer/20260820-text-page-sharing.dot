@@ -1,0 +1,36 @@
+// 同じ物理ページを共有する2つのプロセス
+digraph text_page_sharing {
+  graph [
+    rankdir=LR, splines=ortho,
+    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=13,
+    bgcolor="white", pad=0.25
+  ];
+  node [
+    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=12,
+    shape=box, style="rounded,filled",
+    fillcolor="#F1F5F9", color="#475569", penwidth=1.6,
+    margin="0.2,0.14"
+  ];
+  edge [
+    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=11,
+    color="#334155", penwidth=1.4, arrowsize=0.9,
+    fontcolor="#1E293B"
+  ];
+
+  pa [label=<<b>プロセスAの対応表</b><br align="left"/>.text の範囲 → 読み取り専用の印<br align="left"/>>, fillcolor="#D9E7F4", color="#38638F"];
+  pb [label=<<b>プロセスBの対応表</b><br align="left"/>.text の範囲 → 読み取り専用の印<br align="left"/>>, fillcolor="#D6E8D6", color="#3F6E3F"];
+
+  phys [shape=plain, style="", label=<
+    <table border="0" cellborder="1" cellspacing="0" cellpadding="7" color="#475569">
+      <tr><td align="left" bgcolor="#F4F6F8"><b>物理メモリ</b></td></tr>
+      <tr><td port="pg" align="left" bgcolor="#D9E7F4">.text のページ（4KBごと）<br align="left"/>読み取りと実行のみ可<br align="left"/></td></tr>
+    </table>>];
+
+  file [label=<<b>実行ファイルの .text</b><br align="left"/>ディスク上。変わらない<br align="left"/>>, fillcolor="#F3E8CE", color="#96742E"];
+
+  pa -> phys:pg:w;
+  pb -> phys:w;
+  file -> phys [style=dashed, color="#7C8DA3"];
+
+  { rank=same; pa; pb; file; }
+}

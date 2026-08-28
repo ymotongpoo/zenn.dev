@@ -1,0 +1,36 @@
+// 動かない g 構造体と、動くスタック
+digraph g_vs_stack {
+  graph [
+    rankdir=TB, splines=ortho,
+    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=13,
+    nodesep=0.6, ranksep=0.6,
+    bgcolor="white", pad=0.25
+  ];
+  node [
+    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=12,
+    shape=box, style="rounded,filled",
+    fillcolor="#F1F5F9", color="#475569", penwidth=1.6,
+    margin="0.2,0.14"
+  ];
+  edge [
+    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=11,
+    color="#334155", penwidth=1.4, arrowsize=0.9,
+    fontcolor="#1E293B"
+  ];
+
+  gtable [shape=plain, style="", label=<
+    <table border="0" cellborder="1" cellspacing="0" cellpadding="6" color="#75589C">
+      <tr><td colspan="2" align="left" bgcolor="#F5F1F9"><b>g 構造体</b>（ヒープ上、0xc000102000）</td></tr>
+      <tr><td align="left" bgcolor="#E9DFF2">stack.lo</td><td align="left" bgcolor="#E9DFF2">スタックの下端</td></tr>
+      <tr><td align="left" bgcolor="#E9DFF2">stack.hi</td><td align="left" bgcolor="#E9DFF2">スタックの上端</td></tr>
+      <tr><td colspan="2" align="left" bgcolor="#F5F1F9">goroutineが生きているあいだ、このアドレスは変わらない</td></tr>
+    </table>>];
+
+  areaA [label=<<b>スタック領域A</b><br align="left"/>0x2522317ac000〜（伸長前）<br align="left"/>>, fillcolor="#EDF1F5"];
+  areaB [label=<<b>スタック領域B</b><br align="left"/>0x2522319df000〜（伸長後）<br align="left"/>>, fillcolor="#D9E7F4", color="#38638F"];
+
+  { rank=same; areaA; areaB; }
+
+  gtable -> areaA [style=dashed, color="#7C8DA3"];
+  gtable -> areaB [penwidth=1.8];
+}

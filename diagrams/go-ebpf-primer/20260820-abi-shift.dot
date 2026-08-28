@@ -1,0 +1,57 @@
+// Go 1.17 の呼び出し規約の転換
+digraph abi_shift {
+  graph [
+    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=13,
+    rankdir=TB, compound=true, splines=true,
+    nodesep=0.5, ranksep=0.7, pad=0.25,
+    bgcolor="white", newrank=true
+  ];
+  node [
+    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=12,
+    shape=box, style="rounded,filled",
+    fillcolor="#F1F5F9", color="#475569", penwidth=1.6,
+    margin="0.2,0.14"
+  ];
+  edge [
+    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=11,
+    color="#334155", penwidth=1.4, arrowsize=0.9,
+    fontcolor="#1E293B"
+  ];
+
+  subgraph cluster_old {
+    label=<<b>Go 1.16 以前（スタック渡し）</b>>;
+    style="rounded"; labeljust="l"; penwidth=1.6; margin=14;
+    color="#475569"; fontcolor="#334155"; bgcolor="#F4F6F8";
+
+    stack [shape=plain, style="", label=<
+      <table border="0" cellborder="1" cellspacing="0" cellpadding="6" color="#475569">
+        <tr><td colspan="2" align="left" bgcolor="#F4F6F8"><b>スタック</b>（Add3(1, 2, 3) の呼び出し時）</td></tr>
+        <tr><td align="left" bgcolor="#EDF1F5">SP+0</td><td align="left" bgcolor="#EDF1F5">引数 a ＝ 1</td></tr>
+        <tr><td align="left" bgcolor="#EDF1F5">SP+8</td><td align="left" bgcolor="#EDF1F5">引数 b ＝ 2</td></tr>
+        <tr><td align="left" bgcolor="#EDF1F5" port="p">SP+16</td><td align="left" bgcolor="#EDF1F5">引数 c ＝ 3</td></tr>
+      </table>>];
+    read_old [label=<<b>外から読む側</b><br align="left"/>SPからの固定オフセットで足りる<br align="left"/>>,
+              fillcolor="#D6E8D6", color="#3F6E3F"];
+    stack -> read_old [label=" 位置が決まっている"];
+  }
+
+  subgraph cluster_new {
+    label=<<b>Go 1.17 以降（ABIInternal）</b>>;
+    style="rounded"; labeljust="l"; penwidth=1.6; margin=14;
+    color="#38638F"; fontcolor="#2E4D6E"; bgcolor="#EFF5FB";
+
+    regs [shape=plain, style="", label=<
+      <table border="0" cellborder="1" cellspacing="0" cellpadding="6" color="#38638F">
+        <tr><td colspan="2" align="left" bgcolor="#EFF5FB"><b>レジスタ</b>（Add3(1, 2, 3) の呼び出し時）</td></tr>
+        <tr><td align="left" bgcolor="#D9E7F4">AX</td><td align="left" bgcolor="#D9E7F4">引数 a ＝ 1</td></tr>
+        <tr><td align="left" bgcolor="#D9E7F4">BX</td><td align="left" bgcolor="#D9E7F4">引数 b ＝ 2</td></tr>
+        <tr><td align="left" bgcolor="#D9E7F4" port="p">CX</td><td align="left" bgcolor="#D9E7F4">引数 c ＝ 3</td></tr>
+        <tr><td align="left" bgcolor="#D6E8D6">AX</td><td align="left" bgcolor="#D6E8D6">戻り値 ＝ 6（同じAXに戻ってくる）</td></tr>
+      </table>>];
+    read_new [label=<<b>外から読む側</b><br align="left"/>アーキテクチャ別のレジスタ対応表が要る<br align="left"/>>,
+              fillcolor="#F3E8CE", color="#96742E"];
+    regs -> read_new [label=" どのレジスタかを\l 知らないと読めない\l"];
+  }
+
+  { rank=same; stack; regs; }
+}

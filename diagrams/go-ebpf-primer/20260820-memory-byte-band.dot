@@ -1,0 +1,38 @@
+// メモリは番地の付いたバイトの列
+digraph memory_byte_band {
+  graph [
+    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=13,
+    rankdir=TB, compound=true, splines=true,
+    nodesep=0.5, ranksep=0.7, pad=0.25,
+    bgcolor="white", newrank=true
+  ];
+  node [
+    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=12,
+    shape=box, style="rounded,filled",
+    fillcolor="#F1F5F9", color="#475569", penwidth=1.6,
+    margin="0.2,0.14"
+  ];
+  edge [
+    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=11,
+    color="#334155", penwidth=1.4, arrowsize=0.9,
+    fontcolor="#1E293B"
+  ];
+
+  band [shape=plain, style="", label=<
+    <table border="0" cellborder="1" cellspacing="0" cellpadding="6" color="#475569">
+      <tr>
+        <td colspan="8" align="center" bgcolor="#D9E7F4"><b>int n</b>（8バイト）</td>
+        <td align="center" bgcolor="#D6E8D6"><b>byte b</b></td>
+        <td align="center" bgcolor="#EDF1F5">…</td>
+      </tr>
+      <tr>
+        <td bgcolor="#FFFFFF">…70</td><td bgcolor="#FFFFFF">…71</td><td bgcolor="#FFFFFF">…72</td>
+        <td bgcolor="#FFFFFF">…73</td><td bgcolor="#FFFFFF">…74</td><td bgcolor="#FFFFFF">…75</td>
+        <td bgcolor="#FFFFFF">…76</td><td bgcolor="#FFFFFF">…77</td><td bgcolor="#FFFFFF">…78</td>
+        <td bgcolor="#FFFFFF">…79</td>
+      </tr>
+      <tr>
+        <td colspan="10" align="left" bgcolor="#F4F6F8">下の段が各マスのアドレス（下2桁だけを示した）。1マスが1バイト</td>
+      </tr>
+    </table>>];
+}

@@ -1,0 +1,39 @@
+// 関数呼び出しとスタックフレーム
+digraph stack_frame {
+  graph [
+    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=13,
+    rankdir=TB, compound=true, splines=true,
+    nodesep=0.5, ranksep=0.7, pad=0.25,
+    bgcolor="white", newrank=true
+  ];
+  node [
+    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=12,
+    shape=box, style="rounded,filled",
+    fillcolor="#F1F5F9", color="#475569", penwidth=1.6,
+    margin="0.2,0.14"
+  ];
+  edge [
+    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=11,
+    color="#334155", penwidth=1.4, arrowsize=0.9,
+    fontcolor="#1E293B"
+  ];
+  stack [shape=plain, style="", label=<
+    <table border="0" cellborder="1" cellspacing="0" cellpadding="7" color="#475569">
+      <tr><td colspan="3" align="left" bgcolor="#F4F6F8"><b>goroutine のスタック</b>（呼び出しが深くなるほど低いアドレスへ積まれる）</td></tr>
+      <tr><td colspan="3" align="left" bgcolor="#FFFFFF"><i>高いアドレス</i></td></tr>
+      <tr><td align="left" bgcolor="#EDF1F5"><b>main</b> のフレーム</td>
+          <td align="left" bgcolor="#EDF1F5">descend(0) を呼ぶ</td>
+          <td align="left" bgcolor="#EDF1F5"></td></tr>
+      <tr><td align="left" bgcolor="#D9E7F4"><b>descend(0)</b> のフレーム</td>
+          <td align="left" bgcolor="#D9E7F4">local は 0x…eeb8</td>
+          <td rowspan="4" align="left" bgcolor="#F3E8CE">1フレーム<br/>= 176バイト</td></tr>
+      <tr><td align="left" bgcolor="#D9E7F4"><b>descend(1)</b> のフレーム</td>
+          <td align="left" bgcolor="#D9E7F4">local は 0x…ee08</td></tr>
+      <tr><td align="left" bgcolor="#D9E7F4"><b>descend(2)</b> のフレーム</td>
+          <td align="left" bgcolor="#D9E7F4">local は 0x…ed58</td></tr>
+      <tr><td align="left" bgcolor="#D9E7F4"><b>descend(3)</b> のフレーム</td>
+          <td align="left" bgcolor="#D9E7F4">local は 0x…eca8</td></tr>
+      <tr><td colspan="3" align="left" bgcolor="#FFFFFF">まだ使われていない領域</td></tr>
+      <tr><td colspan="3" align="left" bgcolor="#FFFFFF"><i>低いアドレス</i></td></tr>
+    </table>>];
+}

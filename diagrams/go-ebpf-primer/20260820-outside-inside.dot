@@ -1,0 +1,31 @@
+// 外からの観測と内からの観測
+digraph outside_inside {
+  graph [
+    rankdir=TB, splines=ortho,
+    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=13,
+    bgcolor="white", pad=0.25
+  ];
+  node [
+    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=12,
+    shape=box, style="rounded,filled",
+    fillcolor="#F1F5F9", color="#475569", penwidth=1.6,
+    margin="0.2,0.14"
+  ];
+  edge [
+    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=11,
+    color="#334155", penwidth=1.4, arrowsize=0.9,
+    fontcolor="#1E293B"
+  ];
+
+  outside [label=<<b>外からの観測：eBPF / OBI</b><br align="left"/>利点：アプリを変更せずに済む<br align="left"/>コスト：内部構造を追いかけ続ける宿命を負う<br align="left"/>>,
+           fillcolor="#D9E7F4", color="#38638F"];
+  inside [label=<<b>内からの観測：Goランタイム</b><br align="left"/>利点：正確で壊れにくい<br align="left"/>コスト：コードやビルドへの関与が要る<br align="left"/>>,
+          fillcolor="#D6E8D6", color="#3F6E3F"];
+
+  app [label=<<b>Goアプリケーション</b>>, fillcolor="#EDF1F5"];
+
+  { rank=same; outside; inside; }
+
+  outside -> app;
+  inside -> app;
+}

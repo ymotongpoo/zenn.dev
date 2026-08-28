@@ -1,0 +1,38 @@
+// インライン展開で消える計装点
+digraph inlining {
+  graph [
+    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=13,
+    rankdir=TB, compound=true, splines=true,
+    nodesep=0.5, ranksep=0.7, pad=0.25,
+    bgcolor="white", newrank=true
+  ];
+  node [
+    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=12,
+    shape=box, style="rounded,filled",
+    fillcolor="#F1F5F9", color="#475569", penwidth=1.6,
+    margin="0.2,0.14"
+  ];
+  edge [
+    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=11,
+    color="#334155", penwidth=1.4, arrowsize=0.9,
+    fontcolor="#1E293B"
+  ];
+
+  before [shape=plain, style="", label=<
+    <table border="0" cellborder="1" cellspacing="0" cellpadding="6" color="#38638F">
+      <tr><td colspan="2" align="left" bgcolor="#EFF5FB"><b>展開されなかった場合</b></td></tr>
+      <tr><td align="left" bgcolor="#D9E7F4">0x49e1ae</td><td align="left" bgcolor="#D9E7F4">MOVQ …</td></tr>
+      <tr><td align="left" bgcolor="#D6E8D6" port="call">0x49e1b3</td><td align="left" bgcolor="#D6E8D6"><b>CALL main.double</b>（ここに観測点を置ける）</td></tr>
+      <tr><td align="left" bgcolor="#D9E7F4">0x49e1b8</td><td align="left" bgcolor="#D9E7F4">MOVQ …</td></tr>
+    </table>>];
+
+  after [shape=plain, style="", label=<
+    <table border="0" cellborder="1" cellspacing="0" cellpadding="6" color="#A04848">
+      <tr><td colspan="2" align="left" bgcolor="#FBEFEF"><b>インライン展開された場合</b></td></tr>
+      <tr><td align="left" bgcolor="#F5DEDE">0x49e1ae</td><td align="left" bgcolor="#F5DEDE">MOVQ …</td></tr>
+      <tr><td align="left" bgcolor="#F5DEDE">0x49e1b3</td><td align="left" bgcolor="#F5DEDE">double の中身（2倍の計算）が直接並ぶ</td></tr>
+      <tr><td align="left" bgcolor="#F5DEDE">0x49e1b6</td><td align="left" bgcolor="#F5DEDE">MOVQ …（呼び出しの命令が無い）</td></tr>
+    </table>>];
+
+  before -> after [label=" コンパイラがインライン展開すると\l CALL が消え、置くアドレスが無くなる\l", penwidth=1.8];
+}

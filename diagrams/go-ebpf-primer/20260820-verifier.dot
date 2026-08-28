@@ -1,0 +1,37 @@
+// 検証器が課す制約
+digraph verifier {
+  graph [
+    rankdir=TB, splines=ortho,
+    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=13,
+    bgcolor="white", pad=0.25
+  ];
+  node [
+    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=12,
+    shape=box, style="rounded,filled",
+    fillcolor="#F1F5F9", color="#475569", penwidth=1.6,
+    margin="0.2,0.14"
+  ];
+  edge [
+    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=11,
+    color="#334155", penwidth=1.4, arrowsize=0.9,
+    fontcolor="#1E293B"
+  ];
+
+  prog [label=<<b>eBPFプログラム</b>（バイトコード）>, fillcolor="#D9E7F4", color="#38638F"];
+
+  checks [shape=plain, style="", label=<
+    <table border="0" cellborder="1" cellspacing="0" cellpadding="6" color="#75589C">
+      <tr><td align="left" bgcolor="#F5F1F9"><b>検証器が調べること</b></td></tr>
+      <tr><td align="left" bgcolor="#E9DFF2">必ず停止するか（ループの回数に上界があるか）</td></tr>
+      <tr><td align="left" bgcolor="#E9DFF2">命令数が上限内か</td></tr>
+      <tr><td align="left" bgcolor="#E9DFF2">未初期化のメモリやポインタを読まないか</td></tr>
+      <tr><td align="left" bgcolor="#E9DFF2">許可された範囲の外に触らないか</td></tr>
+    </table>>];
+
+  ok [label=<<b>カーネルに常駐する</b>>, fillcolor="#D6E8D6", color="#3F6E3F"];
+  ng [label=<<b>ロードが失敗する</b><br align="left"/>走らせる前に断られる<br align="left"/>>, fillcolor="#F5DEDE", color="#A04848"];
+
+  prog -> checks [penwidth=1.8, xlabel=" ロードを試みる"];
+  checks -> ok [xlabel=" すべて通った"];
+  checks -> ng [xlabel=" 1つでも通らない"];
+}

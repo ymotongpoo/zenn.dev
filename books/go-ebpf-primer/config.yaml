@@ -1,0 +1,22 @@
+title: "OpenTelemetry eBPF Instrumentationの舞台裏"
+summary: "Go Conference 2026の登壇「OpenTelemetry eBPF Instrumentationの舞台裏」の解説資料です。eBPFによるゼロコード計装は「言語を問わず動く」と語られますが、Goバイナリへの関数レベルの計装は他言語にない4つの難所を抱えています。なぜ難しいのかを、CPUとメモリの仕組みという初歩から積み上げて、OBIの実装コードまで手元で確かめながら読める構成にしました。"
+topics: ["go", "ebpf", "opentelemetry", "observability", "linux"]
+published: false
+price: 0 # 有料の場合200〜5000
+# 本に含めるチャプターを順番に並べましょう
+chapters:
+  - 00-introduction
+  - 05-computer
+  - 10-os_kernel
+  - 15-source_to_binary
+  - 20-function_call
+  - 25-go_runtime
+  - 30-ebpf
+  - 35-obi
+  - 40-hurdle1_uretprobe
+  - 45-hurdle2_abi
+  - 50-hurdle3_offsets
+  - 55-hurdle4_propagation
+  - 60-for_go_developers
+  - 65-conclusion
+  - 99-glossary_references

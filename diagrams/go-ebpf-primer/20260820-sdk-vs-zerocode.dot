@@ -1,0 +1,53 @@
+// 誰が traceparent を書き込むのか
+digraph sdk_vs_zerocode {
+  graph [
+    rankdir=TB, compound=true, splines=ortho,
+    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=13,
+    nodesep=0.5, ranksep=0.75,
+    bgcolor="white", pad=0.25, newrank=true
+  ];
+  node [
+    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=12,
+    shape=box, style="rounded,filled",
+    fillcolor="#F1F5F9", color="#475569", penwidth=1.6,
+    margin="0.2,0.14"
+  ];
+  edge [
+    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=11,
+    color="#334155", penwidth=1.4, arrowsize=0.9,
+    fontcolor="#1E293B"
+  ];
+
+  subgraph cluster_l {
+    label=<<b>SDK計装</b>>;
+    fontcolor="#2C4F2C";
+    style="rounded"; labeljust="l"; penwidth=1.6; margin=14;
+    color="#3F6E3F"; bgcolor="#F0F7F0";
+
+    appL [label=<<b>アプリのコード</b><br align="left"/>ctx と req を手元に持っている<br align="left"/>>,
+          fillcolor="#D6E8D6", color="#3F6E3F"];
+    hdrL [label=<<b>リクエストのヘッダ</b>>, fillcolor="#EDF1F5"];
+
+    appL -> hdrL;
+  }
+
+  subgraph cluster_r {
+    label=<<b>ゼロコード計装</b>>;
+    fontcolor="#2E4D6E";
+    style="rounded"; labeljust="l"; penwidth=1.6; margin=14;
+    color="#38638F"; bgcolor="#EFF5FB";
+
+    appR [label=<<b>アプリのコード</b><br align="left"/>traceparent の存在を知らない<br align="left"/>>,
+          fillcolor="#EDF1F5"];
+    obiR [label=<<b>OBI</b>（カーネル側のフック）>, fillcolor="#D9E7F4", color="#38638F"];
+    hdrR [label=<<b>リクエストのヘッダ</b>>, fillcolor="#EDF1F5"];
+
+    { rank=same; appR; obiR; }
+
+    appR -> hdrR [style=dashed, color="#A04848", arrowhead=tee];
+    obiR -> hdrR [penwidth=1.8];
+  }
+
+  { rank=same; appL; appR; obiR; }
+  { rank=same; hdrL; hdrR; }
+}

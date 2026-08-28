@@ -1,0 +1,42 @@
+// CPUとレジスタ
+digraph cpu_registers {
+  graph [
+    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=13,
+    rankdir=TB, compound=true, splines=ortho,
+    nodesep=0.5, ranksep=0.85, pad=0.25,
+    bgcolor="white", newrank=true
+  ];
+  node [
+    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=12,
+    shape=box, style="rounded,filled",
+    fillcolor="#F1F5F9", color="#475569", penwidth=1.6,
+    margin="0.2,0.14"
+  ];
+  edge [
+    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=11,
+    color="#334155", penwidth=1.4, arrowsize=0.9, labeldistance=3.0,
+    fontcolor="#1E293B"
+  ];
+
+  subgraph cluster_cpu {
+    label=<<b>CPU</b>>;
+    style="rounded"; labeljust="l"; penwidth=1.6; margin=14;
+    color="#38638F"; fontcolor="#2E4D6E"; bgcolor="#EFF5FB";
+
+    regs [shape=plain, style="", label=<
+      <table border="0" cellborder="1" cellspacing="0" cellpadding="6" color="#38638F">
+        <tr><td colspan="2" align="left" bgcolor="#EFF5FB"><b>レジスタ</b>（CPUの中の小さな入れ物）</td></tr>
+        <tr><td align="left" bgcolor="#D9E7F4">RAX、RBX、RCX …</td><td align="left" bgcolor="#D9E7F4">計算に使う汎用レジスタ</td></tr>
+        <tr><td align="left" bgcolor="#D9E7F4">SP</td><td align="left" bgcolor="#D9E7F4">スタックの先端のアドレス</td></tr>
+        <tr><td align="left" bgcolor="#D9E7F4">PC</td><td align="left" bgcolor="#D9E7F4">次に実行する命令のアドレス</td></tr>
+      </table>>];
+  }
+
+  mem [label=<<b>メモリ</b><br align="left"/>レジスタより桁違いに遅い<br align="left"/>>, fillcolor="#F3E8CE", color="#96742E"];
+
+  // 往復する2本を splines=ortho で真下・真上の直線にする。ラベルは xlabel だと
+  // 2本の間（57.6pt）に収まらず、どちらの矢印のものか読み取れなくなるので、
+  // head/tail ラベルを labelangle で各矢印の外側へ振り分ける。
+  mem -> regs [taillabel="読み込む", labelangle=-40];
+  regs -> mem [headlabel="書き込む", labelangle=40];
+}
