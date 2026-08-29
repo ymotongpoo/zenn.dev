@@ -2,17 +2,17 @@
 digraph distributed_trace_basics {
   graph [
     rankdir=TB, splines=ortho,
-    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=13,
+    fontname="IBM Plex Sans JP", fontsize=13,
     bgcolor="white", pad=0.25
   ];
   node [
-    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=12,
+    fontname="IBM Plex Sans JP", fontsize=12,
     shape=box, style="rounded,filled",
     fillcolor="#F1F5F9", color="#475569", penwidth=1.6,
     margin="0.2,0.14"
   ];
   edge [
-    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=11,
+    fontname="IBM Plex Sans JP", fontsize=11,
     color="#334155", penwidth=1.4, arrowsize=0.9,
     fontcolor="#1E293B"
   ];
@@ -24,8 +24,8 @@ digraph distributed_trace_basics {
     <table border="0" cellborder="1" cellspacing="0" cellpadding="6" color="#75589C">
       <tr><td colspan="3" align="left" bgcolor="#F5F1F9"><b>バックエンドに集まる記録</b></td></tr>
       <tr><td align="left" bgcolor="#E9DFF2"><b>スパン</b></td><td align="left" bgcolor="#E9DFF2"><b>トレースID</b></td><td align="left" bgcolor="#E9DFF2"><b>スパンID と親</b></td></tr>
-      <tr><td port="ra" align="left" bgcolor="#FFFFFF">Aの処理</td><td align="left" bgcolor="#FFFFFF">4bf9…</td><td align="left" bgcolor="#FFFFFF">00f0…（親なし）</td></tr>
-      <tr><td port="rb" align="left" bgcolor="#FFFFFF">Bの処理</td><td align="left" bgcolor="#FFFFFF">4bf9…（同じ）</td><td align="left" bgcolor="#FFFFFF">b7ad…（親は 00f0…）</td></tr>
+      <tr><td port="ra" align="left" bgcolor="#FFFFFF">Aの処理</td><td align="left" bgcolor="#FFFFFF"><font face="JetBrains Mono">4bf9…</font></td><td align="left" bgcolor="#FFFFFF"><font face="JetBrains Mono">00f0…</font>（親なし）</td></tr>
+      <tr><td port="rb" align="left" bgcolor="#FFFFFF">Bの処理</td><td align="left" bgcolor="#FFFFFF"><font face="JetBrains Mono">4bf9…</font>（同じ）</td><td align="left" bgcolor="#FFFFFF"><font face="JetBrains Mono">b7ad…</font>（親は <font face="JetBrains Mono">00f0…</font>）</td></tr>
     </table>>];
 
   sa -> sb [penwidth=1.8];

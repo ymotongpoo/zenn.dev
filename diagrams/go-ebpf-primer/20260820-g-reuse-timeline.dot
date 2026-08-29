@@ -1,30 +1,30 @@
 // g のアドレスが再利用されるまで
 digraph g_reuse {
   graph [
-    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=13,
+    fontname="IBM Plex Sans JP", fontsize=13,
     rankdir=TB, compound=true, splines=true,
     nodesep=0.5, ranksep=0.7, pad=0.25,
     bgcolor="white", newrank=true
   ];
   node [
-    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=12,
+    fontname="IBM Plex Sans JP", fontsize=12,
     shape=box, style="rounded,filled",
     fillcolor="#F1F5F9", color="#475569", penwidth=1.6,
     margin="0.2,0.14"
   ];
   edge [
-    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=11,
+    fontname="IBM Plex Sans JP", fontsize=11,
     color="#334155", penwidth=1.4, arrowsize=0.9,
     fontcolor="#1E293B"
   ];
 
-  t1 [label=<<b>時刻1</b><br align="left"/>goroutine A の g は 0xc000102000<br align="left"/>>,
+  t1 [label=<<b>時刻1</b><br align="left"/>goroutine A の g は <font face="JetBrains Mono">0xc000102000</font><br align="left"/>>,
       fillcolor="#D9E7F4", color="#38638F"];
-  t2 [label=<<b>時刻2</b><br align="left"/>A のスタックだけが別の領域へ移る<br align="left"/>g は 0xc000102000 のまま<br align="left"/>>,
+  t2 [label=<<b>時刻2</b><br align="left"/>A のスタックだけが別の領域へ移る<br align="left"/>g は <font face="JetBrains Mono">0xc000102000</font> のまま<br align="left"/>>,
       fillcolor="#D9E7F4", color="#38638F"];
   t3 [label=<<b>時刻3</b><br align="left"/>A が終了する<br align="left"/>>,
       fillcolor="#EDF1F5"];
-  t4 [label=<<b>時刻4</b><br align="left"/>goroutine B の g として 0xc000102000 が再利用される<br align="left"/>>,
+  t4 [label=<<b>時刻4</b><br align="left"/>goroutine B の g として <font face="JetBrains Mono">0xc000102000</font> が再利用される<br align="left"/>>,
       fillcolor="#F3E8CE", color="#96742E"];
   risk [label=<<b>古いマップ要素を消していないと</b><br align="left"/>B の処理が A の記録を拾う<br align="left"/>>,
         fillcolor="#F5DEDE", color="#A04848"];

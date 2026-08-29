@@ -2,44 +2,44 @@
 digraph goroutine_key {
   graph [
     rankdir=TB, splines=ortho, compound=true,
-    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=13,
+    fontname="IBM Plex Sans JP", fontsize=13,
     nodesep=0.5, ranksep=0.6,
     bgcolor="white", pad=0.25
   ];
   node [
-    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=12,
+    fontname="IBM Plex Sans JP", fontsize=12,
     shape=box, style="rounded,filled",
     fillcolor="#F1F5F9", color="#475569", penwidth=1.6,
     margin="0.2,0.14"
   ];
   edge [
-    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=11,
+    fontname="IBM Plex Sans JP", fontsize=11,
     color="#334155", penwidth=1.4, arrowsize=0.9,
     fontcolor="#1E293B"
   ];
 
-  fire [label=<<b>uprobe 発火</b>　レジスタの写し pt_regs>, fillcolor="#EDF1F5"];
+  fire [label=<<b>uprobe 発火</b>　レジスタの写し <font face="JetBrains Mono">pt_regs</font>>, fillcolor="#EDF1F5"];
 
   subgraph cluster_regs {
     label=<<b>OBI が読むレジスタ</b>>;
     style="rounded"; labeljust="l"; penwidth=1.6; margin=14;
     color="#38638F"; fontcolor="#2E4D6E"; bgcolor="#EFF5FB";
 
-    r14 [label=<<b>R14</b>（amd64）/ <b>R28</b>（arm64）<br align="left"/>g 構造体の先頭アドレス<br align="left"/>>,
+    r14 [label=<<font face="JetBrains Mono"><b>R14</b></font>（<font face="JetBrains Mono">amd64</font>）/ <font face="JetBrains Mono"><b>R28</b></font>（<font face="JetBrains Mono">arm64</font>）<br align="left"/>g 構造体の先頭アドレス<br align="left"/>>,
          fillcolor="#D9E7F4", color="#38638F"];
-    args [label=<<b>AX, BX, CX, …</b><br align="left"/>関数の引数<br align="left"/>>,
+    args [label=<<font face="JetBrains Mono"><b>AX, BX, CX, …</b></font><br align="left"/>関数の引数<br align="left"/>>,
           fillcolor="#D9E7F4", color="#38638F"];
     { rank=same; r14; args; }
   }
 
   key [shape=plain, style="", label=<
     <table border="0" cellborder="1" cellspacing="0" cellpadding="7" color="#75589C">
-      <tr><td align="left" bgcolor="#F5F1F9"><b>go_addr_key_t</b>（goroutine の識別子）</td></tr>
-      <tr><td align="left" bgcolor="#E9DFF2">addr = 0xc000102000</td></tr>
-      <tr><td align="left" bgcolor="#E9DFF2">pid&nbsp;&nbsp;= 12345</td></tr>
+      <tr><td align="left" bgcolor="#F5F1F9"><font face="JetBrains Mono"><b>go_addr_key_t</b></font>（goroutine の識別子）</td></tr>
+      <tr><td align="left" bgcolor="#E9DFF2"><font face="JetBrains Mono">addr = 0xc000102000</font></td></tr>
+      <tr><td align="left" bgcolor="#E9DFF2"><font face="JetBrains Mono">pid&nbsp;&nbsp;= 12345</font></td></tr>
     </table>>];
 
-  gstruct [label=<<b>g 構造体の中身</b><br align="left"/>stack.lo / stack.hi / goid …<br align="left"/>>,
+  gstruct [label=<<b>g 構造体の中身</b><br align="left"/><font face="JetBrains Mono">stack.lo / stack.hi / goid …</font><br align="left"/>>,
            style="rounded,filled,dashed", fillcolor="#FBEFEF", color="#A04848"];
 
   values [label=<<b>引数の値</b><br align="left"/>HTTPメソッド、URLなど<br align="left"/>>, fillcolor="#EDF1F5"];

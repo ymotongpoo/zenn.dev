@@ -2,18 +2,18 @@
 digraph flight_recording {
   graph [
     rankdir=LR, compound=true, splines=ortho,
-    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=13,
+    fontname="IBM Plex Sans JP", fontsize=13,
     nodesep=0.6, ranksep=0.8,
     bgcolor="white", pad=0.25, newrank=true
   ];
   node [
-    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=12,
+    fontname="IBM Plex Sans JP", fontsize=12,
     shape=box, style="rounded,filled",
     fillcolor="#F1F5F9", color="#475569", penwidth=1.6,
     margin="0.2,0.14"
   ];
   edge [
-    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=11,
+    fontname="IBM Plex Sans JP", fontsize=11,
     color="#334155", penwidth=1.4, arrowsize=0.9,
     fontcolor="#1E293B"
   ];
@@ -35,7 +35,7 @@ digraph flight_recording {
   trigger [label=<<b>問題が起きた瞬間</b><br align="left"/>エラー検知、レイテンシ急増 など<br align="left"/>>,
            fillcolor="#F5DEDE", color="#A04848"];
 
-  snap [label=<<b>FlightRecorder.WriteTo</b><br align="left"/>「直前」の記録だけを書き出す<br align="left"/>>,
+  snap [label=<<font face="JetBrains Mono"><b>FlightRecorder.WriteTo</b></font><br align="left"/>「直前」の記録だけを書き出す<br align="left"/>>,
         fillcolor="#D6E8D6", color="#3F6E3F"];
 
   runtime -> ring [xlabel=" 常に記録し続ける"];

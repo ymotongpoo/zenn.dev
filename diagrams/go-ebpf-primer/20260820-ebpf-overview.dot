@@ -2,18 +2,18 @@
 digraph ebpf_overview {
   graph [
     rankdir=TB, splines=ortho, compound=true,
-    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=13,
+    fontname="IBM Plex Sans JP", fontsize=13,
     nodesep=1.1, ranksep=0.7,
     bgcolor="white", pad=0.25
   ];
   node [
-    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=12,
+    fontname="IBM Plex Sans JP", fontsize=12,
     shape=box, style="rounded,filled",
     fillcolor="#F1F5F9", color="#475569", penwidth=1.6,
     margin="0.2,0.14"
   ];
   edge [
-    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=11,
+    fontname="IBM Plex Sans JP", fontsize=11,
     color="#334155", penwidth=1.4, arrowsize=0.9,
     fontcolor="#1E293B"
   ];
@@ -23,7 +23,7 @@ digraph ebpf_overview {
     style="rounded"; labeljust="l"; penwidth=1.6; margin=14;
     color="#475569"; fontcolor="#334155"; bgcolor="#F4F6F8";
 
-    loader [label=<<b>ローダー</b><br align="left"/>Goで書かれる（cilium/ebpf）<br align="left"/>>,
+    loader [label=<<b>ローダー</b><br align="left"/>Goで書かれる（<font face="JetBrains Mono">cilium/ebpf</font>）<br align="left"/>>,
             fillcolor="#D9E7F4", color="#38638F"];
     target [label=<<b>計装対象のGoバイナリ</b><br align="left"/>無改変のまま動く<br align="left"/>>,
             fillcolor="#EDF1F5"];

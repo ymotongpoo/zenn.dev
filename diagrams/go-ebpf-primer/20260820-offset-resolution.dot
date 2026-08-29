@@ -3,17 +3,17 @@ digraph offset_resolution {
   graph [
     rankdir=TB, splines=ortho,
     nodesep=0.5, ranksep=0.5, pad=0.25,
-    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=13,
+    fontname="IBM Plex Sans JP", fontsize=13,
     bgcolor="white"
   ];
   node [
-    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=12,
+    fontname="IBM Plex Sans JP", fontsize=12,
     shape=box, style="rounded,filled",
     fillcolor="#F1F5F9", color="#475569", penwidth=1.6,
     margin="0.2,0.14"
   ];
   edge [
-    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=11,
+    fontname="IBM Plex Sans JP", fontsize=11,
     color="#334155", penwidth=1.4, arrowsize=0.9,
     fontcolor="#1E293B"
   ];
@@ -26,7 +26,7 @@ digraph offset_resolution {
        fillcolor="#D6E8D6", color="#3F6E3F"];
   miss [label=<<b>読めなかったフィールド</b>>, fillcolor="#F3E8CE", color="#96742E"];
 
-  json [label=<<b>offsets.json を引く</b><br align="left"/>go-offsets-tracker が自動更新する表<br align="left"/>>,
+  json [label=<<b><font face="JetBrains Mono">offsets.json</font> を引く</b><br align="left"/><font face="JetBrains Mono">go-offsets-tracker</font> が自動更新する表<br align="left"/>>,
         fillcolor="#F3E8CE", color="#96742E"];
 
   ver [label=<<b>ビルド情報から版を割り出す</b><br align="left"/>Goと依存ライブラリのバージョン<br align="left"/>>,

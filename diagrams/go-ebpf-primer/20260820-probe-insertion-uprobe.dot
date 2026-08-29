@@ -2,33 +2,33 @@
 digraph probe_insertion_uprobe {
   graph [
     rankdir=TB, compound=true, splines=ortho,
-    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=13,
+    fontname="IBM Plex Sans JP", fontsize=13,
     nodesep=0.5, ranksep=0.5,
     bgcolor="white", pad=0.25, newrank=true
   ];
   node [
-    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=12,
+    fontname="IBM Plex Sans JP", fontsize=12,
     shape=box, style="rounded,filled",
     fillcolor="#F1F5F9", color="#475569", penwidth=1.6,
     margin="0.2,0.14"
   ];
   edge [
-    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=11,
+    fontname="IBM Plex Sans JP", fontsize=11,
     color="#334155", penwidth=1.4, arrowsize=0.9,
     fontcolor="#1E293B"
   ];
 
   subgraph cluster_u {
-    label=<<b>uprobe</b>>;
+    label=<<font face="Poppins"><b>uprobe</b></font>>;
     fontcolor="#2E4D6E";
     style="rounded"; labeljust="l"; penwidth=1.6; margin=14;
     color="#38638F"; bgcolor="#EFF5FB";
 
     code [shape=plain, style="", label=<
       <table border="0" cellborder="1" cellspacing="0" cellpadding="6" color="#38638F">
-        <tr><td colspan="2" align="left" bgcolor="#EFF5FB"><b>コード領域 0x49e180</b></td></tr>
-        <tr><td align="left" bgcolor="#D9E7F4">差し替え前</td><td align="left" bgcolor="#D9E7F4">48 01 c0</td></tr>
-        <tr><td align="left" bgcolor="#F3E8CE">差し替え後</td><td align="left" bgcolor="#F3E8CE"><b>cc</b> 01 c0</td></tr>
+        <tr><td colspan="2" align="left" bgcolor="#EFF5FB"><b>コード領域 <font face="JetBrains Mono">0x49e180</font></b></td></tr>
+        <tr><td align="left" bgcolor="#D9E7F4">差し替え前</td><td align="left" bgcolor="#D9E7F4"><font face="JetBrains Mono">48 01 c0</font></td></tr>
+        <tr><td align="left" bgcolor="#F3E8CE">差し替え後</td><td align="left" bgcolor="#F3E8CE"><font face="JetBrains Mono"><b>cc</b> 01 c0</font></td></tr>
       </table>>];
     trap_u [label=<<b>トラップしてカーネルへ</b><br align="left"/>レジスタ一式を保存<br align="left"/>>, fillcolor="#F3E8CE", color="#96742E"];
     prog_u [label=<<b>eBPFプログラムが走る</b><br align="left"/>レジスタの写しを受け取る<br align="left"/>>, fillcolor="#D9E7F4", color="#38638F"];

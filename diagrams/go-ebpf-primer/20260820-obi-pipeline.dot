@@ -3,23 +3,23 @@ digraph obi_pipeline {
   graph [
     rankdir=TB, splines=ortho,
     nodesep=0.5, ranksep=0.5, pad=0.25,
-    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=13,
+    fontname="IBM Plex Sans JP", fontsize=13,
     bgcolor="white"
   ];
   node [
-    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=12,
+    fontname="IBM Plex Sans JP", fontsize=12,
     shape=box, style="rounded,filled",
     fillcolor="#F1F5F9", color="#475569", penwidth=1.6,
     margin="0.2,0.14"
   ];
   edge [
-    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=11,
+    fontname="IBM Plex Sans JP", fontsize=11,
     color="#334155", penwidth=1.4, arrowsize=0.9,
     fontcolor="#1E293B"
   ];
 
-  discover [label=<<b>1. 発見</b><br align="left"/>/proc を走査し、設定の条件に合うプロセスを選ぶ<br align="left"/>>, fillcolor="#D9E7F4", color="#38638F"];
-  analyze [label=<<b>2. ELF解析</b><br align="left"/>シンボル、.gopclntab、DWARF、オフセット表から<br align="left"/>関数アドレスとフィールド位置を割り出す<br align="left"/>>, fillcolor="#D9E7F4", color="#38638F"];
+  discover [label=<<b>1. 発見</b><br align="left"/><font face="JetBrains Mono">/proc</font> を走査し、設定の条件に合うプロセスを選ぶ<br align="left"/>>, fillcolor="#D9E7F4", color="#38638F"];
+  analyze [label=<<b>2. ELF解析</b><br align="left"/>シンボル、<font face="JetBrains Mono">.gopclntab</font>、DWARF、オフセット表から<br align="left"/>関数アドレスとフィールド位置を割り出す<br align="left"/>>, fillcolor="#D9E7F4", color="#38638F"];
   attach [label=<<b>3. ロードとアタッチ</b><br align="left"/>eBPFプログラムを検証器に通し、uprobeを結び付ける<br align="left"/>>, fillcolor="#D9E7F4", color="#38638F"];
   collect [label=<<b>4. イベント収集</b><br align="left"/>フック発火→リングバッファ→スパンの組み立て<br align="left"/>>, fillcolor="#D9E7F4", color="#38638F"];
   export [label=<<b>5. エクスポート</b><br align="left"/>メタデータを付けてOTLP / Prometheusで送る<br align="left"/>>, fillcolor="#D6E8D6", color="#3F6E3F"];

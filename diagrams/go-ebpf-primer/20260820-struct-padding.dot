@@ -1,35 +1,35 @@
 // フィールドの並びとパディング
 digraph struct_padding {
   graph [
-    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=13,
+    fontname="IBM Plex Sans JP", fontsize=13,
     rankdir=TB, compound=true, splines=true,
     nodesep=0.5, ranksep=0.7, pad=0.25,
     bgcolor="white", newrank=true
   ];
   node [
-    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=12,
+    fontname="IBM Plex Sans JP", fontsize=12,
     shape=box, style="rounded,filled",
     fillcolor="#F1F5F9", color="#475569", penwidth=1.6,
     margin="0.2,0.14"
   ];
   edge [
-    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=11,
+    fontname="IBM Plex Sans JP", fontsize=11,
     color="#334155", penwidth=1.4, arrowsize=0.9,
     fontcolor="#1E293B"
   ];
 
   rec [shape=plain, style="", label=<
     <table border="0" cellborder="1" cellspacing="0" cellpadding="7" color="#475569">
-      <tr><td colspan="2" align="left" bgcolor="#F4F6F8"><b>record</b>（合計24バイト）</td></tr>
-      <tr><td align="left" bgcolor="#D9E7F4">+0</td>
-          <td align="left" bgcolor="#D9E7F4">flag bool（1バイト）</td></tr>
-      <tr><td align="left" bgcolor="#F3E8CE">+1 〜 +7</td>
+      <tr><td colspan="2" align="left" bgcolor="#F4F6F8"><font face="JetBrains Mono"><b>record</b></font>（合計24バイト）</td></tr>
+      <tr><td align="left" bgcolor="#D9E7F4"><font face="JetBrains Mono">+0</font></td>
+          <td align="left" bgcolor="#D9E7F4"><font face="JetBrains Mono">flag bool</font>（1バイト）</td></tr>
+      <tr><td align="left" bgcolor="#F3E8CE"><font face="JetBrains Mono">+1 〜 +7</font></td>
           <td align="left" bgcolor="#F3E8CE">詰め物（countを8の倍数の番地から始めるため）</td></tr>
-      <tr><td align="left" bgcolor="#D9E7F4">+8 〜 +15</td>
-          <td align="left" bgcolor="#D9E7F4">count int64（8バイト）</td></tr>
-      <tr><td align="left" bgcolor="#D9E7F4">+16 〜 +19</td>
-          <td align="left" bgcolor="#D9E7F4">id int32（4バイト）</td></tr>
-      <tr><td align="left" bgcolor="#F3E8CE">+20 〜 +23</td>
+      <tr><td align="left" bgcolor="#D9E7F4"><font face="JetBrains Mono">+8 〜 +15</font></td>
+          <td align="left" bgcolor="#D9E7F4"><font face="JetBrains Mono">count int64</font>（8バイト）</td></tr>
+      <tr><td align="left" bgcolor="#D9E7F4"><font face="JetBrains Mono">+16 〜 +19</font></td>
+          <td align="left" bgcolor="#D9E7F4"><font face="JetBrains Mono">id int32</font>（4バイト）</td></tr>
+      <tr><td align="left" bgcolor="#F3E8CE"><font face="JetBrains Mono">+20 〜 +23</font></td>
           <td align="left" bgcolor="#F3E8CE">詰め物（全体の大きさを8の倍数にするため）</td></tr>
     </table>>];
 }

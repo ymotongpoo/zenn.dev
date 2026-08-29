@@ -1,19 +1,19 @@
 // CALLとRETによる戻りアドレスの受け渡し
 digraph call_ret_timeline {
   graph [
-    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=13,
+    fontname="IBM Plex Sans JP", fontsize=13,
     rankdir=TB, compound=true, splines=true,
     nodesep=0.5, ranksep=0.7, pad=0.25,
     bgcolor="white", newrank=true
   ];
   node [
-    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=12,
+    fontname="IBM Plex Sans JP", fontsize=12,
     shape=box, style="rounded,filled",
     fillcolor="#F1F5F9", color="#475569", penwidth=1.6,
     margin="0.2,0.14"
   ];
   edge [
-    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=11,
+    fontname="IBM Plex Sans JP", fontsize=11,
     color="#334155", penwidth=1.4, arrowsize=0.9,
     fontcolor="#1E293B"
   ];
@@ -28,7 +28,7 @@ digraph call_ret_timeline {
   s2 [shape=plain, style="", label=<
     <table border="0" cellborder="1" cellspacing="0" cellpadding="6" color="#38638F">
       <tr><td colspan="2" align="left" bgcolor="#EFF5FB"><b>2. doubleを実行中</b>（CALLがジャンプした先）</td></tr>
-      <tr><td align="left" bgcolor="#D9E7F4">スタック</td><td align="left" bgcolor="#F3E8CE">戻りアドレス <b>0x49e1b8</b>（CALLが積んだ）</td></tr>
+      <tr><td align="left" bgcolor="#D9E7F4">スタック</td><td align="left" bgcolor="#F3E8CE">戻りアドレス <font face="JetBrains Mono"><b>0x49e1b8</b></font>（CALLが積んだ）</td></tr>
     </table>>];
 
   s3 [shape=plain, style="", label=<

@@ -2,17 +2,17 @@
 digraph memory_and_cpu {
   graph [
     layout=neato, inputscale=72, splines=ortho,
-    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=13,
+    fontname="IBM Plex Sans JP", fontsize=13,
     bgcolor="white", pad=0.25
   ];
   node [
-    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=12,
+    fontname="IBM Plex Sans JP", fontsize=12,
     shape=box, style="rounded,filled",
     fillcolor="#F1F5F9", color="#475569", penwidth=1.6,
     margin="0.2,0.14"
   ];
   edge [
-    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=11,
+    fontname="IBM Plex Sans JP", fontsize=11,
     color="#334155", penwidth=1.4, arrowsize=0.9,
     fontcolor="#1E293B"
   ];
@@ -20,9 +20,9 @@ digraph memory_and_cpu {
   regs [pos="210,250!", shape=plain, style="", label=<
     <table border="0" cellborder="1" cellspacing="0" cellpadding="6" color="#38638F">
       <tr><td colspan="2" align="left" bgcolor="#EFF5FB"><b>CPUのレジスタ</b>（中の小さな入れ物）</td></tr>
-      <tr><td align="left" bgcolor="#D9E7F4">RAX、RBX、RCX …</td><td align="left" bgcolor="#D9E7F4">計算に使う汎用レジスタ</td></tr>
-      <tr><td align="left" bgcolor="#D9E7F4">SP</td><td port="sp" align="left" bgcolor="#D9E7F4">スタックの先端のアドレス</td></tr>
-      <tr><td align="left" bgcolor="#D9E7F4">PC</td><td port="pc" align="left" bgcolor="#D9E7F4">次に実行する命令のアドレス</td></tr>
+      <tr><td align="left" bgcolor="#D9E7F4"><font face="JetBrains Mono">RAX、RBX、RCX …</font></td><td align="left" bgcolor="#D9E7F4">計算に使う汎用レジスタ</td></tr>
+      <tr><td align="left" bgcolor="#D9E7F4"><font face="JetBrains Mono">SP</font></td><td port="sp" align="left" bgcolor="#D9E7F4">スタックの先端のアドレス</td></tr>
+      <tr><td align="left" bgcolor="#D9E7F4"><font face="JetBrains Mono">PC</font></td><td port="pc" align="left" bgcolor="#D9E7F4">次に実行する命令のアドレス</td></tr>
     </table>>];
 
   mem [pos="556,250!", shape=plain, style="", label=<

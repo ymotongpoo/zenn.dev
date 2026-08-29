@@ -1,18 +1,18 @@
 // ELFバイナリの中身と、それを読む側
 digraph elf_sections {
   graph [
-    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=13,
+    fontname="IBM Plex Sans JP", fontsize=13,
     splines=ortho,
     bgcolor="white", pad=0.25
   ];
   node [
-    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=12,
+    fontname="IBM Plex Sans JP", fontsize=12,
     shape=box, style="rounded,filled",
     fillcolor="#F1F5F9", color="#475569", penwidth=1.6,
     margin="0.2,0.14"
   ];
   edge [
-    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=11,
+    fontname="IBM Plex Sans JP", fontsize=11,
     color="#334155", penwidth=1.4, arrowsize=0.9,
     fontcolor="#1E293B"
   ];
@@ -22,18 +22,18 @@ digraph elf_sections {
       <tr><td align="left" bgcolor="#F4F6F8"><b>ELFのセクション</b></td>
           <td align="left" bgcolor="#F4F6F8"><b>中身</b></td>
           <td align="left" bgcolor="#F5F1F9"><b>デバッガ</b></td>
-          <td align="left" bgcolor="#F0F7F0"><b>OBI</b></td>
+          <td align="left" bgcolor="#F0F7F0"><font face="Poppins"><b>OBI</b></font></td>
           <td align="left" bgcolor="#EFF5FB"><b>Goランタイム</b></td></tr>
-      <tr><td align="left" bgcolor="#EDF1F5">.text</td>
+      <tr><td align="left" bgcolor="#EDF1F5"><font face="JetBrains Mono">.text</font></td>
           <td align="left" bgcolor="#FFFFFF">機械語</td>
           <td align="left" bgcolor="#FFFFFF"></td><td align="left" bgcolor="#FFFFFF"></td><td align="left" bgcolor="#FFFFFF"></td></tr>
-      <tr><td align="left" bgcolor="#EDF1F5">.symtab</td>
+      <tr><td align="left" bgcolor="#EDF1F5"><font face="JetBrains Mono">.symtab</font></td>
           <td align="left" bgcolor="#FFFFFF">シンボル名とアドレスの対応</td>
           <td align="left" bgcolor="#FFFFFF"></td><td align="left" bgcolor="#D6E8D6">読む</td><td align="left" bgcolor="#FFFFFF"></td></tr>
-      <tr><td align="left" bgcolor="#EDF1F5">.debug_*</td>
+      <tr><td align="left" bgcolor="#EDF1F5"><font face="JetBrains Mono">.debug_*</font></td>
           <td align="left" bgcolor="#FFFFFF">DWARF（型、フィールド、行番号）</td>
           <td align="left" bgcolor="#E9DFF2">読む</td><td align="left" bgcolor="#D6E8D6">読む</td><td align="left" bgcolor="#FFFFFF"></td></tr>
-      <tr><td align="left" bgcolor="#EDF1F5">.gopclntab</td>
+      <tr><td align="left" bgcolor="#EDF1F5"><font face="JetBrains Mono">.gopclntab</font></td>
           <td align="left" bgcolor="#FFFFFF">Go固有。アドレスと関数、行の対応</td>
           <td align="left" bgcolor="#FFFFFF"></td><td align="left" bgcolor="#D6E8D6">読む</td><td align="left" bgcolor="#D9E7F4">読む</td></tr>
       <tr><td align="left" bgcolor="#EDF1F5">ビルド情報</td>
