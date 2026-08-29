@@ -2,23 +2,23 @@
 digraph virtual_to_physical {
   graph [
     rankdir=LR, splines=ortho,
-    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=13,
+    fontname="IBM Plex Sans JP", fontsize=13,
     bgcolor="white", pad=0.25
   ];
   node [
-    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=12,
+    fontname="IBM Plex Sans JP", fontsize=12,
     shape=box, style="rounded,filled",
     fillcolor="#F1F5F9", color="#475569", penwidth=1.6,
     margin="0.2,0.14"
   ];
   edge [
-    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=11,
+    fontname="IBM Plex Sans JP", fontsize=11,
     color="#334155", penwidth=1.4, arrowsize=0.9,
     fontcolor="#1E293B"
   ];
 
-  va1 [label=<<b>プロセスAの仮想アドレス空間</b><br align="left"/>0x0000… から連続して見える<br align="left"/>>, fillcolor="#D9E7F4", color="#38638F"];
-  va2 [label=<<b>プロセスBの仮想アドレス空間</b><br align="left"/>0x0000… から連続して見える<br align="left"/>>, fillcolor="#D6E8D6", color="#3F6E3F"];
+  va1 [label=<<b>プロセスAの仮想アドレス空間</b><br align="left"/><font face="JetBrains Mono">0x0000…</font> から連続して見える<br align="left"/>>, fillcolor="#D9E7F4", color="#38638F"];
+  va2 [label=<<b>プロセスBの仮想アドレス空間</b><br align="left"/><font face="JetBrains Mono">0x0000…</font> から連続して見える<br align="left"/>>, fillcolor="#D6E8D6", color="#3F6E3F"];
 
   { rank=same; va1; va2; }
 

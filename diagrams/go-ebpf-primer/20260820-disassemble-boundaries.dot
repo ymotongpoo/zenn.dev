@@ -1,19 +1,19 @@
 // バイト列には命令の区切りが書かれていない
 digraph disassemble_boundaries {
   graph [
-    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=13,
+    fontname="IBM Plex Sans JP", fontsize=13,
     rankdir=TB, compound=true, splines=true,
     nodesep=0.5, ranksep=0.7, pad=0.25,
     bgcolor="white", newrank=true
   ];
   node [
-    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=12,
+    fontname="IBM Plex Sans JP", fontsize=12,
     shape=box, style="rounded,filled",
     fillcolor="#F1F5F9", color="#475569", penwidth=1.6,
     margin="0.2,0.14"
   ];
   edge [
-    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=11,
+    fontname="IBM Plex Sans JP", fontsize=11,
     color="#334155", penwidth=1.4, arrowsize=0.9,
     fontcolor="#1E293B"
   ];
@@ -21,14 +21,14 @@ digraph disassemble_boundaries {
   bytes [shape=plain, style="", label=<
     <table border="0" cellborder="1" cellspacing="0" cellpadding="7" color="#475569">
       <tr><td colspan="4" align="left" bgcolor="#F4F6F8"><b>バイナリの中のバイト列</b>（区切りの情報は無い）</td></tr>
-      <tr><td bgcolor="#FFFFFF">48</td><td bgcolor="#FFFFFF">01</td><td bgcolor="#FFFFFF">c0</td><td bgcolor="#FFFFFF">c3</td></tr>
+      <tr><td bgcolor="#FFFFFF"><font face="JetBrains Mono">48</font></td><td bgcolor="#FFFFFF"><font face="JetBrains Mono">01</font></td><td bgcolor="#FFFFFF"><font face="JetBrains Mono">c0</font></td><td bgcolor="#FFFFFF"><font face="JetBrains Mono">c3</font></td></tr>
     </table>>];
 
   insns [shape=plain, style="", label=<
     <table border="0" cellborder="1" cellspacing="0" cellpadding="7" color="#38638F">
       <tr><td colspan="4" align="left" bgcolor="#EFF5FB"><b>解釈してはじめて分かる命令の区切り</b></td></tr>
-      <tr><td colspan="3" align="center" bgcolor="#D9E7F4">ADDQ AX, AX（3バイト）</td>
-          <td align="center" bgcolor="#D6E8D6">RET（1バイト）</td></tr>
+      <tr><td colspan="3" align="center" bgcolor="#D9E7F4"><font face="JetBrains Mono">ADDQ AX, AX</font>（3バイト）</td>
+          <td align="center" bgcolor="#D6E8D6"><font face="JetBrains Mono">RET</font>（1バイト）</td></tr>
     </table>>];
 
   bytes -> insns [label=" 先頭から1命令ずつ解釈する\l （途中から読むと別の解釈になる）\l"];

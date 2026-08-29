@@ -212,7 +212,7 @@ v2 スライス: ["GO"]
 v2 マップ  : {"lang":"GO"}
 ```
 
-v1では、スライスの要素なら `MarshalJSON` が呼ばれて `"GO"` になり、マップの値なら呼ばれずに既定の構造体表現へ落ちます。同じ型の同じ値でも、置かれた場所によって結果が変わります。v2はどちらでも呼びます。
+v1では、スライスの要素なら `MarshalJSON` が呼ばれて `"GO"` になり、マップの値なら呼ばれずにデフォルトの構造体表現へ落ちます。同じ型の同じ値でも、置かれた場所によって結果が変わります。v2はどちらでも呼びます。
 
 この最後の項目には、注目すべき但し書きが付いています。
 
@@ -224,4 +224,4 @@ v1では、スライスの要素なら `MarshalJSON` が呼ばれて `"GO"` に�
 
 > These behavioral flaws of 'json' cannot be changed without being a breaking change. Options could be added to specify different behavior, but that would be unfortunate since the desired behavior is not the default behavior. Changing the default behavior suggests the need for a v2 'json' package.
 >
-> （jsonのこれらの挙動上の欠陥は、破壊的変更なしには変えられません。オプションを足して別の挙動を指定できるようにはできますが、望ましい挙動が既定でないという状態が残るので、それは不本意です。既定の挙動を変えるということは、v2のjsonパッケージが必要だということを示しています。）
+> （jsonのこれらの挙動上の欠陥は、破壊的変更なしには変えられません。オプションを足して別の挙動を指定できるようにはできますが、望ましい挙動がデフォルトでないという状態が残るので、それは不本意です。デフォルトの挙動を変えるということは、v2のjsonパッケージが必要だということを示しています。）

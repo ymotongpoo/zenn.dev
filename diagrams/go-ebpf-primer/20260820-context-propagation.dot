@@ -2,18 +2,18 @@
 digraph context_propagation {
   graph [
     rankdir=TB, splines=ortho, compound=true,
-    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=13,
+    fontname="IBM Plex Sans JP", fontsize=13,
     nodesep=0.7, ranksep=0.7,
     bgcolor="white", pad=0.25
   ];
   node [
-    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=12,
+    fontname="IBM Plex Sans JP", fontsize=12,
     shape=box, style="rounded,filled",
     fillcolor="#F1F5F9", color="#475569", penwidth=1.6,
     margin="0.2,0.14"
   ];
   edge [
-    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=11,
+    fontname="IBM Plex Sans JP", fontsize=11,
     color="#334155", penwidth=1.4, arrowsize=0.9,
     fontcolor="#1E293B"
   ];
@@ -25,17 +25,17 @@ digraph context_propagation {
 
     recv [label=<<b>受信 goroutine</b>　トレース開始>, fillcolor="#D9E7F4", color="#38638F"];
     proc [label=<<b>処理 goroutine</b>>, fillcolor="#D9E7F4", color="#38638F"];
-    send [label=<<b>送信 goroutine</b><br align="left"/>writeSubset で直列化<br align="left"/>>, fillcolor="#D9E7F4", color="#38638F"];
+    send [label=<<b>送信 goroutine</b><br align="left"/><font face="JetBrains Mono">writeSubset</font> で直列化<br align="left"/>>, fillcolor="#D9E7F4", color="#38638F"];
 
     recv -> proc [xlabel="newproc1 で親子を記録"];
     proc -> send [xlabel="遡れるのは6段まで"];
   }
 
-  p1 [label=<<b>経路1</b><br align="left"/>bufio.Writer のバッファに<br align="left"/>bpf_probe_write_user で追記<br align="left"/>>,
+  p1 [label=<<b>経路1</b><br align="left"/><font face="JetBrains Mono">bufio.Writer</font> のバッファに<br align="left"/><font face="JetBrains Mono">bpf_probe_write_user</font> で追記<br align="left"/>>,
       fillcolor="#E9DFF2", color="#75589C"];
-  p2 [label=<<b>経路2</b><br align="left"/>sk_msg で送出される<br align="left"/>バイト列を伸ばす<br align="left"/>>,
+  p2 [label=<<b>経路2</b><br align="left"/><font face="JetBrains Mono">sk_msg</font> で送出される<br align="left"/>バイト列を伸ばす<br align="left"/>>,
       fillcolor="#E9DFF2", color="#75589C"];
-  lock [label=<<b>kernel lockdown / Secure Boot</b>>, fillcolor="#F5DEDE", color="#A04848"];
+  lock [label=<<font face="Poppins"><b>kernel lockdown / Secure Boot</b></font>>, fillcolor="#F5DEDE", color="#A04848"];
   svcb [label=<<b>サービスB</b>　traceparent を受け取る>, fillcolor="#EDF1F5"];
 
   { rank=same; p1; p2; }

@@ -1,32 +1,32 @@
 // DWARFはソースとメモリを突き合わせる表
 digraph dwarf_field_mapping {
   graph [
-    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=13,
+    fontname="IBM Plex Sans JP", fontsize=13,
     rankdir=TB, compound=true, splines=true,
     nodesep=0.5, ranksep=0.7, pad=0.25,
     bgcolor="white", newrank=true
   ];
   node [
-    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=12,
+    fontname="IBM Plex Sans JP", fontsize=12,
     shape=box, style="rounded,filled",
     fillcolor="#F1F5F9", color="#475569", penwidth=1.6,
     margin="0.2,0.14"
   ];
   edge [
-    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=11,
+    fontname="IBM Plex Sans JP", fontsize=11,
     color="#334155", penwidth=1.4, arrowsize=0.9,
     fontcolor="#1E293B"
   ];
   rankdir=LR;
   ranksep=0.9;
 
-  src [label=<<b>ソースコードの世界</b><br align="left"/>type record struct {<br align="left"/>　flag bool<br align="left"/>　count int64<br align="left"/>}<br align="left"/>>, fillcolor="#D6E8D6", color="#3F6E3F"];
+  src [label=<<b>ソースコードの世界</b><br align="left"/><font face="JetBrains Mono">type record struct {<br align="left"/>　flag bool<br align="left"/>　count int64<br align="left"/>}</font><br align="left"/>>, fillcolor="#D6E8D6", color="#3F6E3F"];
 
   dwarf [shape=plain, style="", label=<
     <table border="0" cellborder="1" cellspacing="0" cellpadding="6" color="#75589C">
-      <tr><td colspan="2" align="left" bgcolor="#F5F1F9"><b>DWARF</b>（.debug_* セクション）</td></tr>
-      <tr><td align="left" bgcolor="#E9DFF2">record.flag</td><td align="left" bgcolor="#E9DFF2">先頭から +0</td></tr>
-      <tr><td align="left" bgcolor="#E9DFF2">record.count</td><td align="left" bgcolor="#E9DFF2">先頭から +8</td></tr>
+      <tr><td colspan="2" align="left" bgcolor="#F5F1F9"><font face="Poppins"><b>DWARF</b></font>（<font face="JetBrains Mono">.debug_*</font> セクション）</td></tr>
+      <tr><td align="left" bgcolor="#E9DFF2"><font face="JetBrains Mono">record.flag</font></td><td align="left" bgcolor="#E9DFF2">先頭から <font face="JetBrains Mono">+0</font></td></tr>
+      <tr><td align="left" bgcolor="#E9DFF2"><font face="JetBrains Mono">record.count</font></td><td align="left" bgcolor="#E9DFF2">先頭から <font face="JetBrains Mono">+8</font></td></tr>
     </table>>];
 
   mem [label=<<b>実行中のメモリの世界</b><br align="left"/>バイト列とアドレスだけ<br align="left"/>>, fillcolor="#D9E7F4", color="#38638F"];
