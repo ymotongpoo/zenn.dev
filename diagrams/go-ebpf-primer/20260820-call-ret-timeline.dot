@@ -28,7 +28,7 @@ digraph call_ret_timeline {
   s2 [shape=plain, style="", label=<
     <table border="0" cellborder="1" cellspacing="0" cellpadding="6" color="#AB5A13">
       <tr><td colspan="2" align="left" bgcolor="#FFF5ED"><b>2. doubleを実行中</b>（CALLがジャンプした先）</td></tr>
-      <tr><td align="left" bgcolor="#FFE9D6">スタック</td><td align="left" bgcolor="#FFFCD7">戻りアドレス <font face="JetBrains Mono"><b>0x49e1b8</b></font>（CALLが積んだ）</td></tr>
+      <tr><td align="left" bgcolor="#FFE9D6">スタック</td><td align="left" bgcolor="#FFFCD7">戻りアドレス <font face="JetBrains Mono"><b>0x49e1b8</b></font>（CALLが積んだ）<br align="left"/><font point-size="10">= <font face="JetBrains Mono">0x49e1b3 + 5</font>（CALL命令は5バイト長）</font></td></tr>
     </table>>];
 
   s3 [shape=plain, style="", label=<
