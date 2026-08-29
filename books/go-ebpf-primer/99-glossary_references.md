@@ -119,6 +119,8 @@ title: "付録：用語集と参考リンク"
 - golang/go#63185（runtime/trace flight recorder、Go 1.25）: <https://github.com/golang/go/issues/63185>
 - Go 1.17 Release Notes（レジスタベース呼び出し規約）: <https://go.dev/doc/go1.17>
 - Go internal ABI 仕様: <https://github.com/golang/go/blob/master/src/cmd/compile/abi-internal.md>
+- open-telemetry/opentelemetry-go-compile-instrumentation（Compile-Time Instrumentation SIG、`otelc`）: <https://github.com/open-telemetry/opentelemetry-go-compile-instrumentation>
+- Announcing v1 of OpenTelemetry Go Compile-Time Instrumentation: <https://opentelemetry.io/blog/2026/go-compile-time-instrumentation-v1/>
 
 ### eBPF
 

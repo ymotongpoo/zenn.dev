@@ -1,0 +1,55 @@
+// otelcはビルド時にどう割り込むか（通常ビルドとの対比）
+digraph otelc_toolexec {
+  graph [
+    rankdir=TB, compound=true, splines=ortho,
+    fontname="IBM Plex Sans JP", fontsize=13,
+    nodesep=0.5, ranksep=0.6,
+    bgcolor="white", pad=0.25, newrank=true
+  ];
+  node [
+    fontname="IBM Plex Sans JP", fontsize=12,
+    shape=box, style="rounded,filled",
+    fillcolor="#F1F5F9", color="#475569", penwidth=1.6,
+    margin="0.2,0.14"
+  ];
+  edge [
+    fontname="IBM Plex Sans JP", fontsize=11,
+    color="#334155", penwidth=1.4, arrowsize=0.9,
+    fontcolor="#1E293B"
+  ];
+
+  src [label=<<b>ソースコード</b>（変更なし）>, fillcolor="#EDF1F5"];
+
+  subgraph cluster_l {
+    label=<<b>ふつうのビルド</b>>;
+    fontcolor="#334155";
+    style="rounded"; labeljust="l"; penwidth=1.6; margin=14;
+    color="#475569"; bgcolor="#F4F6F8";
+
+    buildL [label=<<font face="JetBrains Mono">go build</font>>, fillcolor="#EDF1F5"];
+    binL [label=<<b>バイナリ</b><br align="left"/>計装コードは無い<br align="left"/>>, fillcolor="#EDF1F5"];
+
+    buildL -> binL;
+  }
+
+  subgraph cluster_r {
+    label=<<b>otelc経由のビルド</b>>;
+    fontcolor="#2E4D6E";
+    style="rounded"; labeljust="l"; penwidth=1.6; margin=14;
+    color="#38638F"; bgcolor="#EFF5FB";
+
+    buildR [label=<<font face="JetBrains Mono">otelc go build</font>>, fillcolor="#D9E7F4", color="#38638F"];
+    wrap [label=<<b>内部で go build に差し替え</b><br align="left"/><font face="JetBrains Mono">-toolexec=&lt;otelc&gt; toolexec</font> を追加<br align="left"/>>,
+            fillcolor="#F3E8CE", color="#96742E"];
+    inject [label=<<b>コンパイル直前に割り込む</b><br align="left"/><font face="JetBrains Mono">net/http</font>・<font face="JetBrains Mono">gRPC</font>・<font face="JetBrains Mono">database/sql</font> などの<br align="left"/>呼び出しに計装コードを注入<br align="left"/>>,
+            fillcolor="#F3E8CE", color="#96742E"];
+    binR [label=<<b>計装済みバイナリ</b><br align="left"/>ソースは1行も変えていない<br align="left"/>>, fillcolor="#D6E8D6", color="#3F6E3F"];
+
+    buildR -> wrap -> inject -> binR;
+  }
+
+  src -> buildL;
+  src -> buildR;
+
+  { rank=same; buildL; buildR; }
+}
