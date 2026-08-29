@@ -9,39 +9,39 @@ digraph ebpf_overview {
   node [
     fontname="IBM Plex Sans JP", fontsize=12,
     shape=box, style="rounded,filled",
-    fillcolor="#F1F5F9", color="#475569", penwidth=1.6,
+    fillcolor="#F1F1F1", color="#4A4A4A", penwidth=1.6,
     margin="0.2,0.14"
   ];
   edge [
     fontname="IBM Plex Sans JP", fontsize=11,
-    color="#334155", penwidth=1.4, arrowsize=0.9,
-    fontcolor="#1E293B"
+    color="#343434", penwidth=1.4, arrowsize=0.9,
+    fontcolor="#171717"
   ];
 
   subgraph cluster_user {
     label=<<b>ユーザー空間</b>>;
     style="rounded"; labeljust="l"; penwidth=1.6; margin=14;
-    color="#475569"; fontcolor="#334155"; bgcolor="#F4F6F8";
+    color="#4A4A4A"; fontcolor="#343434"; bgcolor="#F3F3F3";
 
     loader [label=<<b>ローダー</b><br align="left"/>Goで書かれる（<font face="JetBrains Mono">cilium/ebpf</font>）<br align="left"/>>,
-            fillcolor="#D9E7F4", color="#38638F"];
+            fillcolor="#D8E5FF", color="#1D4EB2"];
     target [label=<<b>計装対象のGoバイナリ</b><br align="left"/>無改変のまま動く<br align="left"/>>,
-            fillcolor="#EDF1F5"];
+            fillcolor="#E4E4E4"];
 
-    loader -> target [dir=none, style=dashed, color="#7C8DA3", xlabel="uprobeを命令アドレスに置く"];
+    loader -> target [dir=none, style=dashed, color="#8A8A8A", xlabel="uprobeを命令アドレスに置く"];
   }
 
   subgraph cluster_kernel {
     label=<<b>カーネル空間</b>>;
     style="rounded"; labeljust="l"; penwidth=1.6; margin=14;
-    color="#75589C"; fontcolor="#5B4370"; bgcolor="#F5F1F9";
+    color="#5846B2"; fontcolor="#3E3280"; bgcolor="#F5F3FF";
 
     verifier [label=<<b>検証器</b><br align="left"/>停止性とメモリ安全を静的に検査<br align="left"/>>,
-              fillcolor="#E9DFF2", color="#75589C"];
+              fillcolor="#E8E3FF", color="#5846B2"];
     prog [label=<<b>eBPFプログラム</b><br align="left"/>イベントごとに実行されて終わる<br align="left"/>>,
-          fillcolor="#D9E7F4", color="#38638F"];
+          fillcolor="#D8E5FF", color="#1D4EB2"];
     map [label=<<b>マップ</b><br align="left"/>イベントをまたぐ状態を持つ<br align="left"/>>,
-        fillcolor="#F3E8CE", color="#96742E"];
+        fillcolor="#FFF0D8", color="#996719"];
 
     verifier -> prog;
     prog -> map [dir=both, xlabel="読み書き"];
@@ -53,5 +53,5 @@ digraph ebpf_overview {
   // labeldistance/labelangle で各矢印の到達点のそばに固定する（残りの説明は
   // 本文とキャプションにある）。
   target -> prog [penwidth=1.8, headlabel="発火", labeldistance=4.0, labelangle=-25];
-  map -> loader [style=dashed, color="#7C8DA3", headlabel="読み出す", labeldistance=4.0, labelangle=-45];
+  map -> loader [style=dashed, color="#8A8A8A", headlabel="読み出す", labeldistance=4.0, labelangle=-45];
 }

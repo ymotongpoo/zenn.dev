@@ -9,26 +9,26 @@ digraph source_to_execution {
   node [
     fontname="IBM Plex Sans JP", fontsize=12,
     shape=box, style="rounded,filled",
-    fillcolor="#F1F5F9", color="#475569", penwidth=1.6,
+    fillcolor="#F1F1F1", color="#4A4A4A", penwidth=1.6,
     margin="0.2,0.14"
   ];
   edge [
     fontname="IBM Plex Sans JP", fontsize=11,
-    color="#334155", penwidth=1.4, arrowsize=0.9,
-    fontcolor="#1E293B"
+    color="#343434", penwidth=1.4, arrowsize=0.9,
+    fontcolor="#171717"
   ];
 
-  src [label=<<b>Goのソースコード</b>>, fillcolor="#D6E8D6", color="#3F6E3F"];
+  src [label=<<b>Goのソースコード</b>>, fillcolor="#D2F3DF", color="#038435"];
   mc [label=<<b>機械語</b><br align="left"/>4章「ソースコードが実行ファイルになるまで」<br align="left"/>>,
-      fillcolor="#F3E8CE", color="#96742E"];
+      fillcolor="#FFF0D8", color="#996719"];
   elf [label=<<b>ELF形式の実行ファイル</b><br align="left"/>4章「ソースコードが実行ファイルになるまで」<br align="left"/>>,
-       fillcolor="#F3E8CE", color="#96742E"];
+       fillcolor="#FFF0D8", color="#996719"];
   proc [label=<<b>プロセスとしてメモリに置かれる</b><br align="left"/>3章「OSとカーネル」<br align="left"/>>,
-        fillcolor="#D9E7F4", color="#38638F"];
+        fillcolor="#D8E5FF", color="#1D4EB2"];
   cpu [label=<<b>CPUがPCの指す命令を実行する</b><br align="left"/>2章「コンピュータはプログラムをどう実行するか」<br align="left"/>>,
-       fillcolor="#D9E7F4", color="#38638F"];
+       fillcolor="#D8E5FF", color="#1D4EB2"];
   call [label=<<b>関数呼び出しでレジスタとスタックを使う</b><br align="left"/>5章「関数呼び出しの仕組み」<br align="left"/>>,
-        fillcolor="#D9E7F4", color="#38638F"];
+        fillcolor="#D8E5FF", color="#1D4EB2"];
 
   src -> mc [label=" コンパイラが変換する"];
   mc -> elf [label=" リンカが1つのファイルにまとめる"];

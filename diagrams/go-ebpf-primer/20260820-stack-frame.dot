@@ -9,30 +9,30 @@ digraph stack_frame {
   node [
     fontname="IBM Plex Sans JP", fontsize=12,
     shape=box, style="rounded,filled",
-    fillcolor="#F1F5F9", color="#475569", penwidth=1.6,
+    fillcolor="#F1F1F1", color="#4A4A4A", penwidth=1.6,
     margin="0.2,0.14"
   ];
   edge [
     fontname="IBM Plex Sans JP", fontsize=11,
-    color="#334155", penwidth=1.4, arrowsize=0.9,
-    fontcolor="#1E293B"
+    color="#343434", penwidth=1.4, arrowsize=0.9,
+    fontcolor="#171717"
   ];
   stack [shape=plain, style="", label=<
-    <table border="0" cellborder="1" cellspacing="0" cellpadding="7" color="#475569">
-      <tr><td colspan="3" align="left" bgcolor="#F4F6F8"><b>goroutine のスタック</b>（呼び出しが深くなるほど低いアドレスへ積まれる）</td></tr>
+    <table border="0" cellborder="1" cellspacing="0" cellpadding="7" color="#4A4A4A">
+      <tr><td colspan="3" align="left" bgcolor="#F3F3F3"><b>goroutine のスタック</b>（呼び出しが深くなるほど低いアドレスへ積まれる）</td></tr>
       <tr><td colspan="3" align="left" bgcolor="#FFFFFF"><i>高いアドレス</i></td></tr>
-      <tr><td align="left" bgcolor="#EDF1F5"><font face="JetBrains Mono"><b>main</b></font> のフレーム</td>
-          <td align="left" bgcolor="#EDF1F5"><font face="JetBrains Mono">descend(0)</font> を呼ぶ</td>
-          <td align="left" bgcolor="#EDF1F5"></td></tr>
-      <tr><td align="left" bgcolor="#D9E7F4"><font face="JetBrains Mono"><b>descend(0)</b></font> のフレーム</td>
-          <td align="left" bgcolor="#D9E7F4">local は <font face="JetBrains Mono">0x…eeb8</font></td>
-          <td rowspan="4" align="left" bgcolor="#F3E8CE">1フレーム<br/>= 176バイト</td></tr>
-      <tr><td align="left" bgcolor="#D9E7F4"><font face="JetBrains Mono"><b>descend(1)</b></font> のフレーム</td>
-          <td align="left" bgcolor="#D9E7F4">local は <font face="JetBrains Mono">0x…ee08</font></td></tr>
-      <tr><td align="left" bgcolor="#D9E7F4"><font face="JetBrains Mono"><b>descend(2)</b></font> のフレーム</td>
-          <td align="left" bgcolor="#D9E7F4">local は <font face="JetBrains Mono">0x…ed58</font></td></tr>
-      <tr><td align="left" bgcolor="#D9E7F4"><font face="JetBrains Mono"><b>descend(3)</b></font> のフレーム</td>
-          <td align="left" bgcolor="#D9E7F4">local は <font face="JetBrains Mono">0x…eca8</font></td></tr>
+      <tr><td align="left" bgcolor="#E4E4E4"><font face="JetBrains Mono"><b>main</b></font> のフレーム</td>
+          <td align="left" bgcolor="#E4E4E4"><font face="JetBrains Mono">descend(0)</font> を呼ぶ</td>
+          <td align="left" bgcolor="#E4E4E4"></td></tr>
+      <tr><td align="left" bgcolor="#D8E5FF"><font face="JetBrains Mono"><b>descend(0)</b></font> のフレーム</td>
+          <td align="left" bgcolor="#D8E5FF">local は <font face="JetBrains Mono">0x…eeb8</font></td>
+          <td rowspan="4" align="left" bgcolor="#FFF0D8">1フレーム<br/>= 176バイト</td></tr>
+      <tr><td align="left" bgcolor="#D8E5FF"><font face="JetBrains Mono"><b>descend(1)</b></font> のフレーム</td>
+          <td align="left" bgcolor="#D8E5FF">local は <font face="JetBrains Mono">0x…ee08</font></td></tr>
+      <tr><td align="left" bgcolor="#D8E5FF"><font face="JetBrains Mono"><b>descend(2)</b></font> のフレーム</td>
+          <td align="left" bgcolor="#D8E5FF">local は <font face="JetBrains Mono">0x…ed58</font></td></tr>
+      <tr><td align="left" bgcolor="#D8E5FF"><font face="JetBrains Mono"><b>descend(3)</b></font> のフレーム</td>
+          <td align="left" bgcolor="#D8E5FF">local は <font face="JetBrains Mono">0x…eca8</font></td></tr>
       <tr><td colspan="3" align="left" bgcolor="#FFFFFF">まだ使われていない領域</td></tr>
       <tr><td colspan="3" align="left" bgcolor="#FFFFFF"><i>低いアドレス</i></td></tr>
     </table>>];

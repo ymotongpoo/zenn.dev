@@ -9,31 +9,31 @@ digraph obi_pipeline {
   node [
     fontname="IBM Plex Sans JP", fontsize=12,
     shape=box, style="rounded,filled",
-    fillcolor="#F1F5F9", color="#475569", penwidth=1.6,
+    fillcolor="#F1F1F1", color="#4A4A4A", penwidth=1.6,
     margin="0.2,0.14"
   ];
   edge [
     fontname="IBM Plex Sans JP", fontsize=11,
-    color="#334155", penwidth=1.4, arrowsize=0.9,
-    fontcolor="#1E293B"
+    color="#343434", penwidth=1.4, arrowsize=0.9,
+    fontcolor="#171717"
   ];
 
-  discover [label=<<b>1. 発見</b><br align="left"/><font face="JetBrains Mono">/proc</font> を走査し、設定の条件に合うプロセスを選ぶ<br align="left"/>>, fillcolor="#D9E7F4", color="#38638F"];
-  analyze [label=<<b>2. ELF解析</b><br align="left"/>シンボル、<font face="JetBrains Mono">.gopclntab</font>、DWARF、オフセット表から<br align="left"/>関数アドレスとフィールド位置を割り出す<br align="left"/>>, fillcolor="#D9E7F4", color="#38638F"];
-  attach [label=<<b>3. ロードとアタッチ</b><br align="left"/>eBPFプログラムを検証器に通し、uprobeを結び付ける<br align="left"/>>, fillcolor="#D9E7F4", color="#38638F"];
-  collect [label=<<b>4. イベント収集</b><br align="left"/>フック発火→リングバッファ→スパンの組み立て<br align="left"/>>, fillcolor="#D9E7F4", color="#38638F"];
-  export [label=<<b>5. エクスポート</b><br align="left"/>メタデータを付けてOTLP / Prometheusで送る<br align="left"/>>, fillcolor="#D6E8D6", color="#3F6E3F"];
+  discover [label=<<b>1. 発見</b><br align="left"/><font face="JetBrains Mono">/proc</font> を走査し、設定の条件に合うプロセスを選ぶ<br align="left"/>>, fillcolor="#D8E5FF", color="#1D4EB2"];
+  analyze [label=<<b>2. ELF解析</b><br align="left"/>シンボル、<font face="JetBrains Mono">.gopclntab</font>、DWARF、オフセット表から<br align="left"/>関数アドレスとフィールド位置を割り出す<br align="left"/>>, fillcolor="#D8E5FF", color="#1D4EB2"];
+  attach [label=<<b>3. ロードとアタッチ</b><br align="left"/>eBPFプログラムを検証器に通し、uprobeを結び付ける<br align="left"/>>, fillcolor="#D8E5FF", color="#1D4EB2"];
+  collect [label=<<b>4. イベント収集</b><br align="left"/>フック発火→リングバッファ→スパンの組み立て<br align="left"/>>, fillcolor="#D8E5FF", color="#1D4EB2"];
+  export [label=<<b>5. エクスポート</b><br align="left"/>メタデータを付けてOTLP / Prometheusで送る<br align="left"/>>, fillcolor="#D2F3DF", color="#038435"];
 
-  hA [label=<<b>難所1と難所3</b><br align="left"/>どこにフックを置き、<br align="left"/>どこを読むか<br align="left"/>>, fillcolor="#F5DEDE", color="#A04848"];
-  hB [label=<<b>難所2と難所4</b><br align="left"/>発火の瞬間に何を<br align="left"/>どう読み書きするか<br align="left"/>>, fillcolor="#F5DEDE", color="#A04848"];
+  hA [label=<<b>難所1と難所3</b><br align="left"/>どこにフックを置き、<br align="left"/>どこを読むか<br align="left"/>>, fillcolor="#FDE1EC", color="#AA3E6A"];
+  hB [label=<<b>難所2と難所4</b><br align="left"/>発火の瞬間に何を<br align="left"/>どう読み書きするか<br align="left"/>>, fillcolor="#FDE1EC", color="#AA3E6A"];
 
   discover -> analyze;
   analyze -> attach;
   attach -> collect;
   collect -> export;
-  hA -> analyze [style=dashed, color="#A04848"];
-  hA -> attach [style=dashed, color="#A04848"];
-  hB -> collect [style=dashed, color="#A04848"];
+  hA -> analyze [style=dashed, color="#AA3E6A"];
+  hA -> attach [style=dashed, color="#AA3E6A"];
+  hB -> collect [style=dashed, color="#AA3E6A"];
 
   { rank=same; analyze; hA; }
   { rank=same; collect; hB; }

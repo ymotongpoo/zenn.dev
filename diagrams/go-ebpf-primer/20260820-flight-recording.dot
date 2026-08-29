@@ -9,34 +9,34 @@ digraph flight_recording {
   node [
     fontname="IBM Plex Sans JP", fontsize=12,
     shape=box, style="rounded,filled",
-    fillcolor="#F1F5F9", color="#475569", penwidth=1.6,
+    fillcolor="#F1F1F1", color="#4A4A4A", penwidth=1.6,
     margin="0.2,0.14"
   ];
   edge [
     fontname="IBM Plex Sans JP", fontsize=11,
-    color="#334155", penwidth=1.4, arrowsize=0.9,
-    fontcolor="#1E293B"
+    color="#343434", penwidth=1.4, arrowsize=0.9,
+    fontcolor="#171717"
   ];
 
   runtime [label=<<b>Goランタイム</b><br align="left"/>実行トレースを出し続ける<br align="left"/>（goroutineの切替、GC、syscall …）<br align="left"/>>,
-           fillcolor="#D9E7F4", color="#38638F"];
+           fillcolor="#D8E5FF", color="#1D4EB2"];
 
   ring [shape=plain, style="", label=<
-    <table border="0" cellborder="1" cellspacing="0" cellpadding="6" color="#38638F">
-      <tr><td colspan="4" align="left" bgcolor="#EFF5FB"><b>リングバッファ（直近ぶんだけを保持）</b></td></tr>
+    <table border="0" cellborder="1" cellspacing="0" cellpadding="6" color="#1D4EB2">
+      <tr><td colspan="4" align="left" bgcolor="#EEF4FF"><b>リングバッファ（直近ぶんだけを保持）</b></td></tr>
       <tr>
-        <td bgcolor="#EDF1F5"><font color="#7C8DA3">古い記録は上書き</font></td>
-        <td bgcolor="#D9E7F4">…</td>
-        <td bgcolor="#D9E7F4">直近の記録</td>
-        <td bgcolor="#F3E8CE"><b>いま</b></td>
+        <td bgcolor="#E4E4E4"><font color="#8A8A8A">古い記録は上書き</font></td>
+        <td bgcolor="#D8E5FF">…</td>
+        <td bgcolor="#D8E5FF">直近の記録</td>
+        <td bgcolor="#FFF0D8"><b>いま</b></td>
       </tr>
     </table>>];
 
   trigger [label=<<b>問題が起きた瞬間</b><br align="left"/>エラー検知、レイテンシ急増 など<br align="left"/>>,
-           fillcolor="#F5DEDE", color="#A04848"];
+           fillcolor="#FDE1EC", color="#AA3E6A"];
 
   snap [label=<<font face="JetBrains Mono"><b>FlightRecorder.WriteTo</b></font><br align="left"/>「直前」の記録だけを書き出す<br align="left"/>>,
-        fillcolor="#D6E8D6", color="#3F6E3F"];
+        fillcolor="#D2F3DF", color="#038435"];
 
   runtime -> ring [xlabel=" 常に記録し続ける"];
   ring -> snap [xlabel=" その瞬間の中身"];

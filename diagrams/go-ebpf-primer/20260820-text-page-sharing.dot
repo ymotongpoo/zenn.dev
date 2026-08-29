@@ -8,29 +8,29 @@ digraph text_page_sharing {
   node [
     fontname="IBM Plex Sans JP", fontsize=12,
     shape=box, style="rounded,filled",
-    fillcolor="#F1F5F9", color="#475569", penwidth=1.6,
+    fillcolor="#F1F1F1", color="#4A4A4A", penwidth=1.6,
     margin="0.2,0.14"
   ];
   edge [
     fontname="IBM Plex Sans JP", fontsize=11,
-    color="#334155", penwidth=1.4, arrowsize=0.9,
-    fontcolor="#1E293B"
+    color="#343434", penwidth=1.4, arrowsize=0.9,
+    fontcolor="#171717"
   ];
 
-  pa [label=<<b>プロセスAの対応表</b><br align="left"/><font face="JetBrains Mono">.text</font> の範囲 → 読み取り専用の印<br align="left"/>>, fillcolor="#D9E7F4", color="#38638F"];
-  pb [label=<<b>プロセスBの対応表</b><br align="left"/><font face="JetBrains Mono">.text</font> の範囲 → 読み取り専用の印<br align="left"/>>, fillcolor="#D6E8D6", color="#3F6E3F"];
+  pa [label=<<b>プロセスAの対応表</b><br align="left"/><font face="JetBrains Mono">.text</font> の範囲 → 読み取り専用の印<br align="left"/>>, fillcolor="#D8E5FF", color="#1D4EB2"];
+  pb [label=<<b>プロセスBの対応表</b><br align="left"/><font face="JetBrains Mono">.text</font> の範囲 → 読み取り専用の印<br align="left"/>>, fillcolor="#D2F3DF", color="#038435"];
 
   phys [shape=plain, style="", label=<
-    <table border="0" cellborder="1" cellspacing="0" cellpadding="7" color="#475569">
-      <tr><td align="left" bgcolor="#F4F6F8"><b>物理メモリ</b></td></tr>
-      <tr><td port="pg" align="left" bgcolor="#D9E7F4"><font face="JetBrains Mono">.text</font> のページ（4KBごと）<br align="left"/>読み取りと実行のみ可<br align="left"/></td></tr>
+    <table border="0" cellborder="1" cellspacing="0" cellpadding="7" color="#4A4A4A">
+      <tr><td align="left" bgcolor="#F3F3F3"><b>物理メモリ</b></td></tr>
+      <tr><td port="pg" align="left" bgcolor="#D8E5FF"><font face="JetBrains Mono">.text</font> のページ（4KBごと）<br align="left"/>読み取りと実行のみ可<br align="left"/></td></tr>
     </table>>];
 
-  file [label=<<b>実行ファイルの <font face="JetBrains Mono">.text</font></b><br align="left"/>ディスク上。変わらない<br align="left"/>>, fillcolor="#F3E8CE", color="#96742E"];
+  file [label=<<b>実行ファイルの <font face="JetBrains Mono">.text</font></b><br align="left"/>ディスク上。変わらない<br align="left"/>>, fillcolor="#FFF0D8", color="#996719"];
 
   pa -> phys:pg:w;
   pb -> phys:w;
-  file -> phys [style=dashed, color="#7C8DA3"];
+  file -> phys [style=dashed, color="#8A8A8A"];
 
   { rank=same; pa; pb; file; }
 }

@@ -8,28 +8,28 @@ digraph verifier {
   node [
     fontname="IBM Plex Sans JP", fontsize=12,
     shape=box, style="rounded,filled",
-    fillcolor="#F1F5F9", color="#475569", penwidth=1.6,
+    fillcolor="#F1F1F1", color="#4A4A4A", penwidth=1.6,
     margin="0.2,0.14"
   ];
   edge [
     fontname="IBM Plex Sans JP", fontsize=11,
-    color="#334155", penwidth=1.4, arrowsize=0.9,
-    fontcolor="#1E293B"
+    color="#343434", penwidth=1.4, arrowsize=0.9,
+    fontcolor="#171717"
   ];
 
-  prog [label=<<b>eBPFプログラム</b>（バイトコード）>, fillcolor="#D9E7F4", color="#38638F"];
+  prog [label=<<b>eBPFプログラム</b>（バイトコード）>, fillcolor="#D8E5FF", color="#1D4EB2"];
 
   checks [shape=plain, style="", label=<
-    <table border="0" cellborder="1" cellspacing="0" cellpadding="6" color="#75589C">
-      <tr><td align="left" bgcolor="#F5F1F9"><b>検証器が調べること</b></td></tr>
-      <tr><td align="left" bgcolor="#E9DFF2">必ず停止するか（ループの回数に上界があるか）</td></tr>
-      <tr><td align="left" bgcolor="#E9DFF2">命令数が上限内か</td></tr>
-      <tr><td align="left" bgcolor="#E9DFF2">未初期化のメモリやポインタを読まないか</td></tr>
-      <tr><td align="left" bgcolor="#E9DFF2">許可された範囲の外に触らないか</td></tr>
+    <table border="0" cellborder="1" cellspacing="0" cellpadding="6" color="#5846B2">
+      <tr><td align="left" bgcolor="#F5F3FF"><b>検証器が調べること</b></td></tr>
+      <tr><td align="left" bgcolor="#E8E3FF">必ず停止するか（ループの回数に上界があるか）</td></tr>
+      <tr><td align="left" bgcolor="#E8E3FF">命令数が上限内か</td></tr>
+      <tr><td align="left" bgcolor="#E8E3FF">未初期化のメモリやポインタを読まないか</td></tr>
+      <tr><td align="left" bgcolor="#E8E3FF">許可された範囲の外に触らないか</td></tr>
     </table>>];
 
-  ok [label=<<b>カーネルに常駐する</b>>, fillcolor="#D6E8D6", color="#3F6E3F"];
-  ng [label=<<b>ロードが失敗する</b><br align="left"/>走らせる前に断られる<br align="left"/>>, fillcolor="#F5DEDE", color="#A04848"];
+  ok [label=<<b>カーネルに常駐する</b>>, fillcolor="#D2F3DF", color="#038435"];
+  ng [label=<<b>ロードが失敗する</b><br align="left"/>走らせる前に断られる<br align="left"/>>, fillcolor="#FDE1EC", color="#AA3E6A"];
 
   prog -> checks [penwidth=1.8, xlabel=" ロードを試みる"];
   checks -> ok [xlabel=" すべて通った"];

@@ -9,32 +9,32 @@ digraph convention_stack_vs_register {
   node [
     fontname="IBM Plex Sans JP", fontsize=12,
     shape=box, style="rounded,filled",
-    fillcolor="#F1F5F9", color="#475569", penwidth=1.6,
+    fillcolor="#F1F1F1", color="#4A4A4A", penwidth=1.6,
     margin="0.2,0.14"
   ];
   edge [
     fontname="IBM Plex Sans JP", fontsize=11,
-    color="#334155", penwidth=1.4, arrowsize=0.9,
-    fontcolor="#1E293B"
+    color="#343434", penwidth=1.4, arrowsize=0.9,
+    fontcolor="#171717"
   ];
   rankdir=LR;
   nodesep=0.8;
 
   stackway [shape=plain, style="", label=<
-    <table border="0" cellborder="1" cellspacing="0" cellpadding="7" color="#475569">
-      <tr><td colspan="2" align="left" bgcolor="#F4F6F8"><b>スタック渡し</b>　<font face="JetBrains Mono">f(a, b, c)</font></td></tr>
-      <tr><td align="left" bgcolor="#D9E7F4"><font face="JetBrains Mono">SP+0</font></td><td align="left" bgcolor="#D9E7F4"><font face="JetBrains Mono">a</font></td></tr>
-      <tr><td align="left" bgcolor="#D9E7F4"><font face="JetBrains Mono">SP+8</font></td><td align="left" bgcolor="#D9E7F4"><font face="JetBrains Mono">b</font></td></tr>
-      <tr><td align="left" bgcolor="#D9E7F4"><font face="JetBrains Mono">SP+16</font></td><td align="left" bgcolor="#D9E7F4"><font face="JetBrains Mono">c</font></td></tr>
+    <table border="0" cellborder="1" cellspacing="0" cellpadding="7" color="#4A4A4A">
+      <tr><td colspan="2" align="left" bgcolor="#F3F3F3"><b>スタック渡し</b>　<font face="JetBrains Mono">f(a, b, c)</font></td></tr>
+      <tr><td align="left" bgcolor="#D8E5FF"><font face="JetBrains Mono">SP+0</font></td><td align="left" bgcolor="#D8E5FF"><font face="JetBrains Mono">a</font></td></tr>
+      <tr><td align="left" bgcolor="#D8E5FF"><font face="JetBrains Mono">SP+8</font></td><td align="left" bgcolor="#D8E5FF"><font face="JetBrains Mono">b</font></td></tr>
+      <tr><td align="left" bgcolor="#D8E5FF"><font face="JetBrains Mono">SP+16</font></td><td align="left" bgcolor="#D8E5FF"><font face="JetBrains Mono">c</font></td></tr>
       <tr><td colspan="2" align="left" bgcolor="#FFFFFF">フレームの決まった位置を見れば読める</td></tr>
     </table>>];
 
   regway [shape=plain, style="", label=<
-    <table border="0" cellborder="1" cellspacing="0" cellpadding="7" color="#3F6E3F">
-      <tr><td colspan="2" align="left" bgcolor="#F0F7F0"><b>レジスタ渡し</b>　<font face="JetBrains Mono">f(a, b, c)</font></td></tr>
-      <tr><td align="left" bgcolor="#D6E8D6"><font face="JetBrains Mono">AX</font></td><td align="left" bgcolor="#D6E8D6"><font face="JetBrains Mono">a</font></td></tr>
-      <tr><td align="left" bgcolor="#D6E8D6"><font face="JetBrains Mono">BX</font></td><td align="left" bgcolor="#D6E8D6"><font face="JetBrains Mono">b</font></td></tr>
-      <tr><td align="left" bgcolor="#D6E8D6"><font face="JetBrains Mono">CX</font></td><td align="left" bgcolor="#D6E8D6"><font face="JetBrains Mono">c</font></td></tr>
+    <table border="0" cellborder="1" cellspacing="0" cellpadding="7" color="#038435">
+      <tr><td colspan="2" align="left" bgcolor="#EBFAF1"><b>レジスタ渡し</b>　<font face="JetBrains Mono">f(a, b, c)</font></td></tr>
+      <tr><td align="left" bgcolor="#D2F3DF"><font face="JetBrains Mono">AX</font></td><td align="left" bgcolor="#D2F3DF"><font face="JetBrains Mono">a</font></td></tr>
+      <tr><td align="left" bgcolor="#D2F3DF"><font face="JetBrains Mono">BX</font></td><td align="left" bgcolor="#D2F3DF"><font face="JetBrains Mono">b</font></td></tr>
+      <tr><td align="left" bgcolor="#D2F3DF"><font face="JetBrains Mono">CX</font></td><td align="left" bgcolor="#D2F3DF"><font face="JetBrains Mono">c</font></td></tr>
       <tr><td colspan="2" align="left" bgcolor="#FFFFFF">速いが、対応表を知らないと読めない</td></tr>
     </table>>];
 

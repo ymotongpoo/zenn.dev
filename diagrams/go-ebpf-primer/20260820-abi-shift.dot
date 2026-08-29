@@ -9,47 +9,47 @@ digraph abi_shift {
   node [
     fontname="IBM Plex Sans JP", fontsize=12,
     shape=box, style="rounded,filled",
-    fillcolor="#F1F5F9", color="#475569", penwidth=1.6,
+    fillcolor="#F1F1F1", color="#4A4A4A", penwidth=1.6,
     margin="0.2,0.14"
   ];
   edge [
     fontname="IBM Plex Sans JP", fontsize=11,
-    color="#334155", penwidth=1.4, arrowsize=0.9,
-    fontcolor="#1E293B"
+    color="#343434", penwidth=1.4, arrowsize=0.9,
+    fontcolor="#171717"
   ];
 
   subgraph cluster_old {
     label=<<b>Go 1.16 以前（スタック渡し）</b>>;
     style="rounded"; labeljust="l"; penwidth=1.6; margin=14;
-    color="#475569"; fontcolor="#334155"; bgcolor="#F4F6F8";
+    color="#4A4A4A"; fontcolor="#343434"; bgcolor="#F3F3F3";
 
     stack [shape=plain, style="", label=<
-      <table border="0" cellborder="1" cellspacing="0" cellpadding="6" color="#475569">
-        <tr><td colspan="2" align="left" bgcolor="#F4F6F8"><b>スタック</b>（<font face="JetBrains Mono">Add3(1, 2, 3)</font> の呼び出し時）</td></tr>
-        <tr><td align="left" bgcolor="#EDF1F5"><font face="JetBrains Mono">SP+0</font></td><td align="left" bgcolor="#EDF1F5">引数 a ＝ 1</td></tr>
-        <tr><td align="left" bgcolor="#EDF1F5"><font face="JetBrains Mono">SP+8</font></td><td align="left" bgcolor="#EDF1F5">引数 b ＝ 2</td></tr>
-        <tr><td align="left" bgcolor="#EDF1F5" port="p"><font face="JetBrains Mono">SP+16</font></td><td align="left" bgcolor="#EDF1F5">引数 c ＝ 3</td></tr>
+      <table border="0" cellborder="1" cellspacing="0" cellpadding="6" color="#4A4A4A">
+        <tr><td colspan="2" align="left" bgcolor="#F3F3F3"><b>スタック</b>（<font face="JetBrains Mono">Add3(1, 2, 3)</font> の呼び出し時）</td></tr>
+        <tr><td align="left" bgcolor="#E4E4E4"><font face="JetBrains Mono">SP+0</font></td><td align="left" bgcolor="#E4E4E4">引数 a ＝ 1</td></tr>
+        <tr><td align="left" bgcolor="#E4E4E4"><font face="JetBrains Mono">SP+8</font></td><td align="left" bgcolor="#E4E4E4">引数 b ＝ 2</td></tr>
+        <tr><td align="left" bgcolor="#E4E4E4" port="p"><font face="JetBrains Mono">SP+16</font></td><td align="left" bgcolor="#E4E4E4">引数 c ＝ 3</td></tr>
       </table>>];
     read_old [label=<<b>外から読む側</b><br align="left"/>SPからの固定オフセットで足りる<br align="left"/>>,
-              fillcolor="#D6E8D6", color="#3F6E3F"];
+              fillcolor="#D2F3DF", color="#038435"];
     stack -> read_old [label=" 位置が決まっている"];
   }
 
   subgraph cluster_new {
     label=<<b>Go 1.17 以降（<font face="JetBrains Mono">ABIInternal</font>）</b>>;
     style="rounded"; labeljust="l"; penwidth=1.6; margin=14;
-    color="#38638F"; fontcolor="#2E4D6E"; bgcolor="#EFF5FB";
+    color="#1D4EB2"; fontcolor="#143880"; bgcolor="#EEF4FF";
 
     regs [shape=plain, style="", label=<
-      <table border="0" cellborder="1" cellspacing="0" cellpadding="6" color="#38638F">
-        <tr><td colspan="2" align="left" bgcolor="#EFF5FB"><b>レジスタ</b>（<font face="JetBrains Mono">Add3(1, 2, 3)</font> の呼び出し時）</td></tr>
-        <tr><td align="left" bgcolor="#D9E7F4"><font face="JetBrains Mono">AX</font></td><td align="left" bgcolor="#D9E7F4">引数 a ＝ 1</td></tr>
-        <tr><td align="left" bgcolor="#D9E7F4"><font face="JetBrains Mono">BX</font></td><td align="left" bgcolor="#D9E7F4">引数 b ＝ 2</td></tr>
-        <tr><td align="left" bgcolor="#D9E7F4" port="p"><font face="JetBrains Mono">CX</font></td><td align="left" bgcolor="#D9E7F4">引数 c ＝ 3</td></tr>
-        <tr><td align="left" bgcolor="#D6E8D6"><font face="JetBrains Mono">AX</font></td><td align="left" bgcolor="#D6E8D6">戻り値 ＝ 6（同じAXに戻ってくる）</td></tr>
+      <table border="0" cellborder="1" cellspacing="0" cellpadding="6" color="#1D4EB2">
+        <tr><td colspan="2" align="left" bgcolor="#EEF4FF"><b>レジスタ</b>（<font face="JetBrains Mono">Add3(1, 2, 3)</font> の呼び出し時）</td></tr>
+        <tr><td align="left" bgcolor="#D8E5FF"><font face="JetBrains Mono">AX</font></td><td align="left" bgcolor="#D8E5FF">引数 a ＝ 1</td></tr>
+        <tr><td align="left" bgcolor="#D8E5FF"><font face="JetBrains Mono">BX</font></td><td align="left" bgcolor="#D8E5FF">引数 b ＝ 2</td></tr>
+        <tr><td align="left" bgcolor="#D8E5FF" port="p"><font face="JetBrains Mono">CX</font></td><td align="left" bgcolor="#D8E5FF">引数 c ＝ 3</td></tr>
+        <tr><td align="left" bgcolor="#D2F3DF"><font face="JetBrains Mono">AX</font></td><td align="left" bgcolor="#D2F3DF">戻り値 ＝ 6（同じAXに戻ってくる）</td></tr>
       </table>>];
     read_new [label=<<b>外から読む側</b><br align="left"/>アーキテクチャ別のレジスタ対応表が要る<br align="left"/>>,
-              fillcolor="#F3E8CE", color="#96742E"];
+              fillcolor="#FFF0D8", color="#996719"];
     regs -> read_new [label=" どのレジスタかを\l 知らないと読めない\l"];
   }
 

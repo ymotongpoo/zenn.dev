@@ -11,37 +11,37 @@ digraph source_to_machine {
   node [
     fontname="IBM Plex Sans JP", fontsize=12,
     shape=box, style="rounded,filled",
-    fillcolor="#F1F5F9", color="#475569", penwidth=1.6,
+    fillcolor="#F1F1F1", color="#4A4A4A", penwidth=1.6,
     margin="0.2,0.14"
   ];
   edge [
     fontname="IBM Plex Sans JP", fontsize=11,
-    color="#334155", penwidth=1.4, arrowsize=0.9,
-    fontcolor="#1E293B"
+    color="#343434", penwidth=1.4, arrowsize=0.9,
+    fontcolor="#171717"
   ];
 
-  src [label=<<b>Goのソース</b>　<font face="JetBrains Mono">func double(n int) int</font>>, fillcolor="#D6E8D6", color="#3F6E3F"];
-  bytes [label=<<b>機械語のバイト列</b>　<font face="JetBrains Mono">48 01 c0 c3</font>>, fillcolor="#F3E8CE", color="#96742E"];
+  src [label=<<b>Goのソース</b>　<font face="JetBrains Mono">func double(n int) int</font>>, fillcolor="#D2F3DF", color="#038435"];
+  bytes [label=<<b>機械語のバイト列</b>　<font face="JetBrains Mono">48 01 c0 c3</font>>, fillcolor="#FFF0D8", color="#996719"];
 
   insns [shape=plain, style="", label=<
-    <table border="0" cellborder="1" cellspacing="0" cellpadding="6" color="#38638F">
-      <tr><td colspan="2" align="left" bgcolor="#EFF5FB"><b>命令の並び</b>（1命令ごとにアドレスが付く）</td></tr>
-      <tr><td port="head" align="left" bgcolor="#D9E7F4"><font face="JetBrains Mono">0x49e180</font></td>
-          <td align="left" bgcolor="#D9E7F4"><font face="JetBrains Mono">ADDQ AX, AX</font></td></tr>
-      <tr><td align="left" bgcolor="#D9E7F4"><font face="JetBrains Mono">0x49e183</font></td>
-          <td align="left" bgcolor="#D9E7F4"><font face="JetBrains Mono">RET</font></td></tr>
+    <table border="0" cellborder="1" cellspacing="0" cellpadding="6" color="#1D4EB2">
+      <tr><td colspan="2" align="left" bgcolor="#EEF4FF"><b>命令の並び</b>（1命令ごとにアドレスが付く）</td></tr>
+      <tr><td port="head" align="left" bgcolor="#D8E5FF"><font face="JetBrains Mono">0x49e180</font></td>
+          <td align="left" bgcolor="#D8E5FF"><font face="JetBrains Mono">ADDQ AX, AX</font></td></tr>
+      <tr><td align="left" bgcolor="#D8E5FF"><font face="JetBrains Mono">0x49e183</font></td>
+          <td align="left" bgcolor="#D8E5FF"><font face="JetBrains Mono">RET</font></td></tr>
     </table>>];
 
   symtab [shape=plain, style="", label=<
-    <table border="0" cellborder="1" cellspacing="0" cellpadding="6" color="#96742E">
-      <tr><td colspan="2" align="left" bgcolor="#FAF4E4"><b>シンボルテーブル</b></td></tr>
-      <tr><td align="left" bgcolor="#F3E8CE"><font face="JetBrains Mono">main.double</font></td>
-          <td port="addr" align="left" bgcolor="#F3E8CE"><font face="JetBrains Mono">0x49e180</font></td></tr>
+    <table border="0" cellborder="1" cellspacing="0" cellpadding="6" color="#996719">
+      <tr><td colspan="2" align="left" bgcolor="#FFF8EE"><b>シンボルテーブル</b></td></tr>
+      <tr><td align="left" bgcolor="#FFF0D8"><font face="JetBrains Mono">main.double</font></td>
+          <td port="addr" align="left" bgcolor="#FFF0D8"><font face="JetBrains Mono">0x49e180</font></td></tr>
     </table>>];
 
   src -> bytes;
   bytes -> insns;
-  symtab:addr:e -> insns:head:w [style=dashed, color="#7C8DA3"];
+  symtab:addr:e -> insns:head:w [style=dashed, color="#8A8A8A"];
 
   { rank=same; symtab; insns; }
 }

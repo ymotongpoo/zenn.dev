@@ -9,36 +9,36 @@ digraph context_not_traceable {
   node [
     fontname="IBM Plex Sans JP", fontsize=12,
     shape=box, style="rounded,filled",
-    fillcolor="#F1F5F9", color="#475569", penwidth=1.6,
+    fillcolor="#F1F1F1", color="#4A4A4A", penwidth=1.6,
     margin="0.2,0.14"
   ];
   edge [
     fontname="IBM Plex Sans JP", fontsize=11,
-    color="#334155", penwidth=1.4, arrowsize=0.9,
-    fontcolor="#1E293B"
+    color="#343434", penwidth=1.4, arrowsize=0.9,
+    fontcolor="#171717"
   ];
 
-  top [label=<<b>uprobeが発火した瞬間のOBI</b>>, fillcolor="#EDF1F5"];
+  top [label=<<b>uprobeが発火した瞬間のOBI</b>>, fillcolor="#E4E4E4"];
 
   can [label=<<b>できる</b>：レジスタから引数の値を読む<br align="left"/>HTTPメソッドやURLをその場で取り出せる<br align="left"/>>,
-       fillcolor="#D6E8D6", color="#3F6E3F"];
+       fillcolor="#D2F3DF", color="#038435"];
   cannot [label=<<b>できない</b>：ctx が渡っていく先を追い続ける<br align="left"/>>,
-          fillcolor="#F5DEDE", color="#A04848"];
+          fillcolor="#FDE1EC", color="#AA3E6A"];
   alt [label=<<b>代わりの手がかり</b><br align="left"/>goroutineの親子関係を記録して辿る<br align="left"/>>,
-       fillcolor="#D9E7F4", color="#38638F"];
+       fillcolor="#D8E5FF", color="#1D4EB2"];
 
   reasons [shape=plain, style="", label=<
-    <table border="0" cellborder="1" cellspacing="0" cellpadding="6" color="#A04848">
-      <tr><td align="left" bgcolor="#FBEFEF"><b>追えない理由</b></td></tr>
-      <tr><td align="left" bgcolor="#F5DEDE">ctx はインターフェース値で、中身は別の場所にある</td></tr>
-      <tr><td align="left" bgcolor="#F5DEDE">引数の位置は関数ごとに違う</td></tr>
-      <tr><td align="left" bgcolor="#F5DEDE">goroutineをまたいで渡されることがある</td></tr>
+    <table border="0" cellborder="1" cellspacing="0" cellpadding="6" color="#AA3E6A">
+      <tr><td align="left" bgcolor="#FEF2F7"><b>追えない理由</b></td></tr>
+      <tr><td align="left" bgcolor="#FDE1EC">ctx はインターフェース値で、中身は別の場所にある</td></tr>
+      <tr><td align="left" bgcolor="#FDE1EC">引数の位置は関数ごとに違う</td></tr>
+      <tr><td align="left" bgcolor="#FDE1EC">goroutineをまたいで渡されることがある</td></tr>
     </table>>];
 
   { rank=same; can; cannot; alt; }
 
   top -> can;
-  top -> cannot [style=dashed, color="#A04848", arrowhead=tee];
+  top -> cannot [style=dashed, color="#AA3E6A", arrowhead=tee];
   top -> alt [xlabel="値を解読せずに済ませる"];
-  cannot -> reasons [style=dotted, color="#7C8DA3", arrowhead=none];
+  cannot -> reasons [style=dotted, color="#8A8A8A", arrowhead=none];
 }

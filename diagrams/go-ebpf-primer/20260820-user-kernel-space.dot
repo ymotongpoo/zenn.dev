@@ -9,34 +9,34 @@ digraph user_kernel_space {
   node [
     fontname="IBM Plex Sans JP", fontsize=12,
     shape=box, style="rounded,filled",
-    fillcolor="#F1F5F9", color="#475569", penwidth=1.6,
+    fillcolor="#F1F1F1", color="#4A4A4A", penwidth=1.6,
     margin="0.2,0.14"
   ];
   edge [
     fontname="IBM Plex Sans JP", fontsize=11,
-    color="#334155", penwidth=1.4, arrowsize=0.9,
-    fontcolor="#1E293B"
+    color="#343434", penwidth=1.4, arrowsize=0.9,
+    fontcolor="#171717"
   ];
 
   subgraph cluster_user {
     label=<<b>ユーザー空間</b>>; labeljust="l"; style="rounded"; penwidth=1.6; margin=14;
-    color="#475569"; fontcolor="#334155"; bgcolor="#F4F6F8";
-    app [label=<<b>アプリケーション</b><br align="left"/>Goで書いたプログラムもここで動く<br align="left"/>>, fillcolor="#D9E7F4", color="#38638F"];
+    color="#4A4A4A"; fontcolor="#343434"; bgcolor="#F3F3F3";
+    app [label=<<b>アプリケーション</b><br align="left"/>Goで書いたプログラムもここで動く<br align="left"/>>, fillcolor="#D8E5FF", color="#1D4EB2"];
   }
 
   subgraph cluster_kernel {
     label=<<b>カーネル空間</b>>; labeljust="l"; style="rounded"; penwidth=1.6; margin=14;
-    color="#75589C"; fontcolor="#5B4370"; bgcolor="#F5F1F9";
-    kernel [label=<<b>カーネル</b><br align="left"/>ファイル、ネットワーク、メモリを管理する<br align="left"/>>, fillcolor="#E9DFF2", color="#75589C"];
+    color="#5846B2"; fontcolor="#3E3280"; bgcolor="#F5F3FF";
+    kernel [label=<<b>カーネル</b><br align="left"/>ファイル、ネットワーク、メモリを管理する<br align="left"/>>, fillcolor="#E8E3FF", color="#5846B2"];
   }
 
-  hw [label=<<b>ハードウェア</b><br align="left"/>CPU、メモリ、ディスク、ネットワークカード<br align="left"/>>, fillcolor="#EDF1F5"];
+  hw [label=<<b>ハードウェア</b><br align="left"/>CPU、メモリ、ディスク、ネットワークカード<br align="left"/>>, fillcolor="#E4E4E4"];
 
   app -> kernel [penwidth=1.8, xlabel=" システムコールで頼む"];
-  kernel -> app [style=dashed, color="#7C8DA3", constraint=false, xlabel=" 結果を返す"];
+  kernel -> app [style=dashed, color="#8A8A8A", constraint=false, xlabel=" 結果を返す"];
   kernel -> hw [xlabel=" 直接操作する"];
   // このエッジはcluster_kernelをまたぐため splines=ortho の直角配線が崩れ、
   // 単純な斜め線になる（クラスタをまたぐ辺の既知の制約）。1本の素直な斜め線
   // なので「触れない」という意味の破線としては許容する。
-  app -> hw [style=dashed, color="#A04848", arrowhead=tee, xlabel=" 直接は触れない"];
+  app -> hw [style=dashed, color="#AA3E6A", arrowhead=tee, xlabel=" 直接は触れない"];
 }

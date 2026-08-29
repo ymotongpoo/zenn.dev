@@ -8,28 +8,28 @@ digraph virtual_to_physical {
   node [
     fontname="IBM Plex Sans JP", fontsize=12,
     shape=box, style="rounded,filled",
-    fillcolor="#F1F5F9", color="#475569", penwidth=1.6,
+    fillcolor="#F1F1F1", color="#4A4A4A", penwidth=1.6,
     margin="0.2,0.14"
   ];
   edge [
     fontname="IBM Plex Sans JP", fontsize=11,
-    color="#334155", penwidth=1.4, arrowsize=0.9,
-    fontcolor="#1E293B"
+    color="#343434", penwidth=1.4, arrowsize=0.9,
+    fontcolor="#171717"
   ];
 
-  va1 [label=<<b>プロセスAの仮想アドレス空間</b><br align="left"/><font face="JetBrains Mono">0x0000…</font> から連続して見える<br align="left"/>>, fillcolor="#D9E7F4", color="#38638F"];
-  va2 [label=<<b>プロセスBの仮想アドレス空間</b><br align="left"/><font face="JetBrains Mono">0x0000…</font> から連続して見える<br align="left"/>>, fillcolor="#D6E8D6", color="#3F6E3F"];
+  va1 [label=<<b>プロセスAの仮想アドレス空間</b><br align="left"/><font face="JetBrains Mono">0x0000…</font> から連続して見える<br align="left"/>>, fillcolor="#D8E5FF", color="#1D4EB2"];
+  va2 [label=<<b>プロセスBの仮想アドレス空間</b><br align="left"/><font face="JetBrains Mono">0x0000…</font> から連続して見える<br align="left"/>>, fillcolor="#D2F3DF", color="#038435"];
 
   { rank=same; va1; va2; }
 
-  table_ [label=<<b>カーネルの対応表</b><br align="left"/>仮想アドレス → 物理アドレス<br align="left"/>>, fillcolor="#E9DFF2", color="#75589C"];
+  table_ [label=<<b>カーネルの対応表</b><br align="left"/>仮想アドレス → 物理アドレス<br align="left"/>>, fillcolor="#E8E3FF", color="#5846B2"];
 
   phys [shape=plain, style="", label=<
-    <table border="0" cellborder="1" cellspacing="0" cellpadding="7" color="#96742E">
-      <tr><td align="left" bgcolor="#FAF4E4"><b>物理メモリ</b></td></tr>
-      <tr><td port="a" align="left" bgcolor="#D9E7F4">Aに割り当てた部分</td></tr>
+    <table border="0" cellborder="1" cellspacing="0" cellpadding="7" color="#996719">
+      <tr><td align="left" bgcolor="#FFF8EE"><b>物理メモリ</b></td></tr>
+      <tr><td port="a" align="left" bgcolor="#D8E5FF">Aに割り当てた部分</td></tr>
       <tr><td align="left" bgcolor="#FFFFFF">空き</td></tr>
-      <tr><td port="b" align="left" bgcolor="#D6E8D6">Bに割り当てた部分</td></tr>
+      <tr><td port="b" align="left" bgcolor="#D2F3DF">Bに割り当てた部分</td></tr>
       <tr><td align="left" bgcolor="#FFFFFF">空き</td></tr>
     </table>>];
 
