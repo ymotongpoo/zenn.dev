@@ -21,22 +21,22 @@ digraph source_to_machine {
   ];
 
   src [label=<<b>Goのソース</b>　<font face="JetBrains Mono">func double(n int) int</font>>, fillcolor="#D2F3DF", color="#038435"];
-  bytes [label=<<b>機械語のバイト列</b>　<font face="JetBrains Mono">48 01 c0 c3</font>>, fillcolor="#FFF0D8", color="#996719"];
+  bytes [label=<<b>機械語のバイト列</b>　<font face="JetBrains Mono">48 01 c0 c3</font>>, fillcolor="#FFFCD7", color="#736B10"];
 
   insns [shape=plain, style="", label=<
-    <table border="0" cellborder="1" cellspacing="0" cellpadding="6" color="#1D4EB2">
-      <tr><td colspan="2" align="left" bgcolor="#EEF4FF"><b>命令の並び</b>（1命令ごとにアドレスが付く）</td></tr>
-      <tr><td port="head" align="left" bgcolor="#D8E5FF"><font face="JetBrains Mono">0x49e180</font></td>
-          <td align="left" bgcolor="#D8E5FF"><font face="JetBrains Mono">ADDQ AX, AX</font></td></tr>
-      <tr><td align="left" bgcolor="#D8E5FF"><font face="JetBrains Mono">0x49e183</font></td>
-          <td align="left" bgcolor="#D8E5FF"><font face="JetBrains Mono">RET</font></td></tr>
+    <table border="0" cellborder="1" cellspacing="0" cellpadding="6" color="#AB5A13">
+      <tr><td colspan="2" align="left" bgcolor="#FFF5ED"><b>命令の並び</b>（1命令ごとにアドレスが付く）</td></tr>
+      <tr><td port="head" align="left" bgcolor="#FFE9D6"><font face="JetBrains Mono">0x49e180</font></td>
+          <td align="left" bgcolor="#FFE9D6"><font face="JetBrains Mono">ADDQ AX, AX</font></td></tr>
+      <tr><td align="left" bgcolor="#FFE9D6"><font face="JetBrains Mono">0x49e183</font></td>
+          <td align="left" bgcolor="#FFE9D6"><font face="JetBrains Mono">RET</font></td></tr>
     </table>>];
 
   symtab [shape=plain, style="", label=<
-    <table border="0" cellborder="1" cellspacing="0" cellpadding="6" color="#996719">
-      <tr><td colspan="2" align="left" bgcolor="#FFF8EE"><b>シンボルテーブル</b></td></tr>
-      <tr><td align="left" bgcolor="#FFF0D8"><font face="JetBrains Mono">main.double</font></td>
-          <td port="addr" align="left" bgcolor="#FFF0D8"><font face="JetBrains Mono">0x49e180</font></td></tr>
+    <table border="0" cellborder="1" cellspacing="0" cellpadding="6" color="#736B10">
+      <tr><td colspan="2" align="left" bgcolor="#FFFEED"><b>シンボルテーブル</b></td></tr>
+      <tr><td align="left" bgcolor="#FFFCD7"><font face="JetBrains Mono">main.double</font></td>
+          <td port="addr" align="left" bgcolor="#FFFCD7"><font face="JetBrains Mono">0x49e180</font></td></tr>
     </table>>];
 
   src -> bytes;

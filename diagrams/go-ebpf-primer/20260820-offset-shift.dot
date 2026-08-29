@@ -19,7 +19,7 @@ digraph offset_shift {
   ];
 
   code [label=<<b><font face="JetBrains Mono">+88</font> を読む計装コード</b><br align="left"/>オフセットをハードコード<br align="left"/>>,
-        fillcolor="#FFF0D8", color="#996719"];
+        fillcolor="#FFFCD7", color="#736B10"];
 
   t166 [shape=plain, style="", label=<
     <table border="0" cellborder="1" cellspacing="0" cellpadding="6" color="#038435">

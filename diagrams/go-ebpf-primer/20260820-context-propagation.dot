@@ -21,20 +21,20 @@ digraph context_propagation {
   subgraph cluster_svca {
     label=<<b>サービスA（1プロセス）</b>>;
     style="rounded"; labeljust="l"; penwidth=1.6; margin=14;
-    color="#1D4EB2"; fontcolor="#143880"; bgcolor="#EEF4FF";
+    color="#AB5A13"; fontcolor="#783F0E"; bgcolor="#FFF5ED";
 
-    recv [label=<<b>受信 goroutine</b>　トレース開始>, fillcolor="#D8E5FF", color="#1D4EB2"];
-    proc [label=<<b>処理 goroutine</b>>, fillcolor="#D8E5FF", color="#1D4EB2"];
-    send [label=<<b>送信 goroutine</b><br align="left"/><font face="JetBrains Mono">writeSubset</font> で直列化<br align="left"/>>, fillcolor="#D8E5FF", color="#1D4EB2"];
+    recv [label=<<b>受信 goroutine</b>　トレース開始>, fillcolor="#FFE9D6", color="#AB5A13"];
+    proc [label=<<b>処理 goroutine</b>>, fillcolor="#FFE9D6", color="#AB5A13"];
+    send [label=<<b>送信 goroutine</b><br align="left"/><font face="JetBrains Mono">writeSubset</font> で直列化<br align="left"/>>, fillcolor="#FFE9D6", color="#AB5A13"];
 
     recv -> proc [xlabel="newproc1 で親子を記録"];
     proc -> send [xlabel="遡れるのは6段まで"];
   }
 
   p1 [label=<<b>経路1</b><br align="left"/><font face="JetBrains Mono">bufio.Writer</font> のバッファに<br align="left"/><font face="JetBrains Mono">bpf_probe_write_user</font> で追記<br align="left"/>>,
-      fillcolor="#E8E3FF", color="#5846B2"];
+      fillcolor="#F7DDFC", color="#9430A9"];
   p2 [label=<<b>経路2</b><br align="left"/><font face="JetBrains Mono">sk_msg</font> で送出される<br align="left"/>バイト列を伸ばす<br align="left"/>>,
-      fillcolor="#E8E3FF", color="#5846B2"];
+      fillcolor="#F7DDFC", color="#9430A9"];
   lock [label=<<font face="Poppins"><b>kernel lockdown / Secure Boot</b></font>>, fillcolor="#FDE1EC", color="#AA3E6A"];
   svcb [label=<<b>サービスB</b>　traceparent を受け取る>, fillcolor="#E4E4E4"];
 

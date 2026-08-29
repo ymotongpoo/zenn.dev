@@ -19,13 +19,13 @@ digraph g_reuse {
   ];
 
   t1 [label=<<b>時刻1</b><br align="left"/>goroutine A の g は <font face="JetBrains Mono">0xc000102000</font><br align="left"/>>,
-      fillcolor="#D8E5FF", color="#1D4EB2"];
+      fillcolor="#FFE9D6", color="#AB5A13"];
   t2 [label=<<b>時刻2</b><br align="left"/>A のスタックだけが別の領域へ移る<br align="left"/>g は <font face="JetBrains Mono">0xc000102000</font> のまま<br align="left"/>>,
-      fillcolor="#D8E5FF", color="#1D4EB2"];
+      fillcolor="#FFE9D6", color="#AB5A13"];
   t3 [label=<<b>時刻3</b><br align="left"/>A が終了する<br align="left"/>>,
       fillcolor="#E4E4E4"];
   t4 [label=<<b>時刻4</b><br align="left"/>goroutine B の g として <font face="JetBrains Mono">0xc000102000</font> が再利用される<br align="left"/>>,
-      fillcolor="#FFF0D8", color="#996719"];
+      fillcolor="#FFFCD7", color="#736B10"];
   risk [label=<<b>古いマップ要素を消していないと</b><br align="left"/>B の処理が A の記録を拾う<br align="left"/>>,
         fillcolor="#FDE1EC", color="#AA3E6A"];
 

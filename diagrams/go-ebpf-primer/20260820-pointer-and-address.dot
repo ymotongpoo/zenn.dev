@@ -24,9 +24,9 @@ digraph pointer_and_address {
   ranksep=1.0;
 
   p [shape=plain, style="", label=<
-    <table border="0" cellborder="1" cellspacing="0" cellpadding="7" color="#1D4EB2">
-      <tr><td align="left" bgcolor="#EEF4FF"><b>変数 p</b>（ポインタ）</td></tr>
-      <tr><td port="v" align="left" bgcolor="#D8E5FF">値: <font face="JetBrains Mono">0x…08</font></td></tr>
+    <table border="0" cellborder="1" cellspacing="0" cellpadding="7" color="#AB5A13">
+      <tr><td align="left" bgcolor="#FFF5ED"><b>変数 p</b>（ポインタ）</td></tr>
+      <tr><td port="v" align="left" bgcolor="#FFE9D6">値: <font face="JetBrains Mono">0x…08</font></td></tr>
       <tr><td align="left" bgcolor="#FFFFFF">アドレス: <font face="JetBrains Mono">0x…40</font></td></tr>
     </table>>];
 

@@ -25,9 +25,9 @@ digraph disassemble_boundaries {
     </table>>];
 
   insns [shape=plain, style="", label=<
-    <table border="0" cellborder="1" cellspacing="0" cellpadding="7" color="#1D4EB2">
-      <tr><td colspan="4" align="left" bgcolor="#EEF4FF"><b>解釈してはじめて分かる命令の区切り</b></td></tr>
-      <tr><td colspan="3" align="center" bgcolor="#D8E5FF"><font face="JetBrains Mono">ADDQ AX, AX</font>（3バイト）</td>
+    <table border="0" cellborder="1" cellspacing="0" cellpadding="7" color="#AB5A13">
+      <tr><td colspan="4" align="left" bgcolor="#FFF5ED"><b>解釈してはじめて分かる命令の区切り</b></td></tr>
+      <tr><td colspan="3" align="center" bgcolor="#FFE9D6"><font face="JetBrains Mono">ADDQ AX, AX</font>（3バイト）</td>
           <td align="center" bgcolor="#D2F3DF"><font face="JetBrains Mono">RET</font>（1バイト）</td></tr>
     </table>>];
 

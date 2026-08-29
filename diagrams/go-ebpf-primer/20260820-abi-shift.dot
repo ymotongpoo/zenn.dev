@@ -38,18 +38,18 @@ digraph abi_shift {
   subgraph cluster_new {
     label=<<b>Go 1.17 以降（<font face="JetBrains Mono">ABIInternal</font>）</b>>;
     style="rounded"; labeljust="l"; penwidth=1.6; margin=14;
-    color="#1D4EB2"; fontcolor="#143880"; bgcolor="#EEF4FF";
+    color="#AB5A13"; fontcolor="#783F0E"; bgcolor="#FFF5ED";
 
     regs [shape=plain, style="", label=<
-      <table border="0" cellborder="1" cellspacing="0" cellpadding="6" color="#1D4EB2">
-        <tr><td colspan="2" align="left" bgcolor="#EEF4FF"><b>レジスタ</b>（<font face="JetBrains Mono">Add3(1, 2, 3)</font> の呼び出し時）</td></tr>
-        <tr><td align="left" bgcolor="#D8E5FF"><font face="JetBrains Mono">AX</font></td><td align="left" bgcolor="#D8E5FF">引数 a ＝ 1</td></tr>
-        <tr><td align="left" bgcolor="#D8E5FF"><font face="JetBrains Mono">BX</font></td><td align="left" bgcolor="#D8E5FF">引数 b ＝ 2</td></tr>
-        <tr><td align="left" bgcolor="#D8E5FF" port="p"><font face="JetBrains Mono">CX</font></td><td align="left" bgcolor="#D8E5FF">引数 c ＝ 3</td></tr>
+      <table border="0" cellborder="1" cellspacing="0" cellpadding="6" color="#AB5A13">
+        <tr><td colspan="2" align="left" bgcolor="#FFF5ED"><b>レジスタ</b>（<font face="JetBrains Mono">Add3(1, 2, 3)</font> の呼び出し時）</td></tr>
+        <tr><td align="left" bgcolor="#FFE9D6"><font face="JetBrains Mono">AX</font></td><td align="left" bgcolor="#FFE9D6">引数 a ＝ 1</td></tr>
+        <tr><td align="left" bgcolor="#FFE9D6"><font face="JetBrains Mono">BX</font></td><td align="left" bgcolor="#FFE9D6">引数 b ＝ 2</td></tr>
+        <tr><td align="left" bgcolor="#FFE9D6" port="p"><font face="JetBrains Mono">CX</font></td><td align="left" bgcolor="#FFE9D6">引数 c ＝ 3</td></tr>
         <tr><td align="left" bgcolor="#D2F3DF"><font face="JetBrains Mono">AX</font></td><td align="left" bgcolor="#D2F3DF">戻り値 ＝ 6（同じAXに戻ってくる）</td></tr>
       </table>>];
     read_new [label=<<b>外から読む側</b><br align="left"/>アーキテクチャ別のレジスタ対応表が要る<br align="left"/>>,
-              fillcolor="#FFF0D8", color="#996719"];
+              fillcolor="#FFFCD7", color="#736B10"];
     regs -> read_new [label=" どのレジスタかを\l 知らないと読めない\l"];
   }
 

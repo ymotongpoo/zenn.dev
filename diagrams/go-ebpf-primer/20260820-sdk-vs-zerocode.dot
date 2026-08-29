@@ -33,13 +33,13 @@ digraph sdk_vs_zerocode {
 
   subgraph cluster_r {
     label=<<b>ゼロコード計装</b>>;
-    fontcolor="#143880";
+    fontcolor="#783F0E";
     style="rounded"; labeljust="l"; penwidth=1.6; margin=14;
-    color="#1D4EB2"; bgcolor="#EEF4FF";
+    color="#AB5A13"; bgcolor="#FFF5ED";
 
     appR [label=<<b>アプリのコード</b><br align="left"/>traceparent の存在を知らない<br align="left"/>>,
           fillcolor="#E4E4E4"];
-    obiR [label=<<font face="Poppins"><b>OBI</b></font>（カーネル側のフック）>, fillcolor="#D8E5FF", color="#1D4EB2"];
+    obiR [label=<<font face="Poppins"><b>OBI</b></font>（カーネル側のフック）>, fillcolor="#FFE9D6", color="#AB5A13"];
     hdrR [label=<<b>リクエストのヘッダ</b>>, fillcolor="#E4E4E4"];
 
     { rank=same; appR; obiR; }

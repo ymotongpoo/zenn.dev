@@ -21,9 +21,9 @@ digraph elf_sections {
     <table border="0" cellborder="1" cellspacing="0" cellpadding="6" color="#4A4A4A">
       <tr><td align="left" bgcolor="#F3F3F3"><b>ELFのセクション</b></td>
           <td align="left" bgcolor="#F3F3F3"><b>中身</b></td>
-          <td align="left" bgcolor="#F5F3FF"><b>デバッガ</b></td>
+          <td align="left" bgcolor="#FCF0FE"><b>デバッガ</b></td>
           <td align="left" bgcolor="#EBFAF1"><font face="Poppins"><b>OBI</b></font></td>
-          <td align="left" bgcolor="#EEF4FF"><b>Goランタイム</b></td></tr>
+          <td align="left" bgcolor="#FFF5ED"><b>Goランタイム</b></td></tr>
       <tr><td align="left" bgcolor="#E4E4E4"><font face="JetBrains Mono">.text</font></td>
           <td align="left" bgcolor="#FFFFFF">機械語</td>
           <td align="left" bgcolor="#FFFFFF"></td><td align="left" bgcolor="#FFFFFF"></td><td align="left" bgcolor="#FFFFFF"></td></tr>
@@ -32,10 +32,10 @@ digraph elf_sections {
           <td align="left" bgcolor="#FFFFFF"></td><td align="left" bgcolor="#D2F3DF">読む</td><td align="left" bgcolor="#FFFFFF"></td></tr>
       <tr><td align="left" bgcolor="#E4E4E4"><font face="JetBrains Mono">.debug_*</font></td>
           <td align="left" bgcolor="#FFFFFF">DWARF（型、フィールド、行番号）</td>
-          <td align="left" bgcolor="#E8E3FF">読む</td><td align="left" bgcolor="#D2F3DF">読む</td><td align="left" bgcolor="#FFFFFF"></td></tr>
+          <td align="left" bgcolor="#F7DDFC">読む</td><td align="left" bgcolor="#D2F3DF">読む</td><td align="left" bgcolor="#FFFFFF"></td></tr>
       <tr><td align="left" bgcolor="#E4E4E4"><font face="JetBrains Mono">.gopclntab</font></td>
           <td align="left" bgcolor="#FFFFFF">Go固有。アドレスと関数、行の対応</td>
-          <td align="left" bgcolor="#FFFFFF"></td><td align="left" bgcolor="#D2F3DF">読む</td><td align="left" bgcolor="#D8E5FF">読む</td></tr>
+          <td align="left" bgcolor="#FFFFFF"></td><td align="left" bgcolor="#D2F3DF">読む</td><td align="left" bgcolor="#FFE9D6">読む</td></tr>
       <tr><td align="left" bgcolor="#E4E4E4">ビルド情報</td>
           <td align="left" bgcolor="#FFFFFF">Goの版と依存モジュール</td>
           <td align="left" bgcolor="#FFFFFF"></td><td align="left" bgcolor="#D2F3DF">読む</td><td align="left" bgcolor="#FFFFFF"></td></tr>

@@ -17,17 +17,17 @@ digraph virtual_to_physical {
     fontcolor="#171717"
   ];
 
-  va1 [label=<<b>プロセスAの仮想アドレス空間</b><br align="left"/><font face="JetBrains Mono">0x0000…</font> から連続して見える<br align="left"/>>, fillcolor="#D8E5FF", color="#1D4EB2"];
+  va1 [label=<<b>プロセスAの仮想アドレス空間</b><br align="left"/><font face="JetBrains Mono">0x0000…</font> から連続して見える<br align="left"/>>, fillcolor="#FFE9D6", color="#AB5A13"];
   va2 [label=<<b>プロセスBの仮想アドレス空間</b><br align="left"/><font face="JetBrains Mono">0x0000…</font> から連続して見える<br align="left"/>>, fillcolor="#D2F3DF", color="#038435"];
 
   { rank=same; va1; va2; }
 
-  table_ [label=<<b>カーネルの対応表</b><br align="left"/>仮想アドレス → 物理アドレス<br align="left"/>>, fillcolor="#E8E3FF", color="#5846B2"];
+  table_ [label=<<b>カーネルの対応表</b><br align="left"/>仮想アドレス → 物理アドレス<br align="left"/>>, fillcolor="#F7DDFC", color="#9430A9"];
 
   phys [shape=plain, style="", label=<
-    <table border="0" cellborder="1" cellspacing="0" cellpadding="7" color="#996719">
-      <tr><td align="left" bgcolor="#FFF8EE"><b>物理メモリ</b></td></tr>
-      <tr><td port="a" align="left" bgcolor="#D8E5FF">Aに割り当てた部分</td></tr>
+    <table border="0" cellborder="1" cellspacing="0" cellpadding="7" color="#736B10">
+      <tr><td align="left" bgcolor="#FFFEED"><b>物理メモリ</b></td></tr>
+      <tr><td port="a" align="left" bgcolor="#FFE9D6">Aに割り当てた部分</td></tr>
       <tr><td align="left" bgcolor="#FFFFFF">空き</td></tr>
       <tr><td port="b" align="left" bgcolor="#D2F3DF">Bに割り当てた部分</td></tr>
       <tr><td align="left" bgcolor="#FFFFFF">空き</td></tr>

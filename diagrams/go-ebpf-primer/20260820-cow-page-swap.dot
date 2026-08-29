@@ -18,10 +18,10 @@ digraph cow_page_swap {
     fontcolor="#171717"
   ];
 
-  pa [label=<<b>プロセスAの対応表</b>>, fillcolor="#D8E5FF", color="#1D4EB2"];
+  pa [label=<<b>プロセスAの対応表</b>>, fillcolor="#FFE9D6", color="#AB5A13"];
   pb [label=<<b>プロセスBの対応表</b><br align="left"/>（Bの機械語を書き換えたい）<br align="left"/>>, fillcolor="#D2F3DF", color="#038435"];
 
-  orig [label=<<b>共有ページ</b><br align="left"/>変わらない<br align="left"/>>, fillcolor="#D8E5FF", color="#1D4EB2"];
+  orig [label=<<b>共有ページ</b><br align="left"/>変わらない<br align="left"/>>, fillcolor="#FFE9D6", color="#AB5A13"];
   copy [label=<<b>B専用のコピー</b><br align="left"/>この1ページだけ書き換えた<br align="left"/>>, fillcolor="#FDE1EC", color="#AA3E6A"];
 
   { rank=same; pa; pb; }

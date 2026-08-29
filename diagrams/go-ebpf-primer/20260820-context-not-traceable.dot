@@ -25,7 +25,7 @@ digraph context_not_traceable {
   cannot [label=<<b>できない</b>：ctx が渡っていく先を追い続ける<br align="left"/>>,
           fillcolor="#FDE1EC", color="#AA3E6A"];
   alt [label=<<b>代わりの手がかり</b><br align="left"/>goroutineの親子関係を記録して辿る<br align="left"/>>,
-       fillcolor="#D8E5FF", color="#1D4EB2"];
+       fillcolor="#FFE9D6", color="#AB5A13"];
 
   reasons [shape=plain, style="", label=<
     <table border="0" cellborder="1" cellspacing="0" cellpadding="6" color="#AA3E6A">

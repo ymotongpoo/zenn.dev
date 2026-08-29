@@ -19,20 +19,20 @@ digraph http_bytes_injection {
   ];
 
   p1 [label=<<b>経路1</b>：<font face="JetBrains Mono">writeSubset</font> の戻りフック<br align="left"/>アプリのメモリを書き換える<br align="left"/>>,
-      fillcolor="#E8E3FF", color="#5846B2"];
+      fillcolor="#F7DDFC", color="#9430A9"];
 
   buf [shape=plain, style="", label=<
-    <table border="0" cellborder="1" cellspacing="0" cellpadding="6" color="#996719">
-      <tr><td align="left" bgcolor="#FFF8EE"><b><font face="JetBrains Mono">bufio.Writer</font> のバッファ</b>（このまま送られるバイト列）</td></tr>
-      <tr><td align="left" bgcolor="#FFF0D8"><font face="JetBrains Mono">GET /items HTTP/1.1</font></td></tr>
-      <tr><td align="left" bgcolor="#FFF0D8"><font face="JetBrains Mono">Host: service-b</font></td></tr>
+    <table border="0" cellborder="1" cellspacing="0" cellpadding="6" color="#736B10">
+      <tr><td align="left" bgcolor="#FFFEED"><b><font face="JetBrains Mono">bufio.Writer</font> のバッファ</b>（このまま送られるバイト列）</td></tr>
+      <tr><td align="left" bgcolor="#FFFCD7"><font face="JetBrains Mono">GET /items HTTP/1.1</font></td></tr>
+      <tr><td align="left" bgcolor="#FFFCD7"><font face="JetBrains Mono">Host: service-b</font></td></tr>
       <tr><td align="left" bgcolor="#D2F3DF"><font face="JetBrains Mono">Traceparent: 00-4bf9…-00f0…-01</font>　← OBIが足した1行</td></tr>
-      <tr><td align="left" bgcolor="#FFF0D8">（空行。ここでヘッダが終わる）</td></tr>
-      <tr><td align="left" bgcolor="#EEF4FF">n ＝ いま使っているバイト数。書き足したぶん進める</td></tr>
+      <tr><td align="left" bgcolor="#FFFCD7">（空行。ここでヘッダが終わる）</td></tr>
+      <tr><td align="left" bgcolor="#FFF5ED">n ＝ いま使っているバイト数。書き足したぶん進める</td></tr>
     </table>>];
 
   p2 [label=<<b>経路2</b>：<font face="JetBrains Mono">sk_msg</font> プログラム<br align="left"/>アプリのメモリには触らない<br align="left"/>>,
-      fillcolor="#E8E3FF", color="#5846B2"];
+      fillcolor="#F7DDFC", color="#9430A9"];
 
   sock [label=<<b>ソケットへ出ていくバイトストリーム</b>>, fillcolor="#E4E4E4"];
 

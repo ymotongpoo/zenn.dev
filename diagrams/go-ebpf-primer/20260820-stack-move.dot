@@ -19,24 +19,24 @@ digraph stack_move {
   ];
 
   before [shape=plain, style="", label=<
-    <table border="0" cellborder="1" cellspacing="0" cellpadding="6" color="#1D4EB2">
-      <tr><td align="left" bgcolor="#EEF4FF"><b>いまのスタック</b>（たとえば8KB）</td></tr>
-      <tr><td align="left" bgcolor="#D8E5FF"><font face="JetBrains Mono">main</font> のフレーム</td></tr>
-      <tr><td align="left" bgcolor="#D8E5FF">呼び出し先のフレーム …</td></tr>
+    <table border="0" cellborder="1" cellspacing="0" cellpadding="6" color="#AB5A13">
+      <tr><td align="left" bgcolor="#FFF5ED"><b>いまのスタック</b>（たとえば8KB）</td></tr>
+      <tr><td align="left" bgcolor="#FFE9D6"><font face="JetBrains Mono">main</font> のフレーム</td></tr>
+      <tr><td align="left" bgcolor="#FFE9D6">呼び出し先のフレーム …</td></tr>
       <tr><td align="left" bgcolor="#FDE1EC">これ以上積む余地がない</td></tr>
     </table>>];
 
   check [label=<<b>関数の入口でスタックの残りを調べる</b><br align="left"/>足りなければ <font face="JetBrains Mono">runtime.morestack</font> へ飛ぶ<br align="left"/>>,
-         fillcolor="#FFF0D8", color="#996719"];
-  alloc [label=<<b>より大きい領域を確保する</b>>, fillcolor="#FFF0D8", color="#996719"];
+         fillcolor="#FFFCD7", color="#736B10"];
+  alloc [label=<<b>より大きい領域を確保する</b>>, fillcolor="#FFFCD7", color="#736B10"];
   copy [label=<<b>中身をまるごとコピーし、ポインタを補正する</b><br align="left"/>戻りアドレスからどの関数のフレームかを引き、1フレームずつ辿って書き換える<br align="left"/>>,
-        fillcolor="#FFF0D8", color="#996719"];
+        fillcolor="#FFFCD7", color="#736B10"];
 
   after [shape=plain, style="", label=<
-    <table border="0" cellborder="1" cellspacing="0" cellpadding="6" color="#1D4EB2">
-      <tr><td align="left" bgcolor="#EEF4FF"><b>引っ越し後のスタック</b>（16KB、別のアドレス）</td></tr>
-      <tr><td align="left" bgcolor="#D8E5FF"><font face="JetBrains Mono">main</font> のフレーム（アドレスが変わった）</td></tr>
-      <tr><td align="left" bgcolor="#D8E5FF">呼び出し先のフレーム …</td></tr>
+    <table border="0" cellborder="1" cellspacing="0" cellpadding="6" color="#AB5A13">
+      <tr><td align="left" bgcolor="#FFF5ED"><b>引っ越し後のスタック</b>（16KB、別のアドレス）</td></tr>
+      <tr><td align="left" bgcolor="#FFE9D6"><font face="JetBrains Mono">main</font> のフレーム（アドレスが変わった）</td></tr>
+      <tr><td align="left" bgcolor="#FFE9D6">呼び出し先のフレーム …</td></tr>
     </table>>];
 
   before -> check;

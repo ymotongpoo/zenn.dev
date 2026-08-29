@@ -21,13 +21,13 @@ digraph process_threads {
   subgraph cluster_proc {
     label=<<b>1つのプロセス</b>>;
     style="rounded"; labeljust="l"; penwidth=1.6; margin=14;
-    color="#1D4EB2"; fontcolor="#143880"; bgcolor="#EEF4FF";
+    color="#AB5A13"; fontcolor="#783F0E"; bgcolor="#FFF5ED";
 
-    t1 [label=<<b>スレッド1</b><br align="left"/>専用のスタック<br align="left"/>>, fillcolor="#D8E5FF", color="#1D4EB2"];
-    t2 [label=<<b>スレッド2</b><br align="left"/>専用のスタック<br align="left"/>>, fillcolor="#D8E5FF", color="#1D4EB2"];
-    t3 [label=<<b>スレッド3</b><br align="left"/>専用のスタック<br align="left"/>>, fillcolor="#D8E5FF", color="#1D4EB2"];
+    t1 [label=<<b>スレッド1</b><br align="left"/>専用のスタック<br align="left"/>>, fillcolor="#FFE9D6", color="#AB5A13"];
+    t2 [label=<<b>スレッド2</b><br align="left"/>専用のスタック<br align="left"/>>, fillcolor="#FFE9D6", color="#AB5A13"];
+    t3 [label=<<b>スレッド3</b><br align="left"/>専用のスタック<br align="left"/>>, fillcolor="#FFE9D6", color="#AB5A13"];
 
-    shared [label=<<b>共有の領域</b><br align="left"/>ヒープ、データ、テキスト。どのスレッドからも見える<br align="left"/>>, fillcolor="#FFF0D8", color="#996719"];
+    shared [label=<<b>共有の領域</b><br align="left"/>ヒープ、データ、テキスト。どのスレッドからも見える<br align="left"/>>, fillcolor="#FFFCD7", color="#736B10"];
 
     { rank=same; t1; t2; t3; }
     t1 -> shared [style=invis];

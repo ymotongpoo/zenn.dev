@@ -20,15 +20,15 @@ digraph source_to_execution {
 
   src [label=<<b>Goのソースコード</b>>, fillcolor="#D2F3DF", color="#038435"];
   mc [label=<<b>機械語</b><br align="left"/>4章「ソースコードが実行ファイルになるまで」<br align="left"/>>,
-      fillcolor="#FFF0D8", color="#996719"];
+      fillcolor="#FFFCD7", color="#736B10"];
   elf [label=<<b>ELF形式の実行ファイル</b><br align="left"/>4章「ソースコードが実行ファイルになるまで」<br align="left"/>>,
-       fillcolor="#FFF0D8", color="#996719"];
+       fillcolor="#FFFCD7", color="#736B10"];
   proc [label=<<b>プロセスとしてメモリに置かれる</b><br align="left"/>3章「OSとカーネル」<br align="left"/>>,
-        fillcolor="#D8E5FF", color="#1D4EB2"];
+        fillcolor="#FFE9D6", color="#AB5A13"];
   cpu [label=<<b>CPUがPCの指す命令を実行する</b><br align="left"/>2章「コンピュータはプログラムをどう実行するか」<br align="left"/>>,
-       fillcolor="#D8E5FF", color="#1D4EB2"];
+       fillcolor="#FFE9D6", color="#AB5A13"];
   call [label=<<b>関数呼び出しでレジスタとスタックを使う</b><br align="left"/>5章「関数呼び出しの仕組み」<br align="left"/>>,
-        fillcolor="#D8E5FF", color="#1D4EB2"];
+        fillcolor="#FFE9D6", color="#AB5A13"];
 
   src -> mc [label=" コンパイラが変換する"];
   mc -> elf [label=" リンカが1つのファイルにまとめる"];

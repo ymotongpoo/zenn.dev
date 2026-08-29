@@ -23,11 +23,11 @@ digraph obi_two_paths {
   proto [label=<<b>プロトコル計装</b><br align="left"/>ソケットを流れるバイト列を解釈<br align="left"/>HTTP/1.1、HTTP/2、gRPC、MySQL、Redis<br align="left"/>>,
          fillcolor="#D2F3DF", color="#038435"];
   lib [label=<<b>ランタイムとライブラリの計装</b><br align="left"/>対象の環境ごとに個別の実装が要る<br align="left"/>関数計装を持つのはGoだけ<br align="left"/>>,
-       fillcolor="#D8E5FF", color="#1D4EB2"];
+       fillcolor="#FFE9D6", color="#AB5A13"];
 
   proto_res [label=<<b>言語に依存しない</b>>, fillcolor="#EBFAF1", color="#038435"];
   lib_res [label=<<b>本書が扱う4つの難所</b><br align="left"/>可動スタック、レジスタABI<br align="left"/>オフセット追従、goroutine<br align="left"/>>,
-           fillcolor="#EEF4FF", color="#1D4EB2"];
+           fillcolor="#FFF5ED", color="#AB5A13"];
 
   // obi からの2本は「横に伸びてから真下に折れる」形にする。splines=ortho の
   // 直角配線を dot に任せると、必ず「真下に降りてから横に折れて子の側面に入る」

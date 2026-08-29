@@ -20,17 +20,17 @@ digraph map_pattern {
   ranksep=0.9;
 
   entry [label=<<b>入口のフック</b><br align="left"/>いまの時刻を書き込む<br align="left"/>>,
-         fillcolor="#D8E5FF", color="#1D4EB2"];
+         fillcolor="#FFE9D6", color="#AB5A13"];
 
   map [shape=plain, style="", label=<
-    <table border="0" cellborder="1" cellspacing="0" cellpadding="6" color="#996719">
-      <tr><td colspan="2" align="left" bgcolor="#FFF8EE"><b>マップ</b>（カーネルが持つキーバリューストア）</td></tr>
-      <tr><td align="left" bgcolor="#FFF0D8"><b>キー</b></td><td align="left" bgcolor="#FFF0D8">入口と出口を結びつける識別子</td></tr>
-      <tr><td align="left" bgcolor="#FFF0D8"><b>値</b></td><td align="left" bgcolor="#FFF0D8">開始時刻</td></tr>
+    <table border="0" cellborder="1" cellspacing="0" cellpadding="6" color="#736B10">
+      <tr><td colspan="2" align="left" bgcolor="#FFFEED"><b>マップ</b>（カーネルが持つキーバリューストア）</td></tr>
+      <tr><td align="left" bgcolor="#FFFCD7"><b>キー</b></td><td align="left" bgcolor="#FFFCD7">入口と出口を結びつける識別子</td></tr>
+      <tr><td align="left" bgcolor="#FFFCD7"><b>値</b></td><td align="left" bgcolor="#FFFCD7">開始時刻</td></tr>
     </table>>];
 
   exit [label=<<b>出口のフック</b><br align="left"/>開始時刻を読み、差を所要時間とする<br align="left"/>>,
-        fillcolor="#D8E5FF", color="#1D4EB2"];
+        fillcolor="#FFE9D6", color="#AB5A13"];
 
   entry -> map [label=" 先に起きるイベントが書く", penwidth=1.8];
   map -> exit [label=" 後に起きるイベントが読む", penwidth=1.8];

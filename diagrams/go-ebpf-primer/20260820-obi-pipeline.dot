@@ -18,10 +18,10 @@ digraph obi_pipeline {
     fontcolor="#171717"
   ];
 
-  discover [label=<<b>1. 発見</b><br align="left"/><font face="JetBrains Mono">/proc</font> を走査し、設定の条件に合うプロセスを選ぶ<br align="left"/>>, fillcolor="#D8E5FF", color="#1D4EB2"];
-  analyze [label=<<b>2. ELF解析</b><br align="left"/>シンボル、<font face="JetBrains Mono">.gopclntab</font>、DWARF、オフセット表から<br align="left"/>関数アドレスとフィールド位置を割り出す<br align="left"/>>, fillcolor="#D8E5FF", color="#1D4EB2"];
-  attach [label=<<b>3. ロードとアタッチ</b><br align="left"/>eBPFプログラムを検証器に通し、uprobeを結び付ける<br align="left"/>>, fillcolor="#D8E5FF", color="#1D4EB2"];
-  collect [label=<<b>4. イベント収集</b><br align="left"/>フック発火→リングバッファ→スパンの組み立て<br align="left"/>>, fillcolor="#D8E5FF", color="#1D4EB2"];
+  discover [label=<<b>1. 発見</b><br align="left"/><font face="JetBrains Mono">/proc</font> を走査し、設定の条件に合うプロセスを選ぶ<br align="left"/>>, fillcolor="#FFE9D6", color="#AB5A13"];
+  analyze [label=<<b>2. ELF解析</b><br align="left"/>シンボル、<font face="JetBrains Mono">.gopclntab</font>、DWARF、オフセット表から<br align="left"/>関数アドレスとフィールド位置を割り出す<br align="left"/>>, fillcolor="#FFE9D6", color="#AB5A13"];
+  attach [label=<<b>3. ロードとアタッチ</b><br align="left"/>eBPFプログラムを検証器に通し、uprobeを結び付ける<br align="left"/>>, fillcolor="#FFE9D6", color="#AB5A13"];
+  collect [label=<<b>4. イベント収集</b><br align="left"/>フック発火→リングバッファ→スパンの組み立て<br align="left"/>>, fillcolor="#FFE9D6", color="#AB5A13"];
   export [label=<<b>5. エクスポート</b><br align="left"/>メタデータを付けてOTLP / Prometheusで送る<br align="left"/>>, fillcolor="#D2F3DF", color="#038435"];
 
   hA [label=<<b>難所1と難所3</b><br align="left"/>どこにフックを置き、<br align="left"/>どこを読むか<br align="left"/>>, fillcolor="#FDE1EC", color="#AA3E6A"];

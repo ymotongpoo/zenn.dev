@@ -21,13 +21,13 @@ digraph user_kernel_space {
   subgraph cluster_user {
     label=<<b>ユーザー空間</b>>; labeljust="l"; style="rounded"; penwidth=1.6; margin=14;
     color="#4A4A4A"; fontcolor="#343434"; bgcolor="#F3F3F3";
-    app [label=<<b>アプリケーション</b><br align="left"/>Goで書いたプログラムもここで動く<br align="left"/>>, fillcolor="#D8E5FF", color="#1D4EB2"];
+    app [label=<<b>アプリケーション</b><br align="left"/>Goで書いたプログラムもここで動く<br align="left"/>>, fillcolor="#FFE9D6", color="#AB5A13"];
   }
 
   subgraph cluster_kernel {
     label=<<b>カーネル空間</b>>; labeljust="l"; style="rounded"; penwidth=1.6; margin=14;
-    color="#5846B2"; fontcolor="#3E3280"; bgcolor="#F5F3FF";
-    kernel [label=<<b>カーネル</b><br align="left"/>ファイル、ネットワーク、メモリを管理する<br align="left"/>>, fillcolor="#E8E3FF", color="#5846B2"];
+    color="#9430A9"; fontcolor="#6A2278"; bgcolor="#FCF0FE";
+    kernel [label=<<b>カーネル</b><br align="left"/>ファイル、ネットワーク、メモリを管理する<br align="left"/>>, fillcolor="#F7DDFC", color="#9430A9"];
   }
 
   hw [label=<<b>ハードウェア</b><br align="left"/>CPU、メモリ、ディスク、ネットワークカード<br align="left"/>>, fillcolor="#E4E4E4"];

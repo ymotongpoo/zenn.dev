@@ -18,16 +18,16 @@ digraph header_injection {
     fontcolor="#171717"
   ];
 
-  obi [label=<<font face="Poppins"><b>OBI</b></font>（<font face="JetBrains Mono">writeSubset</font> の戻りフック）>, fillcolor="#E8E3FF", color="#5846B2"];
+  obi [label=<<font face="Poppins"><b>OBI</b></font>（<font face="JetBrains Mono">writeSubset</font> の戻りフック）>, fillcolor="#F7DDFC", color="#9430A9"];
 
   subgraph cluster_path {
     label=<<b><font face="JetBrains Mono">net/http</font> がリクエストを書き出す経路</b><br align="left"/><br align="left"/>>;
     style="rounded"; labeljust="l"; penwidth=1.6; margin=14;
-    color="#1D4EB2"; fontcolor="#143880"; bgcolor="#EEF4FF";
+    color="#AB5A13"; fontcolor="#783F0E"; bgcolor="#FFF5ED";
 
     hdr [label=<<font face="JetBrains Mono"><b>http.Request.Header</b></font><br align="left"/><font face="JetBrains Mono">map[string][]string</font><br align="left"/>>, fillcolor="#E4E4E4"];
-    ws [label=<<font face="JetBrains Mono"><b>Header.writeSubset</b></font><br align="left"/>ヘッダを文字列にして積む<br align="left"/>>, fillcolor="#D8E5FF", color="#1D4EB2"];
-    bufw [label=<<font face="JetBrains Mono"><b>bufio.Writer</b></font><br align="left"/>buf にバイト列、n に書き込み済みバイト数<br align="left"/>>, fillcolor="#FFF0D8", color="#996719"];
+    ws [label=<<font face="JetBrains Mono"><b>Header.writeSubset</b></font><br align="left"/>ヘッダを文字列にして積む<br align="left"/>>, fillcolor="#FFE9D6", color="#AB5A13"];
+    bufw [label=<<font face="JetBrains Mono"><b>bufio.Writer</b></font><br align="left"/>buf にバイト列、n に書き込み済みバイト数<br align="left"/>>, fillcolor="#FFFCD7", color="#736B10"];
     sock [label=<<b>ソケット</b>>, fillcolor="#E4E4E4"];
 
     hdr -> ws;
@@ -36,5 +36,5 @@ digraph header_injection {
   }
 
   obi -> hdr [style=dashed, color="#AA3E6A", arrowhead=tee];
-  obi -> bufw [color="#5846B2", penwidth=1.8];
+  obi -> bufw [color="#9430A9", penwidth=1.8];
 }

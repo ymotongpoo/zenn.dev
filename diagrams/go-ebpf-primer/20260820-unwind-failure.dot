@@ -18,18 +18,18 @@ digraph unwind_failure {
   ];
 
   stack [shape=plain, style="", label=<
-    <table border="0" cellborder="1" cellspacing="0" cellpadding="6" color="#1D4EB2">
-      <tr><td align="left" bgcolor="#EEF4FF"><b>移動中のスタック</b></td></tr>
-      <tr><td align="left" bgcolor="#D8E5FF">いま見ているフレーム</td></tr>
+    <table border="0" cellborder="1" cellspacing="0" cellpadding="6" color="#AB5A13">
+      <tr><td align="left" bgcolor="#FFF5ED"><b>移動中のスタック</b></td></tr>
+      <tr><td align="left" bgcolor="#FFE9D6">いま見ているフレーム</td></tr>
       <tr><td align="left" bgcolor="#FDE1EC" port="ra">戻りアドレス <font face="JetBrains Mono"><b>0xTRAMPOLINE</b></font></td></tr>
-      <tr><td align="left" bgcolor="#D8E5FF">呼び出し元のフレーム …</td></tr>
+      <tr><td align="left" bgcolor="#FFE9D6">呼び出し元のフレーム …</td></tr>
     </table>>];
 
   walk [label=<<b>ランタイムがフレームを1つずつ辿る</b><br align="left"/>スタックの移動時とGCの走査時<br align="left"/>>,
         fillcolor="#E4E4E4"];
 
   lookup [label=<<b>戻りアドレスから関数を引く</b><br align="left"/><font face="JetBrains Mono">findfunc</font> が <font face="JetBrains Mono">.gopclntab</font> を検索する<br align="left"/>>,
-          fillcolor="#FFF0D8", color="#996719"];
+          fillcolor="#FFFCD7", color="#736B10"];
 
   ok [label=<<b>Go関数が見つかる</b><br align="left"/>フレームの大きさとポインタの位置が分かり、補正できる<br align="left"/>>,
       fillcolor="#D2F3DF", color="#038435"];

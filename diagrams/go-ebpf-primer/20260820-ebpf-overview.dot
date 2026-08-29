@@ -24,7 +24,7 @@ digraph ebpf_overview {
     color="#4A4A4A"; fontcolor="#343434"; bgcolor="#F3F3F3";
 
     loader [label=<<b>ローダー</b><br align="left"/>Goで書かれる（<font face="JetBrains Mono">cilium/ebpf</font>）<br align="left"/>>,
-            fillcolor="#D8E5FF", color="#1D4EB2"];
+            fillcolor="#FFE9D6", color="#AB5A13"];
     target [label=<<b>計装対象のGoバイナリ</b><br align="left"/>無改変のまま動く<br align="left"/>>,
             fillcolor="#E4E4E4"];
 
@@ -34,14 +34,14 @@ digraph ebpf_overview {
   subgraph cluster_kernel {
     label=<<b>カーネル空間</b>>;
     style="rounded"; labeljust="l"; penwidth=1.6; margin=14;
-    color="#5846B2"; fontcolor="#3E3280"; bgcolor="#F5F3FF";
+    color="#9430A9"; fontcolor="#6A2278"; bgcolor="#FCF0FE";
 
     verifier [label=<<b>検証器</b><br align="left"/>停止性とメモリ安全を静的に検査<br align="left"/>>,
-              fillcolor="#E8E3FF", color="#5846B2"];
+              fillcolor="#F7DDFC", color="#9430A9"];
     prog [label=<<b>eBPFプログラム</b><br align="left"/>イベントごとに実行されて終わる<br align="left"/>>,
-          fillcolor="#D8E5FF", color="#1D4EB2"];
+          fillcolor="#FFE9D6", color="#AB5A13"];
     map [label=<<b>マップ</b><br align="left"/>イベントをまたぐ状態を持つ<br align="left"/>>,
-        fillcolor="#FFF0D8", color="#996719"];
+        fillcolor="#FFFCD7", color="#736B10"];
 
     verifier -> prog;
     prog -> map [dir=both, xlabel="読み書き"];

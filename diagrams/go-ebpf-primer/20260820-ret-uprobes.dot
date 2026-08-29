@@ -17,14 +17,14 @@ digraph ret_uprobes {
     fontcolor="#171717"
   ];
 
-  decode [label=<<b>1命令ずつデコードする</b>>, fillcolor="#FFF0D8", color="#996719"];
+  decode [label=<<b>1命令ずつデコードする</b>>, fillcolor="#FFFCD7", color="#736B10"];
 
   code [shape=plain, style="", label=<
-    <table border="0" cellborder="1" cellspacing="0" cellpadding="6" color="#1D4EB2">
-      <tr><td colspan="2" align="left" bgcolor="#EEF4FF"><b><font face="JetBrains Mono">main.Lookup</font> の機械語</b>（return は1つ）</td></tr>
-      <tr><td align="left" bgcolor="#D8E5FF">…</td><td align="left" bgcolor="#D8E5FF">…</td></tr>
+    <table border="0" cellborder="1" cellspacing="0" cellpadding="6" color="#AB5A13">
+      <tr><td colspan="2" align="left" bgcolor="#FFF5ED"><b><font face="JetBrains Mono">main.Lookup</font> の機械語</b>（return は1つ）</td></tr>
+      <tr><td align="left" bgcolor="#FFE9D6">…</td><td align="left" bgcolor="#FFE9D6">…</td></tr>
       <tr><td align="left" bgcolor="#D2F3DF" port="ret1"><font face="JetBrains Mono">0x49e290</font></td><td align="left" bgcolor="#D2F3DF" port="ret1r"><font face="JetBrains Mono"><b>RET</b></font>（通常の経路）</td></tr>
-      <tr><td align="left" bgcolor="#D8E5FF"><font face="JetBrains Mono">0x49e291</font></td><td align="left" bgcolor="#D8E5FF"><font face="JetBrains Mono">CALL runtime.deferreturn</font></td></tr>
+      <tr><td align="left" bgcolor="#FFE9D6"><font face="JetBrains Mono">0x49e291</font></td><td align="left" bgcolor="#FFE9D6"><font face="JetBrains Mono">CALL runtime.deferreturn</font></td></tr>
       <tr><td align="left" bgcolor="#D2F3DF" port="ret2"><font face="JetBrains Mono">0x49e2a0</font></td><td align="left" bgcolor="#D2F3DF" port="ret2r"><font face="JetBrains Mono"><b>RET</b></font>（defer 経由の経路）</td></tr>
     </table>>];
 

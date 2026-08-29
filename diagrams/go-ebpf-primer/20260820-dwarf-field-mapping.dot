@@ -23,13 +23,13 @@ digraph dwarf_field_mapping {
   src [label=<<b>ソースコードの世界</b><br align="left"/><font face="JetBrains Mono">type record struct {<br align="left"/>　flag bool<br align="left"/>　count int64<br align="left"/>}</font><br align="left"/>>, fillcolor="#D2F3DF", color="#038435"];
 
   dwarf [shape=plain, style="", label=<
-    <table border="0" cellborder="1" cellspacing="0" cellpadding="6" color="#5846B2">
-      <tr><td colspan="2" align="left" bgcolor="#F5F3FF"><font face="Poppins"><b>DWARF</b></font>（<font face="JetBrains Mono">.debug_*</font> セクション）</td></tr>
-      <tr><td align="left" bgcolor="#E8E3FF"><font face="JetBrains Mono">record.flag</font></td><td align="left" bgcolor="#E8E3FF">先頭から <font face="JetBrains Mono">+0</font></td></tr>
-      <tr><td align="left" bgcolor="#E8E3FF"><font face="JetBrains Mono">record.count</font></td><td align="left" bgcolor="#E8E3FF">先頭から <font face="JetBrains Mono">+8</font></td></tr>
+    <table border="0" cellborder="1" cellspacing="0" cellpadding="6" color="#9430A9">
+      <tr><td colspan="2" align="left" bgcolor="#FCF0FE"><font face="Poppins"><b>DWARF</b></font>（<font face="JetBrains Mono">.debug_*</font> セクション）</td></tr>
+      <tr><td align="left" bgcolor="#F7DDFC"><font face="JetBrains Mono">record.flag</font></td><td align="left" bgcolor="#F7DDFC">先頭から <font face="JetBrains Mono">+0</font></td></tr>
+      <tr><td align="left" bgcolor="#F7DDFC"><font face="JetBrains Mono">record.count</font></td><td align="left" bgcolor="#F7DDFC">先頭から <font face="JetBrains Mono">+8</font></td></tr>
     </table>>];
 
-  mem [label=<<b>実行中のメモリの世界</b><br align="left"/>バイト列とアドレスだけ<br align="left"/>>, fillcolor="#D8E5FF", color="#1D4EB2"];
+  mem [label=<<b>実行中のメモリの世界</b><br align="left"/>バイト列とアドレスだけ<br align="left"/>>, fillcolor="#FFE9D6", color="#AB5A13"];
 
   src -> dwarf [label=" コンパイラが\l 書き残す\l"];
   dwarf -> mem [label=" 名前から\l バイト位置を引く\l", style=dashed, color="#8A8A8A", fontcolor="#8A8A8A"];

@@ -23,7 +23,7 @@ digraph uretprobe_rewrite {
     color="#4A4A4A"; fontcolor="#343434"; bgcolor="#F3F3F3";
 
     stack_n [shape=plain, style="", label=<
-      <table border="0" cellborder="1" cellspacing="0" cellpadding="7" color="#1D4EB2" bgcolor="#D8E5FF">
+      <table border="0" cellborder="1" cellspacing="0" cellpadding="7" color="#AB5A13" bgcolor="#FFE9D6">
         <tr><td align="left">ローカル変数 …</td></tr>
         <tr><td align="left">戻りアドレス <font face="JetBrains Mono"><b>0x49e31f</b></font></td></tr>
       </table>>];
@@ -37,7 +37,7 @@ digraph uretprobe_rewrite {
     color="#AA3E6A"; fontcolor="#7A2C4C"; bgcolor="#FEF2F7";
 
     stack_u [shape=plain, style="", label=<
-      <table border="0" cellborder="1" cellspacing="0" cellpadding="7" color="#1D4EB2" bgcolor="#D8E5FF">
+      <table border="0" cellborder="1" cellspacing="0" cellpadding="7" color="#AB5A13" bgcolor="#FFE9D6">
         <tr><td align="left">ローカル変数 …</td></tr>
         <tr><td align="left" bgcolor="#FDE1EC">戻りアドレス <font face="JetBrains Mono"><b>0xTRAMPOLINE</b></font><br align="left"/><font color="#7A2C4C" point-size="11">← カーネルが書き換えた</font><br align="left"/></td></tr>
       </table>>];

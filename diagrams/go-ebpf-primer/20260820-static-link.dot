@@ -19,12 +19,12 @@ digraph static_link {
 
   cprog [label=<<b>Cで書いたプログラム</b><br align="left"/>自分のコードだけを持つ<br align="left"/>>, fillcolor="#E4E4E4"];
   libc [label=<<font face="JetBrains Mono"><b>libc.so</b></font>（共有ライブラリ）<br align="left"/>起動時に結び付けられ、置き場所は環境で変わる<br align="left"/>>,
-        fillcolor="#FFF0D8", color="#996719"];
+        fillcolor="#FFFCD7", color="#736B10"];
 
   goprog [label=<<b>Goで書いたプログラム</b><br align="left"/>自分のコード、標準ライブラリ、ランタイムを<br align="left"/>1つのバイナリに同梱する<br align="left"/>>,
-          fillcolor="#D8E5FF", color="#1D4EB2"];
+          fillcolor="#FFE9D6", color="#AB5A13"];
 
-  kernel [label=<<b>カーネル</b>>, fillcolor="#E8E3FF", color="#5846B2"];
+  kernel [label=<<b>カーネル</b>>, fillcolor="#F7DDFC", color="#9430A9"];
 
   cprog -> libc;
   libc -> kernel;
