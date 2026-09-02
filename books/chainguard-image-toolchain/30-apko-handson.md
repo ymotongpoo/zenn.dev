@@ -43,11 +43,11 @@ docker run --rm -v "${PWD}":/work cgr.dev/chainguard/apko \
   build apko.yaml hello:latest hello.tar
 ```
 
-引数は順に、設定ファイル、イメージに付けるタグ、出力先のtarballファイル名です。生成された`hello.tar`は、`docker load`でローカルのDockerデーモンに読み込めます。
+引数は順に、設定ファイル、イメージに付けるタグ、出力先のtarballファイル名です。生成された`hello.tar`は、`docker load`でローカルのDockerデーモンに読み込めます。apkoはアーキテクチャを1つしか指定していなくても常にOCI Image Indexとして出力するため、`docker load`はタグの末尾にアーキテクチャ名を付けます。今回は`hello:latest-amd64`という名前で読み込まれます。
 
 ```shell
 docker load < hello.tar
-docker run --rm hello:latest
+docker run --rm hello:latest-amd64
 ```
 
 実行すると、GNU Helloが標準の挨拶文を出力します。Dockerfileを一切書かずに、宣言だけからここまで到達したことになります。

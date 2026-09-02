@@ -16,7 +16,7 @@ docker run --rm -v "${PWD}":/work cgr.dev/chainguard/melange keygen
 
 ## ビルド定義を用意する
 
-melangeの[README](https://github.com/chainguard-dev/melange)に載っているquickstart例をそのまま使います。GNU Hello（`hello`コマンド）をソースからビルドする定義です。4章で見た骨格に、実際に動かすための`copyright`とチェックサムを補うと、次のようになります。
+melangeの[README](https://github.com/chainguard-dev/melange)に載っているquickstart例は、4章で見たとおりビルド環境にAlpine Linuxの公式リポジトリを使っています。ただし本書では、この後の7章で組み立てるAPKをWolfiベースのapkoイメージに組み込むため、ビルド環境もWolfi自身のリポジトリに揃えます。3章で確認したとおり、Alpine Linuxは標準Cライブラリに`musl`を、Wolfiは`glibc`を使っており、Alpine環境でビルドしたバイナリはWolfiのイメージにそのまま乗せられません。READMEの例をWolfi向けに書き換えると、次のようになります。
 
 ```yaml
 package:
@@ -29,12 +29,14 @@ package:
 
 environment:
   contents:
+    keyring:
+      - https://packages.wolfi.dev/os/wolfi-signing.rsa.pub
     repositories:
-      - https://dl-cdn.alpinelinux.org/alpine/edge/main
+      - https://packages.wolfi.dev/os
     packages:
-      - alpine-baselayout-data
-      - busybox
+      - wolfi-base
       - build-base
+      - ca-certificates-bundle
 
 pipeline:
   - uses: fetch
@@ -47,7 +49,7 @@ pipeline:
   - uses: strip
 ```
 
-`environment.contents`でビルド環境自体をAlpine Linuxの公式リポジトリのパッケージ（`busybox`とビルドツール一式の`build-base`）から組み立て、`pipeline`でソース取得からビルド、インストール、デバッグシンボルの除去までを順に実行しています。`autoconf/configure`や`autoconf/make`は、`./configure && make`に相当する処理を共通化した組み込みアクションです。この例がWolfi自身のパッケージではなくAlpineのリポジトリを使っているのは、3章で触れたブートストラップの話がそのまま表れている箇所です。melangeのビルド環境を組み立てる材料は、Wolfiのパッケージに限らず、既存のAlpineエコシステムをベースとして使うこともできます。
+`environment.contents`でビルド環境自体をWolfiのパッケージ（3章で見た最小構成の`wolfi-base`と、ビルドツール一式の`build-base`、HTTPS通信に使う`ca-certificates-bundle`）から組み立て、`pipeline`でソース取得からビルド、インストール、デバッグシンボルの除去までを順に実行しています。`autoconf/configure`や`autoconf/make`は、`./configure && make`に相当する処理を共通化した組み込みアクションです。`ca-certificates-bundle`を外すと、`fetch`アクションが`https://ftp.gnu.org`との通信でTLS証明書を検証できずに失敗するため、必須のパッケージです。
 
 ## ビルドを実行する
 

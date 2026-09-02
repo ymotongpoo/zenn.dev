@@ -6,7 +6,7 @@ title: "Chainguard Imagesの実運用"
 
 ## ビルドの実体はMakefileとCLI呼び出し
 
-Wolfiのパッケージ定義を管理する[wolfi-dev/os](https://github.com/wolfi-dev/os)リポジトリを実際に確認すると、ビルドを駆動しているのはリポジトリ直下の`Makefile`です。`melange`と`apko`のコマンドラインツールを直接呼び出す形でビルドが進み、BazelのBUILDファイルやWORKSPACEファイルは存在しません。CIもGitHub Actionsで構成されており、Bazelには依存していません。
+Wolfiのパッケージ定義を管理する[wolfi-dev/os](https://github.com/wolfi-dev/os)リポジトリを実際に確認すると、ビルドを駆動しているのはリポジトリ直下の`Makefile`です。`melange`と`apko`のコマンドラインツールを直接呼び出す形でビルドが進み、BazelのBUILDファイルやWORKSPACEファイルは存在しません。`.github/`配下にも、GitHub Actionsのワークフロー定義はなく、Chainguard社内の自動化ツールがOIDC経由でこのリポジトリへ書き込むための信頼設定が置かれているだけです。つまりBazelはもちろん、公開されたGitHub Actionsのワークフローにも依存していません。
 
 つまり本書で確認してきた「melange.yamlを書いて`melange build`を実行し、apko.yamlを書いて`apko build`（または`apko publish`）を実行する」という手順は、簡略化した例え話ではなく、Chainguardが実際に行っていることとほぼ同じです。規模の違いはあっても、パイプラインの骨格は5章と7章のハンズオンで手を動かしたものと変わりません。
 
@@ -88,9 +88,9 @@ archs:
 
 `FROM scratch`で最小限のファイルだけを積んでいたDockerfileの後半部分が、`wolfi-baselayout`と自分のバイナリだけを列挙する`contents.packages`に置き換わっています。Goのバイナリは静的リンクされることが多いため、実行に必要なランタイムライブラリを個別に指定する必要はほとんどありません。あとは7章と同じ`apko build`（または`apko publish`）で、Dockerfileを1行も書かずにイメージが完成します。
 
-## 毎晩ソースから再ビルドされる仕組み
+## 毎日ソースから再ビルドされる仕組み
 
-Chainguard Images（[chainguard-images](https://github.com/chainguard-images)組織で公開されているイメージ群）は、Wolfiのパッケージ定義とapkoの設定ファイルを起点に、定期的に自動でリビルドされる運用がとられています。3章で確認したとおり、Wolfiのパッケージはすべてmelangeでビルドされているため、上流のソフトウェアに脆弱性修正が入れば、Wolfi側のパッケージ定義を更新してmelangeで再ビルドするだけで、その修正を反映したAPKパッケージが手に入ります。apkoはそのAPKパッケージ群を組み合わせてイメージを再構成するだけなので、ビルドのたびに最新のパッケージ状態を反映した、CVEの少ないイメージを配布し続けられます。
+Chainguard Images（[chainguard-images](https://github.com/chainguard-images)組織で公開されているイメージ群）は、Wolfiのパッケージ定義とapkoの設定ファイルを起点に、[毎日ソースから再ビルドされる](https://www.chainguard.dev/containers)運用がとられています。3章で確認したとおり、Wolfiのパッケージはすべてmelangeでビルドされているため、上流のソフトウェアに脆弱性修正が入れば、Wolfi側のパッケージ定義を更新してmelangeで再ビルドするだけで、その修正を反映したAPKパッケージが手に入ります。apkoはそのAPKパッケージ群を組み合わせてイメージを再構成するだけなので、ビルドのたびに最新のパッケージ状態を反映した、CVEの少ないイメージを配布し続けられます。
 
 この運用が成立する背景には、2章で確認した課題の裏返しがあります。Dockerfileベースのアプローチでは、ベースイメージの中身がどう構成されているか外部から機械的に把握しづらく、脆弱性の有無を正確に追跡するにはスキャンに頼らざるを得ませんでした。melangeとapkoの組み合わせでは、イメージの中身がAPKパッケージの列挙として宣言されており、SBOMもビルドプロセスの内部情報から生成されるため、どのバージョンのどのパッケージが含まれているかを常に正確に把握できます。
 
