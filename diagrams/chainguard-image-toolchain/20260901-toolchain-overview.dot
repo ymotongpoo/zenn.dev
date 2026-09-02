@@ -1,0 +1,37 @@
+// melangeとapkoの連携全体像
+digraph chainguard_pipeline {
+  graph [
+    rankdir=TB, splines=ortho,
+    fontname="IBM Plex Sans JP", fontsize=13,
+    nodesep=0.5, ranksep=0.6,
+    bgcolor="white", pad=0.25
+  ];
+  node [
+    fontname="IBM Plex Sans JP", fontsize=12,
+    shape=box, style="rounded,filled",
+    fillcolor="#F1F1F1", color="#4A4A4A", penwidth=1.6,
+    margin="0.2,0.14"
+  ];
+  edge [
+    fontname="IBM Plex Sans JP", fontsize=11,
+    color="#343434", penwidth=1.4, arrowsize=0.9,
+    fontcolor="#171717"
+  ];
+
+  source [label=<<b>ソースコード</b><br align="left"/>アプリケーションやライブラリ<br align="left"/>>, fillcolor="#FFE9D6", color="#AB5A13"];
+  melange [label=<<b>melange</b><br align="left"/>宣言的パイプラインで<br align="left"/>APKパッケージをビルド<br align="left"/>>, fillcolor="#FFE9D6", color="#AB5A13"];
+  apk_own [label=<<b>自前のAPKパッケージ</b><br align="left"/>SBOM同梱、署名済み<br align="left"/>>, fillcolor="#FFFCD7", color="#736B10"];
+  wolfi [label=<<b>Wolfi公開リポジトリ</b><br align="left"/>packages.wolfi.dev<br align="left"/>>, fillcolor="#E4E4E4", color="#4A4A4A"];
+  apko [label=<<b>apko</b><br align="left"/>APKだけからOCIイメージを<br align="left"/>宣言的に組み立てる<br align="left"/>>, fillcolor="#FFE9D6", color="#AB5A13"];
+  oci [label=<<b>OCIイメージ</b><br align="left"/>合成SBOM付き<br align="left"/>>, fillcolor="#FFFCD7", color="#736B10"];
+  registry [label=<<b>コンテナレジストリ</b><br align="left"/>apko publishでpush<br align="left"/>>, fillcolor="#E4E4E4", color="#4A4A4A"];
+
+  source -> melange;
+  melange -> apk_own;
+  apk_own -> apko;
+  wolfi -> apko;
+  apko -> oci;
+  oci -> registry;
+
+  { rank=same; apk_own; wolfi; }
+}

@@ -1,0 +1,18 @@
+title: "Chainguardに学ぶセキュアなコンテナイメージの作り方"
+summary: "Chainguard社はDockerfileを使わず、melangeとapkoという2つのOSSツールを組み合わせてセキュアなコンテナイメージを作っています。本書はこの2ツールとWolfi OSがどう連携しているかを、概念の説明とハンズオンを交互に積み重ねながら手元で確かめる本です。ソースコードからAPKパッケージを作り、それをコンテナイメージに組み立て、実際にレジストリへ配布するところまで扱います。"
+topics: ["container", "chainguard", "security", "sbom", "linux"]
+published: true
+price: 0 # 有料の場合200〜5000
+# 本に含めるチャプターを順番に並べましょう
+chapters:
+  - 00-introduction
+  - 05-problem
+  - 10-wolfi
+  - 15-melange-concept
+  - 20-melange-handson
+  - 25-apko-concept
+  - 30-apko-handson
+  - 35-melange-apko-integration
+  - 60-chainguard-images-practice
+  - 65-conclusion
+  - 99-references
