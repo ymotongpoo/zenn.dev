@@ -9,34 +9,34 @@ digraph struct_layout {
   node [
     fontname="IBM Plex Sans JP", fontsize=12,
     shape=box, style="rounded,filled",
-    fillcolor="#F1F5F9", color="#475569", penwidth=1.6,
+    fillcolor="#F1F1F1", color="#4A4A4A", penwidth=1.6,
     margin="0.2,0.14"
   ];
   edge [
     fontname="IBM Plex Sans JP", fontsize=11,
-    color="#334155", penwidth=1.4, arrowsize=0.9,
-    fontcolor="#1E293B"
+    color="#343434", penwidth=1.4, arrowsize=0.9,
+    fontcolor="#171717"
   ];
   ranksep=1.0;
 
   src [shape=plain, style="", label=<
-    <table border="0" cellborder="1" cellspacing="0" cellpadding="6" color="#3F6E3F">
-      <tr><td align="left" bgcolor="#F0F7F0"><b>ソースに書いた構造体</b></td></tr>
-      <tr><td align="left" bgcolor="#D6E8D6"><font face="JetBrains Mono">type record struct {</font></td></tr>
-      <tr><td align="left" bgcolor="#D6E8D6"><font face="JetBrains Mono">&nbsp;&nbsp;&nbsp;&nbsp;flag bool</font></td></tr>
-      <tr><td align="left" bgcolor="#D6E8D6"><font face="JetBrains Mono">&nbsp;&nbsp;&nbsp;&nbsp;count int64</font></td></tr>
-      <tr><td align="left" bgcolor="#D6E8D6"><font face="JetBrains Mono">&nbsp;&nbsp;&nbsp;&nbsp;id int32</font></td></tr>
-      <tr><td align="left" bgcolor="#D6E8D6"><font face="JetBrains Mono">}</font></td></tr>
+    <table border="0" cellborder="1" cellspacing="0" cellpadding="6" color="#038435">
+      <tr><td align="left" bgcolor="#EBFAF1"><b>ソースに書いた構造体</b></td></tr>
+      <tr><td align="left" bgcolor="#D2F3DF"><font face="JetBrains Mono">type record struct {</font></td></tr>
+      <tr><td align="left" bgcolor="#D2F3DF"><font face="JetBrains Mono">&nbsp;&nbsp;&nbsp;&nbsp;flag bool</font></td></tr>
+      <tr><td align="left" bgcolor="#D2F3DF"><font face="JetBrains Mono">&nbsp;&nbsp;&nbsp;&nbsp;count int64</font></td></tr>
+      <tr><td align="left" bgcolor="#D2F3DF"><font face="JetBrains Mono">&nbsp;&nbsp;&nbsp;&nbsp;id int32</font></td></tr>
+      <tr><td align="left" bgcolor="#D2F3DF"><font face="JetBrains Mono">}</font></td></tr>
     </table>>];
 
   mem [shape=plain, style="", label=<
-    <table border="0" cellborder="1" cellspacing="0" cellpadding="6" color="#38638F">
-      <tr><td colspan="2" align="left" bgcolor="#EFF5FB"><b>メモリ上の並び</b>（合計24バイト）</td></tr>
-      <tr><td align="left" bgcolor="#D9E7F4"><font face="JetBrains Mono">+0</font></td><td align="left" bgcolor="#D9E7F4">1バイトの値</td></tr>
-      <tr><td align="left" bgcolor="#F3E8CE"><font face="JetBrains Mono">+1 〜 +7</font></td><td align="left" bgcolor="#F3E8CE">詰め物（8バイト境界に合わせる）</td></tr>
-      <tr><td align="left" bgcolor="#D9E7F4"><font face="JetBrains Mono">+8</font></td><td align="left" bgcolor="#D9E7F4">8バイトの値</td></tr>
-      <tr><td align="left" bgcolor="#D9E7F4"><font face="JetBrains Mono">+16</font></td><td align="left" bgcolor="#D9E7F4">4バイトの値</td></tr>
-      <tr><td align="left" bgcolor="#F3E8CE"><font face="JetBrains Mono">+20 〜 +23</font></td><td align="left" bgcolor="#F3E8CE">詰め物</td></tr>
+    <table border="0" cellborder="1" cellspacing="0" cellpadding="6" color="#AB5A13">
+      <tr><td colspan="2" align="left" bgcolor="#FFF5ED"><b>メモリ上の並び</b>（合計24バイト）</td></tr>
+      <tr><td align="left" bgcolor="#FFE9D6"><font face="JetBrains Mono">+0</font></td><td align="left" bgcolor="#FFE9D6">1バイトの値</td></tr>
+      <tr><td align="left" bgcolor="#FFFCD7"><font face="JetBrains Mono">+1 〜 +7</font></td><td align="left" bgcolor="#FFFCD7">詰め物（8バイト境界に合わせる）</td></tr>
+      <tr><td align="left" bgcolor="#FFE9D6"><font face="JetBrains Mono">+8</font></td><td align="left" bgcolor="#FFE9D6">8バイトの値</td></tr>
+      <tr><td align="left" bgcolor="#FFE9D6"><font face="JetBrains Mono">+16</font></td><td align="left" bgcolor="#FFE9D6">4バイトの値</td></tr>
+      <tr><td align="left" bgcolor="#FFFCD7"><font face="JetBrains Mono">+20 〜 +23</font></td><td align="left" bgcolor="#FFFCD7">詰め物</td></tr>
     </table>>];
 
   src -> mem [label=" コンパイルすると名前は消え、\l バイト位置だけが残る\l", penwidth=1.8];

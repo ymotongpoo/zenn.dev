@@ -8,28 +8,28 @@ digraph fetch_execute_loop {
   node [
     fontname="IBM Plex Sans JP", fontsize=12,
     shape=box, style="rounded,filled",
-    fillcolor="#F1F5F9", color="#475569", penwidth=1.6,
+    fillcolor="#F1F1F1", color="#4A4A4A", penwidth=1.6,
     margin="0.2,0.14"
   ];
   edge [
     fontname="IBM Plex Sans JP", fontsize=11,
-    color="#334155", penwidth=1.4, arrowsize=0.9,
-    fontcolor="#1E293B"
+    color="#343434", penwidth=1.4, arrowsize=0.9,
+    fontcolor="#171717"
   ];
 
   loop [shape=plain, style="", label=<
-    <table border="0" cellborder="1" cellspacing="0" cellpadding="7" color="#475569">
-      <tr><td align="left" bgcolor="#F4F6F8"><b>時刻</b></td>
-          <td align="left" bgcolor="#F4F6F8"><b>PCの値</b></td>
-          <td align="left" bgcolor="#F4F6F8"><b>メモリ（テキスト領域）から取り出して実行する命令</b></td></tr>
-      <tr><td align="left" bgcolor="#D9E7F4">時刻1</td>
+    <table border="0" cellborder="1" cellspacing="0" cellpadding="7" color="#4A4A4A">
+      <tr><td align="left" bgcolor="#F3F3F3"><b>時刻</b></td>
+          <td align="left" bgcolor="#F3F3F3"><b>PCの値</b></td>
+          <td align="left" bgcolor="#F3F3F3"><b>メモリ（テキスト領域）から取り出して実行する命令</b></td></tr>
+      <tr><td align="left" bgcolor="#FFE9D6">時刻1</td>
           <td align="left" bgcolor="#FFFFFF"><font face="JetBrains Mono">0x100</font></td>
-          <td align="left" bgcolor="#D6E8D6"><font face="JetBrains Mono">0x100</font> にある命令A（3バイト）。実行してPCを <font face="JetBrains Mono">0x103</font> へ進める</td></tr>
-      <tr><td align="left" bgcolor="#D9E7F4">時刻2</td>
+          <td align="left" bgcolor="#D2F3DF"><font face="JetBrains Mono">0x100</font> にある命令A（3バイト）。実行してPCを <font face="JetBrains Mono">0x103</font> へ進める</td></tr>
+      <tr><td align="left" bgcolor="#FFE9D6">時刻2</td>
           <td align="left" bgcolor="#FFFFFF"><font face="JetBrains Mono">0x103</font></td>
-          <td align="left" bgcolor="#D6E8D6"><font face="JetBrains Mono">0x103</font> にある命令B（1バイト）。実行してPCを <font face="JetBrains Mono">0x104</font> へ進める</td></tr>
-      <tr><td align="left" bgcolor="#D9E7F4">時刻3</td>
+          <td align="left" bgcolor="#D2F3DF"><font face="JetBrains Mono">0x103</font> にある命令B（1バイト）。実行してPCを <font face="JetBrains Mono">0x104</font> へ進める</td></tr>
+      <tr><td align="left" bgcolor="#FFE9D6">時刻3</td>
           <td align="left" bgcolor="#FFFFFF"><font face="JetBrains Mono">0x104</font></td>
-          <td align="left" bgcolor="#D6E8D6"><font face="JetBrains Mono">0x104</font> にある命令C。同じ繰り返しが続く</td></tr>
+          <td align="left" bgcolor="#D2F3DF"><font face="JetBrains Mono">0x104</font> にある命令C。同じ繰り返しが続く</td></tr>
     </table>>];
 }

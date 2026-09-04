@@ -9,28 +9,28 @@ digraph g_reuse {
   node [
     fontname="IBM Plex Sans JP", fontsize=12,
     shape=box, style="rounded,filled",
-    fillcolor="#F1F5F9", color="#475569", penwidth=1.6,
+    fillcolor="#F1F1F1", color="#4A4A4A", penwidth=1.6,
     margin="0.2,0.14"
   ];
   edge [
     fontname="IBM Plex Sans JP", fontsize=11,
-    color="#334155", penwidth=1.4, arrowsize=0.9,
-    fontcolor="#1E293B"
+    color="#343434", penwidth=1.4, arrowsize=0.9,
+    fontcolor="#171717"
   ];
 
   t1 [label=<<b>時刻1</b><br align="left"/>goroutine A の g は <font face="JetBrains Mono">0xc000102000</font><br align="left"/>>,
-      fillcolor="#D9E7F4", color="#38638F"];
+      fillcolor="#FFE9D6", color="#AB5A13"];
   t2 [label=<<b>時刻2</b><br align="left"/>A のスタックだけが別の領域へ移る<br align="left"/>g は <font face="JetBrains Mono">0xc000102000</font> のまま<br align="left"/>>,
-      fillcolor="#D9E7F4", color="#38638F"];
+      fillcolor="#FFE9D6", color="#AB5A13"];
   t3 [label=<<b>時刻3</b><br align="left"/>A が終了する<br align="left"/>>,
-      fillcolor="#EDF1F5"];
+      fillcolor="#E4E4E4"];
   t4 [label=<<b>時刻4</b><br align="left"/>goroutine B の g として <font face="JetBrains Mono">0xc000102000</font> が再利用される<br align="left"/>>,
-      fillcolor="#F3E8CE", color="#96742E"];
+      fillcolor="#FFFCD7", color="#736B10"];
   risk [label=<<b>古いマップ要素を消していないと</b><br align="left"/>B の処理が A の記録を拾う<br align="left"/>>,
-        fillcolor="#F5DEDE", color="#A04848"];
+        fillcolor="#FDE1EC", color="#AA3E6A"];
 
   t1 -> t2 [label=" 処理中は同じ識別子として使える"];
   t2 -> t3;
   t3 -> t4;
-  t4 -> risk [style=dashed, color="#A04848"];
+  t4 -> risk [style=dashed, color="#AA3E6A"];
 }

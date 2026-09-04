@@ -8,38 +8,38 @@ digraph unwind_failure {
   node [
     fontname="IBM Plex Sans JP", fontsize=12,
     shape=box, style="rounded,filled",
-    fillcolor="#F1F5F9", color="#475569", penwidth=1.6,
+    fillcolor="#F1F1F1", color="#4A4A4A", penwidth=1.6,
     margin="0.2,0.14"
   ];
   edge [
     fontname="IBM Plex Sans JP", fontsize=11,
-    color="#334155", penwidth=1.4, arrowsize=0.9,
-    fontcolor="#1E293B"
+    color="#343434", penwidth=1.4, arrowsize=0.9,
+    fontcolor="#171717"
   ];
 
   stack [shape=plain, style="", label=<
-    <table border="0" cellborder="1" cellspacing="0" cellpadding="6" color="#38638F">
-      <tr><td align="left" bgcolor="#EFF5FB"><b>移動中のスタック</b></td></tr>
-      <tr><td align="left" bgcolor="#D9E7F4">いま見ているフレーム</td></tr>
-      <tr><td align="left" bgcolor="#F5DEDE" port="ra">戻りアドレス <font face="JetBrains Mono"><b>0xTRAMPOLINE</b></font></td></tr>
-      <tr><td align="left" bgcolor="#D9E7F4">呼び出し元のフレーム …</td></tr>
+    <table border="0" cellborder="1" cellspacing="0" cellpadding="6" color="#AB5A13">
+      <tr><td align="left" bgcolor="#FFF5ED"><b>移動中のスタック</b></td></tr>
+      <tr><td align="left" bgcolor="#FFE9D6">いま見ているフレーム</td></tr>
+      <tr><td align="left" bgcolor="#FDE1EC" port="ra">戻りアドレス <font face="JetBrains Mono"><b>0xTRAMPOLINE</b></font></td></tr>
+      <tr><td align="left" bgcolor="#FFE9D6">呼び出し元のフレーム …</td></tr>
     </table>>];
 
   walk [label=<<b>ランタイムがフレームを1つずつ辿る</b><br align="left"/>スタックの移動時とGCの走査時<br align="left"/>>,
-        fillcolor="#EDF1F5"];
+        fillcolor="#E4E4E4"];
 
   lookup [label=<<b>戻りアドレスから関数を引く</b><br align="left"/><font face="JetBrains Mono">findfunc</font> が <font face="JetBrains Mono">.gopclntab</font> を検索する<br align="left"/>>,
-          fillcolor="#F3E8CE", color="#96742E"];
+          fillcolor="#FFFCD7", color="#736B10"];
 
   ok [label=<<b>Go関数が見つかる</b><br align="left"/>フレームの大きさとポインタの位置が分かり、補正できる<br align="left"/>>,
-      fillcolor="#D6E8D6", color="#3F6E3F"];
+      fillcolor="#D2F3DF", color="#038435"];
   ng [label=<<b>トランポリンは表に無い</b><br align="left"/>どの関数のフレームか分からない<br align="left"/>>,
-      fillcolor="#F5DEDE", color="#A04848"];
+      fillcolor="#FDE1EC", color="#AA3E6A"];
 
-  crash [label=<<font face="JetBrains Mono"><b>throw("unknown caller pc")</b></font>>, fillcolor="#F5DEDE", color="#A04848"];
+  crash [label=<<font face="JetBrains Mono"><b>throw("unknown caller pc")</b></font>>, fillcolor="#FDE1EC", color="#AA3E6A"];
 
   walk -> lookup [penwidth=1.8];
-  stack -> lookup [style=dashed, color="#7C8DA3"];
+  stack -> lookup [style=dashed, color="#8A8A8A"];
   lookup -> ok;
   lookup -> ng;
   ng -> crash;

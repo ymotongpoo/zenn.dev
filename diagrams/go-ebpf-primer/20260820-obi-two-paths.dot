@@ -9,25 +9,25 @@ digraph obi_two_paths {
   node [
     fontname="IBM Plex Sans JP", fontsize=12,
     shape=box, style="rounded,filled",
-    fillcolor="#F1F5F9", color="#475569", penwidth=1.6,
+    fillcolor="#F1F1F1", color="#4A4A4A", penwidth=1.6,
     margin="0.2,0.14"
   ];
   edge [
     fontname="IBM Plex Sans JP", fontsize=11,
-    color="#334155", penwidth=1.4, arrowsize=0.9,
-    fontcolor="#1E293B"
+    color="#343434", penwidth=1.4, arrowsize=0.9,
+    fontcolor="#171717"
   ];
 
-  obi [label=<<font face="Poppins"><b>OBI</b></font>>, fillcolor="#EDF1F5"];
+  obi [label=<<font face="Poppins"><b>OBI</b></font>>, fillcolor="#E4E4E4"];
 
   proto [label=<<b>プロトコル計装</b><br align="left"/>ソケットを流れるバイト列を解釈<br align="left"/>HTTP/1.1、HTTP/2、gRPC、MySQL、Redis<br align="left"/>>,
-         fillcolor="#D6E8D6", color="#3F6E3F"];
+         fillcolor="#D2F3DF", color="#038435"];
   lib [label=<<b>ランタイムとライブラリの計装</b><br align="left"/>対象の環境ごとに個別の実装が要る<br align="left"/>関数計装を持つのはGoだけ<br align="left"/>>,
-       fillcolor="#D9E7F4", color="#38638F"];
+       fillcolor="#FFE9D6", color="#AB5A13"];
 
-  proto_res [label=<<b>言語に依存しない</b>>, fillcolor="#F0F7F0", color="#3F6E3F"];
+  proto_res [label=<<b>言語に依存しない</b>>, fillcolor="#EBFAF1", color="#038435"];
   lib_res [label=<<b>本書が扱う4つの難所</b><br align="left"/>可動スタック、レジスタABI<br align="left"/>オフセット追従、goroutine<br align="left"/>>,
-           fillcolor="#EFF5FB", color="#38638F"];
+           fillcolor="#FFF5ED", color="#AB5A13"];
 
   // obi からの2本は「横に伸びてから真下に折れる」形にする。splines=ortho の
   // 直角配線を dot に任せると、必ず「真下に降りてから横に折れて子の側面に入る」
@@ -45,7 +45,7 @@ digraph obi_two_paths {
   wl -> proto;
   obi -> wr [dir=none, penwidth=1.8];
   wr -> lib [penwidth=1.8];
-  proto -> proto_res [style=dashed, color="#7C8DA3"];
+  proto -> proto_res [style=dashed, color="#8A8A8A"];
   lib -> lib_res [penwidth=1.8];
 
   { rank=same; wl; obi; wr; }

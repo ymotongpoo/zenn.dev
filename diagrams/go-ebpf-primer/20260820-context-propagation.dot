@@ -9,40 +9,40 @@ digraph context_propagation {
   node [
     fontname="IBM Plex Sans JP", fontsize=12,
     shape=box, style="rounded,filled",
-    fillcolor="#F1F5F9", color="#475569", penwidth=1.6,
+    fillcolor="#F1F1F1", color="#4A4A4A", penwidth=1.6,
     margin="0.2,0.14"
   ];
   edge [
     fontname="IBM Plex Sans JP", fontsize=11,
-    color="#334155", penwidth=1.4, arrowsize=0.9,
-    fontcolor="#1E293B"
+    color="#343434", penwidth=1.4, arrowsize=0.9,
+    fontcolor="#171717"
   ];
 
   subgraph cluster_svca {
     label=<<b>サービスA（1プロセス）</b>>;
     style="rounded"; labeljust="l"; penwidth=1.6; margin=14;
-    color="#38638F"; fontcolor="#2E4D6E"; bgcolor="#EFF5FB";
+    color="#AB5A13"; fontcolor="#783F0E"; bgcolor="#FFF5ED";
 
-    recv [label=<<b>受信 goroutine</b>　トレース開始>, fillcolor="#D9E7F4", color="#38638F"];
-    proc [label=<<b>処理 goroutine</b>>, fillcolor="#D9E7F4", color="#38638F"];
-    send [label=<<b>送信 goroutine</b><br align="left"/><font face="JetBrains Mono">writeSubset</font> で直列化<br align="left"/>>, fillcolor="#D9E7F4", color="#38638F"];
+    recv [label=<<b>受信 goroutine</b>　トレース開始>, fillcolor="#FFE9D6", color="#AB5A13"];
+    proc [label=<<b>処理 goroutine</b>>, fillcolor="#FFE9D6", color="#AB5A13"];
+    send [label=<<b>送信 goroutine</b><br align="left"/><font face="JetBrains Mono">writeSubset</font> で直列化<br align="left"/>>, fillcolor="#FFE9D6", color="#AB5A13"];
 
     recv -> proc [xlabel="newproc1 で親子を記録"];
     proc -> send [xlabel="遡れるのは6段まで"];
   }
 
   p1 [label=<<b>経路1</b><br align="left"/><font face="JetBrains Mono">bufio.Writer</font> のバッファに<br align="left"/><font face="JetBrains Mono">bpf_probe_write_user</font> で追記<br align="left"/>>,
-      fillcolor="#E9DFF2", color="#75589C"];
+      fillcolor="#F7DDFC", color="#9430A9"];
   p2 [label=<<b>経路2</b><br align="left"/><font face="JetBrains Mono">sk_msg</font> で送出される<br align="left"/>バイト列を伸ばす<br align="left"/>>,
-      fillcolor="#E9DFF2", color="#75589C"];
-  lock [label=<<font face="Poppins"><b>kernel lockdown / Secure Boot</b></font>>, fillcolor="#F5DEDE", color="#A04848"];
-  svcb [label=<<b>サービスB</b>　traceparent を受け取る>, fillcolor="#EDF1F5"];
+      fillcolor="#F7DDFC", color="#9430A9"];
+  lock [label=<<font face="Poppins"><b>kernel lockdown / Secure Boot</b></font>>, fillcolor="#FDE1EC", color="#AA3E6A"];
+  svcb [label=<<b>サービスB</b>　traceparent を受け取る>, fillcolor="#E4E4E4"];
 
   { rank=same; p1; p2; }
 
   send -> p1;
   send -> p2;
-  lock -> p1 [style=dashed, color="#A04848", arrowhead=tee, xlabel="経路1を無効化"];
+  lock -> p1 [style=dashed, color="#AA3E6A", arrowhead=tee, xlabel="経路1を無効化"];
   p1 -> svcb;
   p2 -> svcb;
 }

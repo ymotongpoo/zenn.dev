@@ -9,20 +9,20 @@ digraph cow_page_swap {
   node [
     fontname="IBM Plex Sans JP", fontsize=12,
     shape=box, style="rounded,filled",
-    fillcolor="#F1F5F9", color="#475569", penwidth=1.6,
+    fillcolor="#F1F1F1", color="#4A4A4A", penwidth=1.6,
     margin="0.2,0.14"
   ];
   edge [
     fontname="IBM Plex Sans JP", fontsize=11,
-    color="#334155", penwidth=1.4, arrowsize=0.9,
-    fontcolor="#1E293B"
+    color="#343434", penwidth=1.4, arrowsize=0.9,
+    fontcolor="#171717"
   ];
 
-  pa [label=<<b>プロセスAの対応表</b>>, fillcolor="#D9E7F4", color="#38638F"];
-  pb [label=<<b>プロセスBの対応表</b><br align="left"/>（Bの機械語を書き換えたい）<br align="left"/>>, fillcolor="#D6E8D6", color="#3F6E3F"];
+  pa [label=<<b>プロセスAの対応表</b>>, fillcolor="#FFE9D6", color="#AB5A13"];
+  pb [label=<<b>プロセスBの対応表</b><br align="left"/>（Bの機械語を書き換えたい）<br align="left"/>>, fillcolor="#D2F3DF", color="#038435"];
 
-  orig [label=<<b>共有ページ</b><br align="left"/>変わらない<br align="left"/>>, fillcolor="#D9E7F4", color="#38638F"];
-  copy [label=<<b>B専用のコピー</b><br align="left"/>この1ページだけ書き換えた<br align="left"/>>, fillcolor="#F5DEDE", color="#A04848"];
+  orig [label=<<b>共有ページ</b><br align="left"/>変わらない<br align="left"/>>, fillcolor="#FFE9D6", color="#AB5A13"];
+  copy [label=<<b>B専用のコピー</b><br align="left"/>この1ページだけ書き換えた<br align="left"/>>, fillcolor="#FDE1EC", color="#AA3E6A"];
 
   { rank=same; pa; pb; }
   pa -> pb [style=invis];
@@ -30,5 +30,5 @@ digraph cow_page_swap {
 
   pa -> orig [xlabel="指したまま"];
   pb -> copy [xlabel="差し替わる"];
-  orig -> copy [style=dashed, color="#7C8DA3", constraint=false];
+  orig -> copy [style=dashed, color="#8A8A8A", constraint=false];
 }

@@ -9,34 +9,34 @@ digraph stack_move {
   node [
     fontname="IBM Plex Sans JP", fontsize=12,
     shape=box, style="rounded,filled",
-    fillcolor="#F1F5F9", color="#475569", penwidth=1.6,
+    fillcolor="#F1F1F1", color="#4A4A4A", penwidth=1.6,
     margin="0.2,0.14"
   ];
   edge [
     fontname="IBM Plex Sans JP", fontsize=11,
-    color="#334155", penwidth=1.4, arrowsize=0.9,
-    fontcolor="#1E293B"
+    color="#343434", penwidth=1.4, arrowsize=0.9,
+    fontcolor="#171717"
   ];
 
   before [shape=plain, style="", label=<
-    <table border="0" cellborder="1" cellspacing="0" cellpadding="6" color="#38638F">
-      <tr><td align="left" bgcolor="#EFF5FB"><b>いまのスタック</b>（たとえば8KB）</td></tr>
-      <tr><td align="left" bgcolor="#D9E7F4"><font face="JetBrains Mono">main</font> のフレーム</td></tr>
-      <tr><td align="left" bgcolor="#D9E7F4">呼び出し先のフレーム …</td></tr>
-      <tr><td align="left" bgcolor="#F5DEDE">これ以上積む余地がない</td></tr>
+    <table border="0" cellborder="1" cellspacing="0" cellpadding="6" color="#AB5A13">
+      <tr><td align="left" bgcolor="#FFF5ED"><b>いまのスタック</b>（たとえば8KB）</td></tr>
+      <tr><td align="left" bgcolor="#FFE9D6"><font face="JetBrains Mono">main</font> のフレーム</td></tr>
+      <tr><td align="left" bgcolor="#FFE9D6">呼び出し先のフレーム …</td></tr>
+      <tr><td align="left" bgcolor="#FDE1EC">これ以上積む余地がない</td></tr>
     </table>>];
 
   check [label=<<b>関数の入口でスタックの残りを調べる</b><br align="left"/>足りなければ <font face="JetBrains Mono">runtime.morestack</font> へ飛ぶ<br align="left"/>>,
-         fillcolor="#F3E8CE", color="#96742E"];
-  alloc [label=<<b>より大きい領域を確保する</b>>, fillcolor="#F3E8CE", color="#96742E"];
+         fillcolor="#FFFCD7", color="#736B10"];
+  alloc [label=<<b>より大きい領域を確保する</b>>, fillcolor="#FFFCD7", color="#736B10"];
   copy [label=<<b>中身をまるごとコピーし、ポインタを補正する</b><br align="left"/>戻りアドレスからどの関数のフレームかを引き、1フレームずつ辿って書き換える<br align="left"/>>,
-        fillcolor="#F3E8CE", color="#96742E"];
+        fillcolor="#FFFCD7", color="#736B10"];
 
   after [shape=plain, style="", label=<
-    <table border="0" cellborder="1" cellspacing="0" cellpadding="6" color="#38638F">
-      <tr><td align="left" bgcolor="#EFF5FB"><b>引っ越し後のスタック</b>（16KB、別のアドレス）</td></tr>
-      <tr><td align="left" bgcolor="#D9E7F4"><font face="JetBrains Mono">main</font> のフレーム（アドレスが変わった）</td></tr>
-      <tr><td align="left" bgcolor="#D9E7F4">呼び出し先のフレーム …</td></tr>
+    <table border="0" cellborder="1" cellspacing="0" cellpadding="6" color="#AB5A13">
+      <tr><td align="left" bgcolor="#FFF5ED"><b>引っ越し後のスタック</b>（16KB、別のアドレス）</td></tr>
+      <tr><td align="left" bgcolor="#FFE9D6"><font face="JetBrains Mono">main</font> のフレーム（アドレスが変わった）</td></tr>
+      <tr><td align="left" bgcolor="#FFE9D6">呼び出し先のフレーム …</td></tr>
     </table>>];
 
   before -> check;

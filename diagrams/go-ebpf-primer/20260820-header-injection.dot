@@ -9,32 +9,32 @@ digraph header_injection {
   node [
     fontname="IBM Plex Sans JP", fontsize=12,
     shape=box, style="rounded,filled",
-    fillcolor="#F1F5F9", color="#475569", penwidth=1.6,
+    fillcolor="#F1F1F1", color="#4A4A4A", penwidth=1.6,
     margin="0.2,0.14"
   ];
   edge [
     fontname="IBM Plex Sans JP", fontsize=11,
-    color="#334155", penwidth=1.4, arrowsize=0.9,
-    fontcolor="#1E293B"
+    color="#343434", penwidth=1.4, arrowsize=0.9,
+    fontcolor="#171717"
   ];
 
-  obi [label=<<font face="Poppins"><b>OBI</b></font>（<font face="JetBrains Mono">writeSubset</font> の戻りフック）>, fillcolor="#E9DFF2", color="#75589C"];
+  obi [label=<<font face="Poppins"><b>OBI</b></font>（<font face="JetBrains Mono">writeSubset</font> の戻りフック）>, fillcolor="#F7DDFC", color="#9430A9"];
 
   subgraph cluster_path {
     label=<<b><font face="JetBrains Mono">net/http</font> がリクエストを書き出す経路</b><br align="left"/><br align="left"/>>;
     style="rounded"; labeljust="l"; penwidth=1.6; margin=14;
-    color="#38638F"; fontcolor="#2E4D6E"; bgcolor="#EFF5FB";
+    color="#AB5A13"; fontcolor="#783F0E"; bgcolor="#FFF5ED";
 
-    hdr [label=<<font face="JetBrains Mono"><b>http.Request.Header</b></font><br align="left"/><font face="JetBrains Mono">map[string][]string</font><br align="left"/>>, fillcolor="#EDF1F5"];
-    ws [label=<<font face="JetBrains Mono"><b>Header.writeSubset</b></font><br align="left"/>ヘッダを文字列にして積む<br align="left"/>>, fillcolor="#D9E7F4", color="#38638F"];
-    bufw [label=<<font face="JetBrains Mono"><b>bufio.Writer</b></font><br align="left"/>buf にバイト列、n に書き込み済みバイト数<br align="left"/>>, fillcolor="#F3E8CE", color="#96742E"];
-    sock [label=<<b>ソケット</b>>, fillcolor="#EDF1F5"];
+    hdr [label=<<font face="JetBrains Mono"><b>http.Request.Header</b></font><br align="left"/><font face="JetBrains Mono">map[string][]string</font><br align="left"/>>, fillcolor="#E4E4E4"];
+    ws [label=<<font face="JetBrains Mono"><b>Header.writeSubset</b></font><br align="left"/>ヘッダを文字列にして積む<br align="left"/>>, fillcolor="#FFE9D6", color="#AB5A13"];
+    bufw [label=<<font face="JetBrains Mono"><b>bufio.Writer</b></font><br align="left"/>buf にバイト列、n に書き込み済みバイト数<br align="left"/>>, fillcolor="#FFFCD7", color="#736B10"];
+    sock [label=<<b>ソケット</b>>, fillcolor="#E4E4E4"];
 
     hdr -> ws;
     ws -> bufw;
     bufw -> sock;
   }
 
-  obi -> hdr [style=dashed, color="#A04848", arrowhead=tee];
-  obi -> bufw [color="#75589C", penwidth=1.8];
+  obi -> hdr [style=dashed, color="#AA3E6A", arrowhead=tee];
+  obi -> bufw [color="#9430A9", penwidth=1.8];
 }

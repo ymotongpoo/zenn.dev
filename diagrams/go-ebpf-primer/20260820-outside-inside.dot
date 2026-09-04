@@ -8,21 +8,21 @@ digraph outside_inside {
   node [
     fontname="IBM Plex Sans JP", fontsize=12,
     shape=box, style="rounded,filled",
-    fillcolor="#F1F5F9", color="#475569", penwidth=1.6,
+    fillcolor="#F1F1F1", color="#4A4A4A", penwidth=1.6,
     margin="0.2,0.14"
   ];
   edge [
     fontname="IBM Plex Sans JP", fontsize=11,
-    color="#334155", penwidth=1.4, arrowsize=0.9,
-    fontcolor="#1E293B"
+    color="#343434", penwidth=1.4, arrowsize=0.9,
+    fontcolor="#171717"
   ];
 
   outside [label=<<b>外からの観測：eBPF / OBI</b><br align="left"/>利点：アプリを変更せずに済む<br align="left"/>コスト：内部構造を追いかけ続ける宿命を負う<br align="left"/>>,
-           fillcolor="#D9E7F4", color="#38638F"];
+           fillcolor="#FFE9D6", color="#AB5A13"];
   inside [label=<<b>内からの観測：Goランタイム</b><br align="left"/>利点：正確で壊れにくい<br align="left"/>コスト：コードやビルドへの関与が要る<br align="left"/>>,
-          fillcolor="#D6E8D6", color="#3F6E3F"];
+          fillcolor="#D2F3DF", color="#038435"];
 
-  app [label=<<b>Goアプリケーション</b>>, fillcolor="#EDF1F5"];
+  app [label=<<b>Goアプリケーション</b>>, fillcolor="#E4E4E4"];
 
   { rank=same; outside; inside; }
 

@@ -8,28 +8,28 @@ digraph ret_uprobes {
   node [
     fontname="IBM Plex Sans JP", fontsize=12,
     shape=box, style="rounded,filled",
-    fillcolor="#F1F5F9", color="#475569", penwidth=1.6,
+    fillcolor="#F1F1F1", color="#4A4A4A", penwidth=1.6,
     margin="0.2,0.14"
   ];
   edge [
     fontname="IBM Plex Sans JP", fontsize=11,
-    color="#334155", penwidth=1.4, arrowsize=0.9,
-    fontcolor="#1E293B"
+    color="#343434", penwidth=1.4, arrowsize=0.9,
+    fontcolor="#171717"
   ];
 
-  decode [label=<<b>1命令ずつデコードする</b>>, fillcolor="#F3E8CE", color="#96742E"];
+  decode [label=<<b>1命令ずつデコードする</b>>, fillcolor="#FFFCD7", color="#736B10"];
 
   code [shape=plain, style="", label=<
-    <table border="0" cellborder="1" cellspacing="0" cellpadding="6" color="#38638F">
-      <tr><td colspan="2" align="left" bgcolor="#EFF5FB"><b><font face="JetBrains Mono">main.Lookup</font> の機械語</b>（return は1つ）</td></tr>
-      <tr><td align="left" bgcolor="#D9E7F4">…</td><td align="left" bgcolor="#D9E7F4">…</td></tr>
-      <tr><td align="left" bgcolor="#D6E8D6" port="ret1"><font face="JetBrains Mono">0x49e290</font></td><td align="left" bgcolor="#D6E8D6" port="ret1r"><font face="JetBrains Mono"><b>RET</b></font>（通常の経路）</td></tr>
-      <tr><td align="left" bgcolor="#D9E7F4"><font face="JetBrains Mono">0x49e291</font></td><td align="left" bgcolor="#D9E7F4"><font face="JetBrains Mono">CALL runtime.deferreturn</font></td></tr>
-      <tr><td align="left" bgcolor="#D6E8D6" port="ret2"><font face="JetBrains Mono">0x49e2a0</font></td><td align="left" bgcolor="#D6E8D6" port="ret2r"><font face="JetBrains Mono"><b>RET</b></font>（defer 経由の経路）</td></tr>
+    <table border="0" cellborder="1" cellspacing="0" cellpadding="6" color="#AB5A13">
+      <tr><td colspan="2" align="left" bgcolor="#FFF5ED"><b><font face="JetBrains Mono">main.Lookup</font> の機械語</b>（return は1つ）</td></tr>
+      <tr><td align="left" bgcolor="#FFE9D6">…</td><td align="left" bgcolor="#FFE9D6">…</td></tr>
+      <tr><td align="left" bgcolor="#D2F3DF" port="ret1"><font face="JetBrains Mono">0x49e290</font></td><td align="left" bgcolor="#D2F3DF" port="ret1r"><font face="JetBrains Mono"><b>RET</b></font>（通常の経路）</td></tr>
+      <tr><td align="left" bgcolor="#FFE9D6"><font face="JetBrains Mono">0x49e291</font></td><td align="left" bgcolor="#FFE9D6"><font face="JetBrains Mono">CALL runtime.deferreturn</font></td></tr>
+      <tr><td align="left" bgcolor="#D2F3DF" port="ret2"><font face="JetBrains Mono">0x49e2a0</font></td><td align="left" bgcolor="#D2F3DF" port="ret2r"><font face="JetBrains Mono"><b>RET</b></font>（defer 経由の経路）</td></tr>
     </table>>];
 
-  up1 [label=<<font face="Poppins"><b>uprobe</b></font><br align="left"/>通常の出口（<font face="JetBrains Mono">0x49e290</font>）<br align="left"/>>, fillcolor="#D6E8D6", color="#3F6E3F"];
-  up2 [label=<<font face="Poppins"><b>uprobe</b></font><br align="left"/>defer 経由の出口（<font face="JetBrains Mono">0x49e2a0</font>）<br align="left"/>>, fillcolor="#D6E8D6", color="#3F6E3F"];
+  up1 [label=<<font face="Poppins"><b>uprobe</b></font><br align="left"/>通常の出口（<font face="JetBrains Mono">0x49e290</font>）<br align="left"/>>, fillcolor="#D2F3DF", color="#038435"];
+  up2 [label=<<font face="Poppins"><b>uprobe</b></font><br align="left"/>defer 経由の出口（<font face="JetBrains Mono">0x49e2a0</font>）<br align="left"/>>, fillcolor="#D2F3DF", color="#038435"];
 
   { rank=same; up1; up2; }
 

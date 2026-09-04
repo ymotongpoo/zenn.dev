@@ -9,30 +9,30 @@ digraph goroutine_scheduling {
   node [
     fontname="IBM Plex Sans JP", fontsize=12,
     shape=box, style="rounded,filled",
-    fillcolor="#F1F5F9", color="#475569", penwidth=1.6,
+    fillcolor="#F1F1F1", color="#4A4A4A", penwidth=1.6,
     margin="0.2,0.14"
   ];
   edge [
     fontname="IBM Plex Sans JP", fontsize=11,
-    color="#334155", penwidth=1.4, arrowsize=0.9,
-    fontcolor="#1E293B"
+    color="#343434", penwidth=1.4, arrowsize=0.9,
+    fontcolor="#171717"
   ];
 
-  g1 [label=<<font face="Poppins">goroutine <b>g1</b></font>>, fillcolor="#D9E7F4", color="#38638F"];
-  g2 [label=<<font face="Poppins">goroutine <b>g2</b></font>>, fillcolor="#D9E7F4", color="#38638F"];
-  g3 [label=<<font face="Poppins">goroutine <b>g3</b></font>>, fillcolor="#D9E7F4", color="#38638F"];
-  g4 [label=<<font face="Poppins">goroutine <b>g4</b></font>>, fillcolor="#D9E7F4", color="#38638F"];
+  g1 [label=<<font face="Poppins">goroutine <b>g1</b></font>>, fillcolor="#FFE9D6", color="#AB5A13"];
+  g2 [label=<<font face="Poppins">goroutine <b>g2</b></font>>, fillcolor="#FFE9D6", color="#AB5A13"];
+  g3 [label=<<font face="Poppins">goroutine <b>g3</b></font>>, fillcolor="#FFE9D6", color="#AB5A13"];
+  g4 [label=<<font face="Poppins">goroutine <b>g4</b></font>>, fillcolor="#FFE9D6", color="#AB5A13"];
   { rank=same; g1; g2; g3; g4; }
 
-  p1 [label=<<font face="Poppins"><b>p</b></font>（実行資源と待ち行列）>, fillcolor="#E9DFF2", color="#75589C"];
-  p2 [label=<<font face="Poppins"><b>p</b></font>（実行資源と待ち行列）>, fillcolor="#E9DFF2", color="#75589C"];
+  p1 [label=<<font face="Poppins"><b>p</b></font>（実行資源と待ち行列）>, fillcolor="#F7DDFC", color="#9430A9"];
+  p2 [label=<<font face="Poppins"><b>p</b></font>（実行資源と待ち行列）>, fillcolor="#F7DDFC", color="#9430A9"];
   { rank=same; p1; p2; }
 
-  m1 [label=<<font face="Poppins"><b>m</b></font>（OSスレッド）>, fillcolor="#F3E8CE", color="#96742E"];
-  m2 [label=<<font face="Poppins"><b>m</b></font>（OSスレッド）>, fillcolor="#F3E8CE", color="#96742E"];
+  m1 [label=<<font face="Poppins"><b>m</b></font>（OSスレッド）>, fillcolor="#FFFCD7", color="#736B10"];
+  m2 [label=<<font face="Poppins"><b>m</b></font>（OSスレッド）>, fillcolor="#FFFCD7", color="#736B10"];
   { rank=same; m1; m2; }
 
-  cpu [label=<<font face="Poppins"><b>CPU</b></font>（コアの数だけ同時に走る）>, fillcolor="#EDF1F5"];
+  cpu [label=<<font face="Poppins"><b>CPU</b></font>（コアの数だけ同時に走る）>, fillcolor="#E4E4E4"];
 
   g1 -> p1;
   g2 -> p1;

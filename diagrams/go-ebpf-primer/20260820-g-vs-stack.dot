@@ -9,28 +9,28 @@ digraph g_vs_stack {
   node [
     fontname="IBM Plex Sans JP", fontsize=12,
     shape=box, style="rounded,filled",
-    fillcolor="#F1F5F9", color="#475569", penwidth=1.6,
+    fillcolor="#F1F1F1", color="#4A4A4A", penwidth=1.6,
     margin="0.2,0.14"
   ];
   edge [
     fontname="IBM Plex Sans JP", fontsize=11,
-    color="#334155", penwidth=1.4, arrowsize=0.9,
-    fontcolor="#1E293B"
+    color="#343434", penwidth=1.4, arrowsize=0.9,
+    fontcolor="#171717"
   ];
 
   gtable [shape=plain, style="", label=<
-    <table border="0" cellborder="1" cellspacing="0" cellpadding="6" color="#75589C">
-      <tr><td colspan="2" align="left" bgcolor="#F5F1F9"><b>g 構造体</b>（ヒープ上、<font face="JetBrains Mono">0xc000102000</font>）</td></tr>
-      <tr><td align="left" bgcolor="#E9DFF2"><font face="JetBrains Mono">stack.lo</font></td><td align="left" bgcolor="#E9DFF2">スタックの下端</td></tr>
-      <tr><td align="left" bgcolor="#E9DFF2"><font face="JetBrains Mono">stack.hi</font></td><td align="left" bgcolor="#E9DFF2">スタックの上端</td></tr>
-      <tr><td colspan="2" align="left" bgcolor="#F5F1F9">goroutineが生きているあいだ、このアドレスは変わらない</td></tr>
+    <table border="0" cellborder="1" cellspacing="0" cellpadding="6" color="#9430A9">
+      <tr><td colspan="2" align="left" bgcolor="#FCF0FE"><b>g 構造体</b>（ヒープ上、<font face="JetBrains Mono">0xc000102000</font>）</td></tr>
+      <tr><td align="left" bgcolor="#F7DDFC"><font face="JetBrains Mono">stack.lo</font></td><td align="left" bgcolor="#F7DDFC">スタックの下端</td></tr>
+      <tr><td align="left" bgcolor="#F7DDFC"><font face="JetBrains Mono">stack.hi</font></td><td align="left" bgcolor="#F7DDFC">スタックの上端</td></tr>
+      <tr><td colspan="2" align="left" bgcolor="#FCF0FE">goroutineが生きているあいだ、このアドレスは変わらない</td></tr>
     </table>>];
 
-  areaA [label=<<b>スタック領域A</b><br align="left"/><font face="JetBrains Mono">0x2522317ac000</font>〜（伸長前）<br align="left"/>>, fillcolor="#EDF1F5"];
-  areaB [label=<<b>スタック領域B</b><br align="left"/><font face="JetBrains Mono">0x2522319df000</font>〜（伸長後）<br align="left"/>>, fillcolor="#D9E7F4", color="#38638F"];
+  areaA [label=<<b>スタック領域A</b><br align="left"/><font face="JetBrains Mono">0x2522317ac000</font>〜（伸長前）<br align="left"/>>, fillcolor="#E4E4E4"];
+  areaB [label=<<b>スタック領域B</b><br align="left"/><font face="JetBrains Mono">0x2522319df000</font>〜（伸長後）<br align="left"/>>, fillcolor="#FFE9D6", color="#AB5A13"];
 
   { rank=same; areaA; areaB; }
 
-  gtable -> areaA [style=dashed, color="#7C8DA3"];
+  gtable -> areaA [style=dashed, color="#8A8A8A"];
   gtable -> areaB [penwidth=1.8];
 }

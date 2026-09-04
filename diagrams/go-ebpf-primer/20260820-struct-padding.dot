@@ -9,27 +9,27 @@ digraph struct_padding {
   node [
     fontname="IBM Plex Sans JP", fontsize=12,
     shape=box, style="rounded,filled",
-    fillcolor="#F1F5F9", color="#475569", penwidth=1.6,
+    fillcolor="#F1F1F1", color="#4A4A4A", penwidth=1.6,
     margin="0.2,0.14"
   ];
   edge [
     fontname="IBM Plex Sans JP", fontsize=11,
-    color="#334155", penwidth=1.4, arrowsize=0.9,
-    fontcolor="#1E293B"
+    color="#343434", penwidth=1.4, arrowsize=0.9,
+    fontcolor="#171717"
   ];
 
   rec [shape=plain, style="", label=<
-    <table border="0" cellborder="1" cellspacing="0" cellpadding="7" color="#475569">
-      <tr><td colspan="2" align="left" bgcolor="#F4F6F8"><font face="JetBrains Mono"><b>record</b></font>（合計24バイト）</td></tr>
-      <tr><td align="left" bgcolor="#D9E7F4"><font face="JetBrains Mono">+0</font></td>
-          <td align="left" bgcolor="#D9E7F4"><font face="JetBrains Mono">flag bool</font>（1バイト）</td></tr>
-      <tr><td align="left" bgcolor="#F3E8CE"><font face="JetBrains Mono">+1 〜 +7</font></td>
-          <td align="left" bgcolor="#F3E8CE">詰め物（countを8の倍数の番地から始めるため）</td></tr>
-      <tr><td align="left" bgcolor="#D9E7F4"><font face="JetBrains Mono">+8 〜 +15</font></td>
-          <td align="left" bgcolor="#D9E7F4"><font face="JetBrains Mono">count int64</font>（8バイト）</td></tr>
-      <tr><td align="left" bgcolor="#D9E7F4"><font face="JetBrains Mono">+16 〜 +19</font></td>
-          <td align="left" bgcolor="#D9E7F4"><font face="JetBrains Mono">id int32</font>（4バイト）</td></tr>
-      <tr><td align="left" bgcolor="#F3E8CE"><font face="JetBrains Mono">+20 〜 +23</font></td>
-          <td align="left" bgcolor="#F3E8CE">詰め物（全体の大きさを8の倍数にするため）</td></tr>
+    <table border="0" cellborder="1" cellspacing="0" cellpadding="7" color="#4A4A4A">
+      <tr><td colspan="2" align="left" bgcolor="#F3F3F3"><font face="JetBrains Mono"><b>record</b></font>（合計24バイト）</td></tr>
+      <tr><td align="left" bgcolor="#FFE9D6"><font face="JetBrains Mono">+0</font></td>
+          <td align="left" bgcolor="#FFE9D6"><font face="JetBrains Mono">flag bool</font>（1バイト）</td></tr>
+      <tr><td align="left" bgcolor="#FFFCD7"><font face="JetBrains Mono">+1 〜 +7</font></td>
+          <td align="left" bgcolor="#FFFCD7">詰め物（countを8の倍数の番地から始めるため）</td></tr>
+      <tr><td align="left" bgcolor="#FFE9D6"><font face="JetBrains Mono">+8 〜 +15</font></td>
+          <td align="left" bgcolor="#FFE9D6"><font face="JetBrains Mono">count int64</font>（8バイト）</td></tr>
+      <tr><td align="left" bgcolor="#FFE9D6"><font face="JetBrains Mono">+16 〜 +19</font></td>
+          <td align="left" bgcolor="#FFE9D6"><font face="JetBrains Mono">id int32</font>（4バイト）</td></tr>
+      <tr><td align="left" bgcolor="#FFFCD7"><font face="JetBrains Mono">+20 〜 +23</font></td>
+          <td align="left" bgcolor="#FFFCD7">詰め物（全体の大きさを8の倍数にするため）</td></tr>
     </table>>];
 }

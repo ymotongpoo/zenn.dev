@@ -9,35 +9,35 @@ digraph newproc1_map {
   node [
     fontname="IBM Plex Sans JP", fontsize=12,
     shape=box, style="rounded,filled",
-    fillcolor="#F1F5F9", color="#475569", penwidth=1.6,
+    fillcolor="#F1F1F1", color="#4A4A4A", penwidth=1.6,
     margin="0.2,0.14"
   ];
   edge [
     fontname="IBM Plex Sans JP", fontsize=11,
-    color="#334155", penwidth=1.4, arrowsize=0.9,
-    fontcolor="#1E293B"
+    color="#343434", penwidth=1.4, arrowsize=0.9,
+    fontcolor="#171717"
   ];
 
-  call [label=<<b><font face="JetBrains Mono">go f()</font> が <font face="JetBrains Mono">runtime.newproc1</font> を呼ぶ</b>>, fillcolor="#EDF1F5"];
+  call [label=<<b><font face="JetBrains Mono">go f()</font> が <font face="JetBrains Mono">runtime.newproc1</font> を呼ぶ</b>>, fillcolor="#E4E4E4"];
 
   entry [label=<<b>入口のフック</b><br align="left"/>第2引数にある親を控える<br align="left"/>子はまだ存在しない<br align="left"/>>,
-         fillcolor="#D9E7F4", color="#38638F"];
+         fillcolor="#FFE9D6", color="#AB5A13"];
 
   tmp [shape=plain, style="", label=<
-    <table border="0" cellborder="1" cellspacing="0" cellpadding="6" color="#96742E">
-      <tr><td colspan="2" align="left" bgcolor="#FAF4E4"><b><font face="JetBrains Mono">newproc1</font> マップ</b>（一時的な控え）</td></tr>
-      <tr><td align="left" bgcolor="#F3E8CE">キー</td><td align="left" bgcolor="#F3E8CE">入口と出口を対応づけるキー</td></tr>
-      <tr><td align="left" bgcolor="#F3E8CE">値</td><td align="left" bgcolor="#F3E8CE">親のアドレス</td></tr>
+    <table border="0" cellborder="1" cellspacing="0" cellpadding="6" color="#736B10">
+      <tr><td colspan="2" align="left" bgcolor="#FFFEED"><b><font face="JetBrains Mono">newproc1</font> マップ</b>（一時的な控え）</td></tr>
+      <tr><td align="left" bgcolor="#FFFCD7">キー</td><td align="left" bgcolor="#FFFCD7">入口と出口を対応づけるキー</td></tr>
+      <tr><td align="left" bgcolor="#FFFCD7">値</td><td align="left" bgcolor="#FFFCD7">親のアドレス</td></tr>
     </table>>];
 
   ret [label=<<b>出口のフック</b><br align="left"/>戻り値に子のアドレスが入る<br align="left"/>>,
-       fillcolor="#D9E7F4", color="#38638F"];
+       fillcolor="#FFE9D6", color="#AB5A13"];
 
   ongoing [shape=plain, style="", label=<
-    <table border="0" cellborder="1" cellspacing="0" cellpadding="6" color="#96742E">
-      <tr><td colspan="2" align="left" bgcolor="#FAF4E4"><b><font face="JetBrains Mono">ongoing_goroutines</font> マップ</b>（親子の記録）</td></tr>
-      <tr><td align="left" bgcolor="#F3E8CE">キー</td><td align="left" bgcolor="#F3E8CE">子のアドレスとPID</td></tr>
-      <tr><td align="left" bgcolor="#F3E8CE">値</td><td align="left" bgcolor="#F3E8CE">親のアドレスと時刻</td></tr>
+    <table border="0" cellborder="1" cellspacing="0" cellpadding="6" color="#736B10">
+      <tr><td colspan="2" align="left" bgcolor="#FFFEED"><b><font face="JetBrains Mono">ongoing_goroutines</font> マップ</b>（親子の記録）</td></tr>
+      <tr><td align="left" bgcolor="#FFFCD7">キー</td><td align="left" bgcolor="#FFFCD7">子のアドレスとPID</td></tr>
+      <tr><td align="left" bgcolor="#FFFCD7">値</td><td align="left" bgcolor="#FFFCD7">親のアドレスと時刻</td></tr>
     </table>>];
 
   call -> entry;

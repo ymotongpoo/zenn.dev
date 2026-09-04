@@ -9,32 +9,32 @@ digraph probe_insertion_uprobe {
   node [
     fontname="IBM Plex Sans JP", fontsize=12,
     shape=box, style="rounded,filled",
-    fillcolor="#F1F5F9", color="#475569", penwidth=1.6,
+    fillcolor="#F1F1F1", color="#4A4A4A", penwidth=1.6,
     margin="0.2,0.14"
   ];
   edge [
     fontname="IBM Plex Sans JP", fontsize=11,
-    color="#334155", penwidth=1.4, arrowsize=0.9,
-    fontcolor="#1E293B"
+    color="#343434", penwidth=1.4, arrowsize=0.9,
+    fontcolor="#171717"
   ];
 
   subgraph cluster_u {
     label=<<font face="Poppins"><b>uprobe</b></font>>;
-    fontcolor="#2E4D6E";
+    fontcolor="#783F0E";
     style="rounded"; labeljust="l"; penwidth=1.6; margin=14;
-    color="#38638F"; bgcolor="#EFF5FB";
+    color="#AB5A13"; bgcolor="#FFF5ED";
 
     code [shape=plain, style="", label=<
-      <table border="0" cellborder="1" cellspacing="0" cellpadding="6" color="#38638F">
-        <tr><td colspan="2" align="left" bgcolor="#EFF5FB"><b>コード領域 <font face="JetBrains Mono">0x49e180</font></b></td></tr>
-        <tr><td align="left" bgcolor="#D9E7F4">差し替え前</td><td align="left" bgcolor="#D9E7F4"><font face="JetBrains Mono">48 01 c0</font></td></tr>
-        <tr><td align="left" bgcolor="#F3E8CE">差し替え後</td><td align="left" bgcolor="#F3E8CE"><font face="JetBrains Mono"><b>cc</b> 01 c0</font></td></tr>
+      <table border="0" cellborder="1" cellspacing="0" cellpadding="6" color="#AB5A13">
+        <tr><td colspan="2" align="left" bgcolor="#FFF5ED"><b>コード領域 <font face="JetBrains Mono">0x49e180</font></b></td></tr>
+        <tr><td align="left" bgcolor="#FFE9D6">差し替え前</td><td align="left" bgcolor="#FFE9D6"><font face="JetBrains Mono">48 01 c0</font></td></tr>
+        <tr><td align="left" bgcolor="#FFFCD7">差し替え後</td><td align="left" bgcolor="#FFFCD7"><font face="JetBrains Mono"><b>cc</b> 01 c0</font></td></tr>
       </table>>];
-    trap_u [label=<<b>トラップしてカーネルへ</b><br align="left"/>レジスタ一式を保存<br align="left"/>>, fillcolor="#F3E8CE", color="#96742E"];
-    prog_u [label=<<b>eBPFプログラムが走る</b><br align="left"/>レジスタの写しを受け取る<br align="left"/>>, fillcolor="#D9E7F4", color="#38638F"];
+    trap_u [label=<<b>トラップしてカーネルへ</b><br align="left"/>レジスタ一式を保存<br align="left"/>>, fillcolor="#FFFCD7", color="#736B10"];
+    prog_u [label=<<b>eBPFプログラムが走る</b><br align="left"/>レジスタの写しを受け取る<br align="left"/>>, fillcolor="#FFE9D6", color="#AB5A13"];
     xol [label=<<b>控えた元の命令を実行</b><br align="left"/>カーネルが用意した別領域で<br align="left"/>>,
-         fillcolor="#F3E8CE", color="#96742E"];
-    next_u [label=<<b>続きの命令へ戻る</b>>, fillcolor="#D6E8D6", color="#3F6E3F"];
+         fillcolor="#FFFCD7", color="#736B10"];
+    next_u [label=<<b>続きの命令へ戻る</b>>, fillcolor="#D2F3DF", color="#038435"];
 
     code -> trap_u;
     trap_u -> prog_u;

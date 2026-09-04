@@ -8,19 +8,19 @@ digraph program_vs_process {
   node [
     fontname="IBM Plex Sans JP", fontsize=12,
     shape=box, style="rounded,filled",
-    fillcolor="#F1F5F9", color="#475569", penwidth=1.6,
+    fillcolor="#F1F1F1", color="#4A4A4A", penwidth=1.6,
     margin="0.2,0.14"
   ];
   edge [
     fontname="IBM Plex Sans JP", fontsize=11,
-    color="#334155", penwidth=1.4, arrowsize=0.9,
-    fontcolor="#1E293B"
+    color="#343434", penwidth=1.4, arrowsize=0.9,
+    fontcolor="#171717"
   ];
 
-  file [label=<<b>実行ファイル</b><br align="left"/>ディスク上のただのファイル<br align="left"/>>, fillcolor="#F3E8CE", color="#96742E"];
+  file [label=<<b>実行ファイル</b><br align="left"/>ディスク上のただのファイル<br align="left"/>>, fillcolor="#FFFCD7", color="#736B10"];
 
-  p1 [label=<<b>プロセス（PID 25）</b><br align="left"/>専用の仮想アドレス空間を持つ<br align="left"/>>, fillcolor="#D9E7F4", color="#38638F"];
-  p2 [label=<<b>プロセス（PID 31）</b><br align="left"/>専用の仮想アドレス空間を持つ<br align="left"/>>, fillcolor="#D9E7F4", color="#38638F"];
+  p1 [label=<<b>プロセス（PID 25）</b><br align="left"/>専用の仮想アドレス空間を持つ<br align="left"/>>, fillcolor="#FFE9D6", color="#AB5A13"];
+  p2 [label=<<b>プロセス（PID 31）</b><br align="left"/>専用の仮想アドレス空間を持つ<br align="left"/>>, fillcolor="#FFE9D6", color="#AB5A13"];
 
   { rank=same; p1; p2; }
 

@@ -9,41 +9,41 @@ digraph offset_resolution {
   node [
     fontname="IBM Plex Sans JP", fontsize=12,
     shape=box, style="rounded,filled",
-    fillcolor="#F1F5F9", color="#475569", penwidth=1.6,
+    fillcolor="#F1F1F1", color="#4A4A4A", penwidth=1.6,
     margin="0.2,0.14"
   ];
   edge [
     fontname="IBM Plex Sans JP", fontsize=11,
-    color="#334155", penwidth=1.4, arrowsize=0.9,
-    fontcolor="#1E293B"
+    color="#343434", penwidth=1.4, arrowsize=0.9,
+    fontcolor="#171717"
   ];
 
-  bin [label=<<b>計装対象のバイナリ</b>>, fillcolor="#EDF1F5"];
+  bin [label=<<b>計装対象のバイナリ</b>>, fillcolor="#E4E4E4"];
   dwarf [label=<<b>DWARFデバッグ情報を読む</b><br align="left"/>コンパイラが書き残したフィールドの位置<br align="left"/>>,
-         fillcolor="#D9E7F4", color="#38638F"];
+         fillcolor="#FFE9D6", color="#AB5A13"];
 
   got [label=<<b>読めたフィールド</b><br align="left"/>目の前のバイナリの事実なので追従が要らない<br align="left"/>>,
-       fillcolor="#D6E8D6", color="#3F6E3F"];
-  miss [label=<<b>読めなかったフィールド</b>>, fillcolor="#F3E8CE", color="#96742E"];
+       fillcolor="#D2F3DF", color="#038435"];
+  miss [label=<<b>読めなかったフィールド</b>>, fillcolor="#FFFCD7", color="#736B10"];
 
   json [label=<<b><font face="JetBrains Mono">offsets.json</font> を引く</b><br align="left"/><font face="JetBrains Mono">go-offsets-tracker</font> が自動更新する表<br align="left"/>>,
-        fillcolor="#F3E8CE", color="#96742E"];
+        fillcolor="#FFFCD7", color="#736B10"];
 
   ver [label=<<b>ビルド情報から版を割り出す</b><br align="left"/>Goと依存ライブラリのバージョン<br align="left"/>>,
-       fillcolor="#F3E8CE", color="#96742E"];
+       fillcolor="#FFFCD7", color="#736B10"];
 
-  use [label=<<b>1つのオフセット表として使う</b>>, fillcolor="#EDF1F5"];
-  fail [label=<<b>表にも無ければ、その項目だけ欠ける</b>>, fillcolor="#F5DEDE", color="#A04848"];
+  use [label=<<b>1つのオフセット表として使う</b>>, fillcolor="#E4E4E4"];
+  fail [label=<<b>表にも無ければ、その項目だけ欠ける</b>>, fillcolor="#FDE1EC", color="#AA3E6A"];
 
   bin -> dwarf;
   dwarf -> got;
   dwarf -> miss;
-  bin -> json [style=dashed, color="#7C8DA3"];
+  bin -> json [style=dashed, color="#8A8A8A"];
   miss -> json;
   json -> ver;
   got -> use [penwidth=1.8];
   ver -> use;
-  ver -> fail [style=dashed, color="#A04848"];
+  ver -> fail [style=dashed, color="#AA3E6A"];
 
   { rank=same; got; miss; }
   { rank=same; use; fail; }

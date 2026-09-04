@@ -9,25 +9,25 @@ digraph process_threads {
   node [
     fontname="IBM Plex Sans JP", fontsize=12,
     shape=box, style="rounded,filled",
-    fillcolor="#F1F5F9", color="#475569", penwidth=1.6,
+    fillcolor="#F1F1F1", color="#4A4A4A", penwidth=1.6,
     margin="0.2,0.14"
   ];
   edge [
     fontname="IBM Plex Sans JP", fontsize=11,
-    color="#334155", penwidth=1.4, arrowsize=0.9,
-    fontcolor="#1E293B"
+    color="#343434", penwidth=1.4, arrowsize=0.9,
+    fontcolor="#171717"
   ];
 
   subgraph cluster_proc {
     label=<<b>1つのプロセス</b>>;
     style="rounded"; labeljust="l"; penwidth=1.6; margin=14;
-    color="#38638F"; fontcolor="#2E4D6E"; bgcolor="#EFF5FB";
+    color="#AB5A13"; fontcolor="#783F0E"; bgcolor="#FFF5ED";
 
-    t1 [label=<<b>スレッド1</b><br align="left"/>専用のスタック<br align="left"/>>, fillcolor="#D9E7F4", color="#38638F"];
-    t2 [label=<<b>スレッド2</b><br align="left"/>専用のスタック<br align="left"/>>, fillcolor="#D9E7F4", color="#38638F"];
-    t3 [label=<<b>スレッド3</b><br align="left"/>専用のスタック<br align="left"/>>, fillcolor="#D9E7F4", color="#38638F"];
+    t1 [label=<<b>スレッド1</b><br align="left"/>専用のスタック<br align="left"/>>, fillcolor="#FFE9D6", color="#AB5A13"];
+    t2 [label=<<b>スレッド2</b><br align="left"/>専用のスタック<br align="left"/>>, fillcolor="#FFE9D6", color="#AB5A13"];
+    t3 [label=<<b>スレッド3</b><br align="left"/>専用のスタック<br align="left"/>>, fillcolor="#FFE9D6", color="#AB5A13"];
 
-    shared [label=<<b>共有の領域</b><br align="left"/>ヒープ、データ、テキスト。どのスレッドからも見える<br align="left"/>>, fillcolor="#F3E8CE", color="#96742E"];
+    shared [label=<<b>共有の領域</b><br align="left"/>ヒープ、データ、テキスト。どのスレッドからも見える<br align="left"/>>, fillcolor="#FFFCD7", color="#736B10"];
 
     { rank=same; t1; t2; t3; }
     t1 -> shared [style=invis];
