@@ -178,7 +178,7 @@ services:
 
 マウントしている2つのパスにも役割があります。`/sys/kernel/security` はlockdownの状態を読むため、`/sys/fs/bpf` はeBPFマップをピン留めするためです。`/sys/fs/bpf` を渡さないと警告が出て、ピン留めしたマップを前提とする機能が無効になります。
 
-OBI側の環境変数は6つあり、うち2つはOpenTelemetry標準の変数をそのまま使っています。網羅的な一覧は[設定リファレンス](https://opentelemetry.io/docs/zero-code/obi/configure/options/)にあります。
+OBI側の環境変数は7つあり、うち2つはOpenTelemetry標準の変数をそのまま使っています。網羅的な一覧は[設定リファレンス](https://opentelemetry.io/docs/zero-code/obi/configure/options/)にあります。
 
 | 環境変数 | 意味 |
 |---|---|
@@ -188,6 +188,7 @@ OBI側の環境変数は6つあり、うち2つはOpenTelemetry標準の変数�
 | `OTEL_EBPF_METRICS_FEATURES` | 出すメトリクスの種類。`application` がHTTPやgRPCのリクエスト数、エラー、所要時間 |
 | `OTEL_EBPF_METRICS_INTERVAL` | メトリクスの送信間隔。デフォルトは60秒 |
 | `OTEL_EXPORTER_OTLP_ENDPOINT` | 送信先 |
+| `OTEL_EXPORTER_OTLP_PROTOCOL` | 送信に使うプロトコル。ここではgRPC |
 
 `OTEL_SERVICE_NAME` を計装対象のコンテナのほうに置いているのは、OBIが対象プロセスの環境変数からサービス名を読むからです。設定するのはOBIではなく、観測される側になります。
 

@@ -44,7 +44,7 @@ otel.GetTextMapPropagator().Inject(ctx, propagation.HeaderCarrier(req.Header))
 ![レジスタは読めるが、文脈は追えない](/images/20260820-context-not-traceable.png)
 *図2: 矢印はOBIにできることとできないことを表す。丸で止まっている破線が、できないほうである。点線はその理由を並べたもので、処理の流れではない。*
 
-OBIがフックを置くのは、goroutineの生成そのものです。呼び方を先にそろえておきます。`go f()` を実行してgoroutineを作る側を**親**、作られる側を**子**と呼びます。`go f()` と書いたときに最終的に呼ばれるランタイム関数が `runtime.newproc1` で、その簡略化したシグネチャは次のようになっています。
+OBIがフックを置くのは、goroutineの生成そのものです。呼び方を先にそろえておきます。`go f()` を実行してgoroutineを作る側を**親**、作られる側を**子**と呼びます。`go f()` と書いたときに最終的に呼ばれるランタイム関数が `runtime.newproc1` で、そのシグネチャは、go1.26では次のようになっています。
 
 ```go
 // 子の goroutine を作って返す。callergp は親の g

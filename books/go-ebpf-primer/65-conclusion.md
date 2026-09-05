@@ -8,7 +8,7 @@ title: "Go本体の動向とおわりに"
 
 結論として、eBPF計装を直接助ける機能はGo本体にほぼ入っていません。難所1のuretprobe問題（[#22008](https://github.com/golang/go/issues/22008)）は2017年から提起されていますが、長く「Unplanned」のまま棚上げされています。goroutineの起動にフックを差せるようにする提案（[#73798](https://github.com/golang/go/issues/73798)）は、2025年に「not planned」でクローズされました。
 
-Goチームの姿勢は一貫しています。**ランタイムの内部構造は公開APIではなく、外部から依存すべきでない**というものです。eBPF計装はまさにその非公開な内部に依存しているため、支援は得にくい状況です。難所3で見たオフセット追従のコストは、この設計思想の裏返しでもあります。もっとも、追従の主な相手はランタイム自身ではなく、標準ライブラリとサードパーティライブラリの非公開フィールドでした。内部構造を安定したAPIにしないという方針は、ランタイムにもライブラリにも共通しています。
+Goチームの姿勢は一貫しています。**ランタイムの内部構造は公開APIではなく、外部から依存すべきでない**というものです。eBPF計装はまさにその非公開な内部に依存しているため、支援は得にくい状況です。難所3で見たオフセット追従のコストは、この設計思想の裏返しでもあります。追従の相手はランタイム自身にも及びます。`offsets.json` には `runtime.hchan` や `runtime.moduledata` のようなランタイムの構造体も載っていて、動いた記録の半分近くを占めています。本書で見た `net/http` やgRPCのフィールドは標準ライブラリとサードパーティのものでしたが、内部構造を安定したAPIにしないという方針は、ランタイムにもライブラリにも共通しています。
 
 `goid` を公開しないという判断も、この考え方に基づいています。難所2でOBIが `g` のアドレスを識別子に選んだのは、公開されない値を無理に読むより、読まずに済ませるほうが壊れにくいという判断でした。外部ツール側が「読まない設計」に寄せることで折り合いをつけている、と言ってもいいでしょう。
 
@@ -40,7 +40,7 @@ retract v1.0.0 // otelc pin generates incorrect module paths in user go.mod file
 $ otelc go build -o myapp .
 ```
 
-`go build` の前に `otelc` を付けるだけで、ソースコードは1行も変更しません。ただし「`-toolexec` を使う」というのは比喩ではありません。`otelc go build` は内部で実際に `go build` を次のように組み立てて実行しています（`tool/internal/setup/setup.go` の `buildWithToolexec` 関数、[GitHub上のソース](https://github.com/open-telemetry/opentelemetry-go-compile-instrumentation/blob/v1.1.0/tool/internal/setup/setup.go#L536-L558)）。
+`go build` の前に `otelc` を付けるだけで、ソースコードは1行も変更しません。ただし「`-toolexec` を使う」というのは比喩ではありません。`otelc go build` は内部で実際に `go build` を次のように組み立てて実行しています（`tool/internal/setup/setup.go` の `buildWithToolexec` 関数、[GitHub上のソース](https://github.com/open-telemetry/opentelemetry-go-compile-instrumentation/blob/v1.1.0/tool/internal/setup/setup.go#L536-L596)）。
 
 ```console
 $ go build -work -toolexec="<otelcの実行パス> toolexec" -o myapp .
