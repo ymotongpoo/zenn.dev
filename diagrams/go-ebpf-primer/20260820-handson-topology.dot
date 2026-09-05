@@ -3,7 +3,7 @@ digraph handson_topology {
   graph [
     fontname="IBM Plex Sans JP", fontsize=13,
     rankdir=TB, compound=true, splines=ortho,
-    nodesep=0.45, ranksep=0.55, pad=0.25,
+    nodesep=0.6, ranksep=0.55, pad=0.25,
     bgcolor="white", newrank=true
   ];
   node [
@@ -22,21 +22,24 @@ digraph handson_topology {
         fillcolor="#E4E4E4", color="#4A4A4A"];
 
   subgraph cluster_app {
-    label=<<b>計装対象（Goのアプリ。コードは無改造）</b>>;
+    label=<<b>計装対象</b>>;
     style="rounded"; labeljust="l"; penwidth=1.6; margin=14;
     color="#AB5A13"; fontcolor="#783F0E"; bgcolor="#FFF5ED";
 
-    frontend [label=<<b>frontend</b>　<font face="JetBrains Mono">:8080</font><br align="left"/><font face="JetBrains Mono">/order</font> のハンドラが backend を呼ぶ<br align="left"/>>,
+    frontend [label=<<b>frontend</b>　<font face="JetBrains Mono">:8080</font><br align="left"/><font face="JetBrains Mono">/order</font> のハンドラ<br align="left"/>>,
               fillcolor="#FFE9D6", color="#AB5A13"];
     backend [label=<<b>backend</b>　<font face="JetBrains Mono">:8081</font><br align="left"/><font face="JetBrains Mono">/inventory</font> のハンドラ<br align="left"/>>,
              fillcolor="#FFE9D6", color="#AB5A13"];
+
+    frontend -> backend [constraint=false];
+    { rank=same; frontend; backend; }
   }
 
   obi [label=<<b>obi</b><br align="left"/><font face="JetBrains Mono">otel/ebpf-instrument</font><br align="left"/><font face="JetBrains Mono">privileged</font>、<font face="JetBrains Mono">pid: host</font><br align="left"/>>,
        fillcolor="#F7DDFC", color="#9430A9"];
 
   subgraph cluster_lgtm {
-    label=<<b><font face="JetBrains Mono">grafana/otel-lgtm</font>　（1つのコンテナ）</b>>;
+    label=<<b>Grafanaスタック</b>>;
     style="rounded"; labeljust="l"; penwidth=1.6; margin=14;
     color="#038435"; fontcolor="#025E26"; bgcolor="#EBFAF1";
 
@@ -51,13 +54,15 @@ digraph handson_topology {
     collector -> prom;
     tempo -> grafana;
     prom -> grafana;
+    { rank=same; tempo; prom; }
   }
 
   curl -> frontend;
-  frontend -> backend;
-  obi -> backend [style=dashed, color="#9430A9", constraint=false, lhead=cluster_app];
-  obi -> collector [penwidth=1.8, lhead=cluster_lgtm];
 
-  { rank=same; backend; obi; }
-  { rank=same; tempo; prom; }
+  // OBI は計装対象の下に置き、上へ2本（観測と書き込み）、下へ1本（OTLP）を出す
+  frontend -> obi [style=invis];
+  backend -> obi [style=invis];
+  obi:nw -> frontend:s [style=dashed, color="#9430A9", constraint=false];
+  obi:ne -> backend:s [style=dashed, color="#9430A9", constraint=false];
+  obi:s -> collector:n [penwidth=1.8];
 }
