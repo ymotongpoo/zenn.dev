@@ -6,7 +6,7 @@ title: "OBIを動かしてGrafanaで見る"
 
 ## 用意するもの
 
-OBIはLinux専用です。カーネル5.8以降でBTFが有効になっていること、CPUが `amd64` か `arm64` であること、そしてeBPFプログラムをロードできる権限が要ります。本章の実行結果は、Linux 7.0.0-31-generic（x86_64）、Docker 29.0.0、Docker Compose v2.40.3、OBI `v0.13.0`、`grafana/otel-lgtm:0.32.1` で確かめたものです。
+OBIはLinux専用です。カーネル5.8以降でBTFが有効になっていること、CPUが `amd64` か `arm64` であること、そしてeBPFプログラムをロードできる権限が要ります。手元にDockerとDocker Composeがあれば、ほかに用意するものはありません。
 
 難所4のコンテキスト伝搬まで試すなら、もう1つ条件があります。カーネルのlockdownモードが無効であることです。OBIのサポートマトリクスは次のように書いています。
 
@@ -22,8 +22,6 @@ $ cat /sys/kernel/security/lockdown
 ```
 
 角括弧が `[none]` に付いていれば使えます。Secure Bootが有効な環境では `[integrity]` になっていることがあり、その場合は後述するヘッダ注入が動きません。
-
-macOSやWindowsのDocker DesktopはLinuxのVMの上でコンテナを動かすので、`pid: host` が指すのはそのVMのプロセス空間になります。本章の構成なら計装対象もそのVMの中にいるため原理的には動きますが、筆者が確かめたのはLinuxホストだけです。
 
 ## 計装対象のGoアプリ
 
