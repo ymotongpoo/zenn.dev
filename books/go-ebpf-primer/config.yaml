@@ -13,6 +13,7 @@ chapters:
   - 25-go_runtime
   - 30-ebpf
   - 35-obi
+  - 37-handson
   - 40-hurdle1_uretprobe
   - 45-hurdle2_abi
   - 50-hurdle3_offsets
