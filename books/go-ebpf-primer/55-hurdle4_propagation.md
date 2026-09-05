@@ -62,7 +62,7 @@ func newproc1(fn *funcval, callergp *g, callerpc uintptr, parked bool, waitreaso
 
 ```c
 SEC("uprobe/runtime_newproc1")
-int obi_uprobe_runtime_newproc1(struct pt_regs *ctx) {
+int GUARDED_PROG(obi_uprobe_runtime_newproc1, struct pt_regs *, ctx) {
     void *creator_goroutine_addr = GOROUTINE_PTR(ctx);
 
     new_func_invocation_t invocation = {.parent = (u64)GO_PARAM2(ctx)};
@@ -78,11 +78,13 @@ int obi_uprobe_runtime_newproc1(struct pt_regs *ctx) {
 }
 ```
 
+関数名を包んでいる `GUARDED_PROG` は、本体を実行しているあいだカーネルのプリエンプションを止めるマクロです。uprobeから入るeBPFプログラムはタスクコンテキストで動くので途中で別のタスクに切り替わりえますが、Linux 6.13以降はこの種のプログラムをCPUごとの専用スタックで走らせるため、切り替わると退避したレジスタを次のタスクに上書きされます。ここで追う処理そのものには関わりません。
+
 入口では、第2引数（`GO_PARAM2`、つまり `BX`）に入っている親を、`newproc1` という一時的なマップに控えておきます。コードに出てくる `creator` は「いま `newproc1` を実行している側」を指す名前で、親そのものではなく、この控えを出口で引き取るためのキーとして使われています。
 
 ```c
 // 出口のフック。骨格だけを抜き出したもの
-int obi_uprobe_runtime_newproc1_return(struct pt_regs *ctx) {
+int GUARDED_PROG(obi_uprobe_runtime_newproc1_return, struct pt_regs *, ctx) {
     void *creator_goroutine_addr = GOROUTINE_PTR(ctx);      // 入口と対応づけるためのキー
     void *goroutine_addr = (void *)GO_PARAM1(ctx);          // 戻り値。子の g のアドレス
 
@@ -105,7 +107,7 @@ int obi_uprobe_runtime_newproc1_return(struct pt_regs *ctx) {
 :::details 実装の全文（PIDの組み立て、循環の回避、古いエントリの削除を含む）
 ```c
 SEC("uprobe/runtime_newproc1_return")
-int obi_uprobe_runtime_newproc1_return(struct pt_regs *ctx) {
+int GUARDED_PROG(obi_uprobe_runtime_newproc1_return, struct pt_regs *, ctx) {
     bpf_dbg_printk("=== uprobe/runtime_newproc1_return ===");
     void *creator_goroutine_addr = GOROUTINE_PTR(ctx);
     const u64 pid_tid = bpf_get_current_pid_tgid();
@@ -343,6 +345,8 @@ kernel lockdownが有効な環境やSecure Bootの下では、このヘルパー
 では、セキュリティ機構と衝突しない `sk_msg` だけに揃えればよさそうですが、そうなっていない最大の理由はTLSです。`sk_msg` の位置に流れてくるのは、HTTPSでは暗号化された後のバイト列で、その中にヘッダは差し込めません。経路1が書くのは `bufio.Writer` のバッファ、つまり暗号化される前の平文なので、HTTPSでも標準の `Traceparent` ヘッダを届けられるのは経路1だけです。TLSのときの経路2は、ヘッダの代わりにTCPオプションへ情報を載せる代替手段に切り替わりますが、これは独自形式なので受信側もOBIでなければ読めず、L7のプロキシやロードバランサーを挟むと（元のパケットは破棄されて作り直されるため）消えてしまいます。OBIの設計ドキュメント[^obi-devdocs]でも、`sk_msg` 側は経路1が書けなかったときのフォールバックと位置づけられています。
 
 [^obi-devdocs]: OBIリポジトリの `devdocs/context-propagation.md` と `devdocs/grpc-context-propagation.md` に、2経路の使い分けと排他制御の設計がまとまっています。
+
+送信されるバイト列に後から差し込むこの経路も、狙いを外せば観測対象を壊します。`v0.13.0` は `bpf/tpinjector/` のメモリ安全性の不具合を3件修正しました。前のリクエストがバッファに残したデータに対して注入が走り、TLSのストリームの途中に `traceparent` を書き込んで接続をリセットしてしまうもの（[#3257](https://github.com/open-telemetry/opentelemetry-ebpf-instrumentation/pull/3257)）、メッセージバッファの読み取りがマップされた範囲を超え、取得に失敗したときに無関係なカーネルメモリをスパンの中身として持ち出してしまうもの（[#3298](https://github.com/open-telemetry/opentelemetry-ebpf-instrumentation/pull/3298)）、そして充填に失敗したバッファを無効化せず、前のメッセージを現在のものと取り違えるもの（[#3304](https://github.com/open-telemetry/opentelemetry-ebpf-instrumentation/pull/3304)）です。アプリのメモリに触らない経路であっても、送信の途中に割り込む以上、正確さの要求は変わりません。
 
 1つ目が動いたときは、同じヘッダが二重に入らないよう、2つ目が対象を飛ばすようにマップの登録を消しています。W3Cの仕様では `traceparent` フィールドが2つあると受信側は両方を捨てるため、二重注入は「余分」ではなく「破壊」です。2つの経路が同じ送信に対して走らないための調停が要るわけです。
 

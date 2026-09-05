@@ -8,7 +8,7 @@ title: "OBIとは何か"
 
 OBIは、もともとGrafanaが開発していたeBPFベースの自動計装ツール**Beyla**を前身とします。2025年5月にOpenTelemetryプロジェクトへの寄贈が発表され、同年10月30日に最初のリリース `v0.1.0`（alpha）が出ました。2026年3月のKubeCon EUでbetaに到達し、その後もおよそ月1回のペースでリリースが続いています。Beylaも消えたわけではなく、OBIを基盤とするGrafanaのディストリビューションとして続いています。開発の本流はOBI側にあり、Beylaのメンテナは現在OBIのリポジトリで作業しています。
 
-本書が参照するのは2026年8月17日の `v0.11.0` で、執筆時点の最新は同年8月20日の `v0.12.1` です。リポジトリは [`open-telemetry/opentelemetry-ebpf-instrumentation`](https://github.com/open-telemetry/opentelemetry-ebpf-instrumentation) です。
+本書が参照するのは2026年9月4日の `v0.13.0` です。リポジトリは [`open-telemetry/opentelemetry-ebpf-instrumentation`](https://github.com/open-telemetry/opentelemetry-ebpf-instrumentation) です。
 
 ## OBIは何をするものか
 

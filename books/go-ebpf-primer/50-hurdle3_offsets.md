@@ -56,13 +56,13 @@ ContentLength = 88
 
 ```json
 "net/http.Request": {
-  "Method":        { "versions": {"oldest": "1.17.0", "newest": "1.26.4"},
+  "Method":        { "versions": {"oldest": "1.17.0", "newest": "1.27.1"},
                      "offsets": [{"offset": 0,  "since": "1.17.0"}] },
-  "URL":           { "versions": {"oldest": "1.17.0", "newest": "1.26.4"},
+  "URL":           { "versions": {"oldest": "1.17.0", "newest": "1.27.1"},
                      "offsets": [{"offset": 16, "since": "1.17.0"}] },
-  "Header":        { "versions": {"oldest": "1.17.0", "newest": "1.26.4"},
+  "Header":        { "versions": {"oldest": "1.17.0", "newest": "1.27.1"},
                      "offsets": [{"offset": 56, "since": "1.17.0"}] },
-  "ContentLength": { "versions": {"oldest": "1.17.0", "newest": "1.26.4"},
+  "ContentLength": { "versions": {"oldest": "1.17.0", "newest": "1.27.1"},
                      "offsets": [{"offset": 88, "since": "1.17.0"}] }
 }
 ```
@@ -71,7 +71,7 @@ ContentLength = 88
 
 手元のGoで印字した値と、OBIが事前に用意した表の値は同じです。外から構造体を読むというのは、要するにこの表を信じて `+56` バイト目を読むということです。
 
-`net/http.Request` は運のいい例で、`offsets` の配列が要素1つしかありません。Go 1.17から1.26までのあいだ、一度も動いていません。
+`net/http.Request` は運のいい例で、`offsets` の配列が要素1つしかありません。Go 1.17から1.27までのあいだ、一度も動いていません。
 
 ## フィールドが1つ増えたときのずれ
 
