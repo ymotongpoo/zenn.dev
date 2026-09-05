@@ -2,7 +2,7 @@
 title: "OBIとは何か"
 ---
 
-前章でeBPFの仕組みを見ました。ここからは本書の題材である**OpenTelemetry eBPF Instrumentation**（OBI）を紹介します。生い立ち、全体の動き、使い方、そして計装の2つの経路です。難所の章はOBIの実装の細部に入っていくので、その前に全体の動きを押さえておきます。
+前章でeBPFの仕組みを見ました。ここからは本書の題材である**OpenTelemetry eBPF Instrumentation**（OBI）を紹介します。生い立ち、全体の動き、そして計装の2つの経路です。難所の章はOBIの実装の細部に入っていくので、その前に全体の動きを押さえておきます。
 
 ## Beylaから始まった生い立ち
 
@@ -27,36 +27,11 @@ OBIは、それ自体が1つのプログラムです。観測したいアプリ�
 
 この図は、本書の残りの章がどこを扱うのかも示しています。難所1（uretprobeが使えない）と難所3（フィールドオフセット）は、段階2と3で「どこにフックを置くか、どこを読むか」を決めるときの難しさです。難所2（レジスタABI）と難所4（コンテキスト伝搬）は、段階4でフックが発火した瞬間に「何をどう読み書きするか」の難しさです。
 
-## 使ってみる
+## どこで動かすか
 
-OBIはLinux専用で、カーネル5.8以降（BTF有効）を必要とします。eBPFプログラムをロードする都合上、root権限か、それに相当するcapabilityの組が要ります。
+OBIはLinux専用で、カーネル5.8以降（BTF有効）と、eBPFプログラムをロードできる権限を必要とします。いちばん手軽なのはDockerで、`--pid=host --privileged` を付けて `otel/ebpf-instrument` を起動すれば、同じホストで動いているアプリをそのまま観測できます。Kubernetesでは、各ノードに1つずつ置くDaemonSetとして動かす形が代表的です。`hostPID: true` を付ければ、ノード上の全プロセスを1つのOBIが観測します。OpenTelemetry Collectorに組み込むためのreceiverも用意されています。
 
-いちばん手軽なのはDockerです。ポート8080で待ち受けるアプリを観測して、取れたスパンを画面に印字するだけなら、次のように動かせます。
-
-```
-docker run --rm \
-  -e OTEL_EBPF_OPEN_PORT=8080 \
-  -e OTEL_EBPF_TRACE_PRINTER=text \
-  --pid=host --privileged \
-  otel/ebpf-instrument:v0.11.0
-```
-
-`--pid=host` はホストのプロセスを見えるようにする指定、`--privileged` は特権の付与です。カーネルに手を入れる道具なので、この種の権限は避けて通れません。
-
-主な設定は環境変数で渡します。よく使うものを挙げます。
-
-| 環境変数 | 意味 |
-|---|---|
-| `OTEL_EBPF_OPEN_PORT` | このポートを開いているプロセスを対象にする |
-| `OTEL_EBPF_AUTO_TARGET_EXE` | 実行ファイルのパス（グロブ）で対象を選ぶ |
-| `OTEL_SERVICE_NAME` | スパンに付けるサービス名 |
-| `OTEL_EXPORTER_OTLP_ENDPOINT` | OTLPの送信先（OpenTelemetry標準の変数をそのまま使う） |
-| `OTEL_EBPF_TRACE_PRINTER` | デバッグ用にスパンを標準出力へ印字する |
-| `OTEL_EBPF_BPF_CONTEXT_PROPAGATION` | 難所4で扱うコンテキスト伝搬の有効化（デフォルトは無効） |
-
-Kubernetesでは、各ノードに1つずつ置くDaemonSetとして動かす形が代表的です。`hostPID: true` を付ければ、ノード上の全プロセスを1つのOBIが観測します。OpenTelemetry Collectorに組み込むためのreceiverも用意されています。
-
-本書の主題は「動かし方」ではなく「なぜ動くのか」なので、セットアップの詳細は[公式ドキュメント](https://opentelemetry.io/docs/zero-code/obi/)に譲ります。
+具体的な設定と、そこから何が見えるのかは次章で扱います。設定項目の網羅は[公式ドキュメント](https://opentelemetry.io/docs/zero-code/obi/)に譲ります。
 
 ## 2つの計装経路
 
