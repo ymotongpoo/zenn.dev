@@ -21,7 +21,7 @@ fatal error: unknown caller pc
 :::message
 本書の実行結果と引用は、次のバージョンで確かめたものです。
 
-- Go 1.26.5（linux/amd64）
+- Go 1.26.5（linux/amd64）。9章のビルドだけ `cgr.dev/chainguard/go:latest`（Go 1.27.1）
 - OBI v0.13.0（2026年9月4日リリース）
 - Linuxカーネル 7.0.0-31-generic（x86_64）
 - Docker 29.0.0、Docker Compose v2.40.3、grafana/otel-lgtm 0.32.1（9章のハンズオン）
