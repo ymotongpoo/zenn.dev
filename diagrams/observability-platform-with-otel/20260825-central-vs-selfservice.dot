@@ -1,0 +1,47 @@
+// 中央集権モデルとセルフサービスモデルの対比
+digraph central_vs_selfservice {
+  graph [
+    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=13,
+    rankdir=TB, compound=true, splines=true,
+    nodesep=0.4, ranksep=0.55, pad=0.25,
+    bgcolor="white", newrank=true
+  ];
+  node [
+    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=12,
+    shape=box, style="rounded,filled",
+    fillcolor="#F1F5F9", color="#475569", penwidth=1.6,
+    margin="0.2,0.14"
+  ];
+  edge [
+    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=11,
+    color="#334155", penwidth=1.4, arrowsize=0.9,
+    fontcolor="#1E293B"
+  ];
+
+  subgraph cluster_central {
+    label=<<b>中央集権モデル</b>>;
+    labeljust="l"; style="rounded"; penwidth=1.6;
+    color="#A04848"; bgcolor="#FBEFEF"; fontcolor="#7A3030"; margin=14;
+    tA [label="チームA"]; tB [label="チームB"]; tC [label="チームC"];
+    central [label=<<b>中央チーム</b><br align="left"/>レビュー、設定変更、命名相談が集中<br align="left"/>行列はチーム数に比例して伸びる<br align="left"/>>, fillcolor="#F5DEDE", color="#A04848"];
+    tA -> central [label=" 依頼"];
+    tB -> central [label=" 依頼"];
+    tC -> central [label=" 依頼"];
+  }
+
+  subgraph cluster_selfservice {
+    label=<<b>セルフサービスモデル</b>>;
+    labeljust="l"; style="rounded"; penwidth=1.6;
+    color="#3F6E3F"; bgcolor="#F0F7F0"; fontcolor="#2C4F2C"; margin=14;
+    platform [label=<<b>プラットフォームチーム</b><br align="left"/>配布物と検査を整備する<br align="left"/>>, fillcolor="#D6E8D6", color="#3F6E3F"];
+    artifacts [label=<<b>配布物</b><br align="left"/>ディストリビューション、Collector、レジストリ<br align="left"/>>, fillcolor="#D6E8D6", color="#3F6E3F"];
+    sA [label="チームA"]; sB [label="チームB"]; sC [label="チームC"];
+    platform -> artifacts [label=" 整備"];
+    sA -> artifacts [label=" 利用"];
+    sB -> artifacts [label=" 利用"];
+    sC -> artifacts [label=" 利用"];
+  }
+
+  // 2つのモデルを上下に並べるためのレイアウト調整
+  central -> sB [style=invis];
+}

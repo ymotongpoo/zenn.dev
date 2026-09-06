@@ -1,0 +1,31 @@
+// OpenTelemetry Operatorによる自動計装の注入
+digraph operator_injection {
+  graph [
+    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=13,
+    rankdir=TB, compound=true, splines=true,
+    nodesep=0.5, ranksep=0.55, pad=0.25,
+    bgcolor="white", newrank=true
+  ];
+  node [
+    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=12,
+    shape=box, style="rounded,filled",
+    fillcolor="#F1F5F9", color="#475569", penwidth=1.6,
+    margin="0.2,0.14"
+  ];
+  edge [
+    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=11,
+    color="#334155", penwidth=1.4, arrowsize=0.9,
+    fontcolor="#1E293B"
+  ];
+
+  dev [label=<<b>開発チーム</b><br align="left"/>Podのannotationに<br align="left"/>inject-java: "true" を書くだけ<br align="left"/>>, fillcolor="#D9E7F4", color="#38638F"];
+  apiserver [label=<<b>Kubernetes APIサーバー</b><br align="left"/>Pod作成リクエストを受ける<br align="left"/>>];
+  webhook [label=<<b>Operatorのadmission webhook</b><br align="left"/>Instrumentationリソース（基盤が用意）を参照し<br align="left"/>Podの定義を書き換える<br align="left"/>>, fillcolor="#E9DFF2", color="#75589C"];
+  pod [label=<<b>変更後のPod</b><br align="left"/>エージェントを置くinit containerと<br align="left"/>OTEL_* 環境変数が注入されている<br align="left"/>>, fillcolor="#D6E8D6", color="#3F6E3F"];
+  running [label=<<b>アプリ起動</b><br align="left"/>コード変更なしで計装済み<br align="left"/>>, fillcolor="#D6E8D6", color="#3F6E3F"];
+
+  dev -> apiserver [label=" Pod作成"];
+  apiserver -> webhook [label=" フック"];
+  webhook -> pod [label=" 注入"];
+  pod -> running;
+}

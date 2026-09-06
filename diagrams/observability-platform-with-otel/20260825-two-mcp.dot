@@ -1,0 +1,43 @@
+// AI調査エージェントの二種類のMCP接続
+digraph two_mcp {
+  graph [
+    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=13,
+    rankdir=TB, compound=true, splines=true,
+    nodesep=0.55, ranksep=0.6, pad=0.25,
+    bgcolor="white", newrank=true
+  ];
+  node [
+    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=12,
+    shape=box, style="rounded,filled",
+    fillcolor="#F1F5F9", color="#475569", penwidth=1.6,
+    margin="0.2,0.14"
+  ];
+  edge [
+    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=11,
+    color="#334155", penwidth=1.4, arrowsize=0.9,
+    fontcolor="#1E293B"
+  ];
+
+  ai [label=<<b>AI調査エージェント</b>>, fillcolor="#D9E7F4", color="#38638F"];
+
+  subgraph cluster_schema {
+    label=<<b>スキーマを読む（広く読ませてよい）</b>>;
+    labeljust="l"; style="rounded"; penwidth=1.6;
+    color="#75589C"; bgcolor="#F5F1F9"; fontcolor="#5B4370"; margin=14;
+    regmcp [label=<<b>registry MCP</b><br align="left"/>weaver registry mcp<br align="left"/>>, fillcolor="#E9DFF2", color="#75589C"];
+    registry [label=<<b>社内レジストリ</b><br align="left"/>属性の意味と規約<br align="left"/>>, fillcolor="#F3E8CE", color="#96742E"];
+    regmcp -> registry;
+  }
+
+  subgraph cluster_data {
+    label=<<b>実データを読む（テナント分離と監査の統制下）</b>>;
+    labeljust="l"; style="rounded"; penwidth=1.6;
+    color="#38638F"; bgcolor="#EFF5FB"; fontcolor="#2E4D6E"; margin=14;
+    telmcp [label=<<b>telemetry MCP</b><br align="left"/>バックエンド固有のツール定義<br align="left"/>>, fillcolor="#E9DFF2", color="#75589C"];
+    backend [label=<<b>観測バックエンド</b><br align="left"/>トレース、メトリクス、ログ<br align="left"/>>];
+    telmcp -> backend;
+  }
+
+  ai -> regmcp [label=" 属性の意味を引く"];
+  ai -> telmcp [label=" クエリと根拠リンク"];
+}

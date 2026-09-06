@@ -1,0 +1,35 @@
+// AIエージェントアプリのトレース構造
+digraph agent_trace {
+  graph [
+    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=13,
+    rankdir=TB, compound=true, splines=true,
+    nodesep=0.45, ranksep=0.5, pad=0.25,
+    bgcolor="white", newrank=true
+  ];
+  node [
+    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=12,
+    shape=box, style="rounded,filled",
+    fillcolor="#F1F5F9", color="#475569", penwidth=1.6,
+    margin="0.2,0.14"
+  ];
+  edge [
+    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=11,
+    color="#334155", penwidth=1.4, arrowsize=0.9,
+    fontcolor="#1E293B"
+  ];
+
+  root [label=<<b>GET /ask</b><br align="left"/>HTTPサーバーのスパン<br align="left"/>>, fillcolor="#D9E7F4", color="#38638F"];
+  agent [label=<<b>invoke_agent support-agent</b><br align="left"/>gen_ai.agent.name<br align="left"/>gen_ai.conversation.id<br align="left"/>>, fillcolor="#E9DFF2", color="#75589C"];
+  chat1 [label=<<b>chat stub-model-1</b><br align="left"/>推論: ツールを選ぶ<br align="left"/>gen_ai.usage.input_tokens など<br align="left"/>>, fillcolor="#E9DFF2", color="#75589C"];
+  tool [label=<<b>execute_tool search_orders</b><br align="left"/>gen_ai.tool.name<br align="left"/>>, fillcolor="#E9DFF2", color="#75589C"];
+  http [label=<<b>HTTP GET</b><br align="left"/>ツールが社内APIを呼ぶ<br align="left"/>>, fillcolor="#D9E7F4", color="#38638F"];
+  backend [label=<<b>GET /inventory</b><br align="left"/>backendの通常のスパン<br align="left"/>ここから先は普通の分散トレース<br align="left"/>>, fillcolor="#D6E8D6", color="#3F6E3F"];
+  chat2 [label=<<b>chat stub-model-1</b><br align="left"/>推論: 回答を組み立てる<br align="left"/>>, fillcolor="#E9DFF2", color="#75589C"];
+
+  root -> agent;
+  agent -> chat1;
+  agent -> tool;
+  tool -> http;
+  http -> backend;
+  agent -> chat2;
+}

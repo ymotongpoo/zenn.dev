@@ -1,0 +1,40 @@
+// OCBによるカスタムCollectorのビルドパイプライン
+digraph ocb_pipeline {
+  graph [
+    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=13,
+    rankdir=TB, compound=true, splines=true,
+    nodesep=0.5, ranksep=0.55, pad=0.25,
+    bgcolor="white", newrank=true
+  ];
+  node [
+    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=12,
+    shape=box, style="rounded,filled",
+    fillcolor="#F1F5F9", color="#475569", penwidth=1.6,
+    margin="0.2,0.14"
+  ];
+  edge [
+    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=11,
+    color="#334155", penwidth=1.4, arrowsize=0.9,
+    fontcolor="#1E293B"
+  ];
+
+  manifest [label=<<b>manifest.yaml</b><br align="left"/>使うコンポーネントのgomodを列挙<br align="left"/>組織で使えるものの宣言でもある<br align="left"/>>, fillcolor="#F3E8CE", color="#96742E"];
+
+  subgraph cluster_ci {
+    label=<<b>CI</b>>;
+    labeljust="l"; style="rounded"; penwidth=1.6;
+    color="#38638F"; bgcolor="#EFF5FB"; fontcolor="#2E4D6E"; margin=14;
+    ocb [label=<<b>OCB（builder）</b><br align="left"/>Goコードを生成してビルド<br align="left"/>バージョン整合を検査<br align="left"/>>, fillcolor="#D9E7F4", color="#38638F"];
+    binary [label=<<b>otelcol-internal</b><br align="left"/>必要な部品だけの社内バイナリ<br align="left"/>>, fillcolor="#D6E8D6", color="#3F6E3F"];
+    validate [label=<<b>validate</b><br align="left"/>agentとgatewayの設定を<br align="left"/>ビルドしたバイナリで検証<br align="left"/>>, fillcolor="#D9E7F4", color="#38638F"];
+  }
+
+  image [label=<<b>コンテナイメージ</b>>, fillcolor="#D6E8D6", color="#3F6E3F"];
+  deploy [label=<<b>配備先</b><br align="left"/>agent（30章）、Supervisor管理下（40章）<br align="left"/>>];
+
+  manifest -> ocb;
+  ocb -> binary;
+  binary -> validate;
+  validate -> image;
+  image -> deploy;
+}

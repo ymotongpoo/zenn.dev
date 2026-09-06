@@ -1,0 +1,38 @@
+// AIによる障害調査のループ
+digraph ai_investigation_loop {
+  graph [
+    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=13,
+    rankdir=TB, compound=true, splines=true,
+    nodesep=0.5, ranksep=0.5, pad=0.25,
+    bgcolor="white", newrank=true
+  ];
+  node [
+    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=12,
+    shape=box, style="rounded,filled",
+    fillcolor="#F1F5F9", color="#475569", penwidth=1.6,
+    margin="0.2,0.14"
+  ];
+  edge [
+    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=11,
+    color="#334155", penwidth=1.4, arrowsize=0.9,
+    fontcolor="#1E293B"
+  ];
+
+  alert [label=<<b>アラート</b><br align="left"/>対象サービスと時間帯を特定<br align="left"/>>, fillcolor="#F5DEDE", color="#A04848"];
+  query [label=<<b>クエリの生成と実行</b><br align="left"/>トレース、メトリクス、ログを横断<br align="left"/>ここの正確さが調査全体を決める<br align="left"/>>, fillcolor="#D9E7F4", color="#38638F"];
+  hypo [label=<<b>仮説</b><br align="left"/>「このデプロイ以降、この<br align="left"/>エンドポイントだけエラー率上昇」<br align="left"/>>, fillcolor="#D9E7F4", color="#38638F"];
+  verify [label=<<b>裏付けクエリ</b>>, fillcolor="#D9E7F4", color="#38638F"];
+  report [label=<<b>報告</b><br align="left"/>根拠のテレメトリーへのリンク付き<br align="left"/>検証責任は人間に残る<br align="left"/>>, fillcolor="#D6E8D6", color="#3F6E3F"];
+
+  registry [label=<<b>レジストリ</b><br align="left"/>属性の意味のカタログ<br align="left"/>（weaver registry mcp）<br align="left"/>>, fillcolor="#E9DFF2", color="#75589C"];
+
+  alert -> query;
+  query -> hypo;
+  hypo -> verify;
+  verify -> query [label=" 追加調査"];
+  verify -> report [label=" 確証"];
+
+  registry -> query [style=dashed, color="#75589C", fontcolor="#5B4370", label=" 正しい属性名を参照\l"];
+
+  { rank=same; query; registry; }
+}

@@ -1,0 +1,46 @@
+// セルフサービステレメトリー基盤の3本柱
+digraph three_pillars {
+  graph [
+    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=13,
+    rankdir=TB, compound=true, splines=true,
+    nodesep=0.5, ranksep=0.6, pad=0.25,
+    bgcolor="white", newrank=true
+  ];
+  node [
+    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=12,
+    shape=box, style="rounded,filled",
+    fillcolor="#F1F5F9", color="#475569", penwidth=1.6,
+    margin="0.2,0.14"
+  ];
+  edge [
+    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=11,
+    color="#334155", penwidth=1.4, arrowsize=0.9,
+    fontcolor="#1E293B"
+  ];
+
+  subgraph cluster_pillar1 {
+    label=<<b>柱1: 計装の配布（10章、20章）</b>>;
+    labeljust="l"; style="rounded"; penwidth=1.6;
+    color="#38638F"; bgcolor="#EFF5FB"; fontcolor="#2E4D6E"; margin=14;
+    app [label=<<b>アプリケーション</b><br align="left"/>SDKディストリビューション<br align="left"/>またはゼロコード計装<br align="left"/>>, fillcolor="#D9E7F4", color="#38638F"];
+  }
+
+  subgraph cluster_pillar2 {
+    label=<<b>柱2: Collector層の管理（30章、40章）</b>>;
+    labeljust="l"; style="rounded"; penwidth=1.6;
+    color="#38638F"; bgcolor="#EFF5FB"; fontcolor="#2E4D6E"; margin=14;
+    agent [label=<<b>agent Collector</b><br align="left"/>ノードごと。メタデータ付加<br align="left"/>>, fillcolor="#D9E7F4", color="#38638F"];
+    gateway [label=<<b>gateway Collector</b><br align="left"/>組織の方針を実装<br align="left"/>>, fillcolor="#D9E7F4", color="#38638F"];
+  }
+
+  backend [label=<<b>OTLP対応バックエンド</b><br align="left"/>保存、検索、可視化<br align="left"/>>];
+
+  registry [label=<<b>柱3: セマンティック規約レジストリ（50章）</b><br align="left"/>属性の名前と意味の単一の定義<br align="left"/>>, fillcolor="#E9DFF2", color="#75589C"];
+
+  app -> agent [label=" OTLP"];
+  agent -> gateway;
+  gateway -> backend;
+
+  registry -> app [style=dashed, color="#75589C", fontcolor="#5B4370", label=" 生成した属性定数を同梱\l"];
+  registry -> gateway [style=dashed, color="#75589C", fontcolor="#5B4370", label=" 変換設定を導出\l"];
+}

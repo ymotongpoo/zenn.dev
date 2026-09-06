@@ -1,0 +1,36 @@
+// OpAMPによるフリート管理の構成
+digraph opamp_topology {
+  graph [
+    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=13,
+    rankdir=TB, compound=true, splines=true,
+    nodesep=0.5, ranksep=0.6, pad=0.25,
+    bgcolor="white", newrank=true
+  ];
+  node [
+    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=12,
+    shape=box, style="rounded,filled",
+    fillcolor="#F1F5F9", color="#475569", penwidth=1.6,
+    margin="0.2,0.14"
+  ];
+  edge [
+    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=11,
+    color="#334155", penwidth=1.4, arrowsize=0.9,
+    fontcolor="#1E293B"
+  ];
+
+  git [label=<<b>設定リポジトリ（Git）</b><br align="left"/>真実の源。PRとCI検査を通る<br align="left"/>>, fillcolor="#F3E8CE", color="#96742E"];
+  server [label=<<b>OpAMPサーバー</b><br align="left"/>最後の配達区間を担う<br align="left"/>>, fillcolor="#E9DFF2", color="#75589C"];
+
+  subgraph cluster_node {
+    label=<<b>各ノード</b>>;
+    labeljust="l"; style="rounded"; penwidth=1.6;
+    color="#475569"; bgcolor="#F4F6F8"; fontcolor="#334155"; margin=14;
+    supervisor [label=<<b>Supervisor</b><br align="left"/>接続を保ち、設定を合成し<br align="left"/>Collectorを起動、監視する<br align="left"/>>, fillcolor="#D9E7F4", color="#38638F"];
+    collector [label=<<b>Collector</b><br align="left"/>opampextension入りの<br align="left"/>社内ビルド（30章）<br align="left"/>>, fillcolor="#D9E7F4", color="#38638F"];
+    supervisor -> collector [label=" 起動と設定適用"];
+  }
+
+  git -> server [label=" 取り込み"];
+  server -> supervisor [label=" リモート設定の配布"];
+  supervisor -> server [style=dashed, color="#7C8DA3", fontcolor="#5B6B7E", label=" ヘルスと実効設定の報告\l 適用結果（APPLIED / FAILED）\l"];
+}

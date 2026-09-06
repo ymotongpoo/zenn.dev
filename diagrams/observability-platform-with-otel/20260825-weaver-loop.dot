@@ -1,0 +1,47 @@
+// Weaverによるスキーマ管理の循環
+digraph weaver_loop {
+  graph [
+    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=13,
+    rankdir=TB, compound=true, splines=true,
+    nodesep=0.5, ranksep=0.55, pad=0.25,
+    bgcolor="white", newrank=true
+  ];
+  node [
+    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=12,
+    shape=box, style="rounded,filled",
+    fillcolor="#F1F5F9", color="#475569", penwidth=1.6,
+    margin="0.2,0.14"
+  ];
+  edge [
+    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=11,
+    color="#334155", penwidth=1.4, arrowsize=0.9,
+    fontcolor="#1E293B"
+  ];
+
+  registry [label=<<b>レジストリ定義（YAML）</b><br align="left"/>属性の名前、型、意味の単一の定義<br align="left"/>>, fillcolor="#F3E8CE", color="#96742E"];
+
+  subgraph cluster_pr {
+    label=<<b>変更前（PR）</b>>;
+    labeljust="l"; style="rounded"; penwidth=1.6;
+    color="#38638F"; bgcolor="#EFF5FB"; fontcolor="#2E4D6E"; margin=14;
+    check [label=<<b>check</b><br align="left"/>構文とRegoポリシー検査<br align="left"/>>, fillcolor="#D9E7F4", color="#38638F"];
+    diff [label=<<b>diff</b><br align="left"/>破壊的変更の検知<br align="left"/>>, fillcolor="#D9E7F4", color="#38638F"];
+  }
+
+  subgraph cluster_merge {
+    label=<<b>マージ後</b>>;
+    labeljust="l"; style="rounded"; penwidth=1.6;
+    color="#38638F"; bgcolor="#EFF5FB"; fontcolor="#2E4D6E"; margin=14;
+    generate [label=<<b>generate</b><br align="left"/>SDK定数、ドキュメント<br align="left"/>gatewayの変換設定を導出<br align="left"/>>, fillcolor="#D9E7F4", color="#38638F"];
+  }
+
+  system [label=<<b>実環境</b><br align="left"/>生成物を組み込んだサービスとCollector<br align="left"/>>, fillcolor="#D6E8D6", color="#3F6E3F"];
+  livecheck [label=<<b>live-check</b><br align="left"/>実テレメトリーを定義と突き合わせる<br align="left"/>違反はCIを落とす<br align="left"/>>, fillcolor="#E9DFF2", color="#75589C"];
+
+  registry -> check;
+  check -> diff;
+  diff -> generate [label=" マージ"];
+  generate -> system [label=" 配布（10章、30章）"];
+  system -> livecheck [label=" OTLP"];
+  livecheck -> registry [label=" 定義とのずれを修正"];
+}

@@ -1,0 +1,56 @@
+// agentとgatewayの2段トポロジー
+digraph agent_gateway {
+  graph [
+    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=13,
+    rankdir=TB, compound=true, splines=true,
+    nodesep=0.5, ranksep=0.55, pad=0.25,
+    bgcolor="white", newrank=true
+  ];
+  node [
+    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=12,
+    shape=box, style="rounded,filled",
+    fillcolor="#F1F5F9", color="#475569", penwidth=1.6,
+    margin="0.2,0.14"
+  ];
+  edge [
+    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=11,
+    color="#334155", penwidth=1.4, arrowsize=0.9,
+    fontcolor="#1E293B"
+  ];
+
+  subgraph cluster_node1 {
+    label=<<b>ノード1</b>>;
+    labeljust="l"; style="rounded"; penwidth=1.6;
+    color="#475569"; bgcolor="#F4F6F8"; fontcolor="#334155"; margin=14;
+    app1 [label="アプリ", fillcolor="#D9E7F4", color="#38638F"];
+    agent1 [label=<<b>agent</b><br align="left"/>受け口の提供<br align="left"/>ホストのメタデータ付加<br align="left"/>>, fillcolor="#D9E7F4", color="#38638F"];
+    app1 -> agent1;
+  }
+
+  // agentの役割は全ノードで同一。図の2箱は同じものを表す
+
+  subgraph cluster_node2 {
+    label=<<b>ノード2</b>>;
+    labeljust="l"; style="rounded"; penwidth=1.6;
+    color="#475569"; bgcolor="#F4F6F8"; fontcolor="#334155"; margin=14;
+    app2 [label="アプリ", fillcolor="#D9E7F4", color="#38638F"];
+    agent2 [label=<<b>agent</b><br align="left"/>受け口の提供<br align="left"/>ホストのメタデータ付加<br align="left"/>>, fillcolor="#D9E7F4", color="#38638F"];
+    app2 -> agent2;
+  }
+
+  lb [label=<<b>振り分け層（tail sampling運用時のみ）</b><br align="left"/>同じtrace IDを同じgatewayへ<br align="left"/>>, fillcolor="#F5F1F9", color="#75589C", style="rounded,filled,dashed"];
+
+  subgraph cluster_gateway {
+    label=<<b>gateway（組織の方針を実装）</b>>;
+    labeljust="l"; style="rounded"; penwidth=1.6;
+    color="#38638F"; bgcolor="#EFF5FB"; fontcolor="#2E4D6E"; margin=14;
+    gw [label=<<b>gateway Collector群</b><br align="left"/>tail sampling<br align="left"/>属性の統制（PII削除、変換）<br align="left"/>ルーティングとバックエンド認証<br align="left"/>>, fillcolor="#D9E7F4", color="#38638F"];
+  }
+
+  backend [label=<<b>OTLP対応バックエンド</b>>];
+
+  agent1 -> lb;
+  agent2 -> lb;
+  lb -> gw;
+  gw -> backend;
+}

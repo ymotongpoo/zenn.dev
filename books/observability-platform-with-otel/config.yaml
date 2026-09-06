@@ -1,0 +1,17 @@
+title: "OpenTelemetryで作るセルフサービステレメトリー基盤"
+summary: "Platform Engineering Kaigi 2026の登壇「セルフサービスのオブザーバビリティ基盤をOpenTelemetryで作る」の解説資料です。SDKディストリビューションと自動計装、OpenTelemetry Collector、セマンティック規約を使い、開発チームが自分たちのテレメトリーを整備できる基盤を設計します。AIワークロードの観測と、AIエージェントによる障害調査への拡張も扱います。"
+topics: ["opentelemetry", "observability", "platformengineer", "go", "ai"]
+published: false
+price: 0 # 有料の場合200〜5000
+# 本に含めるチャプターを順番に並べましょう
+chapters:
+  - 00-introduction
+  - 10-sdk_distribution
+  - 20-zero_code_instrumentation
+  - 30-collector_build
+  - 40-collector_fleet
+  - 50-semconv_governance
+  - 60-ai_workload_telemetry
+  - 70-ai_driven_operations
+  - 80-reference_implementation
+  - 99-references

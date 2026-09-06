@@ -1,0 +1,42 @@
+// 計装の注入ポイント比較
+digraph injection_points {
+  graph [
+    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=13,
+    rankdir=TB, compound=true, splines=true,
+    nodesep=0.6, ranksep=0.5, pad=0.25,
+    bgcolor="white", newrank=true
+  ];
+  node [
+    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=12,
+    shape=box, style="rounded,filled",
+    fillcolor="#F1F5F9", color="#475569", penwidth=1.6,
+    margin="0.2,0.14"
+  ];
+  edge [
+    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=11,
+    color="#334155", penwidth=1.4, arrowsize=0.9,
+    fontcolor="#1E293B"
+  ];
+
+  src [label=<<b>ソースコード</b>>, fillcolor="#D9E7F4", color="#38638F"];
+  build [label=<<b>ビルド</b>>, fillcolor="#D9E7F4", color="#38638F"];
+  runtime [label=<<b>実行時（プロセス内）</b>>, fillcolor="#D9E7F4", color="#38638F"];
+  kernel [label=<<b>カーネル</b>>, fillcolor="#D9E7F4", color="#38638F"];
+
+  manual [label=<<b>手動計装</b><br align="left"/>SDKディストリビューション（10章）<br align="left"/>コード変更が必要。表現力は最大<br align="left"/>>, fillcolor="#E9DFF2", color="#75589C"];
+  otelc [label=<<b>ビルド時計装</b><br align="left"/>otelc。ビルドコマンドを差し替える<br align="left"/>特権不要。Goの第一候補<br align="left"/>>, fillcolor="#E9DFF2", color="#75589C"];
+  agentbased [label=<<b>実行時エージェント</b><br align="left"/>Javaのjavaagent、Pythonの実行時パッチなど<br align="left"/>動的なランタイムを持つ言語向け<br align="left"/>>, fillcolor="#E9DFF2", color="#75589C"];
+  ebpf [label=<<b>eBPF</b><br align="left"/>OBI。プロセスの外から観測する<br align="left"/>特権が必要。言語横断<br align="left"/>>, fillcolor="#E9DFF2", color="#75589C"];
+
+  src -> build -> runtime -> kernel;
+
+  manual -> src [style=dashed, color="#75589C"];
+  otelc -> build [style=dashed, color="#75589C"];
+  agentbased -> runtime [style=dashed, color="#75589C"];
+  ebpf -> kernel [style=dashed, color="#75589C"];
+
+  { rank=same; src; manual; }
+  { rank=same; build; otelc; }
+  { rank=same; runtime; agentbased; }
+  { rank=same; kernel; ebpf; }
+}

@@ -1,0 +1,68 @@
+// リファレンス実装 otel-platform-blueprint の全体構成
+digraph blueprint_overview {
+  graph [
+    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=13,
+    rankdir=TB, compound=true, splines=true,
+    nodesep=0.45, ranksep=0.55, pad=0.25,
+    bgcolor="white", newrank=true
+  ];
+  node [
+    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=12,
+    shape=box, style="rounded,filled",
+    fillcolor="#F1F5F9", color="#475569", penwidth=1.6,
+    margin="0.2,0.14"
+  ];
+  edge [
+    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=11,
+    color="#334155", penwidth=1.4, arrowsize=0.9,
+    fontcolor="#1E293B"
+  ];
+
+  subgraph cluster_services {
+    label=<<b>services（otelinit組み込み）</b>>;
+    labeljust="l"; style="rounded"; penwidth=1.6;
+    color="#38638F"; bgcolor="#EFF5FB"; fontcolor="#2E4D6E"; margin=14;
+    frontend [label="frontend", fillcolor="#D9E7F4", color="#38638F"];
+    backendsvc [label="backend", fillcolor="#D9E7F4", color="#38638F"];
+    aiapp [label="ai-app", fillcolor="#D9E7F4", color="#38638F"];
+  }
+
+  uninstr [label=<<b>uninstrumented</b><br align="left"/>計装コードなし<br align="left"/>otelcでビルド時計装（20章）<br align="left"/>>, style="rounded,filled,dashed", fillcolor="#F1F5F9", color="#475569"];
+
+  subgraph cluster_agent {
+    label=<<b>Supervisor管理のagent</b>>;
+    labeljust="l"; style="rounded"; penwidth=1.6;
+    color="#475569"; bgcolor="#F4F6F8"; fontcolor="#334155"; margin=14;
+    agent [label=<<b>otelcol-internal</b><br align="left"/>OCBビルド。opampextension入り<br align="left"/>>, fillcolor="#D9E7F4", color="#38638F"];
+  }
+
+  opamp [label=<<b>opamp-server</b><br align="left"/>remote-configs/ を配布<br align="left"/>>, fillcolor="#E9DFF2", color="#75589C"];
+  gateway [label=<<b>gateway（otelcol-internal）</b><br align="left"/>tail sampling、redaction<br align="left"/>>, fillcolor="#D9E7F4", color="#38638F"];
+
+  subgraph cluster_backend {
+    label=<<b>Grafanaスタック</b>>;
+    labeljust="l"; style="rounded"; penwidth=1.6;
+    color="#96742E"; bgcolor="#FAF4E4"; fontcolor="#6B5321"; margin=14;
+    tempo [label="Tempo\n（トレース）", fillcolor="#F3E8CE", color="#96742E"];
+    mimir [label="Mimir\n（メトリクス）", fillcolor="#F3E8CE", color="#96742E"];
+    loki [label="Loki\n（ログ）", fillcolor="#F3E8CE", color="#96742E"];
+  }
+
+  grafana [label=<<b>Grafana</b><br align="left"/>横断的な可視化<br align="left"/>>];
+  weaverreg [label=<<b>registry/ + Weaver</b><br align="left"/>sdk/semconv/ を生成<br align="left"/>>, fillcolor="#E9DFF2", color="#75589C"];
+
+  frontend -> agent;
+  backendsvc -> agent;
+  aiapp -> agent;
+  uninstr -> agent [label=" otelcビルド後"];
+  agent -> gateway;
+  gateway -> tempo;
+  gateway -> mimir;
+  gateway -> loki;
+  tempo -> grafana;
+  mimir -> grafana;
+  loki -> grafana;
+
+  opamp -> agent [style=dashed, color="#75589C", fontcolor="#5B4370", label=" リモート設定"];
+  weaverreg -> frontend [style=dashed, color="#75589C", fontcolor="#5B4370", label=" 生成定数"];
+}

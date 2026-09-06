@@ -1,0 +1,34 @@
+// リモート設定の段階的ロールアウト
+digraph staged_rollout {
+  graph [
+    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=13,
+    rankdir=TB, compound=true, splines=true,
+    nodesep=0.5, ranksep=0.55, pad=0.25,
+    bgcolor="white", newrank=true
+  ];
+  node [
+    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=12,
+    shape=box, style="rounded,filled",
+    fillcolor="#F1F5F9", color="#475569", penwidth=1.6,
+    margin="0.2,0.14"
+  ];
+  edge [
+    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=11,
+    color="#334155", penwidth=1.4, arrowsize=0.9,
+    fontcolor="#1E293B"
+  ];
+
+  merged [label=<<b>設定のマージ</b><br align="left"/>CIで実効設定を検査済み<br align="left"/>>, fillcolor="#F3E8CE", color="#96742E"];
+  canary [label=<<b>canary（1台）</b><br align="left"/>適用結果とテレメトリー到達を確認<br align="left"/>>, fillcolor="#D9E7F4", color="#38638F"];
+  partial [label=<<b>一部のグループ</b><br align="left"/>exporter失敗率と流量を監視<br align="left"/>>, fillcolor="#D9E7F4", color="#38638F"];
+  full [label=<<b>フリート全体</b>>, fillcolor="#D6E8D6", color="#3F6E3F"];
+  halt [label=<<b>展開停止と再配布</b><br align="left"/>修正版を配り直す<br align="left"/>起動失敗の自動ロールバックだけに頼らない<br align="left"/>>, fillcolor="#F5DEDE", color="#A04848"];
+
+  merged -> canary;
+  canary -> partial [label=" 到達確認OK"];
+  partial -> full [label=" 監視OK"];
+  canary -> halt [style=dashed, color="#A04848", fontcolor="#7A3030", label=" 異常"];
+  partial -> halt [style=dashed, color="#A04848", fontcolor="#7A3030", label=" 異常"];
+
+  { rank=same; partial; halt; }
+}

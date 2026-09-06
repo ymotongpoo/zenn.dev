@@ -1,0 +1,29 @@
+// 公式レジストリと社内レジストリの参照関係
+digraph registry_deps {
+  graph [
+    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=13,
+    rankdir=TB, compound=true, splines=true,
+    nodesep=0.5, ranksep=0.6, pad=0.25,
+    bgcolor="white", newrank=true
+  ];
+  node [
+    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=12,
+    shape=box, style="rounded,filled",
+    fillcolor="#F1F5F9", color="#475569", penwidth=1.6,
+    margin="0.2,0.14"
+  ];
+  edge [
+    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=11,
+    color="#334155", penwidth=1.4, arrowsize=0.9,
+    fontcolor="#1E293B"
+  ];
+
+  division [label=<<b>事業部レジストリ（任意）</b><br align="left"/>全社の上にさらに重ねられる<br align="left"/>（依存は最大10階層）<br align="left"/>>, fillcolor="#E9DFF2", color="#75589C"];
+  internal [label=<<b>社内レジストリ</b><br align="left"/>com.example.* の属性を定義<br align="left"/>公式属性はrefで参照して上書き<br align="left"/>>, fillcolor="#D9E7F4", color="#38638F"];
+  official [label=<<b>公式semconvレジストリ</b><br align="left"/>タグ固定（例: v1.44.0）<br align="left"/>>, fillcolor="#F3E8CE", color="#96742E"];
+  genai [label=<<b>GenAI規約レジストリ</b><br align="left"/>リリースがないためコミットSHA固定<br align="left"/>採用日と上流schema_urlを記録<br align="left"/>>, fillcolor="#F3E8CE", color="#96742E"];
+
+  division -> internal [label=" 依存"];
+  internal -> official [label=" 依存（schema_urlを明記）"];
+  internal -> genai [label=" 依存（60章）"];
+}

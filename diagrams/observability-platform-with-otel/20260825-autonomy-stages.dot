@@ -1,0 +1,29 @@
+// 自律運用への権限の段階
+digraph autonomy_stages {
+  graph [
+    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=13,
+    rankdir=TB, compound=true, splines=true,
+    nodesep=0.5, ranksep=0.5, pad=0.25,
+    bgcolor="white", newrank=true
+  ];
+  node [
+    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=12,
+    shape=box, style="rounded,filled",
+    fillcolor="#F1F5F9", color="#475569", penwidth=1.6,
+    margin="0.2,0.14"
+  ];
+  edge [
+    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=11,
+    color="#334155", penwidth=1.4, arrowsize=0.9,
+    fontcolor="#1E293B"
+  ];
+
+  read [label=<<b>read</b><br align="left"/>調査と要約。誤りのコストは<br align="left"/>「間違った報告」に留まる<br align="left"/>>, fillcolor="#D6E8D6", color="#3F6E3F"];
+  suggest [label=<<b>suggest</b><br align="left"/>修復手順を提案。実行は人間<br align="left"/>提案の質を継続評価する<br align="left"/>>, fillcolor="#D9E7F4", color="#38638F"];
+  act [label=<<b>act（承認付き）</b><br align="left"/>ロールバックなど可逆な操作から<br align="left"/>>, fillcolor="#E9DFF2", color="#75589C"];
+  autonomous [label=<<b>autonomous</b><br align="left"/>定型化された障害のみ<br align="left"/>適用範囲を明示的に列挙する<br align="left"/>>, fillcolor="#F3E8CE", color="#96742E"];
+
+  read -> suggest [label=" 報告が信頼できたら"];
+  suggest -> act [label=" 提案が信頼できたら"];
+  act -> autonomous [label=" 実績が積み上がったら"];
+}
