@@ -21,22 +21,32 @@ digraph call_ret_timeline {
 
   s1 [shape=plain, style="", label=<
     <table border="0" cellborder="1" cellspacing="0" cellpadding="6" color="#AB5A13">
-      <tr><td colspan="2" align="left" bgcolor="#FFF5ED"><b>1. CALLの直前</b>（PC = 0x49e1b3）</td></tr>
-      <tr><td align="left" bgcolor="#FFE9D6">スタック</td><td align="left" bgcolor="#FFFFFF">mainのフレームまで</td></tr>
+      <tr><td colspan="2" width="300" align="left" bgcolor="#FFF5ED"><b>1. CALLの直前</b>（PC = 0x49e1b3）</td></tr>
+      <tr><td colspan="2" align="left" bgcolor="#FFFFFF"><font point-size="10" color="#5A5A5A">高いアドレス</font></td></tr>
+      <tr><td width="46" align="right" bgcolor="#FFFFFF"> </td><td width="250" align="left" bgcolor="#FFFFFF">mainの戻りアドレス</td></tr>
+      <tr><td width="46" align="right" bgcolor="#FFE9D6"><b>SP →</b></td><td width="250" align="left" bgcolor="#FFFFFF">mainのフレーム</td></tr>
+      <tr><td colspan="2" align="left" bgcolor="#FFFFFF"><font point-size="10" color="#5A5A5A">低いアドレス</font></td></tr>
     </table>>];
 
   s2 [shape=plain, style="", label=<
     <table border="0" cellborder="1" cellspacing="0" cellpadding="6" color="#AB5A13">
-      <tr><td colspan="2" align="left" bgcolor="#FFF5ED"><b>2. doubleを実行中</b>（CALLがジャンプした先）</td></tr>
-      <tr><td align="left" bgcolor="#FFE9D6">スタック</td><td align="left" bgcolor="#FFFCD7">戻りアドレス <font face="JetBrains Mono"><b>0x49e1b8</b></font>（CALLが積んだ）<br align="left"/><font point-size="10">= <font face="JetBrains Mono">0x49e1b3 + 5</font>（CALL命令は5バイト長）</font></td></tr>
+      <tr><td colspan="2" width="300" align="left" bgcolor="#FFF5ED"><b>2. doubleを実行中</b>（CALLがジャンプした先）</td></tr>
+      <tr><td colspan="2" align="left" bgcolor="#FFFFFF"><font point-size="10" color="#5A5A5A">高いアドレス</font></td></tr>
+      <tr><td width="46" align="right" bgcolor="#FFFFFF"> </td><td width="250" align="left" bgcolor="#FFFFFF">mainの戻りアドレス</td></tr>
+      <tr><td width="46" align="right" bgcolor="#FFFFFF"> </td><td width="250" align="left" bgcolor="#FFFFFF">mainのフレーム</td></tr>
+      <tr><td width="46" align="right" bgcolor="#FFE9D6"><b>SP →</b></td><td width="250" align="left" bgcolor="#FFFCD7">戻りアドレス <font face="JetBrains Mono"><b>0x49e1b8</b></font>（CALLが積んだ）<br align="left"/><font point-size="10">= <font face="JetBrains Mono">0x49e1b3 + 5</font>（CALL命令は5バイト長）</font></td></tr>
+      <tr><td colspan="2" align="left" bgcolor="#FFFFFF"><font point-size="10" color="#5A5A5A">低いアドレス</font></td></tr>
     </table>>];
 
   s3 [shape=plain, style="", label=<
     <table border="0" cellborder="1" cellspacing="0" cellpadding="6" color="#AB5A13">
-      <tr><td colspan="2" align="left" bgcolor="#FFF5ED"><b>3. RETの直後</b>（PC = 0x49e1b8）</td></tr>
-      <tr><td align="left" bgcolor="#FFE9D6">スタック</td><td align="left" bgcolor="#FFFFFF">スロットは取り出されて元どおり</td></tr>
+      <tr><td colspan="2" width="300" align="left" bgcolor="#FFF5ED"><b>3. RETの直後</b>（PC = 0x49e1b8）</td></tr>
+      <tr><td colspan="2" align="left" bgcolor="#FFFFFF"><font point-size="10" color="#5A5A5A">高いアドレス</font></td></tr>
+      <tr><td width="46" align="right" bgcolor="#FFFFFF"> </td><td width="250" align="left" bgcolor="#FFFFFF">mainの戻りアドレス</td></tr>
+      <tr><td width="46" align="right" bgcolor="#FFE9D6"><b>SP →</b></td><td width="250" align="left" bgcolor="#FFFFFF">mainのフレーム<br align="left"/><font point-size="10" color="#5A5A5A"><font face="JetBrains Mono">0x49e1b8</font> は取り出され、SPは元の位置へ戻った</font></td></tr>
+      <tr><td colspan="2" align="left" bgcolor="#FFFFFF"><font point-size="10" color="#5A5A5A">低いアドレス</font></td></tr>
     </table>>];
 
-  s1 -> s2 [label=" CALL main.double\l 　次の命令のアドレスを積んでからジャンプ\l"];
-  s2 -> s3 [label=" RET\l 　積まれた値を取り出してそこへジャンプ\l"];
+  s1 -> s2 [label=" CALL main.double\l 　次の命令のアドレスを積み、SPをそこへ下げてからジャンプ\l"];
+  s2 -> s3 [label=" RET\l 　SPの指す値を取り出してそこへジャンプ\l"];
 }

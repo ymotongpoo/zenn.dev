@@ -24,8 +24,8 @@ digraph uretprobe_rewrite {
 
     stack_n [shape=plain, style="", label=<
       <table border="0" cellborder="1" cellspacing="0" cellpadding="7" color="#AB5A13" bgcolor="#FFE9D6">
-        <tr><td align="left">ローカル変数 …</td></tr>
-        <tr><td align="left">戻りアドレス <font face="JetBrains Mono"><b>0x49e31f</b></font></td></tr>
+        <tr><td width="46" align="right" bgcolor="#FFFFFF"> </td><td width="230" align="left">ローカル変数 …</td></tr>
+        <tr><td width="46" align="right" bgcolor="#FFFFFF"><b>SP →</b></td><td width="230" align="left">戻りアドレス <font face="JetBrains Mono"><b>0x49e31f</b></font></td></tr>
       </table>>];
     caller_n [label=<<b>呼び出し元 <font face="JetBrains Mono">0x49e31f</font></b>>, fillcolor="#E4E4E4"];
     stack_n -> caller_n [label=" RET でここへ"];
@@ -38,8 +38,8 @@ digraph uretprobe_rewrite {
 
     stack_u [shape=plain, style="", label=<
       <table border="0" cellborder="1" cellspacing="0" cellpadding="7" color="#AB5A13" bgcolor="#FFE9D6">
-        <tr><td align="left">ローカル変数 …</td></tr>
-        <tr><td align="left" bgcolor="#FDE1EC">戻りアドレス <font face="JetBrains Mono"><b>0xTRAMPOLINE</b></font><br align="left"/><font color="#7A2C4C" point-size="11">← カーネルが書き換えた</font><br align="left"/></td></tr>
+        <tr><td width="46" align="right" bgcolor="#FFFFFF"> </td><td width="230" align="left">ローカル変数 …</td></tr>
+        <tr><td width="46" align="right" bgcolor="#FFFFFF"><b>SP →</b></td><td width="230" align="left" bgcolor="#FDE1EC">戻りアドレス <font face="JetBrains Mono"><b>0xTRAMPOLINE</b></font><br align="left"/><font color="#7A2C4C" point-size="11">← カーネルが書き換えた</font><br align="left"/></td></tr>
       </table>>];
     hook [label=<<b>カーネルのフック</b><br align="left"/>（トランポリン）<br align="left"/>>,
           fillcolor="#FDE1EC", color="#AA3E6A"];
