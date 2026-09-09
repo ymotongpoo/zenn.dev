@@ -46,10 +46,10 @@ $ otelc go build -o myapp .
 $ go build -work -toolexec="<otelcの実行パス> toolexec" -o myapp .
 ```
 
-`-toolexec` はGoツールチェーンが公式に提供する、「コンパイラの前段に自分のプログラムを挟む」仕組みです。otelcはこれを使って、コンパイル対象のパッケージが `net/http` やgRPC、`database/sql` といった対応ライブラリを呼んでいる箇所を見つけ、その呼び出しに計装コードを注入してからコンパイラに渡します。
+`-toolexec` はGoツールチェーンが公式に提供する、「コンパイラの前段に自分のプログラムを挟む」仕組みです。otelcはこれを使って、コンパイル対象が `net/http` やgRPC、`database/sql` といった対応ライブラリであれば、その中の対象の関数の本体に計装コードを差し込んでからコンパイラに渡します。書き換わるのは呼び出し側ではなくライブラリ側です。
 
 ![otelcのビルド時割り込み](/images/20260911-otelc-toolexec.png)
-*図2: 矢印はビルドの処理順序を表す。ふつうのビルドではソースコードがそのままバイナリになるのに対し、otelc経由のビルドでは `go build` の前段に `-toolexec` でotelc自身が割り込み、対応ライブラリの呼び出しに計装コードを注入してからコンパイルする。*
+*図2: 矢印はビルドの処理順序を表す。ふつうのビルドではソースコードがそのままバイナリになるのに対し、otelc経由のビルドでは `go build` の前段に `-toolexec` でotelc自身が割り込み、対応ライブラリの関数の本体に計装コードを差し込んでからコンパイルする。*
 
 #### 実際に何が書き換わるのか
 
@@ -187,7 +187,7 @@ $ git clone https://github.com/open-telemetry/opentelemetry-go-compile-instrumen
 $ cd opentelemetry-go-compile-instrumentation
 $ make build
 $ cd demo/app/http/client   # net/httpを使う適当なコードでもよい
-$ ../../../../otelc go build -work -o client .
+$ ../../../../otelc go build -o client .
 # 出力される WORK=/tmp/go-buildXXXXXXXXX を控えて、
 # その下の net/http パッケージのビルドディレクトリを探すと
 # 書き換え後の roundtrip.go が残っている

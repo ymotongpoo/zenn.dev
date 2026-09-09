@@ -131,10 +131,10 @@ ENTRYPOINT ["/frontend"]
 
 ## composeの組み立て
 
-テレメトリの送り先には [`grafana/otel-lgtm`](https://github.com/grafana/docker-otel-lgtm) を使います。Grafana、Prometheus、Tempo、OpenTelemetry Collectorが1つのイメージに入っていて、設定ファイルなしで起動します。OBIはここへOTLPで送るだけで済みます。
+テレメトリの送り先には [`grafana/otel-lgtm`](https://github.com/grafana/docker-otel-lgtm) を使います。Grafana、Prometheus、Tempo、Loki、Pyroscope、OpenTelemetry Collectorが1つのイメージに入っていて、設定ファイルなしで起動します。本章で使うのはこのうちGrafana、Prometheus、Tempo、Collectorの4つです。OBIはここへOTLPで送るだけで済みます。
 
 ![ハンズオンの構成](/images/20260911-handson-topology.png)
-*図1: 実線の矢印はリクエストとテレメトリの流れ、破線はOBIが計装対象を観測して書き込む関係を表す。OBIは2つのサービスをそれぞれ直接見ている。`pid: host` でホストのプロセス空間を見ているので、アプリのコンテナには何も入れない。Grafanaスタックの4つは `grafana/otel-lgtm` という1つのコンテナに入っている。*
+*図1: 実線の矢印はリクエストとテレメトリの流れ、破線はOBIが計装対象を観測して書き込む関係を表す。OBIは2つのサービスをそれぞれ直接見ている。`pid: host` でホストのプロセス空間を見ているので、アプリのコンテナには何も入れない。本章で使うGrafanaスタックの4つは `grafana/otel-lgtm` という1つのコンテナに入っている。*
 
 ```yaml
 services:
@@ -174,7 +174,7 @@ services:
       - "3000:3000"
 ```
 
-`privileged: true` と `pid: host` の2つは外せません。前者はeBPFプログラムのロードに要る権限で、後者はホストのプロセスを見えるようにする指定です。
+`privileged: true` と `pid: host` の2つが、この構成では要ります。前者はeBPFプログラムのロードに必要な権限をまとめて与えるためで、後者はホストのプロセスを見えるようにする指定です。`privileged` は手軽さのための選択で、本番では `CAP_BPF` や `CAP_PERFMON` など必要な権限だけを個別に付ける構成にできます。詳しくは[権限のドキュメント](https://opentelemetry.io/docs/zero-code/obi/security/)にあります。
 
 マウントしている2つのパスにも役割があります。`/sys/kernel/security` はlockdownの状態を読むため、`/sys/fs/bpf` はeBPFマップをピン留めするためです。`/sys/fs/bpf` を渡さないと警告が出て、ピン留めしたマップを前提とする機能が無効になります。
 
@@ -247,7 +247,7 @@ $ curl -s localhost:8080/order
 ![Tempoに届いたトレース](/images/20260911-handson-trace.png)
 *図2: この図に矢印はない。横棒の長さが各スパンの所要時間を表す。7つのスパンが1本のトレースになり、`frontend` と `backend` の2サービスにまたがっている。*
 
-さきほどログで見たのは3つのスパンでしたが、ここでは7つに増えています。足されたのは、サーバースパンごとにOBIが作る `in queue` と `processing` です。リクエストを受け付けてからハンドラが動き出すまでの待ち時間と、ハンドラの中で過ごした時間を分けています。ソケットを流れるバイト列だけを見ていてはこの区別は付きません。`net/http` の内部の関数にフックを置いているから取れる区別です。
+さきほどログで見たのは3つのスパンでしたが、ここでは7つに増えています。足されたのは、待ち時間が測れたサーバースパンに対してOBIが作る `in queue` と `processing` です。リクエストを受け付けてからハンドラが動き出すまでの待ち時間と、ハンドラの中で過ごした時間を分けています。ソケットを流れるバイト列だけを見ていてはこの区別は付きません。`net/http` の内部の関数にフックを置いているから取れる区別です。
 
 `GET /inventory` は2回現れます。上が `frontend` のクライアント側、下が `backend` のサーバー側で、その差がネットワークの往復とクライアント側の処理にかかった時間です。
 
@@ -307,7 +307,7 @@ sum by (service_name, http_route, http_response_status_code) (rate(http_server_r
 
 `backend` が10回に1回返している500と、それを受けた `frontend` の502が、別々の系列として出ています。`frontend` の線と `backend` の線がほぼ重なっているのは、`/order` 1回につき `/inventory` をちょうど1回呼んでいるからです。
 
-ラベルはパスそのものではなく `http_route` です。URLのパスをそのままラベルにすれば、IDを含むパスでは系列が際限なく増える。OBIはこれを避けるための仕組みを別に持っていて、設定でルートのパターンを与えればそれに合わせ、与えなければヒューリスティックが働きます。デフォルトのヒューリスティックは、サービスごとに同じ位置のセグメントの種類が10を超えると、そこをワイルドカードに置き換えます。今回は静的なパスしかないので、`/inventory` と `/order` がそのままの形で出ています。
+ラベルはパスそのものではなく `http_route` です。URLのパスをそのままラベルにすれば、IDを含むパスでは系列が際限なく増える。OBIはこれを避けるための仕組みを別に持っていて、設定でルートのパターンを与えればそれに合わせ、与えなければヒューリスティックが働きます。デフォルトのヒューリスティックは、パスを区切ったそれぞれのセグメントを分類器にかけて、意味のある語ではなくIDらしい文字列だと判定したものをワイルドカードに置き換えます。セグメントの種類の数に上限を設けるやり方もありますが、そちらは設定で明示的に選んだときだけ働きます。今回は静的なパスしかないので、`/inventory` と `/order` がそのままの形で出ています。
 
 メトリクスの名前は、[OpenTelemetryのセマンティック規約](https://opentelemetry.io/docs/specs/semconv/http/http-metrics/)にある名前をPrometheus形式に変換したものです。
 
@@ -342,7 +342,7 @@ level=WARN msg="kernel misreports ioctl(FIONREAD) for sockets in a sockhash (ker
 level=ERROR msg="context propagation is disabled: the BPF compensation is ineffective (attach failed or blocked?). This kernel misreports ioctl(FIONREAD) for sockets in a sockhash (kernel commit 929e30f93125), or could not be verified to report it correctly, so keeping propagation enabled would risk making applications sizing reads via FIONREAD stall or truncate transfers" component=tpinjector
 ```
 
-これは13章で扱う2つの伝搬経路のうち、`sk_msg` を使う経路2が無効になったという意味です。アプリのバッファに `bpf_probe_write_user` で書き込む経路1は動き続けるので、`backend` の側で `Traceparent` が読めているなら伝搬自体は成立しています。ERRORという語感に反して、Goのアプリだけを相手にしているかぎり実害はありません。実際、本章の実行結果はこのログが出ている環境で取ったものです。
+これは13章で扱う2つの伝搬経路のうち、`sk_msg` を使う経路2が無効になったという意味です。アプリのバッファに `bpf_probe_write_user` で書き込む経路1は動き続けるので、`backend` の側で `Traceparent` が読めているなら伝搬自体は成立しています。実際、本章の実行結果はこのログが出ている環境で取ったもので、`backend` は `Traceparent` を受け取れています。ただし経路1が常に書き込めるとはかぎりません。バッファに空きがない場合や必要なオフセットが解決できない場合には書き込みを見送るので、そのときは経路2が無効であることがそのまま伝搬の失敗になります。
 
 lockdownが `[integrity]` の環境では、逆に経路1のほうが使えません。経路2が動く環境ならそちらが引き継ぎますが、両方とも無効なら `Traceparent` は空のまま。同じOBIが両側を見ている範囲でしかトレースはつながりません。
 
