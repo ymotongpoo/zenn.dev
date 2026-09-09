@@ -18,7 +18,7 @@ Goチームの姿勢は一貫しています。**ランタイムの内部構造�
 
 - **Flight recording**（[#63185](https://github.com/golang/go/issues/63185)、Go 1.25で `runtime/trace.FlightRecorder` として実装）：直近の実行トレースをリングバッファに保持し、問題が起きた瞬間にその手前を取り出せる。飛行機のフライトレコーダーと同じ発想である。
 
-![flight recordingの仕組み](/images/20260820-flight-recording.png)
+![flight recordingの仕組み](/images/20260911-flight-recording.png)
 *図1: 矢印は記録と取り出しの流れを表す。ランタイムは直近ぶんだけをリングバッファに残しながら記録し続け、古い記録は上書きされる。問題が起きた瞬間の合図で、その時点の「直前」の記録だけが書き出される。*
 
 - **goroutine leak profile**：Go 1.26の `runtime/pprof` に `goroutineleak` という名前で入った、到達不能になってブロックし続けるgoroutineのプロファイル。ビルド時に `GOEXPERIMENT=goroutineleakprofile` を指定して使う実験的機能。外からeBPFで覗いても、あるgoroutineがリークしているのか、単に待っているだけなのかは区別できない。到達可能性の判定はヒープとスタックの全体を知っているランタイムの内側にしかできない仕事で、「内からだからこそ出せる答え」の実例である。
@@ -48,7 +48,7 @@ $ go build -work -toolexec="<otelcの実行パス> toolexec" -o myapp .
 
 `-toolexec` はGoツールチェーンが公式に提供する、「コンパイラの前段に自分のプログラムを挟む」仕組みです。otelcはこれを使って、コンパイル対象のパッケージが `net/http` やgRPC、`database/sql` といった対応ライブラリを呼んでいる箇所を見つけ、その呼び出しに計装コードを注入してからコンパイラに渡します。
 
-![otelcのビルド時割り込み](/images/20260820-otelc-toolexec.png)
+![otelcのビルド時割り込み](/images/20260911-otelc-toolexec.png)
 *図2: 矢印はビルドの処理順序を表す。ふつうのビルドではソースコードがそのままバイナリになるのに対し、otelc経由のビルドでは `go build` の前段に `-toolexec` でotelc自身が割り込み、対応ライブラリの呼び出しに計装コードを注入してからコンパイルする。*
 
 #### 実際に何が書き換わるのか
@@ -195,7 +195,7 @@ $ ../../../../otelc go build -work -o client .
 
 要するに、eBPFは「外から」観測し、Goは「内から」の観測手段を増やしています。外からの観測は、アプリを変更せずに済む反面、ランタイムの内部構造を追いかけ続ける必要があります。内からの観測は、正確で壊れにくい反面、コードやビルドへの関与を必要とします。
 
-![外からの観測と内からの観測](/images/20260820-outside-inside.png)
+![外からの観測と内からの観測](/images/20260911-outside-inside.png)
 *図3: 矢印は観測する側から観測される側へ向かう。ラベルはそれぞれのやり方の利点とコストを示す。*
 
 ## おわりに

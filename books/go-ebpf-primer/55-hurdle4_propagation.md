@@ -26,7 +26,7 @@ otel.GetTextMapPropagator().Inject(ctx, propagation.HeaderCarrier(req.Header))
 
 ゼロコード計装では、この1行を外から代行しなければなりません。アプリは `traceparent` の存在すら知らないので、誰かが代わりに書き込む必要があります。課題は2つに分かれます。`ctx` にあたるものを外からどう再現するかと、`req.Header` にどう書き込むかです。
 
-![誰が traceparent を書き込むのか](/images/20260820-sdk-vs-zerocode.png)
+![誰が traceparent を書き込むのか](/images/20260911-sdk-vs-zerocode.png)
 *図1: 矢印は誰がヘッダに書き込むかを表す。SDK計装ではアプリ自身が書き、ゼロコード計装では外にいるOBIが代わりに書く。*
 
 ## goroutineをまたいだ追跡
@@ -41,7 +41,7 @@ otel.GetTextMapPropagator().Inject(ctx, propagation.HeaderCarrier(req.Header))
 
 そこでOBIは、`ctx` の値を解読することをやめ、goroutineの生成関係を代わりの手がかりにします。
 
-![レジスタは読めるが、文脈は追えない](/images/20260820-context-not-traceable.png)
+![レジスタは読めるが、文脈は追えない](/images/20260911-context-not-traceable.png)
 *図2: 矢印はOBIにできることとできないことを表す。丸で止まっている破線が、できないほうである。点線はその理由を並べたもので、処理の流れではない。*
 
 OBIがフックを置くのは、goroutineの生成そのものです。呼び方を先にそろえておきます。`go f()` を実行してgoroutineを作る側を**親**、作られる側を**子**と呼びます。`go f()` と書いたときに最終的に呼ばれるランタイム関数が `runtime.newproc1` で、そのシグネチャは、go1.26では次のようになっています。
@@ -101,7 +101,7 @@ int GUARDED_PROG(obi_uprobe_runtime_newproc1_return, struct pt_regs *, ctx) {
 
 出口では、戻り値（`GO_PARAM1`、つまり `AX`）に子の `g` のアドレスが入っています。入口で控えた親と組にして、「子 → 親」の対応を `ongoing_goroutines` マップに記録します。これで「このgoroutineは、あのリクエストを処理しているgoroutineの子だ」と辿れるようになります。
 
-![newproc1 の入口と出口で親子を記録する](/images/20260820-newproc1-map.png)
+![newproc1 の入口と出口で親子を記録する](/images/20260911-newproc1-map.png)
 *図3: 矢印は時間の前後を表す。入口では親しか分からないので一時的に控え、出口で子のアドレスが判明してから、「子 → 親」の組として記録する。*
 
 :::details 実装の全文（PIDの組み立て、循環の回避、古いエントリの削除を含む）
@@ -237,7 +237,7 @@ static __always_inline u64 find_parent_goroutine(go_addr_key_t *current) {
 
 漏れたときに何が起きるかも押さえておきます。6回の検索で調べられるのは自分自身と親5世代までなので、トレース情報を持つ祖先がそれより遠いと `find_parent_goroutine` は0を返します。このとき送信側の処理は計装されないのではなく、`client_trace_parent` が新しいトレースIDを乱数で作ります。つまり下流のリクエストは、上流とつながらない別のトレースとして記録されます。トレースが消える場合より対処が難しく、1本のはずの流れが2本に見えます。
 
-![親子を記録して遡る](/images/20260820-parent-walk.png)
+![親子を記録して遡る](/images/20260911-parent-walk.png)
 *図4: 上段は矢印が記録の流れ、下段は子から親への参照をたどる向きを表す。探索の起点は送信しているgoroutine自身なので、6回の検索で調べられるのは自身と親5世代までである。上界が必要なのは検証器の制約だが、6という値は実装上の選択である。打ち切られた送信処理は計装されないのではなく、新しいトレースIDを振られて別のトレースになる。*
 
 ## 送信リクエストへのヘッダ注入
@@ -275,7 +275,7 @@ HTTP/1.1のリクエストは、ただの1本の文字列です。ヘッダは1�
 
 `net/http` はヘッダを書き出すときに `Header.writeSubset` を通り、その先の `bufio.Writer` のバッファに、いま見たような文字列を積んでいきます。`bufio.Writer` は書き込みをためておくための入れ物で、`buf` がバイト列の置き場、`n` が「そのうち何バイトまで使っているか」を持ちます。OBIはこの関数の入口と戻りの両方にフックを置き、戻りのほうで、ためられた文字列の末尾に1行を書き足します。プローブの登録はGo側の `pkg/internal/ebpf/gotracer/gotracer.go` にあります。
 
-![traceparent をどこへ書き込むか](/images/20260820-header-injection.png)
+![traceparent をどこへ書き込むか](/images/20260911-header-injection.png)
 *図5: 縦に並ぶ矢印は書き出しの経路、OBIから伸びる矢印は書き込み先を表し、先が塞がれた破線は書き込めない相手を指す。`http.Header` のmapには外から書き込めないため、直列化の直前にある `bufio.Writer` のバッファへ `Traceparent` を書き、`n` を進める。*
 
 ```go
@@ -316,7 +316,7 @@ HTTP/1.1のリクエストは、ただの1本の文字列です。ヘッダは1�
 
 難所3で見た `offsets.json` に `bufio.Writer` の `buf`、`n`、`wr` が入っているのは、このためです。Goの標準ライブラリの非公開フィールドを、外から書き換えています。`io_writer_n_pos` という変数名が、そのオフセットを指しています。
 
-![HTTPのバイト列と、traceparent を差し込む2つの位置](/images/20260820-http-bytes-injection.png)
+![HTTPのバイト列と、traceparent を差し込む2つの位置](/images/20260911-http-bytes-injection.png)
 *図6: 矢印は書き込みの向きと、バイト列が出ていく向きを表す。経路1はアプリのメモリにあるバッファへ書き、経路2はソケットへ出ていくバイト列に差し込む。どちらも足すのは同じ1行である。*
 
 ## 書き込みが許されない環境と、もう一つの経路
@@ -354,5 +354,5 @@ kernel lockdownが有効な環境やSecure Bootの下では、このヘルパー
 
 難所4でOBIがしているのは、goroutineの生成にフックを置いて親子関係を記録し、送信の直前に自身を含めて6回まで遡ってトレースIDを見つけ、直列化直前のバッファか、ソケットへ出ていくバイト列にそれを書き足すことです。
 
-![goroutine の親子追跡と traceparent 注入](/images/20260820-context-propagation.png)
+![goroutine の親子追跡と traceparent 注入](/images/20260911-context-propagation.png)
 *図7: 実線の矢印は処理の流れ、破線は無効化を表す。goroutine の親子追跡（プロセス内）と traceparent 注入（プロセス間）を示している。追跡は自身を含めて6回まで、注入は2経路あり、カーネルのセキュリティ機構が有効だと経路1だけが落ちる。*

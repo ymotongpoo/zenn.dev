@@ -133,7 +133,7 @@ ENTRYPOINT ["/frontend"]
 
 テレメトリの送り先には [`grafana/otel-lgtm`](https://github.com/grafana/docker-otel-lgtm) を使います。Grafana、Prometheus、Tempo、OpenTelemetry Collectorが1つのイメージに入っていて、設定ファイルなしで起動します。OBIはここへOTLPで送るだけで済みます。
 
-![ハンズオンの構成](/images/20260820-handson-topology.png)
+![ハンズオンの構成](/images/20260911-handson-topology.png)
 *図1: 実線の矢印はリクエストとテレメトリの流れ、破線はOBIが計装対象を観測して書き込む関係を表す。OBIは2つのサービスをそれぞれ直接見ている。`pid: host` でホストのプロセス空間を見ているので、アプリのコンテナには何も入れない。Grafanaスタックの4つは `grafana/otel-lgtm` という1つのコンテナに入っている。*
 
 ```yaml
@@ -244,7 +244,7 @@ $ curl -s localhost:8080/order
 
 `http://localhost:3000` を開きます。`grafana/otel-lgtm` はデータソースを設定済みなので、ExploreでTempoを選べばすぐ検索できます。[TraceQL](https://grafana.com/docs/tempo/latest/traceql/) に `{ resource.service.name = "frontend" }` と入れて、出てきたトレースを1つ開きます。
 
-![Tempoに届いたトレース](/images/20260820-handson-trace.png)
+![Tempoに届いたトレース](/images/20260911-handson-trace.png)
 *図2: この図に矢印はない。横棒の長さが各スパンの所要時間を表す。7つのスパンが1本のトレースになり、`frontend` と `backend` の2サービスにまたがっている。*
 
 さきほどログで見たのは3つのスパンでしたが、ここでは7つに増えています。足されたのは、サーバースパンごとにOBIが作る `in queue` と `processing` です。リクエストを受け付けてからハンドラが動き出すまでの待ち時間と、ハンドラの中で過ごした時間を分けています。ソケットを流れるバイト列だけを見ていてはこの区別は付きません。`net/http` の内部の関数にフックを置いているから取れる区別です。
@@ -302,7 +302,7 @@ ExploreでPrometheusを選び、次のクエリを実行します。
 sum by (service_name, http_route, http_response_status_code) (rate(http_server_request_duration_seconds_count[1m]))
 ```
 
-![OBIが出したREDメトリクス](/images/20260820-handson-red-metrics.png)
+![OBIが出したREDメトリクス](/images/20260911-handson-red-metrics.png)
 *図3: 縦軸は毎秒あたりのリクエスト数を表す。系列はサービス名、ルート、ステータスコードの組で分かれる。*
 
 `backend` が10回に1回返している500と、それを受けた `frontend` の502が、別々の系列として出ています。`frontend` の線と `backend` の線がほぼ重なっているのは、`/order` 1回につき `/inventory` をちょうど1回呼んでいるからです。
@@ -320,7 +320,7 @@ sum by (service_name, http_route, http_response_status_code) (rate(http_server_r
 
 同じトレースのデータから、サービス間の呼び出し関係も組み立てられます。ExploreのTempoでQuery typeを「Service Graph」に切り替えます。
 
-![サービスグラフ](/images/20260820-handson-service-graph.png)
+![サービスグラフ](/images/20260911-handson-service-graph.png)
 *図4: 矢印は呼び出しの向き（呼ぶ側から呼ばれる側へ）を表す。円を囲む線の色は成功と失敗の比率、円の中の数値は所要時間と毎秒のリクエスト数を示す。*
 
 `user` から `frontend` へ、`frontend` から `backend` への呼び出しが出ています。計装されていない呼び出し元は `user` としてまとめられます。この図はTempoがスパンの親子関係から組み立てたもので、`OTEL_EBPF_METRICS_FEATURES` に `application_service_graph` を足せばOBI自身にもほぼ同じメトリクスを出させられますが、ここでは二重になるので使っていません。
