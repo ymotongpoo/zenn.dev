@@ -37,7 +37,7 @@ digraph build_flags {
   addr [label=<<b>関数のアドレスは特定できる</b><br align="left"/><font face="JetBrains Mono">.gopclntab</font> を自前で解析する<br align="left"/>>,
         fillcolor="#D2F3DF", color="#038435"];
   off_ok [label=<<b>オフセットはバイナリから読める</b>>, fillcolor="#D2F3DF", color="#038435"];
-  off_ng [label=<<b>オフセットは <font face="JetBrains Mono">offsets.json</font> 頼み</b><br align="left"/>表に無い版は静かに欠ける<br align="left"/>>,
+  off_ng [label=<<b>オフセットは <font face="JetBrains Mono">offsets.json</font> 頼み</b><br align="left"/>表に無いバージョンは過去最新の値になる<br align="left"/>>,
           fillcolor="#FDE1EC", color="#AA3E6A"];
 
   { rank=same; addr; off_ok; off_ng; }

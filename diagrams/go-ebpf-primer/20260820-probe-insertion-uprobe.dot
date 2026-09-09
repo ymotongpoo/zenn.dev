@@ -29,6 +29,7 @@ digraph probe_insertion_uprobe {
         <tr><td colspan="2" align="left" bgcolor="#FFF5ED"><b>コード領域 <font face="JetBrains Mono">0x49e180</font></b></td></tr>
         <tr><td align="left" bgcolor="#FFE9D6">差し替え前</td><td align="left" bgcolor="#FFE9D6"><font face="JetBrains Mono">48 01 c0</font></td></tr>
         <tr><td align="left" bgcolor="#FFFCD7">差し替え後</td><td align="left" bgcolor="#FFFCD7"><font face="JetBrains Mono"><b>cc</b> 01 c0</font></td></tr>
+        <tr><td colspan="2" align="left" bgcolor="#FFFFFF"><font point-size="11">CoWでこのプロセスのページだけ</font></td></tr>
       </table>>];
     trap_u [label=<<b>トラップしてカーネルへ</b><br align="left"/>レジスタ一式を保存<br align="left"/>>, fillcolor="#FFFCD7", color="#736B10"];
     prog_u [label=<<b>eBPFプログラムが走る</b><br align="left"/>レジスタの写しを受け取る<br align="left"/>>, fillcolor="#FFE9D6", color="#AB5A13"];
