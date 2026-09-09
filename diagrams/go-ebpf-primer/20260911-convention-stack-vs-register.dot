@@ -37,7 +37,7 @@ digraph convention_stack_vs_register {
       <tr><td align="left" bgcolor="#D2F3DF"><font face="JetBrains Mono">AX</font></td><td align="left" bgcolor="#D2F3DF"><font face="JetBrains Mono">a</font></td><td align="left" bgcolor="#F3F3F3">見ない</td></tr>
       <tr><td align="left" bgcolor="#D2F3DF"><font face="JetBrains Mono">BX</font></td><td align="left" bgcolor="#D2F3DF"><font face="JetBrains Mono">b</font></td><td align="left" bgcolor="#F3F3F3">見ない</td></tr>
       <tr><td align="left" bgcolor="#D2F3DF"><font face="JetBrains Mono">CX</font></td><td align="left" bgcolor="#D2F3DF"><font face="JetBrains Mono">c</font></td><td align="left" bgcolor="#FDE1EC">第4引数だと思う</td></tr>
-      <tr><td align="left" bgcolor="#FFFFFF"><font face="JetBrains Mono">DI</font></td><td align="left" bgcolor="#FFFFFF">（第4引数用）</td><td align="left" bgcolor="#FDE1EC"><b>第1引数だと思う</b></td></tr>
+      <tr><td align="left" bgcolor="#FFFFFF"><font face="JetBrains Mono">DI</font></td><td align="left" bgcolor="#FFFFFF">（4本目のレジスタ用）</td><td align="left" bgcolor="#FDE1EC"><b>第1引数だと思う</b></td></tr>
       <tr><td colspan="3" align="left" bgcolor="#FFFFFF">スタックには引数が無い。Cの規約で読んでも<br align="left"/>エラーは出ず、別の引数の値が返る<br align="left"/></td></tr>
     </table>>];
 
