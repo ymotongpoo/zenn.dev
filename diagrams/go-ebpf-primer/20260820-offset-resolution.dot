@@ -2,7 +2,7 @@
 digraph offset_resolution {
   graph [
     rankdir=TB, splines=ortho,
-    nodesep=0.5, ranksep=0.5, pad=0.25,
+    nodesep=0.9, ranksep=0.5, pad=0.25,
     fontname="IBM Plex Sans JP", fontsize=13,
     bgcolor="white"
   ];
@@ -26,25 +26,22 @@ digraph offset_resolution {
        fillcolor="#D2F3DF", color="#038435"];
   miss [label=<<b>読めなかったフィールド</b>>, fillcolor="#FFFCD7", color="#736B10"];
 
-  json [label=<<b><font face="JetBrains Mono">offsets.json</font> を引く</b><br align="left"/><font face="JetBrains Mono">go-offsets-tracker</font> が自動更新する表<br align="left"/>>,
+  json [label=<<b>ビルド情報から版を割り出し<br align="left"/><font face="JetBrains Mono">offsets.json</font> を引く</b><br align="left"/><font face="JetBrains Mono">go-offsets-tracker</font> が自動更新する表<br align="left"/>その版以下で最新の記録を返す<br align="left"/>>,
         fillcolor="#FFFCD7", color="#736B10"];
 
-  ver [label=<<b>ビルド情報から版を割り出す</b><br align="left"/>Goと依存ライブラリのバージョン<br align="left"/>>,
-       fillcolor="#FFFCD7", color="#736B10"];
-
   use [label=<<b>1つのオフセット表として使う</b>>, fillcolor="#E4E4E4"];
-  fail [label=<<b>表にも無ければ、その項目だけ欠ける</b>>, fillcolor="#FDE1EC", color="#AA3E6A"];
+  fail [label=<<b>記録が無ければ、その項目だけ欠ける</b>>, fillcolor="#FDE1EC", color="#AA3E6A"];
 
   bin -> dwarf;
   dwarf -> got;
   dwarf -> miss;
   bin -> json [style=dashed, color="#8A8A8A"];
   miss -> json;
-  json -> ver;
   got -> use [penwidth=1.8];
-  ver -> use;
-  ver -> fail [style=dashed, color="#AA3E6A"];
+  json -> use;
+  json -> fail [style=dashed, color="#AA3E6A"];
 
-  { rank=same; got; miss; }
-  { rank=same; use; fail; }
+  { rank=same; got; miss; got -> miss [style=invis]; }
+
+
 }

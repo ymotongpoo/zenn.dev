@@ -28,7 +28,7 @@ digraph uretprobe_rewrite {
         <tr><td width="46" align="right" bgcolor="#FFFFFF"><b>SP →</b></td><td width="230" align="left">戻りアドレス <font face="JetBrains Mono"><b>0x49e31f</b></font></td></tr>
       </table>>];
     caller_n [label=<<b>呼び出し元 <font face="JetBrains Mono">0x49e31f</font></b>>, fillcolor="#E4E4E4"];
-    stack_n -> caller_n [label=" RET でここへ"];
+    stack_n -> caller_n [xlabel=" RET  "];
   }
 
   subgraph cluster_uret {
@@ -39,14 +39,14 @@ digraph uretprobe_rewrite {
     stack_u [shape=plain, style="", label=<
       <table border="0" cellborder="1" cellspacing="0" cellpadding="7" color="#AB5A13" bgcolor="#FFE9D6">
         <tr><td width="46" align="right" bgcolor="#FFFFFF"> </td><td width="230" align="left">ローカル変数 …</td></tr>
-        <tr><td width="46" align="right" bgcolor="#FFFFFF"><b>SP →</b></td><td width="230" align="left" bgcolor="#FDE1EC">戻りアドレス <font face="JetBrains Mono"><b>0xTRAMPOLINE</b></font><br align="left"/><font color="#7A2C4C" point-size="11">← カーネルが書き換えた</font><br align="left"/></td></tr>
+        <tr><td width="46" align="right" bgcolor="#FFFFFF"><b>SP →</b></td><td width="230" align="left" bgcolor="#FDE1EC">戻りアドレス <font face="JetBrains Mono"><b>0x7fffffffe000</b></font><br align="left"/><font color="#7A2C4C" point-size="11">← カーネルが書き換えた</font><br align="left"/></td></tr>
       </table>>];
-    hook [label=<<b>カーネルのフック</b><br align="left"/>（トランポリン）<br align="left"/>>,
+    hook [label=<<b>トランポリン</b><br align="left"/>カーネルが対象プロセスの<br align="left"/>アドレス空間に張った専用ページ<br align="left"/><font face="JetBrains Mono" point-size="11">[uprobes]  0x7fffffffe000</font><br align="left"/>>,
           fillcolor="#FDE1EC", color="#AA3E6A"];
     caller_u [label=<<b>本物の <font face="JetBrains Mono">0x49e31f</font></b>>, fillcolor="#E4E4E4"];
 
-    stack_u -> hook [label=" RET でここへ"];
-    hook -> caller_u [label=" 処理後にジャンプし直す", style=dashed, color="#8A8A8A"];
+    stack_u -> hook [xlabel=" RET  "];
+    hook -> caller_u [xlabel=" 処理後  ", style=dashed, color="#8A8A8A"];
   }
 
   { rank=same; stack_n; stack_u; }

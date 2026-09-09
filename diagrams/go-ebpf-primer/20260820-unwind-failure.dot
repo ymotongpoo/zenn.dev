@@ -21,7 +21,7 @@ digraph unwind_failure {
     <table border="0" cellborder="1" cellspacing="0" cellpadding="6" color="#AB5A13">
       <tr><td align="left" bgcolor="#FFF5ED"><b>移動中のスタック</b></td></tr>
       <tr><td align="left" bgcolor="#FFE9D6">いま見ているフレーム</td></tr>
-      <tr><td align="left" bgcolor="#FDE1EC" port="ra">戻りアドレス <font face="JetBrains Mono"><b>0xTRAMPOLINE</b></font></td></tr>
+      <tr><td align="left" bgcolor="#FDE1EC" port="ra">戻りアドレス <font face="JetBrains Mono"><b>0x7fffffffe000</b></font><br align="left"/><font color="#7A2C4C" point-size="11">トランポリンを指している</font><br align="left"/></td></tr>
       <tr><td align="left" bgcolor="#FFE9D6">呼び出し元のフレーム …</td></tr>
     </table>>];
 
@@ -33,7 +33,7 @@ digraph unwind_failure {
 
   ok [label=<<b>Go関数が見つかる</b><br align="left"/>フレームの大きさとポインタの位置が分かり、補正できる<br align="left"/>>,
       fillcolor="#D2F3DF", color="#038435"];
-  ng [label=<<b>トランポリンは表に無い</b><br align="left"/>どの関数のフレームか分からない<br align="left"/>>,
+  ng [label=<<b>トランポリンは表に無い</b><br align="left"/>Goのリンカが知らない領域なので登録されていない<br align="left"/>どの関数のフレームか分からない<br align="left"/>>,
       fillcolor="#FDE1EC", color="#AA3E6A"];
 
   crash [label=<<font face="JetBrains Mono"><b>throw("unknown caller pc")</b></font>>, fillcolor="#FDE1EC", color="#AA3E6A"];

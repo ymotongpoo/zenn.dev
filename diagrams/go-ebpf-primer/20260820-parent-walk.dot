@@ -1,9 +1,13 @@
-// 親を6段まで遡る
+// goroutineの親子を記録し、送信時に自分から親へ遡って開始情報を探す
+//
+// 本文幅は環境によっては700pxしかないので、上下2段（記録→探索）に積んで
+// 縦に組んでいる。スライド用には同名の別バージョン（横長）がある。
 digraph parent_walk {
   graph [
-    rankdir=TB, splines=ortho,
+    rankdir=TB, splines=ortho, compound=true, newrank=true,
+    nodesep=0.4, ranksep=0.55, pad=0.25,
     fontname="IBM Plex Sans JP", fontsize=13,
-    bgcolor="white", pad=0.25
+    bgcolor="white"
   ];
   node [
     fontname="IBM Plex Sans JP", fontsize=12,
@@ -17,19 +21,51 @@ digraph parent_walk {
     fontcolor="#171717"
   ];
 
-  cur [label=<<b>送信 goroutine</b>　いまここ>, fillcolor="#FFE9D6", color="#AB5A13"];
-  p1 [label=<1段目の親>, fillcolor="#E4E4E4"];
-  p2 [label=<2段目の親>, fillcolor="#E4E4E4"];
-  dots [label=<…（6段目まで）>, fillcolor="#E4E4E4"];
+  // ---- 記録する ----
+  subgraph cluster_rec {
+    label=<<b>記録する（<font face="JetBrains Mono">runtime.newproc1</font> のフック）</b>>;
+    style="rounded"; labeljust="l"; penwidth=1.6; margin=14;
+    color="#AB5A13"; fontcolor="#783F0E"; bgcolor="#FFF5ED";
 
-  root [label=<<b>受信 goroutine</b><br align="left"/><font face="JetBrains Mono">go_trace_map</font> にトレース情報を持つ<br align="left"/>>, fillcolor="#D2F3DF", color="#038435"];
-  over [label=<<b>7段目で打ち切り</b><br align="left"/>上界の存在は検証器の要請、6という値は実装の選択<br align="left"/>>, fillcolor="#FDE1EC", color="#AA3E6A"];
+    hooks [shape=plain, style="", label=<
+      <table border="0" cellborder="1" cellspacing="0" cellpadding="7" color="#AB5A13">
+        <tr><td align="left" bgcolor="#FFE9D6"><b>入口</b>　第2引数の親のgを控える</td></tr>
+        <tr><td align="left" bgcolor="#FFE9D6"><b>出口</b>　戻り値の子のgと組にする<br align="left"/><font point-size="11">（難所1で見た全RETへのuprobe）</font><br align="left"/></td></tr>
+      </table>>];
 
-  { rank=same; root; over; }
+    pairs [shape=plain, style="", label=<
+      <table border="0" cellborder="1" cellspacing="0" cellpadding="7" color="#736B10">
+        <tr><td colspan="3" align="left" bgcolor="#FFFEED"><b><font face="JetBrains Mono">ongoing_goroutines</font></b></td></tr>
+        <tr><td align="left" bgcolor="#FFFCD7"><b>子</b></td><td align="left" bgcolor="#FFFCD7"><font face="JetBrains Mono">g3</font></td><td align="left" bgcolor="#FFFCD7"><font face="JetBrains Mono">g2</font></td></tr>
+        <tr><td align="left" bgcolor="#FFFCD7"><b>親</b></td><td align="left" bgcolor="#FFFCD7"><font face="JetBrains Mono">g2</font></td><td align="left" bgcolor="#FFFCD7"><font face="JetBrains Mono">g1</font></td></tr>
+      </table>>];
 
-  cur -> p1;
-  p1 -> p2;
-  p2 -> dots;
-  dots -> root;
-  dots -> over [style=dashed, color="#AA3E6A"];
+    hooks -> pairs;
+  }
+
+  // ---- 探索する ----
+  subgraph cluster_walk {
+    label=<<b>探索する（送信のフック）</b>>;
+    style="rounded"; labeljust="l"; penwidth=1.6; margin=14;
+    color="#4A4A4A"; fontcolor="#343434"; bgcolor="#F3F3F3";
+
+    tries [shape=plain, style="", label=<
+      <table border="0" cellborder="1" cellspacing="0" cellpadding="7" color="#4A4A4A">
+        <tr><td align="left" bgcolor="#E4E4E4"><b>1回目</b>　送信中の <font face="JetBrains Mono">g3</font>　→ 未登録</td></tr>
+        <tr><td align="left" bgcolor="#E4E4E4"><b>2回目</b>　親 <font face="JetBrains Mono">g2</font>　→ 未登録</td></tr>
+        <tr><td align="left" bgcolor="#D2F3DF"><b>3回目</b>　親 <font face="JetBrains Mono">g1</font>　→ <b>発見</b></td></tr>
+      </table>>];
+
+    found [label=<<b>受信を担当した <font face="JetBrains Mono">g1</font></b><br align="left"/><font face="JetBrains Mono">go_trace_map</font> のトレース情報を<br align="left"/>そのまま引き継ぐ<br align="left"/>>,
+           fillcolor="#D2F3DF", color="#038435"];
+    over  [label=<<b>6回で打ち切り</b><br align="left"/>新しいトレースIDが振られ、<br align="left"/>1本の流れが2本に見える<br align="left"/>>,
+           fillcolor="#FDE1EC", color="#AA3E6A"];
+
+    tries -> found;
+    tries -> over [style=dashed, color="#AA3E6A"];
+
+    { rank=same; found; over; }
+  }
+
+  pairs -> tries [ltail=cluster_rec, lhead=cluster_walk, penwidth=1.8];
 }

@@ -2,7 +2,7 @@
 digraph convention_stack_vs_register {
   graph [
     fontname="IBM Plex Sans JP", fontsize=13,
-    rankdir=TB, compound=true, splines=true,
+    rankdir=TB, compound=true, splines=ortho,
     nodesep=0.5, ranksep=0.7, pad=0.25,
     bgcolor="white", newrank=true
   ];
@@ -22,20 +22,22 @@ digraph convention_stack_vs_register {
 
   stackway [shape=plain, style="", label=<
     <table border="0" cellborder="1" cellspacing="0" cellpadding="7" color="#4A4A4A">
-      <tr><td colspan="2" align="left" bgcolor="#F3F3F3"><b>スタック渡し</b>　<font face="JetBrains Mono">f(a, b, c)</font></td></tr>
-      <tr><td align="left" bgcolor="#FFE9D6"><font face="JetBrains Mono">SP+0</font></td><td align="left" bgcolor="#FFE9D6"><font face="JetBrains Mono">a</font></td></tr>
-      <tr><td align="left" bgcolor="#FFE9D6"><font face="JetBrains Mono">SP+8</font></td><td align="left" bgcolor="#FFE9D6"><font face="JetBrains Mono">b</font></td></tr>
-      <tr><td align="left" bgcolor="#FFE9D6"><font face="JetBrains Mono">SP+16</font></td><td align="left" bgcolor="#FFE9D6"><font face="JetBrains Mono">c</font></td></tr>
-      <tr><td colspan="2" align="left" bgcolor="#FFFFFF">フレームの決まった位置を見れば読める</td></tr>
+      <tr><td colspan="2" align="left" bgcolor="#F3F3F3"><b>スタック渡し</b>　<font face="JetBrains Mono">f(a, b, c)</font>　Go 1.16まで</td></tr>
+      <tr><td align="left" bgcolor="#FFFFFF"><font face="JetBrains Mono">SP+0</font></td><td align="left" bgcolor="#FFFFFF">戻りアドレス</td></tr>
+      <tr><td align="left" bgcolor="#FFE9D6"><font face="JetBrains Mono">SP+8</font></td><td align="left" bgcolor="#FFE9D6"><font face="JetBrains Mono">a</font></td></tr>
+      <tr><td align="left" bgcolor="#FFE9D6"><font face="JetBrains Mono">SP+16</font></td><td align="left" bgcolor="#FFE9D6"><font face="JetBrains Mono">b</font></td></tr>
+      <tr><td align="left" bgcolor="#FFE9D6"><font face="JetBrains Mono">SP+24</font></td><td align="left" bgcolor="#FFE9D6"><font face="JetBrains Mono">c</font></td></tr>
+      <tr><td colspan="2" align="left" bgcolor="#FFFFFF">SPからの決まった距離を読むだけ<br align="left"/>Cの規約と同じ考え方で読める<br align="left"/></td></tr>
     </table>>];
 
   regway [shape=plain, style="", label=<
     <table border="0" cellborder="1" cellspacing="0" cellpadding="7" color="#038435">
-      <tr><td colspan="2" align="left" bgcolor="#EBFAF1"><b>レジスタ渡し</b>　<font face="JetBrains Mono">f(a, b, c)</font></td></tr>
+      <tr><td colspan="2" align="left" bgcolor="#EBFAF1"><b>レジスタ渡し</b>　<font face="JetBrains Mono">f(a, b, c)</font>　Go 1.17以降</td></tr>
       <tr><td align="left" bgcolor="#D2F3DF"><font face="JetBrains Mono">AX</font></td><td align="left" bgcolor="#D2F3DF"><font face="JetBrains Mono">a</font></td></tr>
       <tr><td align="left" bgcolor="#D2F3DF"><font face="JetBrains Mono">BX</font></td><td align="left" bgcolor="#D2F3DF"><font face="JetBrains Mono">b</font></td></tr>
       <tr><td align="left" bgcolor="#D2F3DF"><font face="JetBrains Mono">CX</font></td><td align="left" bgcolor="#D2F3DF"><font face="JetBrains Mono">c</font></td></tr>
-      <tr><td colspan="2" align="left" bgcolor="#FFFFFF">速いが、対応表を知らないと読めない</td></tr>
+      <tr><td align="left" bgcolor="#FFFFFF"><font face="JetBrains Mono">SP+0</font></td><td align="left" bgcolor="#FFFFFF">戻りアドレス（引数は無い）</td></tr>
+      <tr><td colspan="2" align="left" bgcolor="#FFFFFF">速いが、スタックには何も無い<br align="left"/>Go専用の対応表が要る（Cとは選び方が違う）<br align="left"/></td></tr>
     </table>>];
 
   stackway -> regway [style=invis];
