@@ -86,7 +86,7 @@ $ ./registry/weaver.sh generate
 
 checkは、公式semconvへの依存をGit URLで解決して約3秒で成功しました。違反を検出できることも確認します。`com.example.` 以外の名前空間として `myteam.custom.flag` を定義すると、checkはRegoポリシーの `internal_namespace_only` violationで失敗しました。この定義を削除すると成功します。generateは `sdk/semconv/semconv.go` を生成し、`com.example.delivery.id` を `ComExampleDeliveryId` 定数に変換しました。生成結果はコミット済みのファイルと一致し、差分は出ません。CIはこの差分の有無を検査します。
 
-実測データはlive-checkで検査します。live-checkをOTLPの受信口として起動し、テスト用テレメトリーを生成する公式ツールtelemetrygenから、レジストリにない属性を含むスパンを送りました。`myteam.rogue.attr` はviolationとして報告され、`com.example.delivery.id` はviolationになりませんでした。ただし、`com.example.delivery.id` にはstabilityがdevelopmentであるという改善提案が付きます。
+実測データはlive-checkで検査します。live-checkをOTLPの受信口として起動し、テレメトリーを生成する公式のテストツールtelemetrygenから、レジストリにない属性を含むスパンを送りました。`myteam.rogue.attr` はviolationとして報告され、`com.example.delivery.id` はviolationになりませんでした。ただし、`com.example.delivery.id` にはstabilityがdevelopmentであるという改善提案が付きます。
 
 live-checkをコンテナで動かす場合は、リスンアドレスを明示します。既定のままではコンテナ外から送ったテレメトリーが届かず、検査対象が0件のまま終了します。実測でも最初はこれに気付かず、違反0件の結果を得ていました。`registry/weaver.sh` は `--otlp-grpc-address 0.0.0.0` を指定しています。
 

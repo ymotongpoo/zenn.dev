@@ -23,7 +23,7 @@ digraph agent_gateway {
     labeljust="l"; style="rounded"; penwidth=1.6;
     color="#475569"; bgcolor="#F4F6F8"; fontcolor="#334155"; margin=14;
     app1 [label="アプリ", fillcolor="#D9E7F4", color="#38638F"];
-    agent1 [label=<<b>agent</b><br align="left"/>受け口の提供<br align="left"/>ホストのメタデータ付加<br align="left"/>>, fillcolor="#D9E7F4", color="#38638F"];
+    agent1 [label=<<b>agent</b><br align="left"/>受け口の提供<br align="left"/>ホストのメタデータ付加<br align="left"/>設定は薄く、全ノードで同一<br align="left"/>>, fillcolor="#D9E7F4", color="#38638F"];
     app1 -> agent1;
   }
 
@@ -34,7 +34,7 @@ digraph agent_gateway {
     labeljust="l"; style="rounded"; penwidth=1.6;
     color="#475569"; bgcolor="#F4F6F8"; fontcolor="#334155"; margin=14;
     app2 [label="アプリ", fillcolor="#D9E7F4", color="#38638F"];
-    agent2 [label=<<b>agent</b><br align="left"/>受け口の提供<br align="left"/>ホストのメタデータ付加<br align="left"/>>, fillcolor="#D9E7F4", color="#38638F"];
+    agent2 [label=<<b>agent</b><br align="left"/>受け口の提供<br align="left"/>ホストのメタデータ付加<br align="left"/>設定は薄く、全ノードで同一<br align="left"/>>, fillcolor="#D9E7F4", color="#38638F"];
     app2 -> agent2;
   }
 

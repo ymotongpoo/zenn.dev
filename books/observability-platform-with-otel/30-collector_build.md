@@ -34,7 +34,7 @@ Collectorには、主に三つの配置があります。
 agentはアプリケーションと同じノードで動くため、ノード障害の影響をともに受けます。二段構成にしても損失条件はなくなりません。各層のキューと再送を設計し、どの障害でどこまで失うかを決めます。
 
 ![agentとgatewayの2段トポロジー](/images/20260926-agent-gateway.png)
-*図1　矢印はテレメトリーの流れを表します。agentは各ノードで同じ最小限の処理を行い、組織の方針はgatewayへ集約します。tail samplingを水平スケールさせる場合は、振り分け層を追加します。*
+*図1　矢印はテレメトリーの流れを表します。二つのノードのagentは同じ役割で、全ノードに同じ設定を配ります。組織の方針はgatewayへ集約します。破線の振り分け層は、tail samplingを水平スケールさせる場合にだけ追加します。*
 
 ## gateway層の処理設計
 
@@ -91,11 +91,11 @@ extensions:
 
 2026年8月時点のmanifestには、バージョンと設定項目に注意が必要です。
 
-Collectorのcoreリポジトリは、v1.65.0とv0.159.0の二つのバージョンを同時にリリースしています。stableに達しているのはpdataやconfmapなどのAPI層です。receiverやprocessorなどのコンポーネントはv0系なので、manifestにはv0.159.0のようなバージョンを書きます。
+Collectorのcoreリポジトリは、v1.65.0とv0.159.0の二つのバージョンを同時にリリースしています。stableに達しているのは、テレメトリーの内部表現を扱うpdataや、設定を読み込むconfmapなどのAPI層です。receiverやprocessorなどのコンポーネントはv0系なので、manifestにはv0.159.0のようなバージョンを書きます。
 
 `otelcol_version` フィールドは、2024年11月のOCBで削除されました。古い記事にはdistセクションへ指定する例が残っていますが、現在は使いません。コンポーネント間のバージョン整合はビルド時に検査されます。
 
-設定値を環境変数などから展開するconfmap providerの `providers` セクションは省略できます。省略時はenv、file、http、https、yamlが組み込まれます。
+設定値を環境変数などから展開する仕組みを**confmap provider**と呼びます。manifestの `providers` セクションは省略でき、省略時はenv、file、http、https、yamlが組み込まれます。展開の書き方は後述の「設定ファイルの配布設計」で扱います。
 
 OCBの公式Dockerイメージを使うと、CIでも同じビルド環境を再現できます。`--skip-compilation` を指定すればコード生成だけを、`--skip-generate --skip-get-modules` を指定すればコンパイルだけを実行できます。生成コードをリポジトリへコミットし、レビュー対象にする運用も可能です。コンテナ化まで含む構成は、公式配布物をビルドする[opentelemetry-collector-releases](https://github.com/open-telemetry/opentelemetry-collector-releases)リポジトリを参照できます。
 
