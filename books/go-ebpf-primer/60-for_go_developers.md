@@ -50,7 +50,7 @@ DWARFを残しておくと計装は堅くなります。`-w` を付けるかど�
 
 5章で見たとおり、インライン展開された関数は呼び出しの命令ごと消えるので、uprobeを置く場所がありません。小さなアクセサやラッパーほど、計装からは見えなくなります。
 
-OBIが計装点として選んでいるのは `net/http.serverHandler.ServeHTTP` や `google.golang.org/grpc.(*Server).handleStream` といった、インライン展開の対象にならない大きさの関数です。とはいえ、自分でeBPFツールを書いて特定の関数を狙うときには、`-gcflags=-m` でインライン化の有無を確認する価値があります。
+OBIが計装点として選んでいるのは `net/http.serverHandler.ServeHTTP` や `google.golang.org/grpc.(*Server).handleStream` といった、インライン展開の対象にならない大きさの関数です。とはいえ、自分でeBPFツールを書いて特定の関数に計装点を置くときには、`-gcflags=-m` でインライン化の有無を確認する価値があります。
 
 ## 使っているライブラリのバージョン
 
