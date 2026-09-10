@@ -236,7 +236,7 @@ $ curl -s localhost:8080/order
 (84.978321ms[84.928271ms]) HTTP(subType=0) 200 GET /order(/order) [172.18.0.1 as 172.18.0.1:57560]->[172.18.0.3 as frontend:8080] svc=[frontend go] traceparent=[00-96b553ab888fe7c26bd049ac81064eea-f8198df6160ef2f4[0000000000000000]-01]
 ```
 
-見るのは行末の `traceparent=[00-<トレースID>-<スパンID>[<親スパンID>]-01]` だけで足ります。3行とも同じトレースID `96b553ab...` を持っています。いちばん下の `/order` の親が全ゼロ。これがルートスパンです。そのスパンID `f8198df6160ef2f4` が真ん中の `HTTPClient` の親になり、`HTTPClient` のスパンID `998c4a1edfbd832f` がいちばん上の `backend` の `/inventory` の親になっています。
+見るのは行末の `traceparent=[00-<トレースID>-<スパンID>[<親スパンID>]-01]` だけで十分です。3行とも同じトレースID `96b553ab...` を持っています。いちばん下の `/order` の親が全ゼロ。これがルートスパンです。そのスパンID `f8198df6160ef2f4` が真ん中の `HTTPClient` の親になり、`HTTPClient` のスパンID `998c4a1edfbd832f` がいちばん上の `backend` の `/inventory` の親になっています。
 
 2つのプロセスにまたがった親子関係が、どちらのアプリにも一行も書かずに出ています。再ビルドも再起動もしていません。
 

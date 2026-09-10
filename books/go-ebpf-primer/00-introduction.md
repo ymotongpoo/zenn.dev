@@ -16,7 +16,7 @@ fatal error: unknown caller pc
 
 本書では、この種のつまずきを4つの**難所**として扱います。難所の正体は、Goを高速かつ書きやすい言語にしている設計そのものです。一般的なeBPF計装の定石は、スタックがOSに管理されて動かないこと、呼び出し規約がプラットフォームの標準に従うことを前提にしています。Cのスレッドや、Javaのプラットフォームスレッドはこの前提を満たします。一方Goは、goroutineのスタックを実行中に動かし、独自の呼び出し規約を持ち、スケジューリングもメモリ管理もランタイムが自前で抱えています。
 
-題材にするのは、Grafana BeylaがOpenTelemetryプロジェクトに寄贈されて生まれた[**OpenTelemetry eBPF Instrumentation**](https://opentelemetry.io/ja/docs/zero-code/obi/)（OBI）です。OBIが `net/http` やgRPCといったライブラリの関数まで踏み込んで計装するのは、Goに対してだけです（他の言語でもランタイム内部の関数にはフックを置きますが、その上で動くライブラリには届きません。この違いは8章で見ます）。4つの難所には、手元で実行して確かめられるコードを用意しました。そのうえで、同じことをOBIが実際にどう書いているかを見ます。
+題材にするのは、[Grafana Beyla](https://grafana.com/oss/beyla-ebpf/)がOpenTelemetryプロジェクトに寄贈されて生まれた[**OpenTelemetry eBPF Instrumentation**](https://opentelemetry.io/ja/docs/zero-code/obi/)（OBI）です。OBIが `net/http` やgRPCといったライブラリの関数まで踏み込んで計装するのは、Goに対してだけです（他の言語でもランタイム内部の関数にはフックを置きますが、その上で動くライブラリには届きません。この違いは8章で見ます）。4つの難所には、手元で実行して確かめられるコードを用意しました。そのうえで、同じことをOBIが実際にどう書いているかを見ます。
 
 :::message
 本書の実行結果と引用は、次のバージョンで確かめたものです。
