@@ -2,7 +2,7 @@
 
 ## この記録の前提
 
-- 対象は `books/observability-platform-with-otel/` の全10章（00から99まで）と `config.yaml`、および本文が参照する `images/20260825-*.png` の図版16枚です。
+- 対象は `books/observability-platform-with-otel/` の全10章（00から99まで）と `config.yaml`、および本文が参照する `images/20260926-*.png` の図版16枚です。
 - 読者は、Platform Engineering Kaigi 2026の登壇概要にある「OpenTelemetryの実装経験は前提としません」を信じて来た人を想定しています。KubernetesとDockerとCI/CDとGitの運用経験はあり、OpenTelemetryは名前を知っている程度で、トレース、スパン、exporter、propagator、sampler、semantic conventionsといった用語は初見です。Goのコードはなんとか読めますが書き慣れてはいません。LLMとAIエージェントは利用者として知っています。
 - 目的は本書を初学者向け入門書に作り替えることではありません。00章の基礎節と章ごとの都度説明だけを頼りに、3本柱それぞれの設計判断（何を配り、誰が決め、何を強制するか）を読者が追える状態を目指します。
 
@@ -75,7 +75,7 @@ SDKがテレメトリーに付与すること、そしてschema URLを手がか�
 
 ### 30章図1のagentの描き方
 
-該当箇所は `30-collector_build.md` の37行目の図（`images/20260825-agent-gateway.png`）です。
+該当箇所は `30-collector_build.md` の37行目の図（`images/20260926-agent-gateway.png`）です。
 
 図ではノード1のagentに「受け口の提供、ホストのメタデータ付加」、ノード2のagentに「設定は薄く全ノード同一」と、別々の説明が書かれています。私は最初、ノード1とノード2でagentの役割が違う構成なのかと読みました。本文（32行目）を読んでようやく、1つのagent像の説明を2つの箱に分けて書いてあるだけだと分かりました。また、振り分け層がagentとgatewayの間に常設の箱として描かれているため、図だけ見ると必須の層に見えます。括弧書きの「tail sampling運用時」とキャプションで条件付きだと分かりますが、本文の「2段構成」という言葉と図の3段の見た目がずれています。
 

@@ -10,7 +10,7 @@ SDKディストリビューションを用意しても、`Setup` を呼び出せ
 
 最低限のトレースが先にあれば、開発チームは不足している業務情報を具体的に判断できます。何も記録されていない状態では、どの計装から追加すべきかも判断できません。
 
-![計装の注入ポイント比較](/images/20260825-injection-points.png)
+![計装の注入ポイント比較](/images/20260926-injection-points.png)
 *図1　縦軸は、ソースコードからカーネルまで、計装を挿入できる位置を表します。実線は実行までの関係、点線は各計装方式が介入する位置です。変更できる位置によって、選択できる方式が決まります。*
 
 ## 言語別の選択肢
@@ -95,7 +95,7 @@ metadata:
 
 Operatorのadmission webhookがPodの作成を検知し、言語に応じたエージェントと環境変数を注入します。設定には `OTEL_*` 環境変数を使うため、SDKディストリビューションとゼロコード計装で同じ設定方法を使えます。
 
-![Operatorによる自動計装の注入](/images/20260825-operator-injection.png)
+![Operatorによる自動計装の注入](/images/20260926-operator-injection.png)
 *図2　矢印は処理の時間順を表します。開発チームはannotationを指定し、Operatorのadmission webhookがPod作成時に計装を注入します。*
 
 Goの注入は既定で無効です。Operatorへ `--enable-go-instrumentation=true` フラグを指定し、対象の実行ファイルパスを示すannotationも追加します。

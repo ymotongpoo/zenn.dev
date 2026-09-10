@@ -69,7 +69,7 @@ groups:
 
 公式属性を社内の文脈で参照することもできます。`ref` で公式の属性を取り込み、requirement levelだけを社内向けに上書きする、といった使い方です。依存は多段にでき（2026年8月時点で最大10階層）、たとえば「全社レジストリの上に事業部レジストリ」という構成も組めます。
 
-![レジストリの参照関係](/images/20260825-registry-deps.png)
+![レジストリの参照関係](/images/20260926-registry-deps.png)
 *図1　矢印は、依存するレジストリから依存先を指します。社内レジストリは公式レジストリへ依存し、GenAI規約のようなDevelopment段階の規約はコミットSHAで固定します（60章）。*
 
 ## Weaverによるスキーマ管理
@@ -93,7 +93,7 @@ $ weaver registry check -r ./registry \
 
 テンプレートは自作できます。[opentelemetry-goのsemconv/templates](https://github.com/open-telemetry/opentelemetry-go/tree/main/semconv/templates)では、公式のGo semconvパッケージをWeaverで生成しています。同じレジストリからMarkdownのドキュメントも生成すれば、定義と説明を一緒に更新できます。
 
-![Weaverによるスキーマ管理の循環](/images/20260825-weaver-loop.png)
+![Weaverによるスキーマ管理の循環](/images/20260926-weaver-loop.png)
 *図2　矢印は工程の流れを表します。変更前はcheckとdiff、マージ後はgenerate、実測時はlive-checkを使い、検出した違反をレジストリの変更へ反映します。*
 
 ## live-checkによる実測検査

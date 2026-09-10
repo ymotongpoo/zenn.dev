@@ -24,7 +24,7 @@ gateway層のtail sampling条件は、設定リポジトリへのPRをマージ�
 
 2026年8月時点で、[OpAMP仕様](https://github.com/open-telemetry/opamp-spec/blob/main/specification.md)はBetaです。v0.20.0までリリースされていますが、破壊的変更を含み、1.0には達していません。参照実装の[opamp-go](https://github.com/open-telemetry/opamp-go)もv0.23.0です。一方、Supervisorは公式配布物として提供され、複数のベンダー製品がOpAMPを実装しています。実運用は始まっていますが、仕様変更への追従を前提に採用する段階です。
 
-![OpAMPによるフリート管理の構成](/images/20260825-opamp-topology.png)
+![OpAMPによるフリート管理の構成](/images/20260926-opamp-topology.png)
 *図1　実線は設定の配布、点線はエージェントからの報告を表します。設定の正本はGitに置き、OpAMPは管理サーバーからエージェントまでの配布を担います。*
 
 ## OpAMP Supervisor
@@ -77,7 +77,7 @@ Supervisorは、設定適用後にCollectorが起動できない場合に前の�
 
 設定配布の被害は、canaryから始める段階展開、Collectorの送受信件数とexporter失敗率の監視、合成テレメトリーの到着確認、展開の停止条件、修正版を再配布する手順で抑えます。自動ロールバックが動作しても、これらの検査と復旧手順を置き換えるものではありません。
 
-![段階的ロールアウトの状態遷移](/images/20260825-staged-rollout.png)
+![段階的ロールアウトの状態遷移](/images/20260926-staged-rollout.png)
 *図2　実線は検査を通過した場合、点線は異常を検知した場合の状態遷移を表します。どの段階でも、修正版の再配布によって復旧します。*
 
 ## OpAMPサーバーの選択肢

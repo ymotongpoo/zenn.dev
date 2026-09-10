@@ -35,7 +35,7 @@ otel-platform-blueprint/
 └── docs/             # 実測記録
 ```
 
-![リファレンス実装の全体構成](/images/20260825-blueprint-overview.png)
+![リファレンス実装の全体構成](/images/20260926-blueprint-overview.png)
 *図1　実線はテレメトリーの流れ、点線は設定と生成物の配布先を表します。00章の図2に実装上のコンポーネント名を加えています。*
 
 ## 検証環境の起動

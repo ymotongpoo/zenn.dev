@@ -33,7 +33,7 @@ Collectorには、主に三つの配置があります。
 
 agentはアプリケーションと同じノードで動くため、ノード障害の影響をともに受けます。二段構成にしても損失条件はなくなりません。各層のキューと再送を設計し、どの障害でどこまで失うかを決めます。
 
-![agentとgatewayの2段トポロジー](/images/20260825-agent-gateway.png)
+![agentとgatewayの2段トポロジー](/images/20260926-agent-gateway.png)
 *図1　矢印はテレメトリーの流れを表します。agentは各ノードで同じ最小限の処理を行い、組織の方針はgatewayへ集約します。tail samplingを水平スケールさせる場合は、振り分け層を追加します。*
 
 ## gateway層の処理設計
@@ -99,7 +99,7 @@ Collectorのcoreリポジトリは、v1.65.0とv0.159.0の二つのバージョ�
 
 OCBの公式Dockerイメージを使うと、CIでも同じビルド環境を再現できます。`--skip-compilation` を指定すればコード生成だけを、`--skip-generate --skip-get-modules` を指定すればコンパイルだけを実行できます。生成コードをリポジトリへコミットし、レビュー対象にする運用も可能です。コンテナ化まで含む構成は、公式配布物をビルドする[opentelemetry-collector-releases](https://github.com/open-telemetry/opentelemetry-collector-releases)リポジトリを参照できます。
 
-![OCBによるビルドパイプライン](/images/20260825-ocb-pipeline.png)
+![OCBによるビルドパイプライン](/images/20260926-ocb-pipeline.png)
 *図2　矢印は成果物が次の工程へ渡る流れを表します。manifestを起点に、ビルド、設定の検証、コンテナ化までをCIで実行します。*
 
 Collectorは隔週でリリースされ、contribのコンポーネントには破壊的変更も入ります。manifestのバージョン更新をRenovateなどでPRにし、CIでビルドと設定を検証します。更新作業をプラットフォーム側へ集約することで、各チームが個別に追従する必要はなくなります。
