@@ -56,7 +56,7 @@ OpenTelemetryでは、SDKに既定値やカスタマイズを加えて再パッ�
 
 ## 社内ディストリビューションの設計
 
-社内ディストリビューションは、exporter、resource、propagator、samplerに関する共通の判断をアプリケーションコードから取り除きます。冒頭のコードにsamplerがない場合も、SDKの既定値を選んだことになります。開発チームが書くのは、社内ディストリビューション `otelinit` の呼び出しと、初期化に失敗した場合の処理です。
+社内ディストリビューションは、exporter、resource、propagator、samplerに関する共通の判断をアプリケーションコードから取り除きます。**sampler**は、トレースを記録するかどうかを決める部品です。冒頭のコードにsamplerがない場合も、SDKの既定値を選んだことになります。開発チームが書くのは、社内ディストリビューション `otelinit` の呼び出しと、初期化に失敗した場合の処理です。
 
 ```go
 shutdown, err := otelinit.Setup(ctx)
@@ -74,7 +74,7 @@ defer func() {
 
 - OTLP exporterを構築する。エンドポイントの既定値は各環境のagent Collector（30章）に向ける
 - propagatorをW3C TraceContext（トレースの文脈を運ぶ標準のヘッダ形式）とBaggageの組み合わせに設定する
-- sampler（トレースを記録するかどうかを決める部品）の既定をParentBasedにする。間引きの主体はgateway側のtail sampling（30章）に寄せる
+- samplerの既定をParentBasedにする。間引きの主体はgateway側（30章）に寄せる
 - 実行環境（Kubernetesやクラウドプロバイダー）のメタデータからresource属性を自動検出する
 - トレース、メトリクス、ログのproviderを構築してグローバルに登録する
 
