@@ -245,7 +245,7 @@ $ curl -s localhost:8080/order
 `http://localhost:3000` を開きます。`grafana/otel-lgtm` はデータソースを設定済みなので、ExploreでTempoを選べばすぐ検索できます。[TraceQL](https://grafana.com/docs/tempo/latest/traceql/) に `{ resource.service.name = "frontend" }` と入れて、出てきたトレースを1つ開きます。
 
 ![Tempoに届いたトレース](/images/20260911-handson-trace.png)
-*図2: この図に矢印はない。横棒の長さが各スパンの所要時間を表す。7つのスパンが1本のトレースになり、`frontend` と `backend` の2サービスにまたがっている。*
+*図2: 横棒の長さが各スパンの所要時間を表す。7つのスパンが1本のトレースになり、`frontend` と `backend` の2サービスにまたがっている。*
 
 さきほどログで見たのは3つのスパンでしたが、ここでは7つに増えています。足されたのは、待ち時間が測れたサーバースパンに対してOBIが作る `in queue` と `processing` です。リクエストを受け付けてからハンドラが動き出すまでの待ち時間と、ハンドラの中で過ごした時間を分けています。ソケットを流れるバイト列だけを見ていてはこの区別は付きません。`net/http` の内部の関数にフックを置いているから取れる区別です。
 
