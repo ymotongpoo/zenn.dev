@@ -110,13 +110,16 @@ $ go tool objdump -s 'main\.double$' demo
 
 ここまでの話には、暗黙の前提がありました。関数の呼び出しが、機械語の上でも `CALL` として残っていることです。この前提は、常には成り立ちません。
 
-コンパイラは、小さな関数の呼び出しを、関数の中身をその場に展開する形に置き換えることがあります。これを**インライン展開**と呼びます。`CALL` と `RET` のひと往復と引数の受け渡しが丸ごと消えるので、実行は速くなります。コンパイラの判定は `-gcflags=-m` で見られます。
+コンパイラは、小さな関数の呼び出しを、関数の中身をその場に展開する形に置き換えることがあります。これを**インライン展開**と呼びます。`CALL` と `RET` のひと往復と引数の受け渡しが丸ごと消えるので、実行は速くなります。コンパイラの判定は `-gcflags=-m` で見られます。4章の `main.go` には展開を禁じる `//go:noinline` が付いているので、その行を消してから実行します。
 
 ```
 $ go build -gcflags=-m main.go
-./main.go:6:6: can inline double
-./main.go:11:20: inlining call to double
+./main.go:5:6: can inline double
+./main.go:10:20: inlining call to double
+./main.go:10:13: inlining call to fmt.Println
 ```
+
+`double` が展開の候補として選ばれ（`can inline`）、`main` の中の呼び出しが実際に展開された（`inlining call to`）ことが読めます。`//go:noinline` を付けたまま実行すると、この2行は出ません。
 
 `//go:noinline` は、この展開を禁止して呼び出しを `CALL` として残させる指示です。本書のサンプルコードが繰り返しこれを付けているのは、展開されてしまうと観察対象の呼び出しそのものが消えてしまうからです。通常のアプリケーションで書く必要はありません。
 

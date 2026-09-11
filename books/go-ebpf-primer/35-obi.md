@@ -31,7 +31,7 @@ OBIは、それ自体が1つのプログラムです。観測したいアプリ�
 
 OBIはLinux専用で、カーネル5.8以降（[BTF](https://docs.kernel.org/bpf/btf.html)有効）と、eBPFプログラムをロードできる権限を必要とします。いちばん手軽なのはDockerで、`--pid=host --privileged` を付けて `otel/ebpf-instrument` を起動すれば、同じホストで動いているアプリをそのまま観測できます。Kubernetesでは、各ノードに1つずつ置くDaemonSetとして動かす形が代表的です。`hostPID: true` を付ければ、ノード上の全プロセスを1つのOBIが観測します。OpenTelemetry Collectorに組み込むためのreceiverも用意されています。
 
-具体的な設定と、そこから何が見えるのかは次章で扱います。設定項目の網羅は[公式ドキュメント](https://opentelemetry.io/docs/zero-code/obi/)に譲ります。
+具体的な設定と、そこから何が見えるのかは次章で扱います。設定項目の網羅は[公式ドキュメント](https://opentelemetry.io/ja/docs/zero-code/obi/)に譲ります。
 
 ## 2つの計装経路
 

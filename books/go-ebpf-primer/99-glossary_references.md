@@ -93,8 +93,8 @@ title: "付録：用語集と参考リンク"
 ### OBI
 
 - OpenTelemetry eBPF Instrumentation（OBI）: <https://github.com/open-telemetry/opentelemetry-ebpf-instrumentation>
-- OBI 公式ドキュメント: <https://opentelemetry.io/docs/zero-code/obi/>
-- OBI 分散トレースのドキュメント: <https://opentelemetry.io/docs/zero-code/obi/distributed-traces/>
+- OBI 公式ドキュメント: <https://opentelemetry.io/ja/docs/zero-code/obi/>
+- OBI 分散トレースのドキュメント: <https://opentelemetry.io/ja/docs/zero-code/obi/distributed-traces/>
 - サポート状況の一覧（`SUPPORT_MATRIX.md`）: <https://github.com/open-telemetry/opentelemetry-ebpf-instrumentation/blob/main/SUPPORT_MATRIX.md>
 - コンテキスト伝搬の設計メモ（`devdocs/context-propagation.md`）: <https://github.com/open-telemetry/opentelemetry-ebpf-instrumentation/blob/main/devdocs/context-propagation.md>
 
@@ -122,7 +122,7 @@ title: "付録：用語集と参考リンク"
 - Go 1.17 Release Notes（レジスタベース呼び出し規約）: <https://go.dev/doc/go1.17>
 - Go internal ABI 仕様: <https://github.com/golang/go/blob/master/src/cmd/compile/abi-internal.md>
 - open-telemetry/opentelemetry-go-compile-instrumentation（Compile-Time Instrumentation SIG、`otelc`）: <https://github.com/open-telemetry/opentelemetry-go-compile-instrumentation>
-- Announcing v1 of OpenTelemetry Go Compile-Time Instrumentation: <https://opentelemetry.io/blog/2026/go-compile-time-instrumentation-v1/>
+- OpenTelemetry Goのコンパイル時の計装v1の発表: <https://opentelemetry.io/ja/blog/2026/go-compile-time-instrumentation-v1/>
 
 ### eBPF
 

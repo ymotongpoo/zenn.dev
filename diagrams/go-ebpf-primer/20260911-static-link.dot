@@ -21,7 +21,7 @@ digraph static_link {
   libc [label=<<font face="JetBrains Mono"><b>libc.so</b></font>（共有ライブラリ）<br align="left"/>起動時に結び付けられ、置き場所は環境で変わる<br align="left"/>>,
         fillcolor="#FFFCD7", color="#736B10"];
 
-  goprog [label=<<b>Goで書いたプログラム</b><br align="left"/>自分のコード、標準ライブラリ、ランタイムを<br align="left"/>1つのバイナリに同梱する<br align="left"/>>,
+  goprog [label=<<b>Goで書いたプログラム</b><br align="left"/>自分のコード、標準ライブラリ、ランタイムを<br align="left"/>1つのバイナリに同梱する<br align="left"/><font point-size="11">（<font face="JetBrains Mono">CGO_ENABLED=0</font> でビルドした場合）</font><br align="left"/>>,
           fillcolor="#FFE9D6", color="#AB5A13"];
 
   kernel [label=<<b>カーネル</b>>, fillcolor="#F7DDFC", color="#9430A9"];

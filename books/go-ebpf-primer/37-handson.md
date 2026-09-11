@@ -174,11 +174,11 @@ services:
       - "3000:3000"
 ```
 
-`privileged: true` と `pid: host` の2つが、この構成では要ります。前者はeBPFプログラムのロードに必要な権限をまとめて与えるためで、後者はホストのプロセスを見えるようにする指定です。`privileged` は手軽さのための選択で、本番では `CAP_BPF` や `CAP_PERFMON` など必要な権限だけを個別に付ける構成にできます。詳しくは[権限のドキュメント](https://opentelemetry.io/docs/zero-code/obi/security/)にあります。
+`privileged: true` と `pid: host` の2つが、この構成では要ります。前者はeBPFプログラムのロードに必要な権限をまとめて与えるためで、後者はホストのプロセスを見えるようにする指定です。`privileged` は手軽さのための選択で、本番では `CAP_BPF` や `CAP_PERFMON` など必要な権限だけを個別に付ける構成にできます。詳しくは[権限のドキュメント](https://opentelemetry.io/ja/docs/zero-code/obi/security/)にあります。
 
 マウントしている2つのパスにも役割があります。`/sys/kernel/security` はlockdownの状態を読むため、`/sys/fs/bpf` はeBPFマップをピン留めするためです。`/sys/fs/bpf` を渡さないと警告が出て、ピン留めしたマップを前提とする機能が無効になります。
 
-OBI側の環境変数は7つあり、うち2つはOpenTelemetry標準の変数をそのまま使っています。網羅的な一覧は[設定リファレンス](https://opentelemetry.io/docs/zero-code/obi/configure/options/)にあります。
+OBI側の環境変数は7つあり、うち2つはOpenTelemetry標準の変数をそのまま使っています。網羅的な一覧は[設定リファレンス](https://opentelemetry.io/ja/docs/zero-code/obi/configure/options/)にあります。
 
 | 環境変数 | 意味 |
 |---|---|
@@ -342,7 +342,13 @@ level=WARN msg="kernel misreports ioctl(FIONREAD) for sockets in a sockhash (ker
 level=ERROR msg="context propagation is disabled: the BPF compensation is ineffective (attach failed or blocked?). This kernel misreports ioctl(FIONREAD) for sockets in a sockhash (kernel commit 929e30f93125), or could not be verified to report it correctly, so keeping propagation enabled would risk making applications sizing reads via FIONREAD stall or truncate transfers" component=tpinjector
 ```
 
-これは13章で扱う2つの伝搬経路のうち、`sk_msg` を使う経路2が無効になったという意味です。アプリのバッファに `bpf_probe_write_user` で書き込む経路1は動き続けるので、`backend` の側で `Traceparent` が読めているなら伝搬自体は成立しています。実際、本章の実行結果はこのログが出ている環境で取ったもので、`backend` は `Traceparent` を受け取れています。ただし経路1が常に書き込めるとはかぎりません。バッファに空きがない場合や必要なオフセットが解決できない場合には書き込みを見送るので、そのときは経路2が無効であることがそのまま伝搬の失敗になります。
+これは13章で扱う2つの伝搬経路のうち、`sk_msg` を使う経路2が無効になったという意味です。
+
+ログにある `6.19+` はOBIの表記です。実際のupstreamの安定版系列では、このコミットは6.19.0ではなく **6.19.4** から入りました[^fionread-backport]。ディストリビューションが独自にバックポートすることもあるので、自分の環境でどうなるかは、この版の比較ではなくOBIが起動時に出すこの検査結果で判断してください。
+
+[^fionread-backport]: 6.19.1から6.19.3の変更履歴には当該コミットがなく、6.19.4の変更履歴に `[ Upstream commit 929e30f9312514902133c45e51c79088421ab084 ]` として記録されています（[ChangeLog-6.19.4](https://cdn.kernel.org/pub/linux/kernel/v6.x/ChangeLog-6.19.4)）。
+
+アプリのバッファに `bpf_probe_write_user` で書き込む経路1は動き続けるので、`backend` の側で `Traceparent` が読めているなら伝搬自体は成立しています。実際、本章の実行結果はこのログが出ている環境で取ったもので、`backend` は `Traceparent` を受け取れています。ただし経路1が常に書き込めるとはかぎりません。バッファに空きがない場合や必要なオフセットが解決できない場合には書き込みを見送るので、そのときは経路2が無効であることがそのまま伝搬の失敗になります。
 
 lockdownが `[integrity]` の環境では、逆に経路1のほうが使えません。経路2が動く環境ならそちらが引き継ぎますが、両方とも無効なら `Traceparent` は空のまま。同じOBIが両側を見ている範囲でしかトレースはつながりません。
 
