@@ -33,9 +33,11 @@ digraph user_kernel_space {
   hw [label=<<b>ハードウェア</b><br align="left"/>CPU、メモリ、ディスク、ネットワークカード<br align="left"/>>, fillcolor="#E4E4E4"];
 
   app -> kernel [penwidth=1.8, headlabel="システムコールで頼む  ", labeldistance=6.5, labelangle=18];
-  // 平行する2辺のラベルは、それぞれの辺の外側へ振り分ける。破線側のラベルを
-  // 2辺の隙間に置くと、隣の実線のほうが近くなり実線の説明に見える。
-  kernel -> app [style=dashed, color="#8A8A8A", constraint=false, headlabel="  結果を返す", labeldistance=6.5, labelangle=45];
+  // 破線側にラベルを置くと、この狭い隙間では必ず隣の実線か app -> hw の斜めの
+  // 破線、あるいはクラスタの枠のいずれかが自分の辺より近くなる（角度・距離・
+  // ポートを総当たりしても成立する配置が無い）。キャプションが「破線は結果が
+  // 返ること」と述べているのでラベルは置かない。
+  kernel -> app [style=dashed, color="#8A8A8A", constraint=false];
   kernel -> hw [label=" 直接操作する "];
   // このエッジはcluster_kernelをまたぐため splines=ortho の直角配線が崩れ、
   // 単純な斜め線になる（クラスタをまたぐ辺の既知の制約）。1本の素直な斜め線
