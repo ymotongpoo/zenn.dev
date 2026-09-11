@@ -4,7 +4,7 @@ title: "はじめに"
 
 本書は、Go Conference 2026での筆者の登壇「[OpenTelemetry eBPF Instrumentationの舞台裏](https://gocon.jp/2026/timetable/1263399/)」の解説資料です。登壇は40分の上級者向けセッションですが、本書は同じ内容を、計算機の仕組みを学び始めたばかりの読者でも前提知識の章から順に読めば追えるように書き直したものです。
 
-[**eBPF**](https://ebpf.io/)（Linuxカーネルの中へ小さな観測プログラムを差し込む仕組み。詳しくは本文で扱います）を使うと、アプリケーションを変更せずにHTTPやgRPCの分散トレースを取得できます。いわゆる**ゼロコード計装**（zero-code instrumentation）です。再ビルドも再デプロイも要らず、言語も問いません。製品の説明ではそう語られます。
+[**eBPF**](https://ebpf.io/ja/)（Linuxカーネルの中へ小さな観測プログラムを差し込む仕組み。詳しくは本文で扱います）を使うと、アプリケーションを変更せずにHTTPやgRPCの分散トレースを取得できます。いわゆる**ゼロコード計装**（zero-code instrumentation）です。再ビルドも再デプロイも要らず、言語も問いません。製品の説明ではそう語られます。
 
 ところが、この計装の定石のひとつ（関数から戻る瞬間で発火するフック）をGoのバイナリに使うと、最悪の場合、観測対象のGoプログラムが次のエラーを出して落ちます。
 
@@ -16,7 +16,7 @@ fatal error: unknown caller pc
 
 本書では、この種のつまずきを4つの**難所**として扱います。難所の正体は、Goを高速かつ書きやすい言語にしている設計そのものです。一般的なeBPF計装の定石は、スタックがOSに管理されて動かないこと、呼び出し規約がプラットフォームの標準に従うことを前提にしています。Cで書かれたプログラムはこの2つを満たします。一方Goは、goroutineのスタックを実行中に動かし、独自の呼び出し規約を持ち、スケジューリングもメモリ管理もランタイムが自前で抱えています。
 
-題材にするのは、[Grafana Beyla](https://grafana.com/oss/beyla-ebpf/)がOpenTelemetryプロジェクトに寄贈されて生まれた[**OpenTelemetry eBPF Instrumentation**](https://opentelemetry.io/ja/docs/zero-code/obi/)（OBI）です。OBIが `net/http` やgRPCといったライブラリの関数まで踏み込んで計装するのは、Goに対してだけです（他の言語でもランタイム内部の関数にはフックを置きますが、その上で動くライブラリには届きません。この違いは8章で見ます）。4つの難所には、手元で実行して確かめられるコードを用意しました。そのうえで、同じことをOBIが実際にどう書いているかを見ます。
+題材にするのは、[Grafana Beyla](https://grafana.com/oss/beyla-ebpf/)がOpenTelemetryプロジェクトに寄贈されて生まれた[**OpenTelemetry eBPF Instrumentation**](https://opentelemetry.io/ja/docs/zero-code/obi/)（OBI）です。OBIが `net/http` やgRPCといったライブラリの関数まで、uprobeで踏み込んで計装するのはGoに対してだけです（他の言語ではランタイム内部の関数にフックを置く方式が中心になります。この違いは8章で見ます）。4つの難所には、手元で実行して確かめられるコードを用意しました。そのうえで、同じことをOBIが実際にどう書いているかを見ます。
 
 :::message
 本書の実行結果と引用は、次のバージョンで確かめたものです。

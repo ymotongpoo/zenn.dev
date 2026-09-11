@@ -22,7 +22,7 @@ digraph obi_two_paths {
 
   proto [label=<<b>プロトコル計装</b><br align="left"/>ソケットを流れるバイト列を解釈<br align="left"/>HTTP/1.1、HTTP/2、gRPC、MySQL、Redis<br align="left"/>>,
          fillcolor="#D2F3DF", color="#038435"];
-  lib [label=<<b>ランタイムとライブラリの計装</b><br align="left"/>対象の環境ごとに個別の実装が要る<br align="left"/>ランタイム内部のフックは他言語にもある<br align="left"/>ライブラリの関数計装を持つのはGoだけ<br align="left"/>>,
+  lib [label=<<b>ランタイムとライブラリの計装</b><br align="left"/>対象の環境ごとに個別の実装が要る<br align="left"/>ランタイム内部のフックは他言語にもある<br align="left"/>ライブラリの関数をuprobeで計装するのはGoだけ<br align="left"/>>,
        fillcolor="#FFE9D6", color="#AB5A13"];
 
   proto_res [label=<<b>言語に依存しない</b>>, fillcolor="#EBFAF1", color="#038435"];

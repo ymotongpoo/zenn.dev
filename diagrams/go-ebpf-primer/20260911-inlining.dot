@@ -29,9 +29,8 @@ digraph inlining {
   after [shape=plain, style="", label=<
     <table border="0" cellborder="1" cellspacing="0" cellpadding="6" color="#AA3E6A">
       <tr><td colspan="2" align="left" bgcolor="#FEF2F7"><b>インライン展開された場合</b></td></tr>
-      <tr><td align="left" bgcolor="#FDE1EC"><font face="JetBrains Mono">0x49e1ae</font></td><td align="left" bgcolor="#FDE1EC"><font face="JetBrains Mono">MOVQ …</font></td></tr>
-      <tr><td align="left" bgcolor="#FDE1EC"><font face="JetBrains Mono">0x49e1b3</font></td><td align="left" bgcolor="#FDE1EC">double の中身（2倍の計算）が直接並ぶ</td></tr>
-      <tr><td align="left" bgcolor="#FDE1EC"><font face="JetBrains Mono">0x49e1b6</font></td><td align="left" bgcolor="#FDE1EC"><font face="JetBrains Mono">MOVQ …</font>（呼び出しの命令が無い）</td></tr>
+      <tr><td align="left" bgcolor="#FDE1EC"><font face="JetBrains Mono">MOVL $0x2a, AX</font></td><td align="left" bgcolor="#FDE1EC">42 に畳み込まれた結果を読み込む</td></tr>
+      <tr><td align="left" bgcolor="#FDE1EC"><font face="JetBrains Mono">…</font></td><td align="left" bgcolor="#FDE1EC"><font face="JetBrains Mono">CALL main.double</font> がどこにも無い</td></tr>
     </table>>];
 
   before -> after [label=" コンパイラがインライン展開すると\l CALL が消え、置くアドレスが無くなる\l", penwidth=1.8];

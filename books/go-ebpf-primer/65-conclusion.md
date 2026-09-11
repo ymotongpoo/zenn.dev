@@ -73,10 +73,11 @@ func (t *Transport) RoundTrip(req *Request) (*Response, error) {
 }
 ```
 
-`otelc go build` は前述のとおり内部で `-work` フラグを付けているため、ビルドが終わったあともGoのビルドキャッシュに書き換え後のソースが残ります。そこを覗くと、次のようになっていました。
+`otelc go build` は前述のとおり内部で `-work` フラグを付けているため、ビルドが終わったあともビルドの一時作業ディレクトリに書き換え後のソースが残ります。そこを覗くと、次のようになっていました。
 
 ```go
 // net/http/roundtrip.go（otelcが実際に書き換えた後の姿。実機で確認）
+// 戻り値の長い識別子は、読みやすさのため _r0 / _r1 に置き換えています。
 func (t *Transport) RoundTrip(req *Request) (_r0 *Response, _r1 error) {
 	if hookContext3038199408, _ := OtelBeforeTrampoline_RoundTrip3038199408(&t, &req); false {
 	} else {

@@ -190,7 +190,7 @@ done:
 
 記録した親子関係を実際に使うのは、下流へリクエストを送る側のフックです。`net/http.(*Transport).roundTrip` やgRPCクライアントの入口が発火した時点で、いま動いているgoroutineから親の方向へ順にたどります。探しているのは「この処理はどのサーバー受信から始まったのか」で、それが分かればトレースIDを引き継げます。
 
-たどる先の目印になるのが `go_trace_map` です。OBIはサーバー側の受信もフックしていて、HTTPなら `net/http.serverHandler.ServeHTTP`、gRPCなら `google.golang.org/grpc.(*Server).handleStream` の入口で、受け取ったリクエストのトレース情報を、処理中のgoroutineをキーにしてこのマップへ書き込みます。受信側がするのは書き込みだけで、遡るのは送信側です。
+たどる先の目印になるのが `go_trace_map` です。OBIはサーバー側の受信もフックしていて、HTTPなら `net/http.serverHandler.ServeHTTP`、gRPCなら `google.golang.org/grpc.(*Server).handleStream` の入口で、受け取ったリクエストのトレース情報を、処理中のgoroutineをキーにしてこのマップへ書き込みます。ここで追っているのは、受信時に記録して送信時に検索する経路です。同じ親子関係の探索は、サーバー側で処理が別のgoroutineに引き継がれたときにも使われます。
 
 やることは、マップを1段ずつ引いて「このgoroutineはトレースを持っているか」を確かめる繰り返しです。最初に確かめるのは自分自身なので、受信と送信が同じgoroutineで起きていれば1回で当たります。持っていなければ、親子関係のマップから親を引いて、同じことを繰り返します。
 
@@ -291,7 +291,9 @@ HTTP/1.1のリクエストは、ただの1本の文字列です。ヘッダは1�
 			},
 ```
 
-キーが計装対象のシンボル名、`Start` が入口、`End` が出口のeBPFプログラムです。この `End` が指定されていると、難所1で見た「全 `RET` を洗い出して一つひとつにuprobeを置く」処理が走ります。抜粋のコメント `inject only if no traceparent present` のとおり、アプリがSDK計装で自分の `traceparent` をすでに付けている場合、OBIは書き込みません。SDK計装との同居でヘッダが二重になることはありません。
+キーが計装対象のシンボル名、`Start` が入口、`End` が出口のeBPFプログラムです。この `End` が指定されていると、難所1で見た「全 `RET` を洗い出して一つひとつにuprobeを置く」処理が走ります。抜粋のコメント `inject only if no traceparent present` のとおり、アプリが自分で `traceparent` を付けている場合は、OBIは書き込みを見送ります。ただしこの検査には探索範囲の上限があります。`writeSubset` が書いた領域のうち先頭1023バイトまでしか走査しないので、大きなヘッダが先に並ぶと既存の `traceparent` を見落とし、2つ目を書き足してしまいます[^tp-scan-limit]。SDK計装との同居で重複が必ず防げるわけではありません。
+
+[^tp-scan-limit]: `bpf/gotracer/go_nethttp.c` の `client_request_has_traceparent` が、走査範囲を `bpf_clamp_umax(region, TRACE_BUF_SIZE - 1)` で切り詰めています。`TRACE_BUF_SIZE` は `bpf/common/http_buf_size.h` で1024と定義されています。
 
 戻りのフックがすることは、`bufio.Writer` のバッファの末尾に直接書き足すことです。
 

@@ -30,13 +30,14 @@ digraph stack_walk {
 
   move [label=<<b>0. 新しい領域を確保して</b><br align="left"/><b>　 中身を丸ごとコピーする</b><br align="left"/>>,
         fillcolor="#FFFCD7", color="#736B10"];
-  read [label=<<b>1. 戻りアドレスを読む</b>>, fillcolor="#FFE9D6", color="#AB5A13"];
-  lookup [label=<<b>2. どの関数のフレームか引く</b><br align="left"/><font face="JetBrains Mono">.gopclntab</font> で命令アドレス→関数<br align="left"/>>,
-          fillcolor="#FFFCD7", color="#736B10"];
-  info [label=<<b>3. フレームの大きさと</b><br align="left"/><b>　 ポインタの位置が分かる</b><br align="left"/>>,
+  read [label=<<b>1. いまのPCから関数を引く</b><br align="left"/><font face="JetBrains Mono">.gopclntab</font> で命令アドレス→関数<br align="left"/>>,
         fillcolor="#FFFCD7", color="#736B10"];
-  copy [label=<<b>4. そのフレームのポインタを</b><br align="left"/><b>　 新しいアドレスへ書き換える</b><br align="left"/>>,
+  lookup [label=<<b>2. フレームの大きさと</b><br align="left"/><b>　 ポインタの位置が分かる</b><br align="left"/>>,
+          fillcolor="#FFFCD7", color="#736B10"];
+  info [label=<<b>3. そのフレームのポインタを</b><br align="left"/><b>　 新しいアドレスへ書き換える</b><br align="left"/>>,
         fillcolor="#D2F3DF", color="#038435"];
+  copy [label=<<b>4. 戻りアドレスを読み、</b><br align="left"/><b>　 呼び出し元の関数を引く</b><br align="left"/>>,
+        fillcolor="#FFE9D6", color="#AB5A13"];
 
   new [shape=plain, style="", label=<
     <table border="0" cellborder="1" cellspacing="0" cellpadding="6" color="#038435">
