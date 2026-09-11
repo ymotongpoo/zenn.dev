@@ -1,9 +1,9 @@
 // ユーザー空間とカーネル空間
 digraph user_kernel_space {
   graph [
-    rankdir=TB, splines=ortho,
+    rankdir=TB, splines=ortho, compound=true,
     fontname="IBM Plex Sans JP", fontsize=13,
-    nodesep=0.9, ranksep=1.5,
+    nodesep=0.9, ranksep=1.6,
     bgcolor="white", pad=0.25
   ];
   node [
@@ -32,15 +32,15 @@ digraph user_kernel_space {
 
   hw [label=<<b>ハードウェア</b><br align="left"/>CPU、メモリ、ディスク、ネットワークカード<br align="left"/>>, fillcolor="#E4E4E4"];
 
-  app -> kernel [penwidth=1.8, headlabel="システムコールで頼む  ", labeldistance=6.5, labelangle=18];
-  // 破線側にラベルを置くと、この狭い隙間では必ず隣の実線か app -> hw の斜めの
-  // 破線、あるいはクラスタの枠のいずれかが自分の辺より近くなる（角度・距離・
-  // ポートを総当たりしても成立する配置が無い）。キャプションが「破線は結果が
-  // 返ること」と述べているのでラベルは置かない。
-  kernel -> app [style=dashed, color="#8A8A8A", constraint=false];
-  kernel -> hw [label=" 直接操作する "];
-  // このエッジはcluster_kernelをまたぐため splines=ortho の直角配線が崩れ、
-  // 単純な斜め線になる（クラスタをまたぐ辺の既知の制約）。1本の素直な斜め線
-  // なので「触れない」という意味の破線としては許容する。
-  app -> hw [style=dashed, color="#AA3E6A", arrowhead=tee, xlabel=" 直接は触れない"];
+  // 往復する2本は、ポート指定で出入口を左右に寄せて経路そのものを離す。
+  // 実線は app/kernel の左寄り、破線は右寄りを通るので、各ラベルは自分の辺が
+  // いちばん近い位置に置ける（ラベルだけを動かして隙間に収めようとすると、
+  // 隣の辺かクラスタの枠のほうが近くなる）。ranksep はラベルが枠の外に出る
+  // 高さを確保するために広げてある。
+  app:sw -> kernel:nw [penwidth=1.8, xlabel="システムコールで頼む "];
+  kernel:ne -> app:se [style=dashed, color="#8A8A8A", constraint=false, xlabel=" 結果を返す"];
+  kernel -> hw [xlabel=" 直接操作する"];
+  // この辺はクラスタをまたいで右側を大きく迂回する。ラベルは到達点側に寄せて
+  // カーネル空間の枠から離す。
+  app -> hw [style=dashed, color="#AA3E6A", arrowhead=tee, headlabel="直接は触れない  ", labeldistance=3.5, labelangle=-14];
 }
