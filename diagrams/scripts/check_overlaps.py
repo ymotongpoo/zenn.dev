@@ -9,12 +9,22 @@
      ノードの矩形の内側を通っている。
   2. 先端の埋没（ARROWHEAD-HIDDEN）: エッジの矢じり（終点）が、到達先ノード
      ではない別のノードの矩形の内側にある。
-  3. ラベルの近接（LABEL-TOO-CLOSE）: エッジの xlabel 座標が、自分以外の
+  3. ラベルの誤帰属（LABEL-MISATTRIBUTED）: ラベルの位置から、自分が説明して
+     いる辺よりも別の辺のほうが近い。重なっていなくても、読者は近いほうの辺の
+     説明だと読むため、これは実害のある欠陥である。
+  4. ラベルの近接（LABEL-TOO-CLOSE）: ラベル座標が、自分以外の
      エッジの経路や無関係なノードの矩形に近すぎる。
+  5. ラベルの枠跨ぎ（LABEL-ON-CLUSTER-FRAME）: ラベルの文字範囲がクラスタの
+     枠線を跨いでいる。
+
+検査するラベルは `xlabel`（`xlp`）だけでなく、`label`/`headlabel`/`taillabel`
+（`_ldraw_`/`_hldraw_`/`_tldraw_` の T 命令）も含む。
 
 これは助言のためのチェックであり、自動修正はしない。書き出したPNGの
 目視確認の前段として使う。誤検知がある: 図形どうしが意図して隣接している
 場合や、クラスタの枠線ぎりぎりを通ることが避けられない場合は無視してよい。
+長い複数行ラベルの幅は dot の報告値と実描画がずれるため、枠跨ぎの判定が
+過剰に出ることがある。
 
 使い方:
     python3 check_overlaps.py diagrams/**/*.dot
@@ -28,6 +38,10 @@ import sys
 
 IN_TO_PT = 72.0
 SAMPLES_PER_SEGMENT = 24
+# 横書き1行の高さの半分（fontsize 11〜13 を想定）。横の枠線への張り出し量。
+# dot は横の枠線から 9pt 程度離してラベルを置くことがあり、それは視覚的に
+# 問題ないので、実際に文字が枠を跨ぐ範囲（中心が 6pt 以内）だけを検出する。
+LABEL_LINE_HALF_HEIGHT = 6.0
 SELF_CROSS_THRESHOLD = 15.0
 
 
@@ -158,6 +172,20 @@ def check_file(path, margin):
         obj["_pos"] = (x, y)
         nodes[gvid] = obj
 
+    # クラスタの枠線。`check_overlaps.py` は当初これを見ていなかったため、
+    # 枠に乗り上げたラベルを検出できなかった。枠を4辺の線分として扱う。
+    cluster_frames = []
+    for obj in data.get("objects", []):
+        bb = obj.get("bb")
+        if not bb or "," not in bb:
+            continue
+        try:
+            x0, y0, x1, y1 = (float(v) for v in bb.split(","))
+        except ValueError:
+            continue
+        cluster_frames.append((obj.get("name", "cluster"),
+                               [(x0, y0), (x1, y0), (x1, y1), (x0, y1), (x0, y0)]))
+
     edges = []
     for e in data.get("edges", []):
         tail, head, pos = e.get("tail"), e.get("head"), e.get("pos")
@@ -166,7 +194,16 @@ def check_file(path, margin):
         epath = parse_pos_points(pos)
         if len(epath) < 2:
             continue
-        edges.append({"tail": tail, "head": head, "path": epath, "xlp": e.get("xlp")})
+        # xlabel は `xlp`、head/tail ラベルは `_hldraw_`/`_tldraw_` の T 命令に
+        # 描画座標が入る。後者を拾わないと headlabel の近接を見落とす。
+        extra_labels = []
+        for grp in ("_hldraw_", "_tldraw_", "_ldraw_"):
+            for op in e.get(grp, []):
+                if op.get("op") == "T" and op.get("pt"):
+                    extra_labels.append((op["pt"][0], op["pt"][1],
+                                         float(op.get("width") or 0.0)))
+        edges.append({"tail": tail, "head": head, "path": epath,
+                      "xlp": e.get("xlp"), "labels": extra_labels})
 
     warnings = 0
 
@@ -207,33 +244,69 @@ def check_file(path, margin):
 
     # 3. ラベルの近接
     for i, e in enumerate(edges):
-        if not e["xlp"]:
-            continue
-        try:
-            lx, ly = (float(v) for v in e["xlp"].split(","))
-        except ValueError:
-            continue
         tail_name = nodes[e["tail"]].get("name", e["tail"])
         head_name = nodes[e["head"]].get("name", e["head"])
-        for j, other in enumerate(edges):
-            if i == j:
-                continue
-            d = dist_point_to_path((lx, ly), other["path"])
-            if d < margin:
+
+        # 検査する点: xlabel の座標と、head/tail ラベルの描画座標
+        points = []
+        if e["xlp"]:
+            try:
+                lx, ly = (float(v) for v in e["xlp"].split(","))
+                points.append((lx, ly, 0.0))
+            except ValueError:
+                pass
+        points.extend(e["labels"])
+
+        for lx, ly, lw in points:
+            own = dist_point_to_path((lx, ly), e["path"])
+            # 3a. 他の辺のほうが自分の辺より近い → どの辺の説明か誤読される
+            for j, other in enumerate(edges):
+                if i == j:
+                    continue
+                d = dist_point_to_path((lx, ly), other["path"])
                 other_tail = nodes[other["tail"]].get("name", other["tail"])
                 other_head = nodes[other["head"]].get("name", other["head"])
-                print(f"  [{path}] {tail_name} -> {head_name} のラベルが "
-                      f"{other_tail} -> {other_head} の経路に近すぎる（{d:.0f}pt, LABEL-TOO-CLOSE）")
-                warnings += 1
-        for gvid, node in nodes.items():
-            if gvid in (e["tail"], e["head"]) or is_waypoint(node):
-                continue
-            bbox = node_bbox(node)
-            d = dist_point_to_bbox((lx, ly), bbox)
-            if d < margin:
-                print(f"  [{path}] {tail_name} -> {head_name} のラベルが "
-                      f"'{node.get('name')}' に近すぎる（{d:.0f}pt, LABEL-TOO-CLOSE）")
-                warnings += 1
+                if d < own:
+                    print(f"  [{path}] {tail_name} -> {head_name} のラベルは "
+                          f"{other_tail} -> {other_head} のほうが近い"
+                          f"（自分{own:.0f}pt / 他{d:.0f}pt, LABEL-MISATTRIBUTED）")
+                    warnings += 1
+                elif d < margin:
+                    print(f"  [{path}] {tail_name} -> {head_name} のラベルが "
+                          f"{other_tail} -> {other_head} の経路に近すぎる（{d:.0f}pt, LABEL-TOO-CLOSE）")
+                    warnings += 1
+            # 3b. 無関係なノードの矩形に近すぎる
+            for gvid, node in nodes.items():
+                if gvid in (e["tail"], e["head"]) or is_waypoint(node):
+                    continue
+                d = dist_point_to_bbox((lx, ly), node_bbox(node))
+                if d < margin:
+                    print(f"  [{path}] {tail_name} -> {head_name} のラベルが "
+                          f"'{node.get('name')}' に近すぎる（{d:.0f}pt, LABEL-TOO-CLOSE）")
+                    warnings += 1
+            # 3c. クラスタの枠線に乗り上げている。文字は横書きなので、縦の枠線
+            # には半幅、横の枠線には行高の半分しか張り出さない。さらに、枠の
+            # 「反対の軸では内側にある」ことも条件にする（y範囲内にあるだけで
+            # 横方向には枠の外、という位置を枠に乗っていると誤判定しないため）。
+            for cname, frame in cluster_frames:
+                x0, y0 = frame[0]
+                x1, y1 = frame[2]
+                half_w = lw / 2
+                # 縦の枠線: ラベルの文字範囲が枠線を跨ぐか
+                crosses_left = abs(lx - x0) < half_w and y0 <= ly <= y1
+                crosses_right = abs(lx - x1) < half_w and y0 <= ly <= y1
+                # 横の枠線: ラベルの行が枠線を跨ぐか
+                crosses_bottom = (abs(ly - y0) < LABEL_LINE_HALF_HEIGHT
+                                  and x0 <= lx <= x1)
+                crosses_top = (abs(ly - y1) < LABEL_LINE_HALF_HEIGHT
+                               and x0 <= lx <= x1)
+                if crosses_left or crosses_right or crosses_bottom or crosses_top:
+                    which = ("左" if crosses_left else "右" if crosses_right
+                             else "下" if crosses_bottom else "上")
+                    print(f"  [{path}] {tail_name} -> {head_name} のラベルが "
+                          f"クラスタ '{cname}' の{which}の枠線を跨いでいる"
+                          f"（文字半幅{half_w:.0f}pt, LABEL-ON-CLUSTER-FRAME）")
+                    warnings += 1
 
     return warnings
 
