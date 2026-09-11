@@ -38,9 +38,9 @@ digraph flight_recording {
   snap [label=<<font face="JetBrains Mono"><b>FlightRecorder.WriteTo</b></font><br align="left"/>「直前」の記録だけを書き出す<br align="left"/>>,
         fillcolor="#D2F3DF", color="#038435"];
 
-  runtime -> ring [xlabel=" 常に記録し続ける"];
-  ring -> snap [xlabel=" その瞬間の中身"];
-  trigger -> snap [xlabel=" 合図"];
+  runtime -> ring [label=" 常に記録し続ける "];
+  ring -> snap [label=" その瞬間の中身 "];
+  trigger -> snap [label=" 合図 "];
 
   { rank=same; trigger; ring; }
 }

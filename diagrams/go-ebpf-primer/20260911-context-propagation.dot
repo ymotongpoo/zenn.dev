@@ -27,8 +27,8 @@ digraph context_propagation {
     proc [label=<<b>処理 goroutine</b>>, fillcolor="#FFE9D6", color="#AB5A13"];
     send [label=<<b>送信 goroutine</b><br align="left"/><font face="JetBrains Mono">writeSubset</font> で直列化<br align="left"/>>, fillcolor="#FFE9D6", color="#AB5A13"];
 
-    recv -> proc [xlabel="newproc1 で親子を記録"];
-    proc -> send [xlabel="遡れるのは6段まで"];
+    recv -> proc [label=" newproc1 で親子を記録 "];
+    proc -> send [label=" 遡れるのは6段まで "];
   }
 
   p1 [label=<<b>経路1</b><br align="left"/><font face="JetBrains Mono">bufio.Writer</font> のバッファに<br align="left"/><font face="JetBrains Mono">bpf_probe_write_user</font> で追記<br align="left"/>>,

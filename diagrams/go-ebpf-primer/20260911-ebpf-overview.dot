@@ -28,7 +28,9 @@ digraph ebpf_overview {
     target [label=<<b>計装対象のGoバイナリ</b><br align="left"/>無改変のまま動く<br align="left"/>>,
             fillcolor="#E4E4E4"];
 
-    loader -> target [dir=none, style=dashed, color="#8A8A8A", xlabel="uprobeを命令アドレスに置く"];
+    // このエッジのラベルは、隣を通る map -> loader のラベルと隣接して読めなく
+    // なるため置かない。破線が何を表すかはキャプションで述べている。
+    loader -> target [dir=none, style=dashed, color="#8A8A8A"];
   }
 
   subgraph cluster_kernel {
@@ -44,7 +46,7 @@ digraph ebpf_overview {
         fillcolor="#FFFCD7", color="#736B10"];
 
     verifier -> prog;
-    prog -> map [dir=both, xlabel="読み書き"];
+    prog -> map [dir=both, label=" 読み書き "];
   }
 
   loader -> verifier [penwidth=1.8];
