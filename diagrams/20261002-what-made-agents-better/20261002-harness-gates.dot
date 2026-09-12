@@ -1,7 +1,14 @@
-// 記事「測ってみたら、モデルではなかった」用。
+// 記事「品質を動かしたのはツールとプロンプトだった」用。
 // ハーネスのゲート。仮説が4つの状態のいずれかに解決され、
 // レビュアーの走査を通るまでレポートは書けない。
 // 「リマインダーはコンテキストの圧力で弱まるが、コードパスは弱まらない」を図にする。
+//
+// 差し戻しの2本には headlabel を付けない。仮説ノードの枠に文字が乗るため
+// （査読 R-12。check_overlaps.py では検出されずPNGの目視で判明）。
+// 2本の意味の違いはキャプションで宣言する。
+// ゲートは「引き金または未解決範囲」を要求する。原文が
+// "the trigger ... or an explicit unresolved boundary" と書いており、
+// 引き金を特定できない結論も許しているため（査読 R-11）。
 digraph harness_gates {
   graph [
     fontname="IBM Plex Sans JP", fontsize=13,
@@ -51,7 +58,7 @@ digraph harness_gates {
 
   gate [
     fillcolor="#E4E4E4", color="#4A4A4A",
-    label=<<b>結論のゲート</b><br align="left"/>全仮説が解決済みか<br align="left"/>引き金を特定したか<br align="left"/>>
+    label=<<b>結論のゲート</b><br align="left"/>全仮説の状態を確定したか<br align="left"/>引き金または未解決範囲を示したか<br align="left"/>>
   ];
 
   reviewer [
@@ -70,6 +77,6 @@ digraph harness_gates {
   resolved -> gate;
   gate -> reviewer;
   reviewer -> report;
-  gate -> hypotheses [style=dashed, color="#8A8A8A", constraint=false, headlabel="未解決なら戻す ", labeldistance=3.2, labelangle=-28];
-  reviewer -> hypotheses [style=dashed, color="#8A8A8A", constraint=false, headlabel="矛盾があれば戻す ", labeldistance=4.0, labelangle=-20];
+  gate -> hypotheses [style=dashed, color="#8A8A8A", constraint=false];
+  reviewer -> hypotheses [style=dashed, color="#8A8A8A", constraint=false];
 }

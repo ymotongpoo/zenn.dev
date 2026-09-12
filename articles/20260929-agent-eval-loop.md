@@ -12,19 +12,19 @@ AIエージェントに可観測性の仕事をさせたとき、その答えが
 
 Grafana Cloud には [Grafana Assistant](https://grafana.com/docs/grafana-cloud/machine-learning/assistant/) というエージェントが組み込まれています。メトリクスを問い合わせ、ログとトレースを探索し、ダッシュボードを作り、自然言語で Grafana を操作します。それを開発しているチームは、評価の仕組みを作った経緯と、そこで見つけたことを公式のエンジニアリングブログで公開しています。この記事では [Building an evaluation loop for Grafana Assistant](https://medium.com/grafana-labs/building-an-evaluation-loop-for-grafana-assistant-9a8690d8662d)（Yasir Ekinci、2026年4月30日）の内容を追いながら、エージェントの評価をどう組み立てるかを見ていきます。
 
-続編として、この方法で実際に測った結果として何が効いたのかを別の記事で扱います。
+続編では、同じ Grafana Labs が公開したインシデント調査の評価事例を取り上げ、測定からどのような改善が見つかったかを追います。
 
 ## もっともらしく見える失敗
 
 記事の冒頭に、評価が難しい理由が書かれています。
 
-> the hardest failures usually aren't the obvious ones; they're the ones that look plausible on the surface.
+> the hardest failures usually aren’t the obvious ones; they’re the ones that look plausible on the surface.
 >
 > （最も難しい失敗はたいてい明白なものではなく、表面上もっともらしく見えるものである）
 
-具体例も2つ挙げられています。答えは良く書けているのに、間違ったクエリに基づいている。パネルは正常に描画されるのに、ユーザーが何かを理解する助けにはなっていない。どちらも出力を見るだけでは気付けません。
+具体例も2つ挙げられています。答えは良く書けているのに、間違ったクエリに基づいている。パネルは正常に描画されるのに、ユーザーが何かを理解する助けにはなっていない。どちらも、最終的な応答を読むだけでは見落とすことがあります。
 
-エージェントがタスクに従っているように見えながら、途中のどこかで悪い判断を下していることもあります。しかもシステムは非決定的なので、同じ要求が一度は成功し、次は失敗します。可観測性のタスクは答えの形が定まっておらず、複数の手順を踏むことが多いため、この種の静かな失敗はとくに見落としやすくなります。
+エージェントがタスクに従っているように見えながら、途中のどこかで悪い判断を下していることもあります。しかもシステムは非決定的なので、同じ要求が一度は成功しても、次には失敗することがあります。可観測性のタスクは答えの形が定まっておらず、複数の手順を踏むことが多いため、この種の静かな失敗はとくに見落としやすくなります。
 
 そこで評価の対象が変わります。
 
@@ -40,7 +40,7 @@ Grafana Cloud には [Grafana Assistant](https://grafana.com/docs/grafana-cloud/
 
 **シナリオ**は現実のユーザーのワークフローと、成功が何を意味するかを記述します。**グレーダー**は、その成功が実際に起きたかを判定します。判定の根拠に使うのは、ツールの引数、クエリの構造、保存された Grafana の状態、ナビゲーションの目的地、環境から取れる接地した事実です。シナリオが望ましい振る舞いを定義し、グレーダーがそれを達成できたかを教えます。
 
-この分離が効く理由は、原文の一文に凝縮されています。
+この分離が意味を持つ理由は、原文の一文に凝縮されています。
 
 > The desired behavior is encoded separately from how the implementation achieves it, whether that implementation is the agent itself, its prompt, its routing logic, or the code around it.
 >
@@ -83,7 +83,7 @@ Grafana Cloud には [Grafana Assistant](https://grafana.com/docs/grafana-cloud/
 
 シナリオは複数回実行します。
 
-> One run is not enough. If a capability only passes occasionally, that is not reliable — it's luck.
+> One run is not enough. If a capability only passes occasionally, that is not reliable — it’s luck.
 >
 > （1回の実行では足りない。ある能力がときどきしか通らないなら、それは信頼できるのではなく、運である）
 
@@ -93,9 +93,9 @@ Grafana Cloud には [Grafana Assistant](https://grafana.com/docs/grafana-cloud/
 
 ## 175シナリオの実測結果
 
-以上の仕組みが何を拾うのかを、記事は実例で示しています。あるプロンプトの改修は、スポットチェックでは明確な改善に見えました。プロンプトのサイズが減り、構造が良くなり、トークンの消費量も下がっています。
+以上の仕組みが何を拾うのかを、記事は実例で示しています。Ekinci の記事では、社内の評価基盤で175のシナリオを各3回ずつ実行した結果が報告されています。対象となったプロンプトの改修は、スポットチェックでは明確な改善に見えました。プロンプトのサイズが減り、構造が良くなり、トークンの消費量も下がっています。
 
-175のシナリオを各3回ずつ走らせると、結果はこうなりました。
+結果はこうなりました。
 
 | 能力の区分 | 改修前 | 改修後 |
 |---|---|---|
@@ -165,7 +165,7 @@ Grafana Cloud には [Grafana Assistant](https://grafana.com/docs/grafana-cloud/
 
 ペースの問題も消えないと認められています。プロダクトの開発は評価の網羅より速く進みます。新しいツールとワークフローは、それをシナリオに落とし込めるより速く到着することが多い。評価が出荷を止めることは望まないが、システムが最も速く変化しているところに盲点があるのも望まない。だから影響の大きいワークフローから優先し、どの隙間がユーザーに最も痛みを与えているかは本番の信号に教えてもらう、という運び方になっています。
 
-この緊張が実際にどう現れたかは、続編で扱います。合成したデータで作った評価環境が通り続けながら、実インシデントでは重要な部分で苦戦していた、という話です。
+この緊張が実際にどう現れたかは、続編で扱います。インシデント調査の評価事例では、合成したデータで作った環境が通り続けながら、実インシデントでは重要な部分で苦戦していたと報告されています。評価の考え方は共通しますが、同じ評価基盤やデータセットだと公開資料から確認できるわけではありません。
 
 ## 自分でループを始める
 

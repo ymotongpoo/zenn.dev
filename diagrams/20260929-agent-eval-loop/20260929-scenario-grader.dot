@@ -6,12 +6,18 @@
 // 矢印のラベルは付けない。クラスタをまたぐ辺のラベルはどこに置いても
 // 枠線を跨ぐため（check_overlaps.py の LABEL-ON-CLUSTER-FRAME）、
 // 矢印の意味はキャプションで宣言する。線種で「タスクを与える」経路だけ分ける。
+//
+// 破線は lhead でクラスタの枠に止める。impl ノードまで引くと、見出し
+// 「実装として変えていくもの」の文字を縦に貫通する（査読 R-12。
+// check_overlaps.py では検出されずPNGの拡大目視で判明）。
+// ポート指定で回避すると SELF-PASS-THROUGH になり、margin を広げても
+// 見出しが長いため文字の上を通る。枠で止めれば文字に触れない。
 digraph scenario_grader {
   graph [
     fontname="IBM Plex Sans JP", fontsize=13,
     rankdir=TB,
     compound=true, splines=ortho,
-    nodesep=0.4, ranksep=0.5, pad=0.25,
+    nodesep=0.4, ranksep=0.85, pad=0.25,
     bgcolor="white", newrank=true
   ];
   node [
@@ -43,7 +49,7 @@ digraph scenario_grader {
 
   subgraph cluster_impl {
     label=<<b>実装として変えていくもの</b>>;
-    style="rounded"; labeljust="l"; penwidth=1.6; margin=14;
+    style="rounded"; labeljust="l"; penwidth=1.6; margin=26;
     color="#9430A9"; bgcolor="#FCF0FE"; fontcolor="#6A2278";
 
     impl [
@@ -62,7 +68,7 @@ digraph scenario_grader {
     label=<<b>振る舞いは保たれたか</b>>
   ];
 
-  scenario -> impl [style=dashed, color="#8A8A8A"];
+  scenario -> impl [style=dashed, color="#8A8A8A", lhead=cluster_impl];
   impl -> evidence;
   evidence -> grader;
   scenario -> grader;

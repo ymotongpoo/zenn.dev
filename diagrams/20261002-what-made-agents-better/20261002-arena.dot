@@ -1,4 +1,4 @@
-// 記事「測ってみたら、モデルではなかった」用。
+// 記事「品質を動かしたのはツールとプロンプトだった」用。
 // アリーナの構成。同じ実インシデントを複数のビルドが調べ、
 // 人間が書いたポストモーテムを正解としてLLMが採点する。
 //
@@ -9,12 +9,16 @@
 //
 // 矢印のラベルは付けない（クラスタをまたぐ辺のラベルは枠線を跨ぐため）。
 // 矢印の意味はキャプションで宣言する。
+//
+// クラスタの margin を広げて、見出し「同じケースに取り組むビルド」の
+// 文字とノードの間に余白を作る。margin=14 では実線が見出しの文字を
+// 横切っていた（査読 R-12）。ポート指定で回避すると SELF-PASS-THROUGH になる。
 digraph arena {
   graph [
     fontname="IBM Plex Sans JP", fontsize=13,
     rankdir=TB,
     compound=true, splines=ortho,
-    nodesep=0.45, ranksep=0.5, pad=0.25,
+    nodesep=0.45, ranksep=0.85, pad=0.25,
     bgcolor="white", newrank=true
   ];
   node [
@@ -46,7 +50,7 @@ digraph arena {
 
   subgraph cluster_variants {
     label=<<b>同じケースに取り組むビルド</b>>;
-    style="rounded"; labeljust="l"; penwidth=1.6; margin=14;
+    style="rounded"; labeljust="l"; penwidth=1.6; margin=26;
     color="#AB5A13"; bgcolor="#FFF5ED"; fontcolor="#783F0E";
 
     own [
