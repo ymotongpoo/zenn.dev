@@ -7,21 +7,28 @@
 // 色はブランドパレットに従う。周回の3段は主系列（Orange）、人間の判断は中立（Neutral）。
 // 矢印はすべて実線（周回の本筋であり、従属・非同期の経路はない）。
 //
-// 人間の判断を右側の別ランクに置き、rankdir=LR で周回を左から右へ回す。
-// 縦組み（rankdir=TB）で human を下に置くと、戻りの辺が
-//   - lhead=cluster_auto を付ければクラスタ枠で止まって Evaluate に届かない
-//   - 付けなければ枠の内側を這う
-// のどちらかになるため、この配置にした。横組みなら戻りの辺が枠の上を
-// 通って Evaluate の上端に素直に届く。
+// レイアウトの経緯:
+// 周回3段を rank=same で横に並べ、人間の判断をその下のランクに置く。こうすると
+// 戻りの辺は「人間が決める」から左へ回り、クラスタの下辺よりさらに下を通って
+// Evaluate の下端に届く。枠との間隔も ranksep で制御できる。
+//
+// 却下した案:
+//   - 3段を縦（rankdir=TB）に並べて human を下に置く: 戻りの辺が
+//     lhead=cluster_auto ありなら枠で止まって Evaluate に届かず、なしなら
+//     枠の内側を這う
+//   - 3段を横に並べて human を右隣のランクに置く: 戻りの辺が枠の下辺から
+//     2.1pt しか離れず、線が枠に張り付いて見える
+//   - クラスタの margin を広げる / クラスタ内に不可視ノードを足す: 枠が
+//     広がるだけで、辺は枠の内側を横切るようになり悪化する
 //
 // 辺のラベルは付けない（クラスタをまたぐ辺は枠線を跨ぐため）。矢印の意味は
 // キャプションで宣言する。
 digraph eval_loop {
   graph [
     fontname="IBM Plex Sans JP", fontsize=13,
-    rankdir=LR,
+    rankdir=TB,
     compound=true, splines=ortho,
-    nodesep=0.4, ranksep=0.55, pad=0.25,
+    nodesep=0.4, ranksep=0.75, pad=0.25,
     bgcolor="white", newrank=true
   ];
   node [
@@ -58,12 +65,13 @@ digraph eval_loop {
       fillcolor="#FFE9D6", color="#AB5A13"
     ];
 
+    { rank=same; evaluate; learn; change; }
     evaluate -> learn;
     learn -> change;
   }
 
   human [
-    label=<<b>人間が決める</b><br align="left"/>採用するか<br align="left"/>退行として扱うか<br align="left"/>>,
+    label=<<b>人間が決める</b><br align="left"/>採用するか退行として扱うか<br align="left"/>>,
     fillcolor="#E4E4E4", color="#4A4A4A"
   ];
 
