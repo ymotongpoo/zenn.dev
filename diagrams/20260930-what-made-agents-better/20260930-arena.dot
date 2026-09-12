@@ -40,7 +40,7 @@ digraph arena {
 
   cutoff [
     fillcolor="#FDE1EC", color="#AA3E6A",
-    label=<<b>開始時点でカットオフ</b><br align="left"/>それより後のテレメトリー<br align="left"/>コミット、解決のレコード<br align="left"/>>
+    label=<<b>開始時点でカットオフ</b><br align="left"/>それより後のテレメトリーと<br align="left"/>コミットは遮断<br align="left"/>解決のレコードは丸ごと除外<br align="left"/>>
   ];
 
   backends [

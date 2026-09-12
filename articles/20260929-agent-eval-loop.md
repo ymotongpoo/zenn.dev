@@ -18,7 +18,7 @@ AIエージェントにオブザーバビリティの仕事をさせたとき、
 
 記事の冒頭に、AIエージェントの評価が難しい理由が書かれています。
 
-> the hardest failures usually aren’t the obvious ones; they’re the ones that look plausible on the surface.
+> the hardest failures usually aren’t the obvious ones; they’re the ones that look plausible on the surface.
 >
 > （最も難しい失敗はたいてい明白なものではなく、表面上もっともらしく見えるものである）
 
@@ -33,7 +33,7 @@ AIエージェントにオブザーバビリティの仕事をさせたとき、
 
 そこで評価の対象が変わります。
 
-> For a tool-using agent, the final answer is only part of the behavior. The rest is hidden in the steps that produced it.
+> For a tool-using agent, the final answer is only part of the behavior. The rest is hidden in the steps that produced it.
 >
 > （ツールを使うエージェントにとって、最終的な答えは振る舞いの一部にすぎない。残りは、それを生み出した手順の中に隠れている）
 
@@ -47,7 +47,8 @@ AIエージェントにオブザーバビリティの仕事をさせたとき、
 
 この分離が意味を持つ理由は、原文の一文に凝縮されています。
 
-> The desired behavior is encoded separately from how the implementation achieves it, whether that implementation is the agent itself, its prompt, its routing logic, or the code around it.
+> The desired behavior is encoded separately from how the implementation achieves it, 
+> whether that implementation is the agent itself, its prompt, its routing logic, or the code around it.
 >
 > （望ましい振る舞いは、実装がそれをどう達成するかとは別に符号化される。その実装がエージェント自身であれ、プロンプトであれ、ルーティングのロジックであれ、周辺のコードであれ変わらない）
 
@@ -136,7 +137,7 @@ AIエージェントにオブザーバビリティの仕事をさせたとき、
 
 ![Evaluate、Learn、Change の3段と人間の決定](/images/20260929-eval-loop.png)
 
-*図3: 矢印は周回の進行を表す。上段の3つはエージェントが担い、採用するかどうかの判断は枠の外に置かれる。人間が採用を決めたら、その変更を入れた状態で左の Evaluate に戻る。*
+*図3: 矢印は周回の進行を表す。Evaluate はベンチマークの実行、Learn はコーディングエージェントによる証拠の分析、Change は更新案にまとめる段で、採用するかどうかの判断は枠の外に置かれる。人間が採用を決めたら、その変更を入れた状態で左の Evaluate に戻る。*
 
 Evaluate はベンチマークの実行そのもので、トランスクリプト、ツールの軌跡、グレーダーの出力、コスト、レイテンシ、能力ごとの結果を集めます。これが生の証拠です。
 
@@ -146,7 +147,7 @@ Change では、その発見を具体的な更新に変えます。ルーブリ�
 
 この関係は一文で定式化されています。
 
-> It is a practical loop where AI proposes, benchmarks verify, and humans decide.
+> It is a practical loop where AI proposes, benchmarks verify, and humans decide.
 >
 > （AIが提案し、ベンチマークが検証し、人間が決める、という実務的なループである）
 
@@ -225,19 +226,19 @@ checks:
         canonical_query: max_over_time(service_cache_refresh_lag_seconds{job="user-service"}[$__range])
 ```
 
-63タスク全体で、決定的な `checks` は39個、ルーブリックの基準は247個あり、そのうち63個に `fact` が付いています。この配分がカテゴリによってはっきり分かれます。dashboarding では決定的なチェックが重みの平均91を占め、prometheus_query と loki_query では0です。つまり保存された成果物は厳密に照合し、調査の結論はルーブリックで判定するという役割分担が、重み付けとして実装されています。記事にあった「事実には構造的なチェックを、結論には意味的なチェックを」の具体形です。
+63タスク全体で、決定的な `checks` は39個、ルーブリックの基準は247個あり、そのうち63個に `fact` が付いています。この配分がカテゴリによってはっきり分かれます。dashboarding では決定的なチェックの重みがタスクあたり平均91あり、タスクごとに全体の重みで正規化すると平均で約88%を占めます。prometheus_query と loki_query では0です。つまり保存された成果物は厳密に照合し、調査の結論はルーブリックで判定するという役割分担が、重み付けとして実装されています。記事にあった「事実には構造的なチェックを、結論には意味的なチェックを」の具体形です。
 
-採点の合成も単純です。`grading/verifier.py` が決定的なチェックを先に走らせ、次にルーブリックをLLMに1回だけ渡し、両方の重みを合計1に正規化して加重平均を取ります。ルーブリックの判定を複数回に分けず1回の呼び出しにまとめるのは設計方針として書かれています（Prefer a single judge call over multiple rubric passes）。
+採点の合成も単純です。`grading/verifier.py` が決定的なチェックを先に走らせ、次にルーブリックをまとめてLLMに渡し、両方の重みを合計1に正規化して加重平均を取ります。ルーブリックの判定を複数回に分けず1回の呼び出しにまとめるのは設計方針として書かれています（Prefer a single judge call over multiple rubric passes）。
 
 このベンチマークは Prometheus と Loki と Tempo を含む Grafana スタックを Docker で立てた中でエージェントを走らせ、デフォルトでは1タスクを3回試行します。前の節で見た「1回の実行では足りない」がデフォルトになっているわけです。採点だけを変えたときは、保存したトランスクリプトを使い回して再採点する仕組みもあります。エージェントを走らせ直さずにグレーダーの較正を反復できるので、記事が「グレーダーの改善をプロダクトの仕事の一部として扱う」と書いていたことが、ここでも形になっています。
 
-なお o11y-bench はハーネスに依存しない設計です。エージェントの実装は差し替え可能で、MCP 経由で Grafana を操作するデフォルトのエージェントのほか、`gcx` CLI しか使えないエージェントも選べます。採点が見るのは結果であって経路ではないので、この差し替えが成り立ちます。
+なお o11y-bench はハーネスに依存しない設計です。エージェントの実装は差し替え可能で、MCP 経由で Grafana を操作するデフォルトのエージェントのほか、`gcx` CLI しか使えないエージェントも選べます。採点が単一の解法や言い回しを強制しない設計なので、この差し替えが成り立ちます。ただし経路を一切見ないわけではありません。たとえば Tempo のタスクには、回答が挙げたトレースIDがツールの実行結果に実際に現れたかを確かめるチェックがあり、トランスクリプトを走査して裏を取っています。
 
 ## ベンチマークの外側
 
 未解決の課題として、環境の忠実度が挙げられています。Assistant は、ダッシュボードとデータソースとプラグインとアラートルールと権限のある現実の Grafana 環境の中で動きます。有用なテストには現実的な統合と現実的なデータが必要ですが、同時に、比較が意味を持つ程度の安定性も必要になります。
 
-> Too much simulation and you miss real failures. Too much live variability and the benchmark gets noisy.
+> Too much simulation and you miss real failures. Too much live variability and the benchmark gets noisy.
 >
 > （シミュレーションが多すぎれば実際の失敗を見落とす。実環境の変動が多すぎればベンチマークがノイズだらけになる）
 

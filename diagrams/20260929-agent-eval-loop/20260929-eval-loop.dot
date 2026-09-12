@@ -45,7 +45,7 @@ digraph eval_loop {
 
   subgraph cluster_auto {
     graph [
-      label=<<b>AIが提案する範囲</b>>,
+      label=<<b>周回の3段</b>>,
       labeljust="l",
       style="rounded", color="#AB5A13", penwidth=1.6,
       margin=16, bgcolor="#FFF5ED",
