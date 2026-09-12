@@ -10,7 +10,13 @@ published: false
 
 AIエージェントにオブザーバビリティの仕事をさせたとき、その答えが良くなったのか悪くなったのかを、どうやって知るのでしょうか。
 
-Grafana Cloud には [Grafana Assistant](https://grafana.com/docs/grafana-cloud/machine-learning/assistant/) というエージェントが組み込まれています。メトリクスを問い合わせ、ログとトレースを探索し、ダッシュボードを作り、自然言語で Grafana を操作します。それを開発しているチームは、評価の仕組みを作った経緯と、そこで見つけたことを公式のエンジニアリングブログで公開しています。この記事では [Building an evaluation loop for Grafana Assistant](https://medium.com/grafana-labs/building-an-evaluation-loop-for-grafana-assistant-9a8690d8662d)（Yasir Ekinci、2026年4月30日）の内容を追いながら、エージェントの評価をどう組み立てるかを見ていきます。
+答えを読んで判断する、という方法は早い段階で行き詰まります。エージェントの出力は自然言語なので、正しい答えと、正しく見えるだけの答えが同じ見た目をしています。しかも同じ質問に毎回同じ答えが返るわけでもありません。テストを書こうとすると、期待値を文字列で固定できないという壁にぶつかります。
+
+この記事では、その壁をどう越えるかを扱います。要点を先に書くと3つです。評価の対象を最終的な答えから、そこに至る手順の全体に移すこと。何を正解とするかを文字列ではなく、実際にデータから取得できる事実として定義すること。そして採点する仕組み自体が劣化するので、それを保守する対象として扱うこと。
+
+素材にするのは Grafana Labs の公開情報です。Grafana Cloud には [Grafana Assistant](https://grafana.com/docs/grafana-cloud/machine-learning/assistant/) というエージェントが組み込まれています。メトリクスを問い合わせ、ログとトレースを探索し、ダッシュボードを作り、自然言語で Grafana を操作します。それを開発しているチームは、評価の仕組みを作った経緯と、そこで見つけたことを公式のエンジニアリングブログで公開しています。この記事では [Building an evaluation loop for Grafana Assistant](https://medium.com/grafana-labs/building-an-evaluation-loop-for-grafana-assistant-9a8690d8662d)（Yasir Ekinci、2026年4月30日）の内容を追いながら、エージェントの評価をどう組み立てるかを見ていきます。
+
+記事で語られている評価基盤は社内のものですが、同じ設計は [o11y-bench](https://github.com/grafana/o11y-bench) としてオープンソースで公開されています。後半では、そのリポジトリのシナリオ定義を実際に読んで、記事の主張がコードとしてどう実装されているかを確認します。
 
 ## もっともらしく見える失敗
 
@@ -126,13 +132,19 @@ Grafana Cloud には [Grafana Assistant](https://grafana.com/docs/grafana-cloud/
 
 ## グレーダーの劣化
 
-シナリオとグレーダーが揃うと、周回ができるようになります。スイートを実行し、成功と失敗を検査し、変更を加え、同じ条件で再実行して比較する。形は単純です。
+シナリオとグレーダーが揃うと、改善の手順を繰り返せるようになります。スイートを実行し、成功と失敗を検査し、変更を加え、同じ条件で再実行して比較する。形は単純です。
 
 難しいのは、この過程を実際のエンジニアリングの判断に使える程度に信頼できるものにすることだ、と記事は書いています。ここにベンチマークと改善のループの違いがあります。ベンチマークは、システムがタスクの集合に合格したか失敗したかを教えてくれます。ループはそれ以上を求められます。何が変わったのか、次に何をすべきかの理解を助けなければなりません。結果を採点するだけでなく、繰り返し現れるパターン、弱いグレーダー、再発する失敗の形、そして改善に実際に支払った費用を浮かび上がらせる必要があります。
 
-手作業での反復が破綻したのはこの段でした。システムが十分に大きくなると、ベンチマークは人間が効率的に消化して行動に移せる量を超える証拠を生みます。トランスクリプト、トレース、グレーダーの出力、区分ごとの差分、コストの変動、繰り返される失敗、不安定なシナリオ、脆いグレーダー。すべて読んで手で推論し通す方法は、そこで規模に対して成り立たなくなります。
+手作業での反復が破綻したのはこの段でした。システムが十分に大きくなると、1回の実行が吐き出す記録の量が、人間が読んで判断に移せる限界を超えます。**トランスクリプト**[^transcript]、トレース、グレーダーの出力、区分ごとの差分、コストの変動、繰り返される失敗、不安定なシナリオ、脆いグレーダー。すべて読んで手で推論し通す方法は、そこで規模に対して成り立たなくなります。
+
+[^transcript]: エージェントが1つのタスクを処理する間のやり取りを、時系列にすべて記録したもの。ユーザーの要求、モデルが出力した思考や文章、呼び出したツールとその引数、ツールが返した結果が順番に並ぶ。最終的な応答だけを見ても分からない「途中でどう判断したか」は、ここにしか残らない。
 
 そこで記事のチームは、周回を Evaluate、Learn、Change の3段に分けて、Learn の段にAIコーディングエージェントを入れました。
+
+![Evaluate、Learn、Change の3段と人間の決定](/images/20260929-eval-loop.png)
+
+*図3: 実線は各段の進行、破線は次の周回への戻りを表す。分析と提案はエージェントが担うが、採用の判断は枠の外に置かれる。*
 
 Evaluate はベンチマークの実行そのもので、トランスクリプト、ツールの軌跡、グレーダーの出力、コスト、レイテンシ、能力ごとの結果を集めます。これが生の証拠です。
 
@@ -160,9 +172,87 @@ Change では、その発見を具体的な更新に変えます。ルーブリ�
 
 タスクが健全かどうかの基準も、書かれていた文面の良さではありません。現実の仕事を反映しているか、試行をまたいで安定しているか、正しい理由で正しい振る舞いと誤った振る舞いを見分けられているか。ときにはバリデータを締め、ときにはルーブリックを変え、ときには共通のハーネスの挙動を直し、ときにはそのタスクが飽和している、あるいは設計が悪いと認めて差し替えることになります。スイートを果てしなく大きくすることが目的ではない、とも述べられています。目指すのは、小さく、現実的で、信号の濃い状態を保つこと。現実のオブザーバビリティの仕事を反映して良いグレーダーを持つ小さなベンチマークは、曖昧で冗長で攻略しやすいタスクだらけの大きなベンチマークよりはるかに有用だ、という比較が置かれています。
 
+## シナリオの実物を読む
+
+ここまでの話は社内の評価基盤についてのものですが、同じ設計を公開されたコードで確認できます。Grafana Labs は [o11y-bench](https://github.com/grafana/o11y-bench) というオブザーバビリティタスクのベンチマークをオープンソースで公開しており、シナリオの定義形式と採点の実装がそのまま読めます。
+
+リポジトリの `tasks-spec/` がシナリオの正となる定義で、2026年9月時点で63個のYAMLが置かれています。内訳は prometheus_query が16、tempo_query が13、investigation が11、loki_query が10、dashboarding が7、grafana_api が6です。README には「`tasks-spec/` is the source of truth for benchmark scenarios」とあり、生成物である `tasks/` を手で編集してはならないと明記されています。
+
+1つ読んでみます。キャッシュ更新の遅延を Prometheus に問い合わせるタスクです。
+
+```yaml
+id: promql-cache-refresh-lag-peak
+category: prometheus_query
+statement: |
+  We had an earlier user-service cache-refresh issue and I want the metric summary, not a general RCA.
+  From Prometheus, tell me how high the user-service cache refresh lag got over roughly the last 12
+  hours, what the lag is now at the end of the window, and whether that means the incident is still
+  active or has recovered.
+checks: []
+rubric:
+- criterion: The final response states Peak cache refresh lag accurately.
+  weight: 45
+  fact:
+    kind: query
+    backend: prometheus
+    query: max_over_time(service_cache_refresh_lag_seconds{job="user-service"}[12h])
+- criterion: The final response states Current cache refresh lag accurately.
+  weight: 35
+  fact:
+    kind: query
+    backend: prometheus
+    query: service_cache_refresh_lag_seconds{job="user-service"}
+```
+
+この構造が、記事で読んだ設計とそのまま対応しています。
+
+`statement` はユーザーの声で書かれた依頼です。採点の詳細はここに入れないという規則が grading/README.md に明記されています（Keep `statement` user-voiced. Put grading detail in `checks`, `rubric`, and `fact`, not in the prompt）。エージェントに渡すのは依頼だけで、何を見て採点するかは伝えません。
+
+`rubric` が判定の基準で、1項目ずつ独立した文になっています。「良い回答か」ではなく「ピーク値を正確に述べているか」と聞く形です。
+
+そして `fact` が、この設計の要点です。基準ごとに正解を求めるためのクエリが書かれていて、採点時にそれを実行した結果が「Source of truth」として判定に渡されます。正解を文字列で固定していないので、エージェントが「約42秒」と書いても「42.3s」と書いても、同じ事実を指していれば通ります。記事にあった「グレーダーを、判定の基準となる状態や実際に取得した証拠に結び付ける」が、この `fact` として実装されているわけです。
+
+一方、保存された状態を問うタスクでは決定的なチェックが主役になります。ダッシュボードを編集させるタスクでは、`checks` に期待するパネルの構成が書かれ、さらに各パネルが保存しているクエリまで検証されます。
+
+```yaml
+checks:
+- weight: 35
+  type: state
+  params:
+    uid: user-access-overview
+    mode: dashboard_state
+    panels:
+    - title: Peak Cache Refresh Lag
+      type: stat
+      datasource_type: prometheus
+      execute_cases:
+      - result_kind: prometheus_scalar
+        canonical_query: max_over_time(service_cache_refresh_lag_seconds{job="user-service"}[$__range])
+```
+
+63タスク全体で、決定的な `checks` は39個、ルーブリックの基準は247個あり、そのうち63個に `fact` が付いています。この配分がカテゴリによってはっきり分かれます。dashboarding では決定的なチェックが重みの平均91を占め、prometheus_query と loki_query では0です。つまり保存された成果物は厳密に照合し、調査の結論はルーブリックで判定するという役割分担が、重み付けとして実装されています。記事にあった「事実には構造的なチェックを、結論には意味的なチェックを」の具体形です。
+
+採点の合成も単純です。`grading/verifier.py` が決定的なチェックを先に走らせ、次にルーブリックをLLMに1回だけ渡し、両方の重みを合計1に正規化して加重平均を取ります。ルーブリックの判定を複数回に分けず1回の呼び出しにまとめるのは設計方針として書かれています（Prefer a single judge call over multiple rubric passes）。
+
+実行方法も公開されています。Prometheus と Loki と Tempo を含む Grafana スタックが Docker のサイドカーとして起動し、その中でエージェントが動きます。
+
+```bash
+mise run bench:job -- --model anthropic/claude-sonnet-4-6
+```
+
+これで既定3回の試行が走り、結果がHTMLレポートとして書き出されます。記事にあった「1回の実行では足りない」が既定値になっているわけです。採点だけを変えたときは、保存したトランスクリプトを使い回して再採点できます。
+
+```bash
+uv run python -m o11y_bench regrade --jobs-dir jobs --job-name <job-name> --path tasks
+```
+
+エージェントを走らせ直さずに採点だけ更新できるので、グレーダーの較正を安く反復できます。記事が「グレーダーの改善をプロダクトの仕事の一部として扱う」と書いていたことが、このコマンドの存在に現れています。
+
+なお o11y-bench はハーネスに依存しない設計です。エージェントの実装は差し替え可能で、MCP 経由で Grafana を操作する既定のエージェントのほか、`gcx` CLI しか使えないエージェントも選べます。採点が見るのは結果であって経路ではないので、この差し替えが成り立ちます。
+
 ## ベンチマークの外側
 
-未解決の難所として、環境の忠実度が挙げられています。Assistant は、ダッシュボードとデータソースとプラグインとアラートルールと権限のある現実の Grafana 環境の中で動きます。有用なテストには現実的な統合と現実的なデータが必要ですが、同時に、比較が意味を持つ程度の安定性も必要になります。
+未解決の課題として、環境の忠実度が挙げられています。Assistant は、ダッシュボードとデータソースとプラグインとアラートルールと権限のある現実の Grafana 環境の中で動きます。有用なテストには現実的な統合と現実的なデータが必要ですが、同時に、比較が意味を持つ程度の安定性も必要になります。
 
 > Too much simulation and you miss real failures. Too much live variability and the benchmark gets noisy.
 >
@@ -170,15 +260,21 @@ Change では、その発見を具体的な更新に変えます。ルーブリ�
 
 もう1つ、よく保守されたベンチマークのスイートであっても、制御されたタスクしか反映しないという限界があります。実際のユーザーは、想定していなかったことを、モデル化していなかった文脈で、完全には符号化できていなかった期待とともに尋ねてきます。
 
-その隙間を埋めるために、記事のチームは本番の会話を採点して分析する仕組みを作りました。それが Grafana Cloud の AI Observability につながっています。オフラインの評価ループに対する、オンライン評価の側の対応物だという位置づけです。
+その隙間を埋めるために、記事のチームは本番の会話を採点して分析する仕組みを作りました。原文にはこう書かれています。
+
+> we built a system that scores and analyzes conversations in production, and it led to AI Observability in Grafana Cloud (currently in public preview). It’s the online eval counterpart to the offline eval loop
+>
+> （本番環境で会話を採点し分析するシステムを構築し、それが Grafana Cloud の AI Observability につながった（現在パブリックプレビュー）。これはオフラインの評価ループに対応するオンライン評価の側である）
+
+この機能はその後 [Agent Observability](https://grafana.com/docs/grafana-cloud/observe-and-act/agent-observability/) に改名されています。ツール使用から評価、ガードレールまでエージェントのライフサイクル全体を覆うようになったため名前を追いつかせた、と[改名の告知](https://grafana.com/whats-new/2026-07-22-ai-observability-is-now-agent-observability--updated-branding-and-migration-guide/)に説明されています。
 
 これはベンチマークだけでは得られないものを与えます。ユーザーが実際に不満を感じている箇所と、実務で問題になる失敗がどれかという視点です。記事に挙げられた読み方が具体的で参考になります。アラートに関するシナリオはスイートでは通るのに、アラートに関する会話が本番では低く評価されるなら、スイートが何か重要なものを取りこぼしていることを意味します。逆に、ベンチマークで見えた退行が本番の品質データに現れないなら、ユーザーがそこまで価値を置いていない何かを、自分たちが重く見すぎている可能性があります。
 
 現時点では、本番から得た洞察はシナリオを追加したり改良したりする判断に使われています。将来はその段も自動化されたループの一部にしたい、と書かれています。実際の会話から出た失敗が自動的にシナリオの候補になり、コーディングエージェントがスイートへの追加を提案し、人間が採用するものを審査する形です。
 
-ペースの問題も消えないと認められています。プロダクトの開発は評価の網羅より速く進みます。新しいツールとワークフローは、それをシナリオに落とし込めるより速く到着することが多い。評価がリリースを止めることは望まないが、システムが最も速く変化しているところに盲点があるのも望まない。だから影響の大きいワークフローから優先し、どの隙間がユーザーに最も痛みを与えているかは本番の信号に教えてもらう、という運び方になっています。
+ペースの問題も消えないと報告されています。プロダクトの開発は評価の網羅より速く進みます。新しいツールとワークフローは、それをシナリオに落とし込めるより速く到着することが多い。評価がリリースを止めることは望まないが、システムが最も速く変化しているところに盲点があるのも望まない。そこで影響の大きいワークフローから先に評価を整え、シナリオが足りていない領域のうちどれを急ぐべきかは、本番の品質データを見て判断する、という進め方をとっています。
 
-この緊張が実際にどう現れたかは、続編で扱います。インシデント調査の評価事例では、合成したデータで作った環境が通り続けながら、実インシデントでは重要な部分で苦戦していたと報告されています。評価の考え方は共通しますが、同じ評価基盤やデータセットだと公開資料から確認できるわけではありません。
+この、現実的なデータと安定した比較のどちらを取るかという選択が実際にどう現れたかは、続編で扱います。インシデント調査の評価事例では、合成したデータで作った環境では評価が合格し続けたのに、実際のインシデントを題材にすると重要な部分で苦戦していたと報告されています。評価の考え方は共通しますが、同じ評価基盤やデータセットだと公開資料から確認できるわけではありません。
 
 ## 自分でループを始める
 
@@ -202,3 +298,6 @@ Change では、その発見を具体的な更新に変えます。ルーブリ�
 
 - Yasir Ekinci, [Building an evaluation loop for Grafana Assistant](https://medium.com/grafana-labs/building-an-evaluation-loop-for-grafana-assistant-9a8690d8662d), Unprompted by Grafana Labs, 2026年4月30日
 - Maurice Rochau, [How we build AI at Grafana Labs](https://medium.com/grafana-labs/how-we-build-ai-at-grafana-labs-small-steps-that-add-up-to-actually-useful-ai-2dcd7b2b3184), Unprompted by Grafana Labs, 2026年7月27日
+- Grafana Labs, [grafana/o11y-bench](https://github.com/grafana/o11y-bench)（AGPL-3.0）。本記事のシナリオ定義と採点の記述は2026年9月時点のリポジトリに基づく
+- Grafana Labs, [Agent Observability ドキュメント](https://grafana.com/docs/grafana-cloud/observe-and-act/agent-observability/)
+- Grafana Labs, [AI Observability is now Agent Observability](https://grafana.com/whats-new/2026-07-22-ai-observability-is-now-agent-observability--updated-branding-and-migration-guide/), 2026年7月22日

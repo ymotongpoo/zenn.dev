@@ -1,0 +1,62 @@
+// 記事「オブザーバビリティのAIエージェントをどう評価するか」用。
+// Evaluate / Learn / Change の3段と、人間が決める位置を示す。
+//
+// 出典: Yasir Ekinci「Building an evaluation loop for Grafana Assistant」
+// "It is a practical loop where AI proposes, benchmarks verify, and humans decide."
+//
+// 規範: クラスタをまたぐ辺にラベルを付けない（枠線を跨ぐため）。
+// 各段の具体的な作業内容は本文に置き、図はノード名＋1〜2行に留める。
+digraph eval_loop {
+  graph [
+    fontname="IBM Plex Sans JP", fontsize=13,
+    rankdir=TB,
+    compound=true,
+    nodesep=0.45, ranksep=0.6, pad=0.25,
+    bgcolor="white", newrank=true
+  ];
+  node [
+    fontname="IBM Plex Sans JP", fontsize=12,
+    shape=box, style="rounded,filled",
+    fillcolor="#F1F1F1", color="#4A4A4A", penwidth=1.6,
+    margin="0.2,0.14"
+  ];
+  edge [
+    fontname="IBM Plex Sans JP", fontsize=11,
+    color="#343434", penwidth=1.5, arrowsize=0.8
+  ];
+
+  subgraph cluster_auto {
+    graph [
+      label=<<b>AIが提案する範囲</b>>,
+      labelloc="t", fontsize=12,
+      style="rounded", color="#9A9A9A", penwidth=1.5,
+      margin=24, bgcolor="#FAFAFA"
+    ];
+
+    evaluate [
+      label=<<b>Evaluate</b><br align="left"/>スイートを実行して証拠を集める<br align="left"/>>,
+      fillcolor="#DCE9F7", color="#3F6FA8"
+    ];
+    learn [
+      label=<<b>Learn</b><br align="left"/>コーディングエージェントが<br align="left"/>失敗と成功を分析する<br align="left"/>>,
+      fillcolor="#F7E8DC", color="#B5772F"
+    ];
+    change [
+      label=<<b>Change</b><br align="left"/>グレーダーの較正と<br align="left"/>エージェントの改善を提案する<br align="left"/>>,
+      fillcolor="#DCE9F7", color="#3F6FA8"
+    ];
+
+    evaluate -> learn;
+    learn -> change;
+  }
+
+  human [
+    label=<<b>人間が決める</b><br align="left"/>採用するか退行として扱うか<br align="left"/>>,
+    fillcolor="#E4E4E4", color="#5A5A5A"
+  ];
+
+  change -> human [minlen=1];
+  human -> evaluate [
+    style=dashed, color="#6A6A6A", constraint=false
+  ];
+}
