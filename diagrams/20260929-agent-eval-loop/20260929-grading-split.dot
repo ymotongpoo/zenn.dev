@@ -1,0 +1,52 @@
+// 記事「もっともらしい答えをどう疑うか」用。
+// 採点の対象によって方法を分ける。構造化された出力には決定的なチェック、
+// より高次の基準にはルーブリック付きの LLM-as-judge。
+// 「事実には構造的なチェックを、結論には意味的なチェックを」という教訓を図にする。
+//
+// 各方法の性質（速い・再現できる／基準ごとに答えさせる）は、
+// 注記だけの浮きノードにせず本文とキャプションに委ねる。
+digraph grading_split {
+  graph [
+    fontname="IBM Plex Sans JP", fontsize=13,
+    rankdir=LR,
+    compound=true, splines=ortho,
+    nodesep=0.4, ranksep=0.75, pad=0.25,
+    bgcolor="white", newrank=true
+  ];
+  node [
+    fontname="IBM Plex Sans JP", fontsize=12,
+    shape=box, style="rounded,filled",
+    fillcolor="#F1F1F1", color="#4A4A4A", penwidth=1.6,
+    margin="0.2,0.14"
+  ];
+  edge [
+    fontname="IBM Plex Sans JP", fontsize=11,
+    color="#343434", penwidth=1.4, arrowsize=0.9,
+    fontcolor="#171717"
+  ];
+
+  trajectory [
+    fillcolor="#FFE9D6", color="#AB5A13",
+    label=<<b>エージェントの軌跡</b><br align="left"/>ツール呼び出し、引数<br align="left"/>保存された状態<br align="left"/>最終的な応答<br align="left"/>>
+  ];
+
+  det [
+    fillcolor="#D2F3DF", color="#038435",
+    label=<<b>決定的なチェック</b><br align="left"/>正しいツールを呼んだか<br align="left"/>正しい引数を渡したか<br align="left"/>期待するクエリの形を作ったか<br align="left"/>>
+  ];
+
+  sem [
+    fillcolor="#F7DDFC", color="#9430A9",
+    label=<<b>ルーブリック付きの判定</b><br align="left"/>正しいサービスを特定したか<br align="left"/>具体的な結果を提示したか<br align="left"/>説明を出力に接地させたか<br align="left"/>>
+  ];
+
+  score [
+    fillcolor="#FFFCD7", color="#736B10",
+    label=<<b>品質、コスト、レイテンシ</b><br align="left"/>3回の実行をまとめて記録<br align="left"/>ベースラインとの差を見る<br align="left"/>>
+  ];
+
+  trajectory -> det [xlabel="事実 "];
+  trajectory -> sem [xlabel="結論 "];
+  det -> score;
+  sem -> score;
+}

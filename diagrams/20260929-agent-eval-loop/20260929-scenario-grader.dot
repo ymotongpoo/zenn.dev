@@ -1,0 +1,70 @@
+// 記事「もっともらしい答えをどう疑うか」用。
+// シナリオ（望ましい振る舞い）とグレーダー（実際に起きたかの判定）を、
+// 実装（プロンプト・ルーティング・ツール定義・モデル）から分離して置くと、
+// 実装側をどれだけ変えても同じ問いを立てられる、という関係を示す。
+//
+// 矢印のラベルは付けない。クラスタをまたぐ辺のラベルはどこに置いても
+// 枠線を跨ぐため（check_overlaps.py の LABEL-ON-CLUSTER-FRAME）、
+// 矢印の意味はキャプションで宣言する。線種で「タスクを与える」経路だけ分ける。
+digraph scenario_grader {
+  graph [
+    fontname="IBM Plex Sans JP", fontsize=13,
+    rankdir=TB,
+    compound=true, splines=ortho,
+    nodesep=0.4, ranksep=0.5, pad=0.25,
+    bgcolor="white", newrank=true
+  ];
+  node [
+    fontname="IBM Plex Sans JP", fontsize=12,
+    shape=box, style="rounded,filled",
+    fillcolor="#F1F1F1", color="#4A4A4A", penwidth=1.6,
+    margin="0.2,0.14"
+  ];
+  edge [
+    fontname="IBM Plex Sans JP", fontsize=11,
+    color="#343434", penwidth=1.4, arrowsize=0.9,
+    fontcolor="#171717"
+  ];
+
+  subgraph cluster_spec {
+    label=<<b>仕様として別に置くもの</b>>;
+    style="rounded"; labeljust="l"; penwidth=1.6; margin=14;
+    color="#AB5A13"; bgcolor="#FFF5ED"; fontcolor="#783F0E";
+
+    scenario [
+      fillcolor="#FFE9D6", color="#AB5A13",
+      label=<<b>シナリオ</b><br align="left"/>現実のユーザーのワークフロー<br align="left"/>成功が何を意味するか<br align="left"/>>
+    ];
+    grader [
+      fillcolor="#FFE9D6", color="#AB5A13",
+      label=<<b>グレーダー</b><br align="left"/>その成功が実際に起きたかを判定<br align="left"/>>
+    ];
+  }
+
+  subgraph cluster_impl {
+    label=<<b>実装として変えていくもの</b>>;
+    style="rounded"; labeljust="l"; penwidth=1.6; margin=14;
+    color="#9430A9"; bgcolor="#FCF0FE"; fontcolor="#6A2278";
+
+    impl [
+      fillcolor="#F7DDFC", color="#9430A9",
+      label=<<b>エージェント</b><br align="left"/>プロンプト<br align="left"/>ルーティングのロジック<br align="left"/>ツールの定義<br align="left"/>モデル<br align="left"/>>
+    ];
+  }
+
+  evidence [
+    fillcolor="#FFFCD7", color="#736B10",
+    label=<<b>判定の根拠</b><br align="left"/>ツールの引数<br align="left"/>クエリの構造<br align="left"/>保存された Grafana の状態<br align="left"/>環境から取れる事実<br align="left"/>>
+  ];
+
+  verdict [
+    fillcolor="#D2F3DF", color="#038435",
+    label=<<b>振る舞いは保たれたか</b>>
+  ];
+
+  scenario -> impl [style=dashed, color="#8A8A8A"];
+  impl -> evidence;
+  evidence -> grader;
+  scenario -> grader;
+  grader -> verdict;
+}
