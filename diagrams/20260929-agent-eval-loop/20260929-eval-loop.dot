@@ -5,20 +5,23 @@
 // "It is a practical loop where AI proposes, benchmarks verify, and humans decide."
 //
 // 色はブランドパレットに従う。周回の3段は主系列（Orange）、人間の判断は中立（Neutral）。
-// 規範: クラスタをまたぐ辺にラベルを付けない（枠線を跨ぐため）。
+// 矢印はすべて実線（周回の本筋であり、従属・非同期の経路はない）。
 //
-// 戻りの破線は、始点(human)がクラスタ外・終点(evaluate)がクラスタ内のため
-// dot は既定では枠の内側を這う経路を引く。対策を2つ重ねている:
-//   1. lhead=cluster_auto で破線を枠の外側で止める（内側通過を解消）
-//   2. human の左に不可視スペーサーを置き rank=same で human を右へ寄せて、
-//      破線が枠から離れた位置を通るようにする（枠との距離 1.2pt → 11.1pt）
-// cluster の margin を広げる方法では内側を這う問題が解決しないため使わない。
+// 人間の判断を右側の別ランクに置き、rankdir=LR で周回を左から右へ回す。
+// 縦組み（rankdir=TB）で human を下に置くと、戻りの辺が
+//   - lhead=cluster_auto を付ければクラスタ枠で止まって Evaluate に届かない
+//   - 付けなければ枠の内側を這う
+// のどちらかになるため、この配置にした。横組みなら戻りの辺が枠の上を
+// 通って Evaluate の上端に素直に届く。
+//
+// 辺のラベルは付けない（クラスタをまたぐ辺は枠線を跨ぐため）。矢印の意味は
+// キャプションで宣言する。
 digraph eval_loop {
   graph [
     fontname="IBM Plex Sans JP", fontsize=13,
-    rankdir=TB,
+    rankdir=LR,
     compound=true, splines=ortho,
-    nodesep=0.45, ranksep=0.7, pad=0.25,
+    nodesep=0.4, ranksep=0.55, pad=0.25,
     bgcolor="white", newrank=true
   ];
   node [
@@ -38,12 +41,12 @@ digraph eval_loop {
       label=<<b>AIが提案する範囲</b>>,
       labeljust="l",
       style="rounded", color="#AB5A13", penwidth=1.6,
-      margin=14, bgcolor="#FFF5ED",
+      margin=16, bgcolor="#FFF5ED",
       fontcolor="#783F0E"
     ];
 
     evaluate [
-      label=<<b>Evaluate</b><br align="left"/>スイートを実行して証拠を集める<br align="left"/>>,
+      label=<<b>Evaluate</b><br align="left"/>スイートを実行して<br align="left"/>証拠を集める<br align="left"/>>,
       fillcolor="#FFE9D6", color="#AB5A13"
     ];
     learn [
@@ -59,19 +62,11 @@ digraph eval_loop {
     learn -> change;
   }
 
-  spacer [style=invis, shape=point, width=0.4, height=0.01, label=""];
-
   human [
-    label=<<b>人間が決める</b><br align="left"/>採用するか退行として扱うか<br align="left"/>>,
+    label=<<b>人間が決める</b><br align="left"/>採用するか<br align="left"/>退行として扱うか<br align="left"/>>,
     fillcolor="#E4E4E4", color="#4A4A4A"
   ];
 
-  { rank=same; spacer; human; }
-  spacer -> human [style=invis, minlen=0];
-
   change -> human;
-  human -> evaluate [
-    style=dashed, color="#8A8A8A", constraint=false,
-    lhead=cluster_auto
-  ];
+  human -> evaluate [constraint=false];
 }
