@@ -1,0 +1,82 @@
+// 記事「測ってみたら、モデルではなかった」用。
+// アリーナの構成。同じ実インシデントを複数のビルドが調べ、
+// 人間が書いたポストモーテムを正解としてLLMが採点する。
+//
+// 証拠の流れは「バックエンド → ビルド」の向きで描く。カットオフは
+// バックエンドに対する遮断として置く（インシデント開始より後の証拠を通さない）。
+// ビルドから採点へ向かう辺とバックエンドへ向かう辺が交差しないよう、
+// 証拠の供給を上流に、採点を下流に配置している。
+//
+// 矢印のラベルは付けない（クラスタをまたぐ辺のラベルは枠線を跨ぐため）。
+// 矢印の意味はキャプションで宣言する。
+digraph arena {
+  graph [
+    fontname="IBM Plex Sans JP", fontsize=13,
+    rankdir=TB,
+    compound=true, splines=ortho,
+    nodesep=0.45, ranksep=0.5, pad=0.25,
+    bgcolor="white", newrank=true
+  ];
+  node [
+    fontname="IBM Plex Sans JP", fontsize=12,
+    shape=box, style="rounded,filled",
+    fillcolor="#F1F1F1", color="#4A4A4A", penwidth=1.6,
+    margin="0.2,0.14"
+  ];
+  edge [
+    fontname="IBM Plex Sans JP", fontsize=11,
+    color="#343434", penwidth=1.4, arrowsize=0.9,
+    fontcolor="#171717"
+  ];
+
+  incident [
+    fillcolor="#FDE1EC", color="#AA3E6A",
+    label=<<b>解決済みの実インシデント</b><br align="left"/>本番インフラで起きたもの<br align="left"/>発火したアラートが入口<br align="left"/>>
+  ];
+
+  cutoff [
+    fillcolor="#FDE1EC", color="#AA3E6A",
+    label=<<b>開始時点でカットオフ</b><br align="left"/>それより後のテレメトリー<br align="left"/>コミット、解決のレコード<br align="left"/>>
+  ];
+
+  backends [
+    fillcolor="#FFFCD7", color="#736B10",
+    label=<<b>可観測性のバックエンド</b><br align="left"/>エンジニアが使うものと同じ<br align="left"/>コードへのアクセスも与える<br align="left"/>>
+  ];
+
+  subgraph cluster_variants {
+    label=<<b>同じケースに取り組むビルド</b>>;
+    style="rounded"; labeljust="l"; penwidth=1.6; margin=14;
+    color="#AB5A13"; bgcolor="#FFF5ED"; fontcolor="#783F0E";
+
+    own [
+      fillcolor="#FFE9D6", color="#AB5A13",
+      label=<<b>自社の調査ハーネス</b><br align="left"/>ツールセット、モデル<br align="left"/>プロンプトを1つずつ変える<br align="left"/>>
+    ];
+    external [
+      fillcolor="#F7DDFC", color="#9430A9",
+      label=<<b>外部のエージェント</b><br align="left"/>MCP サーバー経由<br align="left"/>gcx 経由、HTTP を直接<br align="left"/>>
+    ];
+  }
+
+  judge [
+    fillcolor="#E4E4E4", color="#4A4A4A",
+    label=<<b>LLM による採点</b><br align="left"/>基準ごとに3段階<br align="left"/>重み付けした充足率を比較<br align="left"/>>
+  ];
+
+  postmortem [
+    fillcolor="#D2F3DF", color="#038435",
+    label=<<b>人間が書いたポストモーテム</b><br align="left"/>影響範囲、根本原因、寄与要因<br align="left"/>>
+  ];
+
+  incident -> backends;
+  cutoff -> backends [arrowhead=tee, style=dashed, color="#AA3E6A"];
+  backends -> own;
+  backends -> external;
+  own -> judge;
+  external -> judge;
+  postmortem -> judge [style=dashed, color="#8A8A8A"];
+
+  { rank=same; incident; cutoff; }
+  { rank=same; judge; postmortem; }
+}

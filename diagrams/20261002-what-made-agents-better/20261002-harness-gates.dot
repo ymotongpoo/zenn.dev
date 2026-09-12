@@ -1,0 +1,75 @@
+// 記事「測ってみたら、モデルではなかった」用。
+// ハーネスのゲート。仮説が4つの状態のいずれかに解決され、
+// レビュアーの走査を通るまでレポートは書けない。
+// 「リマインダーはコンテキストの圧力で弱まるが、コードパスは弱まらない」を図にする。
+digraph harness_gates {
+  graph [
+    fontname="IBM Plex Sans JP", fontsize=13,
+    rankdir=TB,
+    compound=true, splines=ortho,
+    nodesep=0.4, ranksep=0.55, pad=0.25,
+    bgcolor="white", newrank=true
+  ];
+  node [
+    fontname="IBM Plex Sans JP", fontsize=12,
+    shape=box, style="rounded,filled",
+    fillcolor="#F1F1F1", color="#4A4A4A", penwidth=1.6,
+    margin="0.2,0.14"
+  ];
+  edge [
+    fontname="IBM Plex Sans JP", fontsize=11,
+    color="#343434", penwidth=1.4, arrowsize=0.9,
+    fontcolor="#171717"
+  ];
+
+  symptoms [
+    fillcolor="#FDE1EC", color="#AA3E6A",
+    label=<<b>症状</b><br align="left"/>発火したアラート<br align="left"/>>
+  ];
+
+  hypotheses [
+    fillcolor="#FFE9D6", color="#AB5A13",
+    label=<<b>仮説</b><br align="left"/>第一級の状態として保持<br align="left"/>証拠を指し示す<br align="left"/>>
+  ];
+
+  evidence [
+    fillcolor="#FFFCD7", color="#736B10",
+    label=<<b>証拠の収集</b><br align="left"/>Mimir、Loki、Tempo、Pyroscope<br align="left"/>>
+  ];
+
+  resolved [
+    shape=plain, style="",
+    label=<
+      <table border="0" cellborder="1" cellspacing="0" cellpadding="7" color="#AB5A13">
+        <tr><td align="left" bgcolor="#FFF5ED"><b>解決の4状態</b></td></tr>
+        <tr><td align="left" bgcolor="#FFE9D6">根本原因</td></tr>
+        <tr><td align="left" bgcolor="#FFE9D6">症状</td></tr>
+        <tr><td align="left" bgcolor="#FFE9D6">反証済み</td></tr>
+        <tr><td align="left" bgcolor="#FFE9D6">判定不能</td></tr>
+      </table>>
+  ];
+
+  gate [
+    fillcolor="#E4E4E4", color="#4A4A4A",
+    label=<<b>結論のゲート</b><br align="left"/>全仮説が解決済みか<br align="left"/>引き金を特定したか<br align="left"/>>
+  ];
+
+  reviewer [
+    fillcolor="#F7DDFC", color="#9430A9",
+    label=<<b>レビュアーの走査</b><br align="left"/>独立した推論ステップ<br align="left"/>矛盾する発見を探す<br align="left"/>>
+  ];
+
+  report [
+    fillcolor="#D2F3DF", color="#038435",
+    label=<<b>レポート</b>>
+  ];
+
+  symptoms -> hypotheses;
+  hypotheses -> evidence;
+  evidence -> resolved;
+  resolved -> gate;
+  gate -> reviewer;
+  reviewer -> report;
+  gate -> hypotheses [style=dashed, color="#8A8A8A", constraint=false, headlabel="未解決なら戻す ", labeldistance=3.2, labelangle=-28];
+  reviewer -> hypotheses [style=dashed, color="#8A8A8A", constraint=false, headlabel="矛盾があれば戻す ", labeldistance=4.0, labelangle=-20];
+}

@@ -1,0 +1,61 @@
+// 記事「測ってみたら、モデルではなかった」用。
+// 51個のツール定義（約54,500トークン）を毎ターン渡す代わりに、
+// 2つの入口から必要な領域のマニュアルだけを読み込む。
+// マニュアルは元のツールの説明とJSONスキーマから生成する（第2の説明を保守しない）。
+digraph tool_facade {
+  graph [
+    fontname="IBM Plex Sans JP", fontsize=13,
+    rankdir=LR,
+    compound=true, splines=ortho,
+    nodesep=0.4, ranksep=0.6, pad=0.25,
+    bgcolor="white", newrank=true
+  ];
+  node [
+    fontname="IBM Plex Sans JP", fontsize=12,
+    shape=box, style="rounded,filled",
+    fillcolor="#F1F1F1", color="#4A4A4A", penwidth=1.6,
+    margin="0.2,0.14"
+  ];
+  edge [
+    fontname="IBM Plex Sans JP", fontsize=11,
+    color="#343434", penwidth=1.4, arrowsize=0.9,
+    fontcolor="#171717"
+  ];
+
+  before [
+    fillcolor="#FDE1EC", color="#AA3E6A",
+    label=<<b>置き換える前</b><br align="left"/><font face="JetBrains Mono">51</font> 個のツール定義<br align="left"/>約 <font face="JetBrains Mono">54,500</font> トークン<br align="left"/>毎ターン渡していた<br align="left"/>>
+  ];
+
+  facade [
+    fillcolor="#FFE9D6", color="#AB5A13",
+    label=<<b>2つの入口</b><br align="left"/><font face="JetBrains Mono">datasource_exec</font><br align="left"/><font face="JetBrains Mono">grafana_exec</font><br align="left"/>約 <font face="JetBrains Mono">504</font> トークン<br align="left"/>>
+  ];
+
+  commands [
+    shape=plain, style="",
+    label=<
+      <table border="0" cellborder="1" cellspacing="0" cellpadding="7" color="#736B10">
+        <tr><td align="left" bgcolor="#FFFEED"><b>4種のコマンド</b></td></tr>
+        <tr><td align="left" bgcolor="#FFFCD7"><font face="JetBrains Mono">list</font> 使える能力の木</td></tr>
+        <tr><td align="left" bgcolor="#FFFCD7"><font face="JetBrains Mono">search</font> 領域を探す</td></tr>
+        <tr><td align="left" bgcolor="#FFFCD7"><font face="JetBrains Mono">load</font> マニュアルを読む</td></tr>
+        <tr><td align="left" bgcolor="#FFFCD7"><font face="JetBrains Mono">operation</font> 実行する</td></tr>
+      </table>>
+  ];
+
+  manual [
+    fillcolor="#F7DDFC", color="#9430A9",
+    label=<<b>領域のマニュアル</b><br align="left"/>元の説明とスキーマから生成<br align="left"/>必須フィールド、列挙値、例<br align="left"/>>
+  ];
+
+  filtered [
+    fillcolor="#D2F3DF", color="#038435",
+    label=<<b>権限と可用性で絞る</b><br align="left"/>使えないものは<br align="left"/>木にも現れない<br align="left"/>>
+  ];
+
+  before -> facade [style=dashed, color="#8A8A8A"];
+  facade -> commands;
+  commands -> manual;
+  manual -> filtered;
+}
