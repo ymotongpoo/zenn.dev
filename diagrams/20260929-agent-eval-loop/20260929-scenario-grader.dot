@@ -54,13 +54,13 @@ digraph scenario_grader {
 
     impl [
       fillcolor="#F7DDFC", color="#9430A9",
-      label=<<b>エージェント</b><br align="left"/>プロンプト<br align="left"/>ルーティングのロジック<br align="left"/>ツールの定義<br align="left"/>モデル<br align="left"/>>
+      label=<<b>エージェント</b><br align="left"/>プロンプトとルーティング<br align="left"/>ツール定義とモデル<br align="left"/>>
     ];
   }
 
   evidence [
     fillcolor="#FFFCD7", color="#736B10",
-    label=<<b>判定の根拠</b><br align="left"/>ツールの引数<br align="left"/>クエリの構造<br align="left"/>保存された Grafana の状態<br align="left"/>環境から取れる事実<br align="left"/>>
+    label=<<b>判定の根拠</b><br align="left"/>ツールの引数、クエリの構造<br align="left"/>保存された Grafana の状態<br align="left"/>>
   ];
 
   verdict [

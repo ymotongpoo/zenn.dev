@@ -8,10 +8,13 @@
 // 4つのコマンド（list/search/load/operation）は grafana_exec のものであり、
 // datasource_exec は別の構文を持つ。両入口の後ろに同じ4コマンド表を置くと
 // 構文を混同させるので、grafana_exec の側にだけコマンド体系を示す。
+//
+// 縦組み（TB）にする。横組みでは1898px になり、本文幅（約700px）に対して
+// 広すぎて文字が読めない（査読 R-20）。
 digraph tool_facade {
   graph [
     fontname="IBM Plex Sans JP", fontsize=13,
-    rankdir=LR,
+    rankdir=TB,
     compound=true, splines=ortho,
     nodesep=0.4, ranksep=0.55, pad=0.25,
     bgcolor="white", newrank=true

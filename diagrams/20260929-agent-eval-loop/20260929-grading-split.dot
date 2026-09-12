@@ -3,8 +3,9 @@
 // より高次の基準にはルーブリック付きの LLM-as-judge。
 // 「事実には構造的なチェックを、結論には意味的なチェックを」という教訓を図にする。
 //
-// 各方法の性質（速い・再現できる／基準ごとに答えさせる）は、
-// 注記だけの浮きノードにせず本文とキャプションに委ねる。
+// 各方法の性質と、判定に使う問いの具体例は本文の表に置く。
+// 図に3行ずつ並べると表と重複し、ノード内が規範の「名前＋1〜2行」を
+// 超える（査読 R-20）。
 digraph grading_split {
   graph [
     fontname="IBM Plex Sans JP", fontsize=13,
@@ -32,17 +33,17 @@ digraph grading_split {
 
   det [
     fillcolor="#D2F3DF", color="#038435",
-    label=<<b>決定的なチェック</b><br align="left"/>正しいツールを呼んだか<br align="left"/>正しい引数を渡したか<br align="left"/>期待するクエリの形を作ったか<br align="left"/>>
+    label=<<b>決定的なチェック</b><br align="left"/>ツール呼び出しと引数を照合<br align="left"/>>
   ];
 
   sem [
     fillcolor="#F7DDFC", color="#9430A9",
-    label=<<b>ルーブリック付きの判定</b><br align="left"/>正しいサービスを特定したか<br align="left"/>具体的な結果を提示したか<br align="left"/>説明を出力に接地させたか<br align="left"/>>
+    label=<<b>ルーブリック付きの判定</b><br align="left"/>基準ごとに個別に答えさせる<br align="left"/>>
   ];
 
   score [
     fillcolor="#FFFCD7", color="#736B10",
-    label=<<b>品質、コスト、レイテンシ</b><br align="left"/>3回の実行をまとめて記録<br align="left"/>ベースラインとの差を見る<br align="left"/>>
+    label=<<b>品質、コスト、レイテンシ</b><br align="left"/>各実行の値を記録<br align="left"/>ベースラインとの差を見る<br align="left"/>>
   ];
 
   trajectory -> det [xlabel="事実 "];
