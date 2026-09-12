@@ -1,0 +1,83 @@
+// 記事「インシデント調査エージェントの品質を動かしたのはツールとプロンプトだった」用。
+// アリーナの周回。原典の図（Enter the arena の "Investigations Arena"）を
+// 本記事の用語と配色で描き直したもの。
+//
+// 出典: William Dumont「Enter the arena」
+//
+// 原典との違い:
+//   - ノードのラベルを本文の用語に合わせて日本語化した
+//   - 破線の「Add more test cases」は、周回の本筋（実線）とは別の経路
+//     （スイートそのものを育てる流れ）なので、規範どおり破線のまま残す
+//   - 原典は左上の「Build test cases」へ戻る曲線だが、ここでは
+//     splines=ortho の直角配線にする
+//
+// 周回4段を rank=same で一列に並べ、テストケースの構築を左に置く。
+// 「更新したエージェントで再実行」の戻りは周回の本筋なので実線。
+// 「ケースを追加」はスイートを育てる別の流れなので破線にする。
+//
+// 辺のラベルは付けない（クラスタをまたぐ辺は枠線を跨ぐため）。
+// 矢印の意味はキャプションで宣言する。
+digraph arena_loop {
+  graph [
+    fontname="IBM Plex Sans JP", fontsize=13,
+    rankdir=TB,
+    compound=true, splines=ortho,
+    nodesep=0.4, ranksep=0.75, pad=0.25,
+    bgcolor="white", newrank=true
+  ];
+  node [
+    fontname="IBM Plex Sans JP", fontsize=12,
+    shape=box, style="rounded,filled",
+    fillcolor="#F1F1F1", color="#4A4A4A", penwidth=1.6,
+    margin="0.2,0.14"
+  ];
+  edge [
+    fontname="IBM Plex Sans JP", fontsize=11,
+    color="#343434", penwidth=1.4, arrowsize=0.9,
+    fontcolor="#171717"
+  ];
+
+  build [
+    label=<<b>テストケースを作る</b><br align="left"/>解決済みの実インシデントから<br align="left"/>>,
+    fillcolor="#FFFCD7", color="#736B10"
+  ];
+
+  subgraph cluster_loop {
+    graph [
+      label=<<b>1週間の反復</b>>,
+      labeljust="l",
+      style="rounded", color="#AB5A13", penwidth=1.6,
+      margin=16, bgcolor="#FFF5ED",
+      fontcolor="#783F0E"
+    ];
+
+    run [
+      label=<<b>複数のビルドを走らせる</b><br align="left"/>同じケースに対して<br align="left"/>>,
+      fillcolor="#FFE9D6", color="#AB5A13"
+    ];
+    score [
+      label=<<b>採点して比べる</b><br align="left"/>トランスクリプトを<br align="left"/>基準ごとに判定<br align="left"/>>,
+      fillcolor="#FFE9D6", color="#AB5A13"
+    ];
+    find [
+      label=<<b>改善点を見つける</b><br align="left"/>一度に1つの因子だけ<br align="left"/>>,
+      fillcolor="#FFE9D6", color="#AB5A13"
+    ];
+
+    { rank=same; run; score; find; }
+    run -> score;
+    score -> find;
+  }
+
+  update [
+    label=<<b>エージェントを更新する</b><br align="left"/>ツールとプロンプトを変える<br align="left"/>>,
+    fillcolor="#E4E4E4", color="#4A4A4A"
+  ];
+
+  { rank=same; build; run; score; find; }
+
+  build -> run;
+  find -> update;
+  update -> run [constraint=false];
+  update -> build [style=dashed, color="#8A8A8A", constraint=false];
+}

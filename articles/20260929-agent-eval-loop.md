@@ -245,7 +245,7 @@ checks:
 
 その隙間を埋めるために、記事のチームは本番の会話を採点して分析する仕組みを作りました。それが [Grafana Cloud](https://grafana.com/products/cloud/) の AI Observability につながった、と原文は述べています。オフラインの評価ループに対応するオンライン評価の側という位置づけです。
 
-この機能はその後 [Agent Observability](https://grafana.com/docs/grafana-cloud/observe-and-act/agent-observability/) に改名されています。ツール使用から評価、ガードレールまでエージェントのライフサイクル全体を覆うようになったため名前を追いつかせた、と[改名の告知](https://grafana.com/whats-new/2026-07-22-ai-observability-is-now-agent-observability--updated-branding-and-migration-guide/)に説明されています。
+この機能はその後 [Agent Observability](https://grafana.com/docs/grafana-cloud/observe-and-act/agent-observability/) に改名されています。ツール使用から評価、ガードレールまでエージェントのライフサイクル全体を対象にするようになったため名前を追いつかせた、と[改名の告知](https://grafana.com/whats-new/2026-07-22-ai-observability-is-now-agent-observability--updated-branding-and-migration-guide/)に説明されています。
 
 これはベンチマークだけでは得られないものを与えます。ユーザーが実際に不満を感じている箇所と、実務で問題になる失敗がどれかという視点です。記事に挙げられた読み方が具体的で参考になります。アラートに関するシナリオはスイートでは通るのに、アラートに関する会話が本番では低く評価されるなら、スイートが何か重要なものを取りこぼしていることを意味します。逆に、ベンチマークで見えた退行が本番の品質データに現れないなら、ユーザーがそこまで価値を置いていない何かを、自分たちが重く見すぎている可能性があります。
 
