@@ -6,7 +6,13 @@
 //
 // 色はブランドパレットに従う。周回の3段は主系列（Orange）、人間の判断は中立（Neutral）。
 // 規範: クラスタをまたぐ辺にラベルを付けない（枠線を跨ぐため）。
-// 各段の具体的な作業内容は本文に置き、図はノード名＋1〜2行に留める。
+//
+// 戻りの破線は、始点(human)がクラスタ外・終点(evaluate)がクラスタ内のため
+// dot は既定では枠の内側を這う経路を引く。対策を2つ重ねている:
+//   1. lhead=cluster_auto で破線を枠の外側で止める（内側通過を解消）
+//   2. human の左に不可視スペーサーを置き rank=same で human を右へ寄せて、
+//      破線が枠から離れた位置を通るようにする（枠との距離 1.2pt → 11.1pt）
+// cluster の margin を広げる方法では内側を這う問題が解決しないため使わない。
 digraph eval_loop {
   graph [
     fontname="IBM Plex Sans JP", fontsize=13,
@@ -53,11 +59,19 @@ digraph eval_loop {
     learn -> change;
   }
 
+  spacer [style=invis, shape=point, width=0.4, height=0.01, label=""];
+
   human [
     label=<<b>人間が決める</b><br align="left"/>採用するか退行として扱うか<br align="left"/>>,
     fillcolor="#E4E4E4", color="#4A4A4A"
   ];
 
+  { rank=same; spacer; human; }
+  spacer -> human [style=invis, minlen=0];
+
   change -> human;
-  human -> evaluate [style=dashed, color="#8A8A8A", constraint=false];
+  human -> evaluate [
+    style=dashed, color="#8A8A8A", constraint=false,
+    lhead=cluster_auto
+  ];
 }
