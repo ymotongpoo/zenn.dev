@@ -45,7 +45,7 @@ digraph arena {
 
   backends [
     fillcolor="#FFFCD7", color="#736B10",
-    label=<<b>可観測性のバックエンド</b><br align="left"/>エンジニアが使うものと同じ<br align="left"/>コードへのアクセスも与える<br align="left"/>>
+    label=<<b>オブザーバビリティのバックエンド</b><br align="left"/>エンジニアが使うものと同じ<br align="left"/>コードへのアクセスも与える<br align="left"/>>
   ];
 
   subgraph cluster_variants {
