@@ -10,13 +10,9 @@ published: false
 
 AIエージェントにオブザーバビリティの仕事をさせたとき、その答えが良くなったのか悪くなったのかを、どうやって知るのでしょうか。
 
-答えを読んで判断する、という方法は早い段階で行き詰まります。エージェントの出力は自然言語なので、正しい答えと、正しく見えるだけの答えが同じ見た目をしています。しかも同じ質問に毎回同じ答えが返るわけでもありません。テストを書こうとすると、期待値を文字列で固定できないという壁にぶつかります。
+答えを読んで判断する方法は早い段階で行き詰まります。正しい答えと、正しく見えるだけの答えが同じ見た目をしているからです。しかも同じ質問に毎回同じ答えが返るわけでもなく、期待値を文字列で固定したテストは書けません。
 
-この記事では、その壁をどう越えるかを扱います。要点を先に書くと3つです。評価の対象を最終的な答えから、そこに至る手順の全体に移すこと。何を正解とするかを文字列ではなく、実際にデータから取得できる事実として定義すること。そして採点する仕組み自体が劣化するので、それを保守する対象として扱うこと。
-
-素材にするのは Grafana Labs の公開情報です。Grafana Cloud には [Grafana Assistant](https://grafana.com/docs/grafana-cloud/machine-learning/assistant/) というエージェントが組み込まれています。メトリクスを問い合わせ、ログとトレースを探索し、ダッシュボードを作り、自然言語で Grafana を操作します。それを開発しているチームは、評価の仕組みを作った経緯と、そこで見つけたことを公式のエンジニアリングブログで公開しています。この記事では [Building an evaluation loop for Grafana Assistant](https://medium.com/grafana-labs/building-an-evaluation-loop-for-grafana-assistant-9a8690d8662d)（Yasir Ekinci、2026年4月30日）の内容を追いながら、エージェントの評価をどう組み立てるかを見ていきます。
-
-記事で語られている評価基盤は社内のものですが、同じ設計は [o11y-bench](https://github.com/grafana/o11y-bench) としてオープンソースで公開されています。後半では、そのリポジトリのシナリオ定義を実際に読んで、記事の主張がコードとしてどう実装されているかを確認します。
+素材にするのは、[Grafana Assistant](https://grafana.com/docs/grafana-cloud/machine-learning/assistant/) を開発しているチームが公式のエンジニアリングブログに書いた [Building an evaluation loop for Grafana Assistant](https://medium.com/grafana-labs/building-an-evaluation-loop-for-grafana-assistant-9a8690d8662d)（Yasir Ekinci、2026年4月30日）です。記事で語られている評価基盤は社内のものですが、同じ設計が [o11y-bench](https://github.com/grafana/o11y-bench) としてオープンソースで公開されているので、後半ではそのシナリオ定義を読んで実装を確認します。
 
 ## もっともらしく見える失敗
 

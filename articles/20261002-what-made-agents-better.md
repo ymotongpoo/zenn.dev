@@ -8,17 +8,15 @@ published: false
 
 ## この記事で扱うこと
 
-前編の[オブザーバビリティのAIエージェントをどう評価するか](https://zenn.dev/ymotongpoo/articles/20260929-agent-eval-loop)では、AIエージェントの振る舞いを評価する仕組みの作り方を追いました。シナリオを仕様として別に置き、グレーダーが実際に何が起きたかを判定する。事実には構造的なチェックを、結論には意味的なチェックを。そして最後に未解決の難所として、環境の忠実度が残りました。シミュレーションが多すぎれば実際の失敗を見落とし、実環境の変動が多すぎればベンチマークがノイズだらけになる、という緊張です。
+前編の[オブザーバビリティのAIエージェントをどう評価するか](https://zenn.dev/ymotongpoo/articles/20260929-agent-eval-loop)では、シナリオを仕様として別に置き、グレーダーが実際に何が起きたかを判定する形を追いました。最後に環境の忠実度が課題として残りました。シミュレーションが多すぎれば実際の失敗を見落とし、実環境の変動が多すぎればベンチマークがノイズだらけになるからです。
 
-この記事では、Grafana Assistant Investigations の開発チームが実インシデントを使った評価で何を改善したかを追います。この比較では、モデルの差し替えよりも、ツールとその使用を導くプロンプトの変更のほうが品質改善への寄与が大きかったと報告されています。
+この記事では、Grafana Assistant Investigations の開発チームが実インシデントを使った評価で何を改善したかを追います。そこでは、モデルの差し替えよりも、ツールとその使用を導くプロンプトの変更のほうが品質改善への寄与が大きかったと報告されています。前編が Assistant 全般の評価ループだったのに対し、こちらはインシデント調査用の評価事例です。考え方は共通しますが、同じ評価基盤やデータセットだと公開資料から確認できるわけではありません。
 
-前編は Assistant 全般の評価ループを扱いました。この記事はインシデント調査用の評価事例を扱います。評価の考え方は共通しますが、同じ評価基盤やデータセットだと公開資料から確認できるわけではありません。
-
-主に参照するのは、Grafana Labs のエンジニアが公式のエンジニアリングブログに書いた4本の署名記事です。[Enter the arena](https://medium.com/grafana-labs/enter-the-arena-evaluating-and-improving-grafana-assistant-investigations-against-real-incidents-d0a813404ad2)（William Dumont、2026年7月15日）、[Inside the harness](https://medium.com/grafana-labs/inside-the-harness-how-grafana-assistant-investigates-incidents-9a982b8ff01d)（Alexander Sniffin、2026年6月9日）、[Progressive tool discovery](https://medium.com/grafana-labs/progressive-tool-discovery-battling-tool-overload-in-ai-agents-418fb0b4cd76)（Cyril Tovena、2026年8月27日）、[CLIs in the age of agents](https://medium.com/grafana-labs/clis-in-the-age-of-agents-how-we-designed-gcx-cdfca8954b30)（Ward Bekker、2026年7月28日）。加えて、公開されているベンチマークのリーダーボードを筆者が集計した結果を1つ挟みます。
+主に参照するのは、Grafana Labs のエンジニアが公式のエンジニアリングブログ Unprompted に書いた4本の署名記事です。インシデント調査の評価、ハーネスの設計、ツール定義の圧縮、CLIの設計を扱ったもので、著者と公開日は末尾の出典にまとめました。加えて、公開されているベンチマークのリーダーボードを筆者が集計した結果を1つ挟みます。
 
 ## 合成環境と実インシデントの差
 
-[Grafana Assistant Investigations](https://grafana.com/docs/grafana-cloud/machine-learning/assistant/) は、インシデントの根本原因の候補を出すエージェントです。発火したアラートを読み、テレメトリーを問い合わせ、見つけたものを相関させ、原因を提案します。オンコールのエンジニアがやることと同じ手順です。
+William Dumont の [Enter the arena](https://medium.com/grafana-labs/enter-the-arena-evaluating-and-improving-grafana-assistant-investigations-against-real-incidents-d0a813404ad2) から見ていきます。[Grafana Assistant Investigations](https://grafana.com/docs/grafana-cloud/machine-learning/assistant/) は、インシデントの根本原因の候補を出すエージェントです。発火したアラートを読み、テレメトリーを問い合わせ、見つけたものを相関させ、原因を提案します。オンコールのエンジニアがやることと同じ手順です。
 
 このツールを作り始めたチームが最初に学んだのは、答えを出すこと自体は難しい部分ではないということでした。難しいのは、その答えが良いかどうかを知ること、そして提案に従って行動する気になる程度に一貫してその品質を出せるかを知ることです。
 
@@ -126,7 +124,7 @@ Opus 4.7 と 4.6 では、推論を切ったほうが一貫性が高く、しか
 
 ## 指示ではなく構造による強制
 
-ツールとプロンプトが改善に寄与すると分かったら、次はそれを動かすハーネスの設計です。ここからは2026年6月の記事に戻って、Assistant Investigations のハーネスを書いたエンジニアの説明を見ます。
+ツールとプロンプトが改善に寄与すると分かったら、次はそれを動かすハーネスの設計です。ここからは2026年6月の記事に戻って、Alexander Sniffin の [Inside the harness](https://medium.com/grafana-labs/inside-the-harness-how-grafana-assistant-investigates-incidents-9a982b8ff01d) を見ます。
 
 インシデント調査に固有の失敗の形が、冒頭で名付けられています。LLMはインシデントで自信のある根本原因の答えを出すのは得意だが、その答えが間違っていると気づくのはそれほど得意ではない、というものです。前編で見た「もっともらしく見える失敗」が、時間の切迫したインシデント対応で現れる形だと言えます。
 
@@ -166,7 +164,7 @@ Opus 4.7 と 4.6 では、推論を切ったほうが一貫性が高く、しか
 
 ## ツールの説明文と段階的な発見
 
-「ツールとプロンプトによる改善」の節では、誤った使用ガイドを直した例を見ました。ここからは、ツールの説明を必要なときに読み込ませる別の設計例を扱います。説明を実際の能力に合わせるという点は共通しますが、前の失敗からこの設計が生まれたと原文に書かれているわけではありません。
+「ツールとプロンプトによる改善」の節では、誤った使用ガイドを直した例を見ました。ここからは Cyril Tovena の [Progressive tool discovery](https://medium.com/grafana-labs/progressive-tool-discovery-battling-tool-overload-in-ai-agents-418fb0b4cd76) を素材に、ツールの説明を必要なときに読み込ませる別の設計例を扱います。説明を実際の能力に合わせるという点は共通しますが、前の失敗からこの設計が生まれたと原文に書かれているわけではありません。
 
 Assistant が扱える範囲は広く、Prometheus、Loki、Tempo、アラート、IRM、Fleet Management、k6、Agent Observability などに及びます。それぞれが自分の操作とスキーマを持つため、全部をモデルに毎ターン渡すとトークンを消費し、ツールの選択が難しくなり、しかも現在のユーザーには使えない能力まで宣伝してしまいます。
 
