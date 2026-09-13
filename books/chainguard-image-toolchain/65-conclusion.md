@@ -2,7 +2,7 @@
 title: "おわりに"
 ---
 
-本書は、Dockerfileベースのイメージビルドが抱える再現性とSBOMの課題（2章）から始まり、Wolfi（3章）、melange（4章と5章）、apko（6章と7章）というChaiguardスタックの解説、Chainguard Imagesの実運用（9章）まで辿ってきました。
+本書は、Dockerfileベースのイメージビルドが抱える再現性とSBOMの課題（2章）から始まり、Wolfi（3章）、melange（4章と5章）、apko（6章と7章）というChainguardスタックの解説、Chainguard Imagesの実運用（9章）まで辿ってきました。
 
 ## どこから始めるか
 
@@ -14,4 +14,4 @@ title: "おわりに"
 
 ## 本書の範囲を超えて
 
-本書では扱いませんでしたが、Chainguardはmelangeとapkoに加えて、脆弱性情報を追跡する[Grype](https://github.com/anchore/grype)やSBOMの生成や検証を行うツールなど、周辺のOSSも公開しています。またBazelモノレポでアプリケーションを管理しているチーム向けには、9章で触れた[rules_apko](https://github.com/chainguard-dev/rules_apko)というBazel rulesも存在します。Wolfiのパッケージ定義自体も[wolfi-dev/os](https://github.com/wolfi-dev/os)で公開されており、実際のパッケージ定義がどう書かれているかを読むことは、melangeの`pipeline`をより実践的に理解する近道になります。本書がその入り口として役立てば幸いです。
+本書では扱いませんでしたが、Chainguardはmelangeとapkoに加えて、脆弱性情報を追跡する[Grype](https://github.com/anchore/grype)やSBOMの生成や検証を行うツールなど、周辺のOSSも公開しています。またBazelモノレポでアプリケーションを管理しているチーム向けには、9章で触れた[rules_apko](https://github.com/chainguard-dev/rules_apko)というBazel rulesも存在します。Wolfiのパッケージ定義自体も[wolfi-dev/os](https://github.com/wolfi-dev/os)で公開されており、実際のパッケージ定義がどう書かれているかを読むことは、melangeの`pipeline`をより実践的に理解する近道になります。本書がそのための手がかりとして役立てば幸いです。

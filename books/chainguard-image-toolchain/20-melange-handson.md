@@ -61,7 +61,7 @@ docker run --privileged --rm -v "${PWD}":/work \
   --arch x86_64 --signing-key melange.rsa
 ```
 
-`--privileged`はコンテナ内でmelangeがサンドボックス（既定では`bubblewrap`）を構成するために必要です。ビルドが成功すると、カレントディレクトリの`packages/x86_64/`以下に、署名済みの`hello-2.12-r0.apk`と、リポジトリの索引ファイルである`APKINDEX.tar.gz`が生成されます。
+`--privileged`はコンテナ内でmelangeがサンドボックス（デフォルトでは`bubblewrap`）を構成するために必要です。ビルドが成功すると、カレントディレクトリの`packages/x86_64/`以下に、署名済みの`hello-2.12-r0.apk`と、リポジトリの索引ファイルである`APKINDEX.tar.gz`が生成されます。
 
 ## 生成物を確認する
 

@@ -29,7 +29,7 @@ Chainguardは2021年10月に、Dan Lorenc、Matt Moore、Kim Lewandowski、Ville
 - **melange**（[chainguard-dev/melange](https://github.com/chainguard-dev/melange)）：ソースコードをビルドし、Alpine Linux由来のパッケージ形式であるAPKを生成するツールです。
 - **apko**（[chainguard-dev/apko](https://github.com/chainguard-dev/apko)）：APKパッケージだけをつかって、Dockerfileを使わずにOCIコンテナイメージを組み立てるツールです。
 
-これに加えて、[**Wolfi**](https://github.com/wolfi-dev/os)というChainguardが管理するLinuxディストリビューションが土台となります。Wolfiのパッケージ群はすべてmelangeでビルドされており、apkoはこのWolfiのAPKリポジトリを主要な材料として使います。
+これに加えて、[**Wolfi**](https://github.com/wolfi-dev/os)というChainguardが管理するLinuxディストリビューションが前提となります。Wolfiのパッケージ群はすべてmelangeでビルドされており、apkoはこのWolfiのAPKリポジトリを主要な材料として使います。
 
 図1に、ソースコードからコンテナイメージが公開されるまでの流れを示します。
 

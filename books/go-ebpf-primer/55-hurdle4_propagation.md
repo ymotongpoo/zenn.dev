@@ -8,7 +8,7 @@ title: "難所4　プロセスをまたぐコンテキスト伝搬"
 
 ## SDK計装での1行
 
-普通のGo開発者が書く計装は、次の数行で済みます。OpenTelemetryのSDKでトレーサと伝搬の形式を設定しておけば、あとはHTTPクライアントのTransportを差し替えるだけです。伝搬の形式は既定では選ばれていないので、`otel.SetTextMapPropagator(propagation.TraceContext{})` を一度呼んでおく必要があります。
+普通のGo開発者が書く計装は、次の数行で済みます。OpenTelemetryのSDKでトレーサと伝搬の形式を設定しておけば、あとはHTTPクライアントのTransportを差し替えるだけです。伝搬の形式はデフォルトでは選ばれていないので、`otel.SetTextMapPropagator(propagation.TraceContext{})` を一度呼んでおく必要があります。
 
 ```go
 client := &http.Client{
@@ -327,7 +327,7 @@ HTTP/1.1のリクエストは、ただの1本の文字列です。ヘッダは1�
 
 > On Linux 5.10 and later, OBI requires effective `CAP_SYS_ADMIN` and kernel lockdown mode `[none]` to use `bpf_probe_write_user`.
 
-kernel lockdownが有効な環境やSecure Bootの下では、このヘルパーが使えません。コード側にも `g_bpf_probe_write_user_enabled` というフラグがあり、使えない環境では上記の処理ごと素通りします。
+kernel lockdownが有効な環境やSecure Bootの下では、このヘルパーが使えません。コード側にも `g_bpf_probe_write_user_enabled` というフラグがあり、使えない環境では上記の処理ごと実行されずに通過します。
 
 ただし、そこでコンテキスト伝搬が消えるわけではありません。OBIには第2の経路があります。同じ関数のすぐ下にあるコメントが、それを説明しています。
 
@@ -348,7 +348,7 @@ kernel lockdownが有効な環境やSecure Bootの下では、このヘルパー
 
 [^obi-devdocs]: OBIリポジトリの `devdocs/context-propagation.md` と `devdocs/grpc-context-propagation.md` に、2経路の使い分けと排他制御の設計がまとまっています。
 
-送信されるバイト列に後から差し込むこの経路も、狙いを外せば観測対象を壊します。`v0.13.0` は `bpf/tpinjector/` のメモリ安全性の不具合を3件修正しました。前のリクエストがバッファに残したデータに対して注入が走り、TLSのストリームの途中に `traceparent` を書き込んで接続をリセットしてしまうもの（[#3257](https://github.com/open-telemetry/opentelemetry-ebpf-instrumentation/pull/3257)）、メッセージバッファの読み取りがマップされた範囲を超え、取得に失敗したときに無関係なカーネルメモリをスパンの中身として持ち出してしまうもの（[#3298](https://github.com/open-telemetry/opentelemetry-ebpf-instrumentation/pull/3298)）、そして充填に失敗したバッファを無効化せず、前のメッセージを現在のものと取り違えるもの（[#3304](https://github.com/open-telemetry/opentelemetry-ebpf-instrumentation/pull/3304)）です。アプリのメモリに触らない経路であっても、送信の途中に割り込む以上、正確さの要求は変わりません。
+送信されるバイト列に後から差し込むこの経路も、狙いを外せば観測対象を壊します。`v0.13.0` は `bpf/tpinjector/` のメモリ安全性の不具合を3件修正しました。前のリクエストがバッファに残したデータに対して注入が走り、TLSのストリームの途中に `traceparent` を書き込んで接続をリセットしてしまうもの（[#3257](https://github.com/open-telemetry/opentelemetry-ebpf-instrumentation/pull/3257)）、メッセージバッファの読み取りがマップされた範囲を超え、取得に失敗したときに無関係なカーネルメモリをスパンの中身として持ち出してしまうもの（[#3298](https://github.com/open-telemetry/opentelemetry-ebpf-instrumentation/pull/3298)）、そして充填に失敗したバッファを無効化せず、前のメッセージを現在のものと混同するもの（[#3304](https://github.com/open-telemetry/opentelemetry-ebpf-instrumentation/pull/3304)）です。アプリのメモリに触らない経路であっても、送信の途中に割り込む以上、正確さの要求は変わりません。
 
 1つ目が動いたときは、同じヘッダが二重に入らないよう、2つ目が対象を飛ばすようにマップの登録を消しています。同じ名前のヘッダが2つ届いたとき、受信側がどう扱うかは実装に委ねられています。HTTPの規則はカンマで1つの値に結合することを許していますが、義務ではありません。Goの `net/http` は2つの値を保ったまま `Header.Get` で最初の1つを返すので、この場合は先に書かれたほうが採用されます。一方、結合されて `traceparent: A,B` という値になると、W3C Trace Contextの定める形式に合わなくなり、受信側はトレースを作り直します。つまり二重注入は「余分」では済まず、どちらの文脈が下流へ伝わるかが受信側の実装次第になります。だからOBIは、2つの経路が同じ送信に対して走らないよう調停しています。
 

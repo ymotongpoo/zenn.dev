@@ -32,7 +32,7 @@ archs:
 
 `repositories`にはWolfiの公開リポジトリと、5章でmelangeが出力したローカルの`./packages`ディレクトリの両方を指定しています。ローカルリポジトリには`@local`という名前を付け、`packages`欄では`hello@local`のように名前付きリポジトリを明示してパッケージを指定します。`keyring`にはWolfi公式の署名鍵と、5章で自分が生成した`melange.rsa.pub`の両方を並べます。ローカルでビルドしたAPKも、Wolfiの公開パッケージと同様に署名検証の対象になるためです。
 
-`accounts.run-as`にUIDを指定すると、コンテナはrootではなくそのUIDで実行されます。多くのChainguard Imagesも、既定の実行ユーザーを非rootに設定しています。
+`accounts.run-as`にUIDを指定すると、コンテナはrootではなくそのUIDで実行されます。多くのChainguard Imagesも、デフォルトの実行ユーザーを非rootに設定しています。
 
 ## イメージをビルドする
 

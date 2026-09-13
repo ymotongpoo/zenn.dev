@@ -75,7 +75,7 @@ v2 format:units:   err=json: cannot marshal from Go main.ConfigTagged: Go struct
 
 もっとも真剣に向き合ったのは [`bytedance/sonic`](https://github.com/bytedance/sonic) です。["feat: support Go 1.27" というプルリクエスト](https://github.com/bytedance/sonic/pull/957)で、2500行を超える変更が入っています。そこで作られたのが[互換性の対照表](https://github.com/bytedance/sonic/blob/main/docs/sonic-go127-compatibility.md)で、リポジトリに `docs/sonic-go127-compatibility.md` として置かれています。
 
-対照表が比較しているのは3つです。sonic自身の標準互換モード、Go 1.27のv1（v2の上に載ったもの）、そして `GOEXPERIMENT=nojsonv2` で戻る旧v1。そこに直接のv2を加えた4者の差を記録しています。
+対照表が比較しているのは3つです。sonic自身の標準互換モード、Go 1.27のv1（v2の上に載ったもの）、そして `GOEXPERIMENT=nojsonv2` で戻る旧v1です。そこに直接のv2を加えた4者の差を記録しています。
 
 CIはGo 1.27をデフォルトと `nojsonv2` の両方で回すようになりました。「`encoding/json` と同じ結果を返す」という約束を維持するために、追いかける対象が増えています。
 

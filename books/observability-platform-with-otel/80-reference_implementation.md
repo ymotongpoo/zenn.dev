@@ -88,7 +88,7 @@ checkは、公式semconvへの依存をGit URLで解決して約3秒で成功し
 
 実測データはlive-checkで検査します。live-checkをOTLPの受信口として起動し、テレメトリーを生成する公式のテストツールtelemetrygenから、レジストリにない属性を含むスパンを送りました。`myteam.rogue.attr` はviolationとして報告され、`com.example.delivery.id` はviolationになりませんでした。ただし、`com.example.delivery.id` にはstabilityがdevelopmentであるという改善提案が付きます。
 
-live-checkをコンテナで動かす場合は、リスンアドレスを明示します。既定のままではコンテナ外から送ったテレメトリーが届かず、検査対象が0件のまま終了します。実測でも最初はこれに気付かず、違反0件の結果を得ていました。`registry/weaver.sh` は `--otlp-grpc-address 0.0.0.0` を指定しています。
+live-checkをコンテナで動かす場合は、リスンアドレスを明示します。デフォルトのままではコンテナ外から送ったテレメトリーが届かず、検査対象が0件のまま終了します。実測でも最初はこれに気付かず、違反0件の結果を得ていました。`registry/weaver.sh` は `--otlp-grpc-address 0.0.0.0` を指定しています。
 
 一方、依存先である公式レジストリの `service.name` や `network.peer.address` などもviolationになりました。live-checkが依存先を解決する範囲は追加調査が必要です。CIの合否に使う場合は、検出された違反を種類に応じて扱う必要があります。
 
@@ -100,7 +100,7 @@ agentはSupervisorから起動し、`opamp/remote-configs/remote.yaml` の変更
 
 存在しないprocessorを参照する設定を配ると、Supervisorは約1秒で起動失敗を検知し、FAILEDを報告しました。しかし、サーバーが適用済みハッシュと配布中のハッシュの違いだけを見て再送すると、FAILEDの後も同じ設定を送り続けます。そこで、FAILEDと報告されたハッシュを再送しない制御を `opamp/server/main.go` に実装しました。
 
-Supervisor側でも、`automatic_config_rollback` を有効にしていたにもかかわらず、0.159.0では前の設定へ自己復旧しませんでした。壊れた設定を「最後に動作した設定」として `last_working_remote_config.dat` へ永続化する挙動を、macOSとLinuxの両方で確認しています。FAILEDのまま30秒観測しても状態は変わりませんでした。サーバーから修正済みの設定を配り直すと復旧しました。
+Supervisor側でも、`automatic_config_rollback` を有効にしていたにもかかわらず、0.159.0では前の設定へ自己復旧しませんでした。起動に失敗した設定を「最後に動作した設定」として `last_working_remote_config.dat` へ永続化する挙動を、macOSとLinuxの両方で確認しています。FAILEDのまま30秒観測しても状態は変わりませんでした。サーバーから修正済みの設定を配り直すと復旧しました。
 
 filterで全スパンをdropする設定は起動に成功し、ステータスもAPPLIEDかつhealthyのままでした。50リクエストを送ってもTempoへ到達したトレースは0件で、ロールバックも発生しません。正常な設定を再配布すると復旧し、25リクエストから6トレースが到達しました。
 

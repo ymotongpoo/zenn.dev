@@ -25,7 +25,7 @@ COPY --from=builder /out/app /app
 ENTRYPOINT ["/app"]
 ```
 
-これをmelangeとapkoに置き換えると、ビルド段階はmelangeの`go/build`アクションが、`FROM scratch`以降はapkoが、それぞれ担当します。melangeの[examples/go-build.yaml](https://github.com/chainguard-dev/melange/blob/main/examples/go-build.yaml)を土台にすると、`melange.yaml`は次のようになります。
+これをmelangeとapkoに置き換えると、ビルド段階はmelangeの`go/build`アクションが、`FROM scratch`以降はapkoが、それぞれ担当します。melangeの[examples/go-build.yaml](https://github.com/chainguard-dev/melange/blob/main/examples/go-build.yaml)を参考にすると、`melange.yaml`は次のようになります。
 
 ```yaml
 package:
