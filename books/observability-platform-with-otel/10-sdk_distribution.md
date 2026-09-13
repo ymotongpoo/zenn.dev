@@ -74,7 +74,7 @@ defer func() {
 
 - OTLP exporterを構築する。エンドポイントの既定値は各環境のagent Collector（30章）に向ける
 - propagatorをW3C TraceContext（トレースの文脈を運ぶ標準のヘッダ形式）とBaggageの組み合わせに設定する
-- samplerの既定をParentBasedにする。間引きの主体はgateway側（30章）に寄せる
+- samplerの既定を `ParentBased(AlwaysSample)` にする。間引きの主体はgateway側（30章）に寄せる
 - 実行環境（Kubernetesやクラウドプロバイダー）のメタデータからresource属性を自動検出する
 - トレース、メトリクス、ログのproviderを構築してグローバルに登録する
 
@@ -82,7 +82,7 @@ defer func() {
 
 [^golog]: opentelemetry-goのモジュール構成とバージョンは[versions.yaml](https://github.com/open-telemetry/opentelemetry-go/blob/main/versions.yaml)で確認できます。
 
-サンプリングの既定値には、処理できる流量の前提が必要です。SDKがトレースの開始時に記録の可否を決める方式を**head sampling**、Collectorがトレースの完結後に決める方式を**tail sampling**と呼びます。ParentBasedは親スパンの決定に従い、親のないトレースは記録する設定です。この設定では、SDKはスパンを間引きません。
+サンプリングの既定値には、処理できる流量の前提が必要です。SDKがトレースの開始時に記録の可否を決める方式を**head sampling**、Collectorがトレースの完結後に決める方式を**tail sampling**と呼びます。ParentBasedは、親スパンの決定に従い、親がない場合にどう判定するかを別のsamplerに委ねる仕組みです。Go SDKの既定は `ParentBased(AlwaysSample)` で、親のないトレースは記録します。この既定のまま、上流から未サンプリングの親が渡ってこない限り、SDKはスパンを間引きません。外部からのリクエストを受けるサービスや、head samplingを併用する場合は、上流の判定が伝播してくることを前提に確認します。
 
 tail samplingへ判断を集約すると、エラーの有無やレイテンシを見て保存対象を選べます。ただし、すべてのスパンがアプリケーションからgatewayまで流れるため、SDK、agent、ネットワーク、gatewayの負荷は減りません。この構成を使えるのは、各区間が全スパンの流量を処理できる場合です。高流量のサービスでは、SDKのhead samplingで先に量を減らします。プラットフォームは、`OTEL_TRACES_SAMPLER` 環境変数を調整点として、どの段階で量を減らすかを決めます。
 
