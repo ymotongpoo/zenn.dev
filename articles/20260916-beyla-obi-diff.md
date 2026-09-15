@@ -15,11 +15,13 @@ published: false
 - 起動方法: `docker run --privileged --pid=host --network=host`、Prometheusエンドポイントを `curl` でスクレイプ
 :::
 
-## この記事で確かめること
+## はじめに
 
-[Grafana Beyla](https://github.com/grafana/beyla) は2025年にOpenTelemetryへ寄贈され、[OpenTelemetry eBPF Instrumentation](https://opentelemetry.io/ja/docs/zero-code/obi/)（以下OBI）という名前でCNCF側の開発が進んでいます。Beylaは廃止されたのではなく、OBIのダウンストリーム配布物として残りました。では今、両者を入れ替えると何が変わるのでしょうか。
+先日のGo Conferenceで[OpenTelemetry eBPF Instrumentation](https://opentelemetry.io/ja/docs/zero-code/obi/)（以下OBI）について発表し、その詳細を[Zennの本](https://zenn.dev/ymotongpoo/books/go-ebpf-primer)として公開しましたが、そもそもOBIがGrafana Labsが開発していたBeylaが元になっていることはあまり触れていませんでした。
 
-手元のLinuxで、記事執筆時点の最新である `otel/ebpf-instrument:v0.13.0` と `grafana/beyla:3.35.0` の両コンテナイメージを同じ条件で動かし、出力されたメトリクスと設定の受け付け方を比較しました。
+[Grafana Beyla](https://github.com/grafana/beyla) は2025年にOpenTelemetryへ[寄贈され](https://grafana.com/blog/opentelemetry-ebpf-instrumentation-beyla-donation/)、OpenTelemetry eBPF Instrumentationという名前でCNCF側の開発が進んでいます。その後、Beylaは廃止されたのではなく、OBIのダウンストリーム配布物として残りました。では今、両者を入れ替えると何が変わるのでしょうか。
+
+手元のLinuxで、記事執筆時点の最新版のOBIとBeylaの両コンテナイメージを同じ条件で動かし、出力されたメトリクスと設定の受け付け方を比較しました。
 
 ## TL;DR
 
@@ -27,16 +29,16 @@ published: false
 
 ## リポジトリの関係
 
-Beylaのリポジトリは、OBIのリポジトリをgitのサブモジュール `.obi-src` として取り込み、`go.mod` で `replace go.opentelemetry.io/obi => ./.obi-src` と差し替えています。つまりBeylaはOBIをライブラリとしてvendorした薄いラッパーです。分量にも出ます。
+Beylaのリポジトリは、OBIのリポジトリをgitのサブモジュール `.obi-src` として取り込み、`go.mod` で `replace go.opentelemetry.io/obi => ./.obi-src` と差し替えています。つまりBeylaはOBIをライブラリとしてvendorした薄いラッパーです。分量にもそれが表れています。
 
 | 項目 | OBI | Beyla | 差 |
 | --- | --- | --- | --- |
 | Goのコード行数（テスト、vendor、生成コードを除く） | 153,939 | 10,275 | Beylaは6.7% |
 | バイナリのサイズ（バイト） | 127,759,366 | 129,898,523 | 1.7%増 |
 
-Beyla 3.35.0が固定しているOBIのコミットは `861d907` で、OBIのタグ `v0.13.0` の2コミット後にあたります。リリースの向きは常に上流から下流で、Beylaのリリースノートは「Update OBI submodule to ...」という行の集まりが大半を占めます。
+Beyla 3.35.0が固定しているOBIのコミットは `861d907` で、OBIのタグ `v0.13.0` の2コミット後にあたります。リリースは常にOBIが上流で、Beylaのリリースノートは「Update OBI submodule to ...」というOBIの更新が大半です。
 
-Beyla側にしか存在しないGoパッケージを並べると、追加機能の重心が見えます。
+Beyla側にしか存在しないGoパッケージを並べると、追加機能の概要が見えてきます。
 
 | パッケージ | 役割 |
 | --- | --- |
@@ -63,9 +65,10 @@ Beyla側にしか存在しないGoパッケージを並べると、追加機能�
 | `target_info` の `telemetry_sdk_name` | `opentelemetry` | `beyla` |
 | `target_info` の `telemetry_distro_version` | `v0.13.0` | `unset` |
 
-接頭辞はOBIが `attr.VendorPrefix` などの変数として外部から差し替えられるように公開しているもので、Beylaは起動時に `beyla` へ上書きします。
+接頭辞はOBIが `attr.VendorPrefix` などの変数として外部から差し替えられるように公開しているもので、Beylaは起動時に `beyla` へ上書きします [^version-info] 。
 
-最後の行だけは意図した差ではなさそうです。`telemetry_distro_version` がBeylaでは `unset` になる一方、`beyla_build_info` は `version="v3.35.0"` を正しく持っているので、ビルド時のバージョン埋め込み自体は有効です。OBI側の `TelemetryDistroVersion` がパッケージ変数の初期化時にOBIの `buildinfo.Version` を写し取る一方、Beylaがその値を上書きするのは初期化より後の `OverrideOBIGlobalConfig` の中なので、写し取られた初期値の `unset` が残ります。ダッシュボードやアラートでこの属性を使っている場合は、Beylaでは値が入らないものとして扱う必要があります。
+[^version-info]: 最後の行だけは意図した差ではなさそうです。`telemetry_distro_version` がBeylaでは `unset` になる一方、`beyla_build_info` は `version="v3.35.0"` を正しく持っているので、ビルド時のバージョン埋め込み自体は有効です。OBI側の `TelemetryDistroVersion` がパッケージ変数の初期化時にOBIの `buildinfo.Version` を写し取る一方、Beylaがその値を上書きするのは初期化より後の `OverrideOBIGlobalConfig` の中なので、写し取られた初期値の `unset` が残ります。ダッシュボードやアラートでこの属性を使っている場合は、Beylaでは値が入らないものとして扱う必要があります。執筆時現在Issueとして登録されています。 https://github.com/open-telemetry/opentelemetry-ebpf-instrumentation/issues/3433
+
 
 ## Beylaだけが持つ機能
 
@@ -94,6 +97,10 @@ process_memory_virtual_bytes
 process_network_io_bytes_total
 ```
 
+名前のとおり、eBPFで取得したものではなくOS上のプロセスのシステムメトリクスです。実装は `/proc/<pid>/{stat,io,net/dev}` をデフォルト5秒ごとに読むポーリングで、gopsutilを使っています。ホスト全体のエージェントと違うのは、計装対象として選ばれたサービスのPIDだけにスコープが絞られる点です。ディスクIOの読み取りには権限が必要で、`processes.run_mode` を `unprivileged` にすると欠けます。
+
+`process_network_io_bytes_total` だけは扱いに注意が要ります。取得元の `/proc/<pid>/net/dev` はnetwork namespace単位のインタフェース統計なので、同じnamespaceに複数のプロセスがいると全員が同じ値を報告します。nginxのmasterとworker 4本は、いずれも送信25,221バイトを返しました。コンテナ内の `eth0` の値と一致しており、PIDごとに足し合わせるとnamespaceのトラフィックを重複して数えることになります。
+
 ### surveyモード
 
 `discovery.survey` は、プロセスを発見して言語を判定するだけで計装はせず、`survey_info` メトリクスとして対象の一覧を出す機能です。外部の自動計装基盤に「計装できる対象の台帳」を渡す用途を想定しています。同じYAMLを両者に読ませると、Beylaは `survey_info` を出し、OBIはこのキーを無視して通常の計装だけを行いました。
@@ -105,7 +112,7 @@ survey_info{...,job="nginx",service_name="nginx",source="beyla",...} 1
 
 ### Grafana製品への出力経路
 
-Beylaの設定には `grafana.otlp` セクションがあり、`cloud_zone` と `cloud_instance_id` と `cloud_api_key` を書くだけでGrafana CloudのOTLPエンドポイントとヘッダーが組み立てられます。OBIに同じセクションを含むYAMLを渡しても、未知のキーとして警告なしに捨てられ、エンドポイントはデフォルトのままでした。
+Beylaの設定には `grafana.otlp` セクションがあり、`cloud_zone` と `cloud_instance_id` と `cloud_api_key` を書くだけでGrafana CloudのOTLPエンドポイントとヘッダーが組み立てられます。OBIは汎用のeBPF計装ツールとして公開されているので、OTLPエンドポイントやその認証は標準の方式（OTLPエンドポイントURLを指定し、ヘッダーを組み立てた状態で設定に渡す）で行う必要があります。
 
 このほか、[Grafana Alloy](https://grafana.com/docs/alloy/latest/) にスパンを直接渡すレシーバー連携（`pkg/export/alloy`）、クラスターをまたぐサービスグラフを[Tempo](https://grafana.com/docs/tempo/latest/)側で組み立てるための接続スパン（`BEYLA_TOPOLOGY_SPANS=inter_cluster`）、GenAIのスパンだけを抽出して別のOTLP宛先へ送る経路（`BEYLA_GRAFANA_AI_*`）がBeyla側にあります。いずれもOBIのパイプラインの出力キューを購読する追加ノードとして実装されており、OBI本体には手を入れていません。
 
@@ -128,7 +135,7 @@ Beylaの設定には `grafana.otlp` セクションがあり、`cloud_zone` と 
 /shop/alpha /shop/bravo ...
 ```
 
-どちらも `/users/12345/orders/98` は `/users/*/orders/*` へ正しくまとめました。数値やハッシュらしいセグメントをワイルドカードにするヒューリスティクスは共通で、差は「見たことのない文字列セグメントが増え続けたときに打ち切るか」だけです。カーディナリティの上限を気にする環境ではBeylaのデフォルトのほうが安全側に寄っており、OBIで同じ挙動を得たい場合は `routes.unmatch: low-cardinality` を明示します。
+どちらも `/users/12345/orders/98` は `/users/*/orders/*` へ正しくまとめていました。数値やハッシュらしいセグメントをワイルドカードにするヒューリスティクスは共通で、差は「見たことのない文字列セグメントが増え続けたときに打ち切るか」だけです。カーディナリティの上限を気にする環境ではBeylaのデフォルトのほうが安全側に寄っており、OBIで同じ挙動を得たい場合は `routes.unmatch: low-cardinality` を明示します。
 
 自己計装を避けるためのデフォルトの除外パターンも異なります。OBIは `obi` と `otelcol*` を除外し、BeylaはこれにGrafana由来のプロセス名（`*beyla`、`*alloy`、`*prometheus-config-reloader`）とKubernetesの名前空間（`grafana-alloy`、`monitoring` など）、コンテナ名を加えます。
 
@@ -136,7 +143,7 @@ Beylaの設定には `grafana.otlp` セクションがあり、`cloud_zone` と 
 
 ## 設定ファイルの世代差
 
-いま両者の差がもっとも大きいのは設定ファイルの読み込みです。OBIはOpenTelemetryの宣言的設定に合わせたConfig v2（`file_format` と `extensions.obi` を持つ文書）をv0.11.0から読めます。検証と移行のサブコマンドも入っています。
+いま両者の差がもっとも大きいのは設定ファイルのバージョンです。OBIはOpenTelemetryの宣言的設定に合わせたConfig v2（`file_format` と `extensions.obi` を持つ文書）をv0.11.0から読めます。検証と移行のサブコマンドも入っています。
 
 ```
 $ docker run --rm -v /tmp/v2.yaml:/cfg.yaml otel/ebpf-instrument:v0.13.0 config validate /cfg.yaml
@@ -177,7 +184,7 @@ level=ERROR msg="wrong Beyla configuration"
   error="missing application discovery section or network metrics configuration."
 ```
 
-理由はBeylaの `cmd/beyla/main.go` に書かれています。v2のローダーがOBIの `internal/config/{schema,convert}` にあり、Goのinternalパッケージ規則はローカルの `replace` では回避できないため、OBI側が `pkg/` 以下に公開ローダーを出すまでBeylaはv1しか読めません。`beyla config validate` のようなサブコマンドも存在しません。
+理由はBeylaの `cmd/beyla/main.go` で確認できます。v2のローダーがOBIの `internal/config/{schema,convert}` にあり、Goのinternalパッケージ規則はローカルの `replace` では回避できないため、OBI側が `pkg/` 以下に公開ローダーを出すまでBeylaはv1しか読めません。`beyla config validate` のようなサブコマンドも存在しません。
 
 ## 埋め込み先としてのOBI
 
