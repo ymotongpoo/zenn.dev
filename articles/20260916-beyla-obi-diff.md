@@ -67,7 +67,7 @@ Beyla側にしか存在しないGoパッケージを並べると、追加機能�
 
 接頭辞はOBIが `attr.VendorPrefix` などの変数として外部から差し替えられるように公開しているもので、Beylaは起動時に `beyla` へ上書きします [^version-info] 。
 
-[^version-info]: 最後の行だけは意図した差ではなさそうです。`telemetry_distro_version` がBeylaでは `unset` になる一方、`beyla_build_info` は `version="v3.35.0"` を正しく持っているので、ビルド時のバージョン埋め込み自体は有効です。OBI側の `TelemetryDistroVersion` がパッケージ変数の初期化時にOBIの `buildinfo.Version` を写し取る一方、Beylaがその値を上書きするのは初期化より後の `OverrideOBIGlobalConfig` の中なので、写し取られた初期値の `unset` が残ります。ダッシュボードやアラートでこの属性を使っている場合は、Beylaでは値が入らないものとして扱う必要があります。執筆時現在Issueとして登録されています。 https://github.com/open-telemetry/opentelemetry-ebpf-instrumentation/issues/3433
+[^version-info]: 最後の行だけは意図した差ではなさそうです。`telemetry_distro_version` がBeylaでは `unset` になる一方、`beyla_build_info` は `version="v3.35.0"` を正しく持っているので、ビルド時のバージョン埋め込み自体は有効です。OBI側の `TelemetryDistroVersion` がパッケージ変数の初期化時にOBIの `buildinfo.Version` を写し取る一方、Beylaがその値を上書きするのは初期化より後の `OverrideOBIGlobalConfig` の中なので、写し取られた初期値の `unset` が残ります。ダッシュボードやアラートでこの属性を使っている場合は、Beylaでは値が入らないものとして扱う必要があります。この件は[修正](https://github.com/open-telemetry/opentelemetry-ebpf-instrumentation/pull/3434)がOBI本体にマージされましたが、執筆時点ではリリース済みのOBIにも、Beylaが取り込んでいるOBIにも入っていません。
 
 
 ## Beylaだけが持つ機能
