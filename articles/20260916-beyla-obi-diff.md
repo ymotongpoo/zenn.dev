@@ -1,9 +1,9 @@
 ---
-title: "Grafana BeylaとOpenTelemetry eBPF Instrumentation（OBI）の差分を実機で確かめる"
+title: "Grafana BeylaとOpenTelemetry eBPF Instrumentation（OBI）の差分は何か"
 emoji: "🔬"
 type: "tech"
-topics: ["OpenTelemetry", "eBPF", "grafana", "Observability", "beyla"]
-published: false
+topics: ["OpenTelemetry", "eBPF", "grafana", "Observability", "Beyla"]
+published: true
 ---
 
 :::message
@@ -202,6 +202,6 @@ Grafana CloudやAlloy、Tempoのサービスグラフと繋ぐなら、そのた
 
 ## おわりに
 
-Beylaは、OBIをライブラリとして取り込み、Grafanaの製品に繋ぐための出力経路といくつかの追加機能を足したディストリビューションです。計装の中身はOBIそのもので、独自に持っているのはGrafana CloudやAlloyへの接続、プロセスメトリクス、surveyモード、Kubernetes向けのSDK注入といった周辺部分に限られます。
+Beylaは、OBIをライブラリとして取り込み、Grafanaの製品に繋ぐための出力経路といくつかの追加機能を足したディストリビューションだということを確認しました。計装の中身はOBIそのもので、独自に持っているのはGrafana CloudやAlloyへの接続、プロセスメトリクス、surveyモード、Kubernetes向けのSDK注入といった周辺部分に限られます。
 
-開発はOBIが上流で、Beylaはサブモジュールを更新して追いかけています。OBIは2026年に1.0を目指して宣言的設定への移行やプロトコルの拡充を進める一方、Beylaはv1しか読めない設定ローダーのように追いついていない箇所を残しています。eBPF計装そのものに関心があるならOBIを見ておけば足り、Grafanaの製品と組み合わせるときにBeylaを選ぶ、という住み分けになっていくのだろうと見ています。
+開発はOBIが上流で、Beylaはサブモジュールを更新して追いかけています。OBIは2026年に1.0を目指して宣言的設定への移行やプロトコルの拡充を進める一方、Beylaはv1しか読めない設定ローダーのように追いついていない箇所を残しています。当面は、eBPF計装そのものに関心があるならOBIを見ておけば足り、Grafanaの製品と組み合わせるときにBeylaを選ぶ、という認識で良さそうです。
