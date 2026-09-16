@@ -6,7 +6,7 @@ SDKディストリビューションを用意しても、`Setup` を呼び出せ
 
 ## 計装の最低保証ライン
 
-コードを変更せずに計装する手法を、OpenTelemetryでは[**ゼロコード計装**](https://opentelemetry.io/docs/zero-code/)と呼びます。セルフサービス基盤では、ゼロコード計装を手動計装の代替ではなく、**計装の最低保証**として使います。開発チームが作業しなくてもHTTPやgRPCの入出力をトレースとメトリクスとして記録し、業務固有の情報が必要なサービスには手動計装を追加します。
+コードを変更せずに計装する手法を、OpenTelemetryでは[**ゼロコード計装**](https://opentelemetry.io/ja/docs/zero-code/)と呼びます。セルフサービス基盤では、ゼロコード計装を手動計装の代替ではなく、**計装の最低保証**として使います。開発チームが作業しなくてもHTTPやgRPCの入出力をトレースとメトリクスとして記録し、業務固有の情報が必要なサービスには手動計装を追加します。
 
 最低限のトレースが先にあれば、開発チームは不足している業務情報を具体的に判断できます。何も記録されていない状態では、どの計装から追加すべきかも判断できません。
 
@@ -33,7 +33,7 @@ GoのeBPF計装は、**OBI**（OpenTelemetry eBPF Instrumentation）で開発さ
 
 [^obi]: 2026年8月17日のv0.11.0ではGoのトレースAPIの自動計装が入り、従来 opentelemetry-go-instrumentation が担っていた領域を取り込みつつあります。プロジェクトの2026年の目標はstable 1.0です（[公式ブログ](https://opentelemetry.io/blog/2026/obi-goals/)）。
 
-ただし、eBPFによるGoバイナリの関数レベル計装には制約があります。goroutineとOSスレッドが一対一に対応しないため、リクエストの文脈を追跡しにくくなります。コンパイラの最適化で関数の構造が変わり、コンテキスト伝播のために実行中のプロセスのメモリへ書き込む操作にも危険が伴います。詳細は別の本「OpenTelemetry eBPF Instrumentationの舞台裏」で、CPUとメモリの仕組みから説明しています。本書では、GoのeBPF計装には取得できる情報の粒度と安定性に制約があることを前提に、配布方法を考えます。
+ただし、eBPFによるGoバイナリの関数レベル計装には制約があります。goroutineとOSスレッドが一対一に対応しないため、リクエストの文脈を追跡しにくくなります。コンパイラの最適化で関数の構造が変わり、コンテキスト伝搬のために実行中のプロセスのメモリへ書き込む操作にも危険が伴います。詳細は別の本「OpenTelemetry eBPF Instrumentationの舞台裏」で、CPUとメモリの仕組みから説明しています。本書では、GoのeBPF計装には取得できる情報の粒度と安定性に制約があることを前提に、配布方法を考えます。
 
 <!-- 公開後に books/go-ebpf-primer へのリンクをここに入れる -->
 
@@ -70,7 +70,7 @@ Goでは、eBPF、ビルド時、手動計装を選べます。次の表で、�
 
 ## Kubernetesでの配布
 
-Kubernetesでは、[OpenTelemetry Operator](https://opentelemetry.io/docs/platforms/kubernetes/operator/automatic/)が `Instrumentation` カスタムリソースを提供します。プラットフォームチームがクラスタに用意すれば、開発チームはPodにannotationを一つ付けて自動計装を有効化できます。
+Kubernetesでは、[OpenTelemetry Operator](https://opentelemetry.io/ja/docs/platforms/kubernetes/operator/automatic/)が `Instrumentation` カスタムリソースを提供します。プラットフォームチームがクラスタに用意すれば、開発チームはPodにannotationを一つ付けて自動計装を有効化できます。
 
 ```yaml
 apiVersion: opentelemetry.io/v1alpha1

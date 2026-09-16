@@ -63,7 +63,7 @@ AIエージェントには、スキーマを読む接続と、実データを読
 
 `weaver registry mcp` は、属性の意味を記録したレジストリを公開し、テレメトリーの実データは扱いません。実データは、バックエンド側のMCPサーバーから検索します。レジストリは組織内で広く共有できる定義情報ですが、本番テレメトリーにはテナント分離と監査が必要です。それぞれに別の認可を設定します。
 
-GenAI規約の専用リポジトリには、[MCPのセマンティック規約](https://github.com/open-telemetry/semantic-conventions-genai/blob/main/docs/gen-ai/mcp.md)（`mcp.*`）もあります。MCPの `params._meta` にW3C Trace Contextを載せて、トレースを伝播する方式が定義されています。これを使えば、AIエージェントが調査中に発行したクエリもトレースとして記録できます。
+GenAI規約の専用リポジトリには、[MCPのセマンティック規約](https://github.com/open-telemetry/semantic-conventions-genai/blob/main/docs/gen-ai/mcp.md)（`mcp.*`）もあります。MCPの `params._meta` にW3C Trace Contextを載せて、トレースを伝搬する方式が定義されています。これを使えば、AIエージェントが調査中に発行したクエリもトレースとして記録できます。
 
 調査用のAIエージェントには読み取り権限だけを与え、テナント分離はバックエンドの権限で強制し、アクセスを監査ログへ残します。人間と同じデータアクセス経路を使うことで、既存の認可と監査を再利用できます。
 

@@ -65,7 +65,7 @@ Tempoは起動後15秒から20秒ほど `/ready` を返さず、その間に届�
 $ for i in $(seq 30); do curl -s localhost:8080/checkout > /dev/null; done
 ```
 
-30リクエストのうち、Tempoへ保存されたのは7トレースでした。ゲートウェイのtail samplingは、エラーをすべて残し、正常系の10%を残す設定です。判定は確率的なので、保存されるトレース数は同じ条件でも回ごとに変わります。別の回では6トレース、macOSでの初回は2トレースでした。送信したリクエスト数と保存されたトレース数は一致しません。保存されたトレースから、次の項目を確認できます。
+30リクエストのうち、Tempoへ保存されたのは7トレースでした。ゲートウェイのテイルサンプリングは、エラーをすべて残し、正常系の10%を残す設定です。判定は確率的なので、保存されるトレース数は同じ条件でも回ごとに変わります。別の回では6トレース、macOSでの初回は2トレースでした。送信したリクエスト数と保存されたトレース数は一致しません。保存されたトレースから、次の項目を確認できます。
 
 - frontendとbackendのスパンが1本のトレースにつながっている。アプリケーション側の計装コードは `otelinit.Setup(ctx)` だけで、プロパゲーターの設定はどこにも書かれていない（2章）
 - リソース属性に、エージェントのリソース detectionが付けた `host.name` と、標準環境変数 `OTEL_RESOURCE_ATTRIBUTES` 経由の `deployment.environment.name` や `team.name` が入っている（2章、4章）
@@ -118,7 +118,7 @@ $ docker compose -f ../../deploy/docker-compose.yaml stop uninstrumented
 $ OTEL_SERVICE_NAME=legacy-otelc OTEL_EXPORTER_OTLP_ENDPOINT=http://localhost:4318 ./legacy-instrumented
 ```
 
-`otelc pin` は初回に実行し、計装用の依存を `otel.instrumentation.go` と `go.mod` へ書き出します。以降は `go build` を `otelc go build` に置き換えます。生成されたバイナリは約25MBで、計装ランタイムを含みます。起動ログには「trace provider initialized with auto-export」「runtime metrics enabled」と出力され、100リクエストから、tail samplingを通過した11トレースがTempoへ届きました。
+`otelc pin` は初回に実行し、計装用の依存を `otel.instrumentation.go` と `go.mod` へ書き出します。以降は `go build` を `otelc go build` に置き換えます。生成されたバイナリは約25MBで、計装ランタイムを含みます。起動ログには「trace provider initialized with auto-export」「runtime metrics enabled」と出力され、100リクエストから、テイルサンプリングを通過した11トレースがTempoへ届きました。
 
 pinが書き出す `go.mod` の `replace` は、作業ディレクトリ配下の絶対パスを指します。このため、**pinの生成物をリポジトリへコミットすると、別のマシンでpinが失敗します**（`package ... is not part of a module`）。最初の測定をmacOSで行い、その生成物がコミットされていたため、Linuxでの再測定はここで止まりました。生成物を `.gitignore` へ入れ、素の `go.mod` からpinを実行してビルドが通ることをCIで検査する構成へ変更しています。
 
@@ -140,7 +140,7 @@ GET /ask
     └── chat stub-model-1
 ```
 
-`invoke_agent` の子としてLLM呼び出しとツール実行が並び、ツールから呼び出した社内APIの分散トレースがその下へつながっています。トークン使用量はリクエストごとに変わるスタブ値です。ai-appのトレースもtail samplingの対象なので、30リクエストで3トレースの到達でした。
+`invoke_agent` の子としてLLM呼び出しとツール実行が並び、ツールから呼び出した社内APIの分散トレースがその下へつながっています。トークン使用量はリクエストごとに変わるスタブ値です。ai-appのトレースもテイルサンプリングの対象なので、30リクエストで3トレースの到達でした。
 
 `ai-ops/` には、レジストリを読むregistry MCPと、実データを読むtelemetry MCPの構成例があります。registry MCPは `weaver registry mcp` を標準入出力で起動し、telemetry MCPはGrafanaスタック向けのMCPサーバーを使います。
 

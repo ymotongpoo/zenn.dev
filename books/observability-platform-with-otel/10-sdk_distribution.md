@@ -2,11 +2,15 @@
 title: "SDKディストリビューションの設計"
 ---
 
-「サービスにOpenTelemetryを入れてください」と依頼された開発チームは、公式ドキュメントの初期化コードを自分のリポジトリに写すことから始めます。Goでは、次のようなコードになります。
+「サービスにOpenTelemetryを入れてください」と依頼された開発チームは、公式ドキュメントの初期化コードを自分のリポジトリに写すことから始めます。
+
+本章はコード例にGoを使います。Goは静的にコンパイルされ、実行時にエージェントを差し込めないため、ディストリビューションを配る設計が分かりやすく現れます。ただし本章の論点はGo固有ではありません。どの言語でも、初期化の判断をライブラリ側へ移し、開発チームが書く量を減らす設計は同じです。言語ごとの違いは本章の最後で扱います。
+
+Goの初期化コードは、次のようになります。
 
 ```go
 func initTracer(ctx context.Context) (func(context.Context) error, error) {
-	// exporter（テレメトリーの送信部品）の組み立て
+	// エクスポーター（テレメトリーの送信部品）の組み立て
 	exporter, err := otlptracegrpc.New(ctx,
 		otlptracegrpc.WithEndpoint("collector.internal.example.com:4317"),
 		otlptracegrpc.WithInsecure(),
@@ -14,7 +18,7 @@ func initTracer(ctx context.Context) (func(context.Context) error, error) {
 	if err != nil {
 		return nil, err
 	}
-	// resource属性の設定
+	// リソース属性の設定
 	res, err := resource.New(ctx,
 		resource.WithAttributes(semconv.ServiceName("payment")),
 	)
@@ -26,7 +30,7 @@ func initTracer(ctx context.Context) (func(context.Context) error, error) {
 		sdktrace.WithResource(res),
 	)
 	otel.SetTracerProvider(tp)
-	// propagatorの設定
+	// プロパゲーターの設定
 	otel.SetTextMapPropagator(propagation.TraceContext{})
 	return tp.Shutdown, nil
 }
@@ -38,7 +42,7 @@ func initTracer(ctx context.Context) (func(context.Context) error, error) {
 
 上のコードでは、Collectorのエンドポイントを直接指定しているため、環境ごとの変更方法を各チームが決めます。リソース属性は `service.name` しか設定しておらず、`deployment.environment.name` や `service.namespace` を追加するかどうかも統一されません。
 
-プロパゲーターにはBaggageを含めていません。**Baggage**は、トレースの文脈とともに任意のキーと値をリクエストへ載せて運ぶ仕組みです。後からBaggageを使う設計を導入しても、このサービスでは属性を引き継げません。`SetTextMapPropagator` の呼び出し自体を忘れれば、トレースはこのサービスで分断されます。
+プロパゲーターにはバゲッジを含めていません。**バゲッジ**（Baggage）は、トレースの文脈とともに任意のキーと値をリクエストへ載せて運ぶ仕組みです。後からバゲッジを使う設計を導入しても、このサービスでは属性を引き継げません。`SetTextMapPropagator` の呼び出し自体を忘れれば、トレースはこのサービスで分断されます。
 
 メトリクスとログの初期化が実装されず、トレースだけを設定して「OpenTelemetryは導入済み」と判断されることもあります。
 
@@ -48,7 +52,7 @@ func initTracer(ctx context.Context) (func(context.Context) error, error) {
 
 ## ディストリビューションの役割
 
-OpenTelemetryでは、SDKにデフォルト値やカスタマイズを加えて再パッケージしたものを[ディストリビューション](https://opentelemetry.io/docs/concepts/distributions/)と呼びます。SDK本体を変更するフォークとは異なり、SDKの上に設定と部品の選択を重ねます。
+OpenTelemetryでは、SDKにデフォルト値やカスタマイズを加えて再パッケージしたものを[ディストリビューション](https://opentelemetry.io/ja/docs/concepts/distributions/)と呼びます。SDK本体を変更するフォークとは異なり、SDKの上に設定と部品の選択を重ねます。
 
 オブザーバビリティベンダーが提供するSDKもディストリビューションの一例です。OTel SDKへ、自社バックエンド向けのデフォルト値、推奨する計装ライブラリとプロパゲーター、共通の初期化処理を追加しています。
 
@@ -73,7 +77,7 @@ defer func() {
 `Setup` の中では次のことを行います。
 
 - OTLP エクスポーターを構築する。エンドポイントのデフォルト値は各環境のエージェント Collector（4章）に向ける
-- プロパゲーターをW3C TraceContext（トレースの文脈を運ぶ標準のヘッダ形式）とBaggageの組み合わせに設定する
+- プロパゲーターをW3C TraceContext（トレースの文脈を運ぶ標準のヘッダ形式）とバゲッジの組み合わせに設定する
 - サンプラーのデフォルトを `ParentBased(AlwaysSample)` にする。間引きの主体はゲートウェイ側（4章）に寄せる
 - 実行環境（Kubernetesやクラウドプロバイダー）のメタデータからリソース属性を自動検出する
 - トレース、メトリクス、ログのプロバイダー（計装のためのインスタンスを返すもの）を構築してグローバルに登録する
@@ -123,7 +127,7 @@ YAMLファイルでSDKを構成するdeclarative configurationも仕様化され
 
 ## 配布とバージョン追従
 
-社内ディストリビューションは、社内Goモジュールとして配布します。社内のバージョン管理システムとGOPRIVATE、またはmodule proxyがあれば配布できます。
+Goの場合、社内ディストリビューションは社内Goモジュールとして配布します。社内のバージョン管理システムとGOPRIVATE、またはmodule proxyがあれば配布できます。言語ごとの配布方法は「多言語展開の課題」で扱います。
 
 バージョン運用はsemverに従い、ディストリビューションと、同梱するSDKや計装ライブラリのバージョン対応表をリリースノートに載せます。各チームのリポジトリにはRenovateやDependabotで更新PRを送ります。SDKの更新作業は、ディストリビューションのリリースと各サービスへの自動PRに分けられます。
 
@@ -133,7 +137,7 @@ otelgrpcではinterceptorベースの計装が非推奨になり、stats handler
 
 SDK本体はv1.46.0系のstableですが、otelhttpやotelgrpcなどの計装ライブラリはv0.71.0であり、2026年9月時点ではv0系です。利用する計装ライブラリとバージョンはディストリビューションのgo.modで固定し、サービス間の差を防ぎます。
 
-HTTPやgRPCのように多くのチームが使う計装ライブラリは、ヘルパーとともにディストリビューションへ含めます。データベースドライバやメッセージングクライアントのようにチームごとに異なるものは、動作確認済みのバージョンを推奨リストで示します。候補は公式の[レジストリ](https://opentelemetry.io/ecosystem/registry/)から探せます。
+HTTPやgRPCのように多くのチームが使う計装ライブラリは、ヘルパーとともにディストリビューションへ含めます。データベースドライバやメッセージングクライアントのようにチームごとに異なるものは、動作確認済みのバージョンを推奨リストで示します。候補は公式の[レジストリ](https://opentelemetry.io/ja/ecosystem/registry/)から探せます。
 
 ## 多言語展開の課題
 
