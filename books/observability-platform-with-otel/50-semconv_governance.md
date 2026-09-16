@@ -23,7 +23,7 @@ OpenTelemetryは、属性の名前と意味を[**セマンティック規約**](
 
 レジストリの構成単位はグループです。属性の集合を定義するattribute_group、スパンの規約を定義するspan、メトリクスを定義するmetricといった種類があり、個々の属性は型と説明と安定性（stabilityがstableかdevelopmentか）を持ちます。規約全体にはバージョンがあり、テレメトリー自体にschema URLとして埋め込まれます。
 
-公式規約も継続して変更されています。2026年8月時点では、領域ごとに安定性が異なります。OpenTelemetryプロジェクトは、規約の検査、生成、差分検出にWeaverを使っており、公式レジストリにある900を超える属性もCIで検査されています[^weaverblog]。
+公式規約も継続して変更されています。2026年9月時点では、領域ごとに安定性が異なります。OpenTelemetryプロジェクトは、規約の検査、生成、差分検出にWeaverを使っており、公式レジストリにある900を超える属性もCIで検査されています[^weaverblog]。
 
 [^weaverblog]: 公式ブログ[Observability by Design](https://opentelemetry.io/blog/2025/otel-weaver/)が、公式semconv自体の運用にWeaverを使っていることを説明しています。
 
@@ -35,7 +35,7 @@ OpenTelemetryは、属性の名前と意味を[**セマンティック規約**](
 
 この規則を検査できる形で記述したものが社内レジストリです。**OpenTelemetry Weaver**のレジストリは、YAMLのグループ定義とマニフェストからなります。マニフェスト（manifest.yaml）には、レジストリの名前、バージョン、依存する公式レジストリを宣言します[^manifestname]。
 
-[^manifestname]: 古い資料ではマニフェストのファイル名が registry_manifest.yaml となっていますが、これは旧名で、現在の名前は manifest.yaml です（2026年8月時点、Weaver v0.25系）。
+[^manifestname]: 古い資料ではマニフェストのファイル名が registry_manifest.yaml となっていますが、これは旧名で、現在の名前は manifest.yaml です（2026年9月時点、Weaver v0.26系）。
 
 ```yaml
 name: example
@@ -67,7 +67,7 @@ groups:
         examples: ["carrier-a"]
 ```
 
-公式属性を社内の文脈で参照することもできます。`ref` で公式の属性を取り込み、requirement levelだけを社内向けに上書きする、といった使い方です。依存は多段にでき（2026年8月時点で最大10階層）、たとえば「全社レジストリの上に事業部レジストリ」という構成も組めます。
+公式属性を社内の文脈で参照することもできます。`ref` で公式の属性を取り込み、requirement levelだけを社内向けに上書きする、といった使い方です。依存は多段にでき（2026年9月時点で最大10階層）、たとえば「全社レジストリの上に事業部レジストリ」という構成も組めます。
 
 ![レジストリの参照関係](/images/20260926-registry-deps.png)
 *図1　矢印は、依存するレジストリから依存先を指します。社内レジストリは公式レジストリへ依存し、GenAI規約のようなDevelopment段階の規約はコミットSHAで固定します（7章）。*
@@ -76,7 +76,7 @@ groups:
 
 Weaverのサブコマンドは、規約の変更前、マージ後、実行時に分けて使います。変更前はcheckとdiff、マージ後はgenerate、実行時はlive-checkを使います[^weaverversion]。
 
-[^weaverversion]: Weaverは2026年8月時点でv0.25.1、まだ1.0前です。かつて存在した `weaver registry resolve` と `search` は非推奨になっているので、古い記事のコマンド例に注意してください。
+[^weaverversion]: Weaverは2026年9月時点でv0.26.1、まだ1.0前です。かつて存在した `weaver registry resolve` と `search` は非推奨になっているので、古い記事のコマンド例に注意してください。
 
 `weaver registry check` は、構文と参照を検査し、OPAのRego言語で書いたポリシーも適用します。たとえば、「`com.example.` 以外の名前空間で属性を新設しない」「stableな属性の型を変更しない」という規則を検査できます。公式の[opentelemetry-weaver-packages](https://github.com/open-telemetry/opentelemetry-weaver-packages)リポジトリには、命名規則、stability制約、後方互換性のポリシーが公開されており、Git URLで指定できます。
 

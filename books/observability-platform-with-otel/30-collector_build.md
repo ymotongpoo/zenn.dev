@@ -74,24 +74,24 @@ dist:
   output_path: ./build
 
 receivers:
-  - gomod: go.opentelemetry.io/collector/receiver/otlpreceiver v0.159.0
+  - gomod: go.opentelemetry.io/collector/receiver/otlpreceiver v0.161.0
 
 processors:
-  - gomod: go.opentelemetry.io/collector/processor/batchprocessor v0.159.0
-  - gomod: go.opentelemetry.io/collector/processor/memorylimiterprocessor v0.159.0
-  - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/processor/transformprocessor v0.159.0
-  - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/processor/tailsamplingprocessor v0.159.0
+  - gomod: go.opentelemetry.io/collector/processor/batchprocessor v0.161.0
+  - gomod: go.opentelemetry.io/collector/processor/memorylimiterprocessor v0.161.0
+  - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/processor/transformprocessor v0.161.0
+  - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/processor/tailsamplingprocessor v0.161.0
 
 exporters:
-  - gomod: go.opentelemetry.io/collector/exporter/otlpexporter v0.159.0
+  - gomod: go.opentelemetry.io/collector/exporter/otlpexporter v0.161.0
 
 extensions:
-  - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/extension/healthcheckextension v0.159.0
+  - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/extension/healthcheckextension v0.161.0
 ```
 
-2026年8月時点のmanifestには、バージョンと設定項目に注意が必要です。
+2026年9月時点のmanifestには、バージョンと設定項目に注意が必要です。
 
-Collectorのcoreリポジトリは、v1.65.0とv0.159.0の二つのバージョンを同時にリリースしています。v1系に到達しているのは、テレメトリーの内部表現を扱うpdataや、設定を読み込むconfmapなどのAPI層のモジュールです。レシーバーやプロセッサーなどのコンポーネントはv0系のモジュールなので、manifestにはv0.159.0のようなバージョンを書きます。
+Collectorのcoreリポジトリは、v1.67.0とv0.161.0の二つのバージョンを同時にリリースしています。v1系に到達しているのは、テレメトリーの内部表現を扱うpdataや、設定を読み込むconfmapなどのAPI層のモジュールです。レシーバーやプロセッサーなどのコンポーネントはv0系のモジュールなので、manifestにはv0.161.0のようなバージョンを書きます。
 
 ここで注意したいのは、モジュールのバージョンとコンポーネントの成熟度が別の指標だということです。コンポーネントは、それぞれの `metadata.yaml` でシグナルごとのstabilityを宣言します。たとえばOTLP レシーバーはv0系のモジュールに含まれますが、traces、metrics、logsについてはstableと宣言されています。採用を判断するときは、モジュールがv0系かどうかではなく、使うコンポーネントが対象のシグナルでどのstabilityを宣言しているかを見ます。
 

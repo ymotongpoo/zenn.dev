@@ -29,7 +29,7 @@ JavaやPythonのように動的なランタイムを持つ言語では、実行�
 
 ## GoのeBPF自動計装
 
-GoのeBPF計装は、**OBI**（OpenTelemetry eBPF Instrumentation）で開発されています。Grafana LabsがBeylaを寄贈して始まったプロジェクトで、2026年8月時点の最新版はv0.12.2です。v0系のため、破壊的変更の可能性が残っています[^obi]。対象プロセスの外からeBPFでシステムコールや関数呼び出しを観測するため、バイナリを変更しません。HTTP、gRPC、主要なデータベースやメッセージングのプロトコル、OpenAIやAnthropicなどのGenAI API呼び出しを捕捉できます。
+GoのeBPF計装は、**OBI**（OpenTelemetry eBPF Instrumentation）で開発されています。Grafana LabsがBeylaを寄贈して始まったプロジェクトで、2026年9月時点の最新版はv0.13.0です。v0系のため、破壊的変更の可能性が残っています[^obi]。対象プロセスの外からeBPFでシステムコールや関数呼び出しを観測するため、バイナリを変更しません。HTTP、gRPC、主要なデータベースやメッセージングのプロトコル、OpenAIやAnthropicなどのGenAI API呼び出しを捕捉できます。
 
 [^obi]: 2026年8月17日のv0.11.0ではGoのトレースAPIの自動計装が入り、従来 opentelemetry-go-instrumentation が担っていた領域を取り込みつつあります。プロジェクトの2026年の目標はstable 1.0です（[公式ブログ](https://opentelemetry.io/blog/2026/obi-goals/)）。
 
@@ -39,7 +39,7 @@ GoのeBPF計装は、**OBI**（OpenTelemetry eBPF Instrumentation）で開発さ
 
 ## ビルド時計装
 
-Goでは、コンパイル時に計装コードを組み込むこともできます。DatadogのOrchestrionとAlibabaの計装ツールを統合して開発された公式ツール**otelc**は、2026年7月にv1.0でstableへ達しました。2026年8月時点の最新版はv1.1.0です[^otelc]。
+Goでは、コンパイル時に計装コードを組み込むこともできます。DatadogのOrchestrionとAlibabaの計装ツールを統合して開発された公式ツール**otelc**は、2026年7月にv1.0でstableへ達しました。2026年9月時点の最新版はv1.1.0です[^otelc]。
 
 [^otelc]: 経緯は[公式ブログのv1発表](https://opentelemetry.io/blog/2026/go-compile-time-instrumentation-v1/)にまとまっています。v1.0.0は不具合でretractされているため、使うならv1.0.1以降です。
 
@@ -50,7 +50,7 @@ $ otelc pin
 $ otelc go build ./...
 ```
 
-`otelc` はGoの `-toolexec` 機構を使い、コンパイルの過程で対象ライブラリの呼び出しに計装コードを差し込みます。2026年8月時点で `net/http` や `database/sql`、gRPC、Redis、Kafkaといった主要ライブラリに対応し、トレースとメトリクスを生成します。ログへのtrace context注入にも対応しています。
+`otelc` はGoの `-toolexec` 機構を使い、コンパイルの過程で対象ライブラリの呼び出しに計装コードを差し込みます。2026年9月時点で `net/http` や `database/sql`、gRPC、Redis、Kafkaといった主要ライブラリに対応し、トレースとメトリクスを生成します。ログへのtrace context注入にも対応しています。
 
 Goでは、eBPF、ビルド時、手動計装を選べます。次の表で、変更箇所と運用上の違いを比較します。
 
@@ -107,7 +107,7 @@ metadata:
     instrumentation.opentelemetry.io/otel-go-auto-target-exe: "/app/server"
 ```
 
-注入されるエージェントはeBPFを使うため、特権コンテナとして動作し、マルチコンテナPodには対応していません。2026年8月時点でOperatorが注入するのはOBIではなく、開発が停滞している従来のopentelemetry-go-instrumentationです。これらの制約があるため、共通CIを変更できる環境ではotelcを先に検討します。
+注入されるエージェントはeBPFを使うため、特権コンテナとして動作し、マルチコンテナPodには対応していません。2026年9月時点でOperatorが注入するのはOBIではなく、開発が停滞している従来のopentelemetry-go-instrumentationです。これらの制約があるため、共通CIを変更できる環境ではotelcを先に検討します。
 
 ## Kubernetes以外での配布
 

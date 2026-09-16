@@ -2,7 +2,7 @@
 title: "リファレンス実装で動かす"
 ---
 
-[otel-platform-blueprint](https://github.com/ymotongpoo/otel-platform-blueprint)は、SDKディストリビューション、ゼロコード計装、Collector、OpAMP、Weaverを組み合わせたリファレンス実装です。本章の挙動と数値は、2026年9月10日にLinux（x86_64、4コア）、Docker Engine 29.0.0、Go 1.26.0の環境で実測しました。Collector v0.159.0、opentelemetry-go v1.45.0、Weaver v0.25.1、OpAMP Supervisor 0.159.0、otelc v1.1.0を使い、詳細をリポジトリの `docs/measurements.md` に記録しています。同じシナリオを2026年8月25日にmacOSでも実施しており、結果が分かれた箇所は本章で明示します。
+[otel-platform-blueprint](https://github.com/ymotongpoo/otel-platform-blueprint)は、SDKディストリビューション、ゼロコード計装、Collector、OpAMP、Weaverを組み合わせたリファレンス実装です。本章の挙動と数値は、2026年9月10日にLinux（x86_64、4コア）、Docker Engine 29.0.0、Go 1.26.0の環境で実測しました。実測時点のCollector v0.159.0、opentelemetry-go v1.45.0、Weaver v0.25.1、OpAMP Supervisor 0.159.0、otelc v1.1.0を使い、詳細をリポジトリの `docs/measurements.md` に記録しています。他章が示す最新版とは差がありますが、数値を再現できる組み合わせを残すため、実測時のバージョンをそのまま記載します。同じシナリオを2026年8月25日にmacOSでも実施しており、結果が分かれた箇所は本章で明示します。
 
 ## リポジトリの全体構成
 

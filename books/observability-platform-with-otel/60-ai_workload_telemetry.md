@@ -19,9 +19,9 @@ LLMを使うワークロードには、従来のWebサービスと異なる性�
 
 ## GenAIセマンティック規約の現状
 
-OpenTelemetryには、生成AI向けのセマンティック規約（`gen_ai.*`）があります。採用時には、2026年8月時点の安定性と配布方法を確認します。
+OpenTelemetryには、生成AI向けのセマンティック規約（`gen_ai.*`）があります。採用時には、2026年9月時点の安定性と配布方法を確認します。
 
-GenAI規約は2026年6月に、semantic conventions本体から専用の[semantic-conventions-genai](https://github.com/open-telemetry/semantic-conventions-genai)リポジトリへ分離されました。`gen_ai.*` に加えて、MCP関連の `mcp.*` もこのリポジトリで管理されています。2026年8月時点では、すべてのGenAI規約がDevelopment段階であり、stableの定義はありません。専用リポジトリにはバージョン付きリリースもないため、特定バージョンへの準拠を宣言できない状態です。
+GenAI規約は2026年6月に、semantic conventions本体から専用の[semantic-conventions-genai](https://github.com/open-telemetry/semantic-conventions-genai)リポジトリへ分離されました。`gen_ai.*` に加えて、MCP関連の `mcp.*` もこのリポジトリで管理されています。2026年9月時点では、すべてのGenAI規約がDevelopment段階であり、stableの定義はありません。専用リポジトリにはバージョン付きリリースもないため、特定バージョンへの準拠を宣言できない状態です。
 
 実際、属性名はこれまでに何度も変わってきました。主要な改名だけでも次のとおりです。
 
@@ -62,7 +62,7 @@ GenAI観測では、プロンプトと応答の本文を記録するかどうか
 
 ## GoでのLLM呼び出し計装
 
-2026年8月時点では、Python向けの公式計装が先行し、専用リポジトリでOpenAI、Anthropic、LangChainなどの計装パッケージを提供しています。GenAI計装の公式プロジェクトが対象とするのはPythonとJavaScriptで、Goには公式のGenAI計装ライブラリがありません。Goではサードパーティ製ライブラリか手動計装を使います。
+2026年9月時点では、Python向けの公式計装が先行し、専用リポジトリでOpenAI、Anthropic、LangChainなどの計装パッケージを提供しています。GenAI計装の公式プロジェクトが対象とするのはPythonとJavaScriptで、Goには公式のGenAI計装ライブラリがありません。Goではサードパーティ製ライブラリか手動計装を使います。
 
 2章のディストリビューションでSDKを初期化していれば、手動計装ではLLM呼び出しを囲むスパンを追加します。次の例はトレースだけの抜粋であり、トークン使用量のヒストグラムなどのメトリクスは省略しています。属性名には、レジストリから生成した `semconv` パッケージの定数を使います。
 

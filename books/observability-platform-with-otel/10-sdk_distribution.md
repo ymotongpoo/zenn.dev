@@ -78,7 +78,7 @@ defer func() {
 - 実行環境（Kubernetesやクラウドプロバイダー）のメタデータからリソース属性を自動検出する
 - トレース、メトリクス、ログのproviderを構築してグローバルに登録する
 
-ログの組み込みでは、APIの安定性を考慮します。2026年8月時点で、Goのログ関連モジュール（`otel/log` と `otel/sdk/log`）はv0.21.0のベータであり、stableに達しているのはトレースとメトリクスです[^golog]。各チームがv0のAPIに直接依存すると、破壊的変更のたびに複数のサービスを修正することになります。ディストリビューションだけがv0のAPIに依存すれば、変更への対応箇所を一つに集約できます。
+ログの組み込みでは、APIの安定性を考慮します。2026年9月時点で、Goのログ関連モジュール（`otel/log` と `otel/sdk/log`）はv0.22.0のベータであり、stableに達しているのはトレースとメトリクスです[^golog]。各チームがv0のAPIに直接依存すると、破壊的変更のたびに複数のサービスを修正することになります。ディストリビューションだけがv0のAPIに依存すれば、変更への対応箇所を一つに集約できます。
 
 [^golog]: opentelemetry-goのモジュール構成とバージョンは[versions.yaml](https://github.com/open-telemetry/opentelemetry-go/blob/main/versions.yaml)で確認できます。
 
@@ -86,7 +86,7 @@ defer func() {
 
 tail samplingへ判断を集約すると、エラーの有無やレイテンシを見て保存対象を選べます。ただし、すべてのスパンがアプリケーションからゲートウェイまで流れるため、SDK、エージェント、ネットワーク、ゲートウェイの負荷は減りません。この構成を使えるのは、各区間が全スパンの流量を処理できる場合です。高流量のサービスでは、SDKのhead samplingで先に量を減らします。プラットフォームは、`OTEL_TRACES_SAMPLER` 環境変数を調整点として、どの段階で量を減らすかを決めます。
 
-head samplingの確率をトレース全体で一貫させるConsistent Probability Samplingには、contribの[Go実装](https://pkg.go.dev/go.opentelemetry.io/contrib/samplers/probability/consistent)があります。ただし2026年8月時点では実験的で、現行の仕様草案との差分も残っています[^cps]。この段階では、ディストリビューションのデフォルト値には採用しません。Consistent Probability Samplingの詳細は、[別の記事](https://zenn.dev/ymotongpoo/articles/20260717-cps)で解説しています。
+head samplingの確率をトレース全体で一貫させるConsistent Probability Samplingには、contribの[Go実装](https://pkg.go.dev/go.opentelemetry.io/contrib/samplers/probability/consistent)があります。ただし2026年9月時点では実験的で、現行の仕様草案との差分も残っています[^cps]。この段階では、ディストリビューションのデフォルト値には採用しません。Consistent Probability Samplingの詳細は、[別の記事](https://zenn.dev/ymotongpoo/articles/20260717-cps)で解説しています。
 
 [^cps]: 実装はtracestateにp値とr値を書く旧ドラフトに準拠しており、現行仕様のth値ベースの方式とは互換がありません。
 
@@ -117,7 +117,7 @@ exp, err := autoexport.NewSpanExporter(ctx)
 otel.SetTextMapPropagator(autoprop.NewTextMapPropagator())
 ```
 
-YAMLファイルでSDKを構成するdeclarative configurationも仕様化されています。設定スキーマは2026年2月に[v1.0.0](https://github.com/open-telemetry/opentelemetry-configuration/releases)へ達しましたが、Go実装の[otelconf](https://pkg.go.dev/go.opentelemetry.io/contrib/otelconf)はv0.25.0の実験的段階です。現時点では環境変数とコードのデフォルト値を使い、otelconfが安定した後に移行を判断します。
+YAMLファイルでSDKを構成するdeclarative configurationも仕様化されています。設定スキーマは2026年2月に[v1.0.0](https://github.com/open-telemetry/opentelemetry-configuration/releases)へ達しましたが、Go実装の[otelconf](https://pkg.go.dev/go.opentelemetry.io/contrib/otelconf)はv0.26.0の実験的段階です。現時点では環境変数とコードのデフォルト値を使い、otelconfが安定した後に移行を判断します。
 
 ## 配布とバージョン追従
 
@@ -129,7 +129,7 @@ otelgrpcではinterceptorベースの計装が非推奨になり、stats handler
 
 ## 計装ライブラリの推奨リスト
 
-SDK本体はv1.45.0系のstableですが、otelhttpやotelgrpcなどの計装ライブラリはv0.70.0であり、2026年8月時点ではv0系です。利用する計装ライブラリとバージョンはディストリビューションのgo.modで固定し、サービス間の差を防ぎます。
+SDK本体はv1.46.0系のstableですが、otelhttpやotelgrpcなどの計装ライブラリはv0.71.0であり、2026年9月時点ではv0系です。利用する計装ライブラリとバージョンはディストリビューションのgo.modで固定し、サービス間の差を防ぎます。
 
 HTTPやgRPCのように多くのチームが使う計装ライブラリは、ヘルパーとともにディストリビューションへ含めます。データベースドライバやメッセージングクライアントのようにチームごとに異なるものは、動作確認済みのバージョンを推奨リストで示します。候補は公式の[レジストリ](https://opentelemetry.io/ecosystem/registry/)から探せます。
 

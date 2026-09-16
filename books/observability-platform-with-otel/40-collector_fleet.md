@@ -22,7 +22,7 @@ title: "OpAMPによるCollectorフリート管理"
 
 各エージェントは管理サーバーへWebSocketまたはHTTPで接続し、AgentToServerとServerToAgentのメッセージを交換します。エージェントは識別情報、実効設定、ヘルスを報告し、サーバーは設定や指示を返します。利用する機能は接続時にcapabilitiesとして交渉するため、設定配布だけを使うこともできます。
 
-2026年8月時点で、[OpAMP仕様](https://github.com/open-telemetry/opamp-spec/blob/main/specification.md)はBetaです。v0.20.0までリリースされていますが、破壊的変更を含み、1.0には達していません。参照実装の[opamp-go](https://github.com/open-telemetry/opamp-go)もv0.23.0です。一方、Supervisorは公式配布物として提供され、複数のベンダー製品がOpAMPを実装しています。実運用は始まっていますが、仕様変更への追従を前提に採用する段階です。
+2026年9月時点で、[OpAMP仕様](https://github.com/open-telemetry/opamp-spec/blob/main/specification.md)はBetaです。v0.20.0までリリースされていますが、破壊的変更を含み、1.0には達していません。参照実装の[opamp-go](https://github.com/open-telemetry/opamp-go)もv0.24.0です。一方、Supervisorは公式配布物として提供され、複数のベンダー製品がOpAMPを実装しています。実運用は始まっていますが、仕様変更への追従を前提に採用する段階です。
 
 ![OpAMPによるフリート管理の構成](/images/20260926-opamp-topology.png)
 *図1　実線は設定の配布、点線はエージェントからの報告を表します。設定の正となる定義はGitに置き、OpAMPは管理サーバーからエージェントまでの配布を担います。*
@@ -59,7 +59,7 @@ OpAMPサーバーとの接続と設定管理はSupervisorが担当し、opampext
 
 `config_files` には、ローカル設定とリモート設定（`$REMOTE_CONFIG`）を並べられます。後から読んだ設定が優先されるため、基盤管理の設定をリモート設定より後へ置けば、必須の設定を最後に重ねられます。ただし、並び順は権限の境界になりません。配布前のCIで、実効設定に必須プロセッサーが含まれることと、接続先が許可されていることを検査します。配布後はSupervisorが報告する実効設定と照合します。
 
-Supervisorは[contribのcmd/opampsupervisor](https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/cmd/opampsupervisor)で開発され、公式のバイナリとコンテナイメージが配布されています。2026年8月時点のstabilityはalphaです。リモート設定の受信と適用、実効設定とヘルスの報告、再起動指示、接続情報の更新は実装されています。
+Supervisorは[contribのcmd/opampsupervisor](https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/cmd/opampsupervisor)で開発され、公式のバイナリとコンテナイメージが配布されています。2026年9月時点のstabilityはalphaです。リモート設定の受信と適用、実効設定とヘルスの報告、再起動指示、接続情報の更新は実装されています。
 
 一方、Collectorバイナリを更新するパッケージ管理は未実装です。OpAMP仕様には定義されていますが、Supervisor経由でバイナリを配ることはできません。バイナリはイメージとして再配布し、OpAMPは設定の配布に使います。
 
@@ -82,7 +82,7 @@ Supervisorは、設定適用後にCollectorが起動できない場合に前の�
 
 ## OpAMPサーバーの選択肢
 
-2026年8月時点で、公式のスタンドアロンOpAMPサーバー製品はありません。opamp-goが提供するのは、サーバー実装用のライブラリとデモ用のexample serverです。本番の管理プレーンとして必要な機能は、利用する側が実装します。
+2026年9月時点で、公式のスタンドアロンOpAMPサーバー製品はありません。opamp-goが提供するのは、サーバー実装用のライブラリとデモ用のexample serverです。本番の管理プレーンとして必要な機能は、利用する側が実装します。
 
 リファレンス実装（9章）には、opamp-goのserverライブラリを使った最小サーバーがあります。プロトコルを確認するための学習用実装であり、本番向けの参照実装ではありません。
 
