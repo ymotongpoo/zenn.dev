@@ -26,11 +26,11 @@ digraph ocb_pipeline {
     color="#AB5A13"; bgcolor="#FFF5ED"; fontcolor="#783F0E"; margin=14;
     ocb [label=<<b>OCB（builder）</b><br align="left"/>Goコードを生成してビルド<br align="left"/>バージョン整合を検査<br align="left"/>>, fillcolor="#FFE9D6", color="#AB5A13"];
     binary [label=<<b>otelcol-internal</b><br align="left"/>必要な部品だけの社内バイナリ<br align="left"/>>, fillcolor="#D2F3DF", color="#038435"];
-    validate [label=<<b>validate</b><br align="left"/>agentとgatewayの設定を<br align="left"/>ビルドしたバイナリで検証<br align="left"/>>, fillcolor="#FFE9D6", color="#AB5A13"];
+    validate [label=<<b>validate</b><br align="left"/>エージェントとゲートウェイの設定を<br align="left"/>ビルドしたバイナリで検証<br align="left"/>>, fillcolor="#FFE9D6", color="#AB5A13"];
   }
 
   image [label=<<b>コンテナイメージ</b>>, fillcolor="#D2F3DF", color="#038435"];
-  deploy [label=<<b>配備先</b><br align="left"/>agent（30章）、Supervisor管理下（40章）<br align="left"/>>];
+  deploy [label=<<b>配備先</b><br align="left"/>エージェント（4章）、Supervisor管理下（5章）<br align="left"/>>];
 
   manifest -> ocb;
   ocb -> binary;

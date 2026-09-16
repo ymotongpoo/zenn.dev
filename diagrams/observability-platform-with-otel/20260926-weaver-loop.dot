@@ -32,7 +32,7 @@ digraph weaver_loop {
     label=<<b>マージ後</b>>;
     labeljust="l"; style="rounded"; penwidth=1.6;
     color="#AB5A13"; bgcolor="#FFF5ED"; fontcolor="#783F0E"; margin=14;
-    generate [label=<<b>generate</b><br align="left"/>SDK定数、ドキュメント<br align="left"/>gatewayの変換設定を導出<br align="left"/>>, fillcolor="#FFE9D6", color="#AB5A13"];
+    generate [label=<<b>generate</b><br align="left"/>SDK定数、ドキュメント<br align="left"/>ゲートウェイの変換設定を導出<br align="left"/>>, fillcolor="#FFE9D6", color="#AB5A13"];
   }
 
   system [label=<<b>実環境</b><br align="left"/>生成物を組み込んだサービスとCollector<br align="left"/>>, fillcolor="#D2F3DF", color="#038435"];
@@ -44,7 +44,7 @@ digraph weaver_loop {
   // ここに置くと、左を回る livecheck -> registry のラベルと隣接して
   // 「定義とのずれを修正マージ」と一続きに読めてしまう。
   diff -> generate;
-  generate -> system [xlabel=" 配布（10章、30章）"];
+  generate -> system [xlabel=" 配布（2章、4章）"];
   system -> livecheck [xlabel=" OTLP"];
   // 戻りの意味はキャプション（検出した違反をレジストリの変更へ反映する）が
   // 述べている。この辺はクラスタの右脇を通るので、ラベルを置くと枠線に乗る。

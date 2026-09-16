@@ -27,17 +27,17 @@ digraph blueprint_overview {
     aiapp [label="ai-app", fillcolor="#FFE9D6", color="#AB5A13"];
   }
 
-  uninstr [label=<<b>uninstrumented</b><br align="left"/>計装コードなし<br align="left"/>otelcでビルド時計装（20章）<br align="left"/>>, style="rounded,filled,dashed", fillcolor="#E4E4E4", color="#4A4A4A"];
+  uninstr [label=<<b>uninstrumented</b><br align="left"/>計装コードなし<br align="left"/>otelcでビルド時計装（3章）<br align="left"/>>, style="rounded,filled,dashed", fillcolor="#E4E4E4", color="#4A4A4A"];
 
   subgraph cluster_agent {
-    label=<<b>Supervisor管理のagent</b>>;
+    label=<<b>Supervisor管理のエージェント</b>>;
     labeljust="l"; style="rounded"; penwidth=1.6;
     color="#4A4A4A"; bgcolor="#F3F3F3"; fontcolor="#343434"; margin=14;
     agent [label=<<b>otelcol-internal</b><br align="left"/>OCBビルド。opampextension入り<br align="left"/>>, fillcolor="#FFE9D6", color="#AB5A13"];
   }
 
   opamp [label=<<b>opamp-server</b><br align="left"/>remote-configs/ を配布<br align="left"/>>, fillcolor="#F7DDFC", color="#9430A9"];
-  gateway [label=<<b>gateway（otelcol-internal）</b><br align="left"/>tail sampling、redaction<br align="left"/>>, fillcolor="#FFE9D6", color="#AB5A13"];
+  gateway [label=<<b>ゲートウェイ（otelcol-internal）</b><br align="left"/>tail sampling、redaction<br align="left"/>>, fillcolor="#FFE9D6", color="#AB5A13"];
 
   subgraph cluster_backend {
     label=<<b>Grafanaスタック</b>>;
