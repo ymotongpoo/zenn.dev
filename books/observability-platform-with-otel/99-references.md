@@ -25,9 +25,9 @@ title: "参考リンク"
 
 - [Zero-code instrumentation](https://opentelemetry.io/ja/docs/zero-code/)
 - [OBI（OpenTelemetry eBPF Instrumentation）](https://opentelemetry.io/ja/docs/zero-code/obi/) と [2026年の目標を述べた公式ブログ](https://opentelemetry.io/blog/2026/obi-goals/)
-- [otelc v1の発表（Goのビルド時計装）](https://opentelemetry.io/blog/2026/go-compile-time-instrumentation-v1/)
+- [otelc v1の発表（Goのコンパイル時計装）](https://opentelemetry.io/blog/2026/go-compile-time-instrumentation-v1/)
 - [OpenTelemetry OperatorによるKubernetesでの自動計装](https://opentelemetry.io/ja/docs/platforms/kubernetes/operator/automatic/)
-- 「OpenTelemetry eBPF Instrumentationの舞台裏」（自著。GoバイナリへのeBPF計装の制約を扱った本） <!-- 公開後にURLを入れる -->
+- [「OpenTelemetry eBPF Instrumentationの舞台裏」](https://zenn.dev/ymotongpoo/books/go-ebpf-primer)（自著。GoバイナリへのeBPF計装の制約を扱った本）
 
 ## 4章 Collector層
 

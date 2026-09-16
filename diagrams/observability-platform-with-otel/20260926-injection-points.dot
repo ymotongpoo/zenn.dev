@@ -18,13 +18,23 @@ digraph injection_points {
     fontcolor="#171717"
   ];
 
+  // 同じカテゴリの箱は大きさを揃えて整列させ、長さの調整は矢印側で行う。
+  // 大きさがまちまちだと、同列のものが別の重みを持つように見えて読みづらい。
+  // width/height は Graphviz では下限として働くので、同じカテゴリに同じ値を
+  // 与えれば、ラベルの文字数が違っても枠が揃う（fixedsize=true は使わない。
+  // ラベルが枠を越えて描かれるため）。
+
+  // 計装の注入ポイント（処理の段階）。短いラベルなので幅を揃える
+  node [width=2.6, height=0.62];
   src [label=<<b>ソースコード</b>>, fillcolor="#FFE9D6", color="#AB5A13"];
   build [label=<<b>ビルド</b>>, fillcolor="#FFE9D6", color="#AB5A13"];
   runtime [label=<<b>実行時（プロセス内）</b>>, fillcolor="#FFE9D6", color="#AB5A13"];
   kernel [label=<<b>カーネル</b>>, fillcolor="#FFE9D6", color="#AB5A13"];
 
+  // 計装の方式。3行のラベルを持つので高さを揃える
+  node [width=4.6, height=1.05];
   manual [label=<<b>手動計装</b><br align="left"/>SDKディストリビューション（2章）<br align="left"/>コード変更が必要。表現力は最大<br align="left"/>>, fillcolor="#F7DDFC", color="#9430A9"];
-  otelc [label=<<b>ビルド時計装</b><br align="left"/>otelc。ビルドコマンドを差し替える<br align="left"/>特権不要。Goの第一候補<br align="left"/>>, fillcolor="#F7DDFC", color="#9430A9"];
+  otelc [label=<<b>コンパイル時計装</b><br align="left"/>otelc。ビルドコマンドを差し替える<br align="left"/>特権不要。Goの第一候補<br align="left"/>>, fillcolor="#F7DDFC", color="#9430A9"];
   agentbased [label=<<b>実行時エージェント</b><br align="left"/>Javaのjavaagent、Pythonの実行時パッチなど<br align="left"/>動的なランタイムを持つ言語向け<br align="left"/>>, fillcolor="#F7DDFC", color="#9430A9"];
   ebpf [label=<<b>eBPF</b><br align="left"/>OBI。プロセスの外から観測する<br align="left"/>特権が必要。言語横断<br align="left"/>>, fillcolor="#F7DDFC", color="#9430A9"];
 

@@ -18,7 +18,7 @@ digraph operator_injection {
     fontcolor="#171717"
   ];
 
-  dev [label=<<b>開発チーム</b><br align="left"/>Podのannotationに<br align="left"/>inject-java: "true" を書くだけ<br align="left"/>>, fillcolor="#FFE9D6", color="#AB5A13"];
+  dev [label=<<b>開発チーム</b><br align="left"/>Podのアノテーションに<br align="left"/>inject-java: "true" を書くだけ<br align="left"/>>, fillcolor="#FFE9D6", color="#AB5A13"];
   apiserver [label=<<b>Kubernetes APIサーバー</b><br align="left"/>Pod作成リクエストを受ける<br align="left"/>>];
   webhook [label=<<b>Operatorのadmission webhook</b><br align="left"/>Instrumentationリソース（基盤が用意）を参照し<br align="left"/>Podの定義を書き換える<br align="left"/>>, fillcolor="#F7DDFC", color="#9430A9"];
   pod [label=<<b>変更後のPod</b><br align="left"/>エージェントを置くinit containerと<br align="left"/>OTEL_* 環境変数が注入されている<br align="left"/>>, fillcolor="#D2F3DF", color="#038435"];

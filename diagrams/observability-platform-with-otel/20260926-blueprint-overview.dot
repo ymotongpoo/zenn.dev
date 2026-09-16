@@ -27,7 +27,7 @@ digraph blueprint_overview {
     aiapp [label="ai-app", fillcolor="#FFE9D6", color="#AB5A13"];
   }
 
-  uninstr [label=<<b>uninstrumented</b><br align="left"/>計装コードなし<br align="left"/>otelcでビルド時計装（3章）<br align="left"/>>, style="rounded,filled,dashed", fillcolor="#E4E4E4", color="#4A4A4A"];
+  uninstr [label=<<b>uninstrumented</b><br align="left"/>計装コードなし<br align="left"/>otelcでコンパイル時計装（3章）<br align="left"/>>, style="rounded,filled,dashed", fillcolor="#E4E4E4", color="#4A4A4A"];
 
   subgraph cluster_agent {
     label=<<b>Supervisor管理のエージェント</b>>;

@@ -108,7 +108,7 @@ filterで全スパンをdropする設定は起動に成功し、ステータス�
 
 ## ゼロコード計装を試す
 
-3章のビルド時計装を、計装コードを一切含まない `services/uninstrumented` で試します。
+3章のコンパイル時計装を、計装コードを一切含まない `services/uninstrumented` で試します。
 
 ```console
 $ cd autoinstrument/otelc
