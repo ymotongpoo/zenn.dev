@@ -53,7 +53,7 @@ storage:
   directory: /var/lib/otelcol/supervisor
 ```
 
-`agent.executable` には、4章でビルドした社内Collectorを指定します。OCBのmanifestには、opampextensionと、起動確認用のnopreceiverおよびnopexporterを含めます。含めずにSupervisorの管理下で起動すると、ブートストラップに失敗しました。これはリファレンス実装で確認した挙動です。
+`agent.executable` には、4章でビルドした社内Collectorを指定します。OCBのマニフェストには、opampextensionと、起動確認用のnopreceiverおよびnopexporterを含めます。含めずにSupervisorの管理下で起動すると、ブートストラップに失敗しました。これはリファレンス実装で確認した挙動です。
 
 OpAMPサーバーとの接続と設定管理はSupervisorが担当し、opampextensionはSupervisorがCollectorの状態を取得するためのローカルな通信に使います。監督プロセスを外へ置く方式でも、Collector内のextensionは必要です。
 
@@ -67,7 +67,7 @@ Supervisorは[contribのcmd/opampsupervisor](https://github.com/open-telemetry/o
 
 OpAMPを導入すると、設定の管理にはGitOpsを、配布にはOpAMPを使います。両方に個別の設定を持つと、Git上の設定と配布済みの設定が一致しません。そこで、Gitを設定の正となる定義とし、設定リポジトリへのマージを契機にOpAMPサーバーが設定を読み込み、Collectorへ配ります。OpAMPはGitOpsを置き換えず、管理サーバーからCollectorまでの配布を担当します。
 
-OpAMPサーバーはエージェントごとに異なる設定を返せるため、属性でグループを分け、段階的に適用できます。たとえば、一台、一つのクラスタ、全体の順に対象を広げます。
+OpAMPサーバーはエージェントごとに異なる設定を返せるため、属性でグループを分け、段階的に適用できます。たとえば、一台、1つのクラスタ、全体の順に対象を広げます。
 
 Supervisorは、設定適用後にCollectorが起動できない場合に前の設定へ戻す `automatic_config_rollback` と、起動時にサーバーへ接続できない場合に使う `startup_fallback_configs` を備えています。自動ロールバックはデフォルトで無効なため、明示的に有効化します。
 

@@ -82,7 +82,7 @@ defer func() {
 - 実行環境（Kubernetesやクラウドプロバイダー）のメタデータからリソース属性を自動検出する
 - トレース、メトリクス、ログのプロバイダー（計装のためのインスタンスを返すもの）を構築してグローバルに登録する
 
-ログの組み込みでは、APIの安定性を考慮します。2026年9月時点で、Goのログ関連モジュール（`otel/log` と `otel/sdk/log`）の正式版はv0.22.0のベータであり、stableに達しているのはトレースとメトリクスです[^golog]。安定化に向けたv1.47.0-rc.1も公開されていますが、リリース候補の段階です。各チームがv0のAPIに直接依存すると、破壊的変更のたびに複数のサービスを修正することになります。ディストリビューションだけがv0のAPIに依存すれば、変更への対応箇所を一つに集約できます。
+ログの組み込みでは、APIの安定性を考慮します。2026年9月時点で、Goのログ関連モジュール（`otel/log` と `otel/sdk/log`）の正式版はv0.22.0のベータであり、stableに達しているのはトレースとメトリクスです[^golog]。安定化に向けたv1.47.0-rc.1も公開されていますが、リリース候補の段階です。各チームがv0のAPIに直接依存すると、破壊的変更のたびに複数のサービスを修正することになります。ディストリビューションだけがv0のAPIに依存すれば、変更への対応箇所を1つに集約できます。
 
 [^golog]: opentelemetry-goのモジュール構成とバージョンは[v1.46.0のversions.yaml](https://github.com/open-telemetry/opentelemetry-go/blob/v1.46.0/versions.yaml)で確認できます。mainブランチはリリース候補を含むため、採用する版のタグで確認してください。
 
@@ -113,7 +113,7 @@ defer func() {
 | `OTEL_PROPAGATORS` | 非対応 | contribのautopropで解釈する |
 | `OTEL_SDK_DISABLED` | 非対応 | ディストリビューションで実装する |
 
-対応状況は仕様リポジトリの[コンプライアンス表](https://github.com/open-telemetry/opentelemetry-specification/blob/main/spec-compliance-matrix.md)にまとまっています。非対応分を埋めるのがcontribの[autoexport](https://pkg.go.dev/go.opentelemetry.io/contrib/exporters/autoexport)と[autoprop](https://pkg.go.dev/go.opentelemetry.io/contrib/propagators/autoprop)で、ディストリビューションはこの二つを組み込むことで標準環境変数のサポートを完成させます。
+対応状況は仕様リポジトリの[コンプライアンス表](https://github.com/open-telemetry/opentelemetry-specification/blob/main/spec-compliance-matrix.md)にまとまっています。非対応分を埋めるのがcontribの[autoexport](https://pkg.go.dev/go.opentelemetry.io/contrib/exporters/autoexport)と[autoprop](https://pkg.go.dev/go.opentelemetry.io/contrib/propagators/autoprop)で、ディストリビューションはこの2つを組み込むことで標準環境変数のサポートを完成させます。
 
 ```go
 // OTEL_TRACES_EXPORTER と OTEL_EXPORTER_OTLP_* を解釈する

@@ -104,7 +104,7 @@ func (c *SummaryClient) Summarize(ctx context.Context, doc string) (string, erro
 ![AIエージェントアプリのトレース構造](/images/20260926-agent-trace.png)
 *図1　矢印はスパンの親子関係を表します。エージェント実行の子スパンは左から時間順に並び、gen_ai属性は紫色のスパンに付きます。*
 
-ツールが社内APIを呼び出す場合、その下には通常の分散トレースが続きます。エージェントの処理とマイクロサービスの処理を一つのトレースとして追跡できるため、既存のオブザーバビリティ基盤を利用できます。会話をまたぐ相関には `gen_ai.conversation.id` 属性を使います。
+ツールが社内APIを呼び出す場合、その下には通常の分散トレースが続きます。エージェントの処理とマイクロサービスの処理を1つのトレースとして追跡できるため、既存のオブザーバビリティ基盤を利用できます。会話をまたぐ相関には `gen_ai.conversation.id` 属性を使います。
 
 Claude CodeやCodexなどのAI開発ツールは、自身のテレメトリーをOpenTelemetry形式で出力します。AIツールの利用状況を収集する方法は、[別の記事](https://zenn.dev/ymotongpoo/articles/20260616-ai-cli-otel-grafana)で解説しています。
 

@@ -37,7 +37,7 @@ digraph blueprint_overview {
   }
 
   opamp [label=<<b>opamp-server</b><br align="left"/>remote-configs/ を配布<br align="left"/>>, fillcolor="#F7DDFC", color="#9430A9"];
-  gateway [label=<<b>ゲートウェイ（otelcol-internal）</b><br align="left"/>tail sampling、redaction<br align="left"/>>, fillcolor="#FFE9D6", color="#AB5A13"];
+  gateway [label=<<b>ゲートウェイ（otelcol-internal）</b><br align="left"/>テイルサンプリング、redaction<br align="left"/>>, fillcolor="#FFE9D6", color="#AB5A13"];
 
   subgraph cluster_backend {
     label=<<b>Grafanaスタック</b>>;

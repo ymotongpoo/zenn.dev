@@ -38,13 +38,13 @@ digraph agent_gateway {
     app2 -> agent2;
   }
 
-  lb [label=<<b>振り分け層（tail sampling運用時のみ）</b><br align="left"/>同じtrace IDを同じゲートウェイへ<br align="left"/>>, fillcolor="#FCF0FE", color="#9430A9", style="rounded,filled,dashed"];
+  lb [label=<<b>振り分け層（テイルサンプリング運用時のみ）</b><br align="left"/>同じトレースIDを同じゲートウェイへ<br align="left"/>>, fillcolor="#FCF0FE", color="#9430A9", style="rounded,filled,dashed"];
 
   subgraph cluster_gateway {
     label=<<b>ゲートウェイ（組織の方針を実装）</b>>;
     labeljust="l"; style="rounded"; penwidth=1.6;
     color="#AB5A13"; bgcolor="#FFF5ED"; fontcolor="#783F0E"; margin=14;
-    gw [label=<<b>ゲートウェイ Collector群</b><br align="left"/>tail sampling<br align="left"/>属性の統制（PII削除、変換）<br align="left"/>ルーティングとバックエンド認証<br align="left"/>>, fillcolor="#FFE9D6", color="#AB5A13"];
+    gw [label=<<b>ゲートウェイ Collector群</b><br align="left"/>テイルサンプリング<br align="left"/>属性の統制（PII削除、変換）<br align="left"/>ルーティングとバックエンド認証<br align="left"/>>, fillcolor="#FFE9D6", color="#AB5A13"];
   }
 
   backend [label=<<b>OTLP対応バックエンド</b>>];

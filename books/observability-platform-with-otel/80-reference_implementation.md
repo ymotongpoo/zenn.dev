@@ -51,7 +51,7 @@ $ docker compose up -d --build
 
 `gateway` を先にビルドします。Supervisor管理のエージェントイメージは、`gateway` のビルド成果物である `otelcol-internal:dev` をベースイメージとして参照しますが、composeはサービス間のビルド順序を保証しません。一括ビルドだけでは、エージェントのビルドが `pull access denied` で失敗することがあります。
 
-初回は、OCBによるCollectorとGoサービスのビルドを実行します。4コアの環境では10分ほどかかりました。Grafanaスタック、OCBでビルドした社内Collector（gatewayとSupervisor管理のエージェント）、OpAMPサーバー、四つのデモサービスからなる10コンテナが起動します。
+初回は、OCBによるCollectorとGoサービスのビルドを実行します。4コアの環境では10分ほどかかりました。Grafanaスタック、OCBでビルドした社内Collector（gatewayとSupervisor管理のエージェント）、OpAMPサーバー、4つのデモサービスからなる10コンテナが起動します。
 
 手元で別のCollectorやGrafana Alloyが動いている場合、エージェントのポート公開が `address already in use` で失敗します。測定した環境でもこれが起きたため、`deploy/docker-compose.override.yaml` で公開ポートをずらしました。
 
@@ -71,7 +71,7 @@ $ for i in $(seq 30); do curl -s localhost:8080/checkout > /dev/null; done
 - リソース属性に、エージェントのリソース detectionが付けた `host.name` と、標準環境変数 `OTEL_RESOURCE_ATTRIBUTES` 経由の `deployment.environment.name` や `team.name` が入っている（2章、4章）
 - スパンに `com.example.delivery.id` が付いていて、ソースコードではWeaver生成の定数で書かれている。`sdk/semconv/` に手書きの属性名文字列はない（6章）
 
-ゲートウェイの属性処理も確認しました。frontendは意図的に `user.email` をスパンへ付けますが、Tempoに保存されたトレースにはこの属性がなく、`com.example.delivery.id` は残っています。transform プロセッサーが `user.email` を転送中に削除しました。
+ゲートウェイの属性処理も確認しました。frontendは意図的に `user.email` をスパンへ付けますが、Tempoに保存されたトレースにはこの属性がなく、`com.example.delivery.id` は残っています。Transformプロセッサーが `user.email` を転送中に削除しました。
 
 メトリクスとログも同じ経路で送ります。otelhttp由来の `http_server_request_duration` はMimirへ、backendがotelslogで出したログはLokiへ届きました。ログのエントリには `trace_id` と `span_id` が付き、トレースから関連するログを検索できます。
 

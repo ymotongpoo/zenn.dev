@@ -68,7 +68,7 @@ Goでは、eBPF、ビルド時、手動計装を選べます。次の表で、�
 
 ## Kubernetesでの配布
 
-Kubernetesでは、[OpenTelemetry Operator](https://opentelemetry.io/ja/docs/platforms/kubernetes/operator/automatic/)が `Instrumentation` カスタムリソースを提供します。プラットフォームチームがクラスタに用意すれば、開発チームはPodにアノテーションを一つ付けて自動計装を有効化できます。
+Kubernetesでは、[OpenTelemetry Operator](https://opentelemetry.io/ja/docs/platforms/kubernetes/operator/automatic/)が `Instrumentation` カスタムリソースを提供します。プラットフォームチームがクラスタに用意すれば、開発チームはPodにアノテーションを1つ付けて自動計装を有効化できます。
 
 ```yaml
 apiVersion: opentelemetry.io/v1alpha1
