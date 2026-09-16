@@ -4,7 +4,7 @@ title: "セマンティック規約のガバナンスとWeaver"
 
 OpenTelemetryでは、HTTPステータスコードの属性名が `http.status_code` から `http.response.status_code` へ変わりました。HTTP関連のセマンティック規約が安定化したときの改名です。移行期間に複数のSDKバージョンを使っていた組織では、ステータスコード別のエラー率を調べるために、新旧の属性名を使ったクエリが必要でした。片方だけを検索すると、ダッシュボードとアラートは一部のサービスを見落とします。
 
-公式規約にも移行があるため、各チームが独自に付ける属性では、さらに多くの表記揺れが生じます。たとえば `user_id`、`userId`、`user.id` や、`env`、`environment`、`deployment.environment.name` です。計装とCollectorを共通化しても、属性の意味が揃っていなければ、サービスを横断して検索できません。三本目の柱では、この意味を統制します。
+公式規約にも移行があるくらいですから、各チームが独自に付ける属性では、さらに多くの表記揺れが生じます。たとえば `user_id`、`userId`、`user.id` や、`env`、`environment`、`deployment.environment.name` です。計装とCollectorを共通化しても、属性の意味が揃っていなければ、サービスを横断して検索できません。三本目の柱では、この意味を統制します。
 
 ## 統制されないスキーマ
 
@@ -15,7 +15,7 @@ OpenTelemetryでは、HTTPステータスコードの属性名が `http.status_c
 - 高カーディナリティを制御できない。メトリクスはラベル値の組み合わせごとに時系列が増えるため、ユーザーIDのように値の種類が多い属性をラベルにすると保存量が急増する
 - ゲートウェイの属性処理に共通の根拠を持てない。削除する属性の一覧が、規約ではなく個別の障害対応だけで増えていく
 
-これらの問題は、属性の名前、意味、型がコードとダッシュボードに散在し、共通の定義がないために起きます。1つの定義からコード、ドキュメント、検査規則を生成する方法を、**schema-as-code**と呼びます。
+これらの問題は、属性の名前、意味、型がコードとダッシュボードに散在し、共通の定義がないために起きます。1つの定義からコード、ドキュメント、検査規則を生成する方法を、**Schema-as-Code**と呼びます。
 
 ## 公式セマンティック規約の構造
 
@@ -23,9 +23,18 @@ OpenTelemetryは、属性の名前と意味を[**セマンティック規約**](
 
 レジストリの構成単位はグループです。属性の集合を定義するattribute_group、スパンの規約を定義するspan、メトリクスを定義するmetricといった種類があり、個々の属性は型と説明と安定度（stable、release_candidate、developmentなど）を持ちます。規約全体にはバージョンがあり、テレメトリー自体にスキーマURLとして埋め込まれます。
 
-公式規約も継続して変更されています。2026年9月時点では、領域ごとに安定度が異なります。OpenTelemetryプロジェクトは、規約の検査、生成、差分検出にWeaverを使っており、公式レジストリにある900を超える属性もCIで検査されています[^weaverblog]。
+公式規約も継続して変更されています。2026年9月時点では、領域ごとに安定度が異なります。OpenTelemetryプロジェクトは、規約の検査、生成、差分検出に**OpenTelemetry Weaver**を使っており、公式レジストリにある900を超える属性もCIで検査されています[^weaverblog]。
 
 [^weaverblog]: 公式ブログ[Observability by Design](https://opentelemetry.io/blog/2025/otel-weaver/)が、公式semconv自体の運用にWeaverを使っていることを説明しています。
+
+[Weaver](https://github.com/open-telemetry/weaver)は、このレジストリのYAMLを入力として受け取るコマンドラインツールです。Rustで実装され、OpenTelemetryプロジェクトが開発しています。次の4つを行います。
+
+- **検査**（`check`）：定義が構文と命名規則に従っているかを調べる
+- **差分検出**（`diff`）：2つのバージョンを比べ、改名や削除といった破壊的変更を洗い出す
+- **生成**（`generate`）：定義からコードやドキュメントを出力する
+- **実データの検査**（`live-check`）：実際に流れているテレメトリーが定義と一致するかを調べる
+
+つまり、前節で述べたSchema-as-Codeを実行する道具です。公式規約の運用にも、組織が自分の規約を運用する場合にも同じツールを使います。以降の節では、社内レジストリを作り、この4つを組織のプロセスへ組み込む方法を説明します。
 
 ## 社内名前空間の設計
 
@@ -33,7 +42,7 @@ OpenTelemetryは、属性の名前と意味を[**セマンティック規約**](
 
 公式規約にある概念には公式の属性を使います。たとえば、HTTPステータスに独自の属性名は追加しません。社内固有の概念には、公式規約と衝突しないよう、逆ドメイン形式の名前空間を使います。本書では `com.example.*` とし、配送IDを `com.example.delivery.id` と定義します。
 
-この規則を検査できる形で記述したものが社内レジストリです。**OpenTelemetry Weaver**のレジストリは、YAMLのグループ定義とマニフェストからなります。マニフェスト（`manifest.yaml`）には、レジストリの名前、バージョン、依存する公式レジストリを宣言します[^manifestname]。
+この規則を検査できる形で記述したものが社内レジストリです。OpenTelemetry Weaverのレジストリは、YAMLのグループ定義とマニフェストからなります。マニフェスト（`manifest.yaml`）には、レジストリの名前、バージョン、依存する公式レジストリを宣言します[^manifestname]。
 
 [^manifestname]: 古い資料ではマニフェストのファイル名が `registry_manifest.yaml` となっていますが、これは旧名で、現在の名前は `manifest.yaml` です（2026年9月時点、Weaver v0.26系）。
 
@@ -78,7 +87,7 @@ Weaverのサブコマンドは、規約の変更前、マージ後、実行時�
 
 [^weaverversion]: Weaverは2026年9月時点でv0.26.1、まだ1.0前です。かつて存在した `weaver registry resolve` と `search` は非推奨になっているので、古い記事のコマンド例に注意してください。
 
-`weaver registry check` は、構文と参照を検査し、OPAのRego言語で書いたポリシーも適用します。たとえば、「`com.example.` 以外の名前空間で属性を新設しない」「stableな属性の型を変更しない」という規則を検査できます。公式の[opentelemetry-weaver-packages](https://github.com/open-telemetry/opentelemetry-weaver-packages)リポジトリには、命名規則、安定度の制約、後方互換性のポリシーが公開されており、Git URLで指定できます。
+`weaver registry check` は、構文と参照を検査し、[OPA](https://www.openpolicyagent.org/)（Open Policy Agent）の[Rego](https://www.openpolicyagent.org/docs/policy-language)言語で書いたポリシーも適用します。たとえば、「`com.example.` 以外の名前空間で属性を新設しない」「stableな属性の型を変更しない」という規則を検査できます。公式の[opentelemetry-weaver-packages](https://github.com/open-telemetry/opentelemetry-weaver-packages)リポジトリには、命名規則、安定度の制約、後方互換性のポリシーが公開されており、Git URLで指定できます。
 
 ```console
 $ weaver registry check -r ./registry \
@@ -87,7 +96,7 @@ $ weaver registry check -r ./registry \
 
 `weaver registry diff` は、PRのレジストリをmainブランチなどの基準と比較します。属性の追加、改名、削除、型変更を構造化された差分として出力します。破壊的変更を機械的に検出し、明示的な承認へ回せます。
 
-`weaver registry generate` は、minijinjaテンプレートとjq形式のフィルタを使い、レジストリから成果物を生成します。本書では社内属性のGo定数パッケージを生成し、2章のディストリビューションへ含めます。開発チームは `attribute.String("com.example.delivery.id", id)` と文字列を手書きせず、生成された定数を使います。
+`weaver registry generate` は、[minijinja](https://github.com/mitsuhiko/minijinja)テンプレートと[jq](https://jqlang.org/)形式のフィルタを使い、レジストリから成果物を生成します。本書では社内属性のGo定数パッケージを生成し、2章のディストリビューションへ含めます。開発チームは `attribute.String("com.example.delivery.id", id)` と文字列を手書きせず、生成された定数を使います。
 
 ただし、Goの `attribute.String` は任意の文字列を受け取るため、生成定数があっても文字列の手書きを禁止できず、誤記もコンパイルエラーにはなりません。生成定数は手書きの機会を減らし、IDEの補完から利用可能な属性を選べるようにします。手書きを禁止するには、文字列を受け取らない社内ラッパーAPIか静的解析が必要です。残った違反はlive-checkで実際のテレメトリーから検出します。
 

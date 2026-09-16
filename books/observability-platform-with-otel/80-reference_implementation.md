@@ -86,7 +86,7 @@ $ ./registry/weaver.sh generate
 
 checkは、公式semconvへの依存をGit URLで解決して約3秒で成功しました。違反を検出できることも確認します。`com.example.` 以外の名前空間として `myteam.custom.flag` を定義すると、checkはRegoポリシーの `internal_namespace_only` violationで失敗しました。この定義を削除すると成功します。generateは `sdk/semconv/semconv.go` を生成し、`com.example.delivery.id` を `ComExampleDeliveryId` 定数に変換しました。生成結果はコミット済みのファイルと一致し、差分は出ません。CIはこの差分の有無を検査します。
 
-実際のテレメトリーはlive-checkで検査します。live-checkをOTLPの受信口として起動し、テレメトリーを生成する公式のテストツールtelemetrygenから、レジストリにない属性を含むスパンを送りました。`myteam.rogue.attr` はviolationとして報告され、`com.example.delivery.id` はviolationになりませんでした。ただし、`com.example.delivery.id` には安定度がdevelopmentであるという改善提案が付きます。
+実際のテレメトリーはlive-checkで検査します。live-checkをOTLPの受信口として起動し、テレメトリーを生成する公式のテストツール[telemetrygen](https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/cmd/telemetrygen)から、レジストリにない属性を含むスパンを送りました。`myteam.rogue.attr` はviolationとして報告され、`com.example.delivery.id` はviolationになりませんでした。ただし、`com.example.delivery.id` には安定度がdevelopmentであるという改善提案が付きます。
 
 live-checkをコンテナで動かす場合は、リスンアドレスとポートを明示します。測定した際は、指定なしで起動したところコンテナ外から送ったテレメトリーが届かず、検査対象が0件のまま終了しました。`registry/weaver.sh` では `--otlp-grpc-address 0.0.0.0 --otlp-grpc-port 4317` を指定して解決しています。ただしv0.25.1のデフォルト値はこの指定と同じ `0.0.0.0:4317` なので、0件になった原因はデフォルトのリスンアドレスではありません。ポート公開の状態や、デフォルトで10秒の無通信タイムアウトが関わった可能性があり、原因は特定していません。なお、v0.26.0でデフォルトのリスンアドレスは `127.0.0.1` に変更されたため、この版以降はコンテナで動かすときに明示指定が必要になります。
 
