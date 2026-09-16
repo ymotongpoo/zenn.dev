@@ -21,9 +21,9 @@ OpenTelemetryでは、HTTPステータスコードの属性名が `http.status_c
 
 OpenTelemetryは、属性の名前と意味を[**セマンティック規約**](https://opentelemetry.io/docs/specs/semconv/)（semantic conventions）として定義します。`http.response.status_code` や `service.name` などの定義をYAMLの**レジストリ**で管理し、ドキュメントと各言語の定数パッケージを生成しています。
 
-レジストリの構成単位はグループです。属性の集合を定義するattribute_group、スパンの規約を定義するspan、メトリクスを定義するmetricといった種類があり、個々の属性は型と説明と安定性（stable、release_candidate、developmentなど）を持ちます。規約全体にはバージョンがあり、テレメトリー自体にスキーマURLとして埋め込まれます。
+レジストリの構成単位はグループです。属性の集合を定義するattribute_group、スパンの規約を定義するspan、メトリクスを定義するmetricといった種類があり、個々の属性は型と説明と安定度（stable、release_candidate、developmentなど）を持ちます。規約全体にはバージョンがあり、テレメトリー自体にスキーマURLとして埋め込まれます。
 
-公式規約も継続して変更されています。2026年9月時点では、領域ごとに安定性が異なります。OpenTelemetryプロジェクトは、規約の検査、生成、差分検出にWeaverを使っており、公式レジストリにある900を超える属性もCIで検査されています[^weaverblog]。
+公式規約も継続して変更されています。2026年9月時点では、領域ごとに安定度が異なります。OpenTelemetryプロジェクトは、規約の検査、生成、差分検出にWeaverを使っており、公式レジストリにある900を超える属性もCIで検査されています[^weaverblog]。
 
 [^weaverblog]: 公式ブログ[Observability by Design](https://opentelemetry.io/blog/2025/otel-weaver/)が、公式semconv自体の運用にWeaverを使っていることを説明しています。
 
@@ -78,7 +78,7 @@ Weaverのサブコマンドは、規約の変更前、マージ後、実行時�
 
 [^weaverversion]: Weaverは2026年9月時点でv0.26.1、まだ1.0前です。かつて存在した `weaver registry resolve` と `search` は非推奨になっているので、古い記事のコマンド例に注意してください。
 
-`weaver registry check` は、構文と参照を検査し、OPAのRego言語で書いたポリシーも適用します。たとえば、「`com.example.` 以外の名前空間で属性を新設しない」「stableな属性の型を変更しない」という規則を検査できます。公式の[opentelemetry-weaver-packages](https://github.com/open-telemetry/opentelemetry-weaver-packages)リポジトリには、命名規則、stability制約、後方互換性のポリシーが公開されており、Git URLで指定できます。
+`weaver registry check` は、構文と参照を検査し、OPAのRego言語で書いたポリシーも適用します。たとえば、「`com.example.` 以外の名前空間で属性を新設しない」「stableな属性の型を変更しない」という規則を検査できます。公式の[opentelemetry-weaver-packages](https://github.com/open-telemetry/opentelemetry-weaver-packages)リポジトリには、命名規則、安定度の制約、後方互換性のポリシーが公開されており、Git URLで指定できます。
 
 ```console
 $ weaver registry check -r ./registry \

@@ -19,7 +19,7 @@ LLMを使うワークロードには、従来のWebサービスと異なる性�
 
 ## GenAIセマンティック規約の現状
 
-OpenTelemetryには、生成AI向けのセマンティック規約（`gen_ai.*`）があります。採用時には、2026年9月時点の安定性と配布方法を確認します。
+OpenTelemetryには、生成AI向けのセマンティック規約（`gen_ai.*`）があります。採用時には、2026年9月時点の安定度と配布方法を確認します。
 
 GenAI規約は2026年6月公開のsemconv v1.42.0で、semantic conventions本体から専用の[semantic-conventions-genai](https://github.com/open-telemetry/semantic-conventions-genai)リポジトリへの分離が反映されました。`gen_ai.*` に加えて、MCP関連の `mcp.*` もこのリポジトリで管理されています。2026年9月時点では、すべてのGenAI規約がDevelopment段階であり、stableの定義はありません。専用リポジトリにはバージョン付きリリースもないため、特定バージョンへの準拠を宣言できない状態です。
 

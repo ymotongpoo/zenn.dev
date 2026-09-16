@@ -19,10 +19,10 @@ digraph staged_rollout {
   ];
 
   merged [label=<<b>設定のマージ</b><br align="left"/>CIで実効設定を検査済み<br align="left"/>>, fillcolor="#FFFCD7", color="#736B10"];
-  canary [label=<<b>canary（1台）</b><br align="left"/>適用結果とテレメトリー到達を確認<br align="left"/>>, fillcolor="#FFE9D6", color="#AB5A13"];
+  canary [label=<<b>カナリア（1台）</b><br align="left"/>適用結果とテレメトリー到達を確認<br align="left"/>>, fillcolor="#FFE9D6", color="#AB5A13"];
   partial [label=<<b>一部のグループ</b><br align="left"/>エクスポーター失敗率と流量を監視<br align="left"/>>, fillcolor="#FFE9D6", color="#AB5A13"];
   full [label=<<b>フリート全体</b>>, fillcolor="#D2F3DF", color="#038435"];
-  halt [label=<<b>展開停止と再配布</b><br align="left"/>修正版を配り直す<br align="left"/>起動失敗の自動ロールバックだけに頼らない<br align="left"/>>, fillcolor="#FDE1EC", color="#AA3E6A"];
+  halt [label=<<b>ロールアウト停止と再配布</b><br align="left"/>修正版を配り直す<br align="left"/>起動失敗の自動ロールバックだけに頼らない<br align="left"/>>, fillcolor="#FDE1EC", color="#AA3E6A"];
 
   merged -> canary;
   canary -> partial [xlabel=" 到達確認OK"];

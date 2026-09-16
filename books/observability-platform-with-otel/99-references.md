@@ -2,7 +2,7 @@
 title: "参考リンク"
 ---
 
-本書で参照した一次情報を章別に示します。本文中のstabilityとバージョンは、2026年9月16日に確認した値です。9章の測定条件と、過去のリリース履歴については、記載した当時の版を示しています。利用時には各リンク先で最新の状態を確認してください。
+本書で参照した一次情報を章別に示します。本文中の安定度とバージョンは、2026年9月16日に確認した値です。9章の測定条件と、過去のリリース履歴については、記載した当時の版を示しています。利用時には各リンク先で最新の状態を確認してください。
 
 ## 全体
 
@@ -14,7 +14,7 @@ title: "参考リンク"
 ## 2章 SDKディストリビューション
 
 - [Distributions（概念の定義）](https://opentelemetry.io/ja/docs/concepts/distributions/)
-- [opentelemetry-go](https://github.com/open-telemetry/opentelemetry-go) と [versions.yaml（モジュール別のstability）](https://github.com/open-telemetry/opentelemetry-go/blob/main/versions.yaml)
+- [opentelemetry-go](https://github.com/open-telemetry/opentelemetry-go) と [versions.yaml（モジュール別の安定度）](https://github.com/open-telemetry/opentelemetry-go/blob/main/versions.yaml)
 - [仕様のコンプライアンス表（環境変数対応状況）](https://github.com/open-telemetry/opentelemetry-specification/blob/main/spec-compliance-matrix.md)
 - [autoexport](https://pkg.go.dev/go.opentelemetry.io/contrib/exporters/autoexport) と [autoprop](https://pkg.go.dev/go.opentelemetry.io/contrib/propagators/autoprop)
 - [otelconf（declarative configurationのGo実装）](https://pkg.go.dev/go.opentelemetry.io/contrib/otelconf) と [opentelemetry-configuration（設定スキーマ）](https://github.com/open-telemetry/opentelemetry-configuration)

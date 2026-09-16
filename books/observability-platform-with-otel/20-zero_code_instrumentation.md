@@ -33,7 +33,7 @@ GoのeBPF計装は、**OBI**（OpenTelemetry eBPF Instrumentation）で開発さ
 
 [^obi]: 2026年8月17日のv0.11.0ではGoのトレースAPIの自動計装が入り、従来 opentelemetry-go-instrumentation が担っていた領域を取り込みつつあります。プロジェクトの2026年の目標はstable 1.0です（[公式ブログ](https://opentelemetry.io/blog/2026/obi-goals/)）。
 
-ただし、eBPFによるGoバイナリの関数レベル計装には制約があります。goroutineとOSスレッドが一対一に対応しないため、リクエストの文脈を追跡しにくくなります。コンパイラの最適化で関数の構造が変わり、コンテキスト伝搬のために実行中のプロセスのメモリへ書き込む操作にも危険が伴います。詳細は別の本「[OpenTelemetry eBPF Instrumentationの舞台裏](https://zenn.dev/ymotongpoo/books/go-ebpf-primer)」で、CPUとメモリの仕組みから説明しています。本書では、GoのeBPF計装には取得できる情報の粒度と安定性に制約があることを前提に、配布方法を考えます。
+ただし、eBPFによるGoバイナリの関数レベル計装には制約があります。goroutineとOSスレッドが一対一に対応しないため、リクエストの文脈を追跡しにくくなります。コンパイラの最適化で関数の構造が変わり、コンテキスト伝搬のために実行中のプロセスのメモリへ書き込む操作にも危険が伴います。詳細は別の本「[OpenTelemetry eBPF Instrumentationの舞台裏](https://zenn.dev/ymotongpoo/books/go-ebpf-primer)」で、CPUとメモリの仕組みから説明しています。本書では、GoのeBPF計装には取得できる情報の粒度と安定度に制約があることを前提に、配布方法を考えます。
 
 ## コンパイル時計装
 
