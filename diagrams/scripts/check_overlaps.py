@@ -35,6 +35,7 @@ import argparse
 import json
 import subprocess
 import sys
+import unicodedata
 
 IN_TO_PT = 72.0
 SAMPLES_PER_SEGMENT = 24
@@ -46,6 +47,24 @@ LABEL_LINE_HALF_HEIGHT = 6.0
 # 小さく出るため、座標上わずかに空いていても目視では隣の図形に触れて見える。
 LABEL_EDGE_MARGIN = 3.0
 SELF_CROSS_THRESHOLD = 15.0
+
+# 辺ラベルのフォントサイズ。本スキルの .dot は edge [fontsize=11] を使う。
+EDGE_FONT_SIZE = 11.0
+
+
+def estimate_text_width(txt, fs=EDGE_FONT_SIZE):
+    """文字列の描画幅をフォントサイズから推定する。
+
+    dot は xlabel の幅を -Tjson で報告しないので、文字から見積もる。
+    全角（CJK・全角記号）は1.0em、半角は約0.55emで数える。厳密な組版幅では
+    ないが、ラベルが箱に被っているかの判定には足りる。過小評価すると
+    被りを見逃すので、半角の係数はやや大きめに取っている。
+    check_elk_output.py の text_width と同じ式を使う。
+    """
+    w = 0.0
+    for ch in txt:
+        w += 1.0 if unicodedata.east_asian_width(ch) in ("W", "F", "A") else 0.55
+    return w * fs
 
 
 def run_dot_json(path):
@@ -199,14 +218,21 @@ def check_file(path, margin):
             continue
         # xlabel は `xlp`、head/tail ラベルは `_hldraw_`/`_tldraw_` の T 命令に
         # 描画座標が入る。後者を拾わないと headlabel の近接を見落とす。
+        #
+        # `_ldraw_` は xlabel の描画命令も含むので、`xlp` がある辺では
+        # 同じラベルを2回数えてしまう（同一の食い込みが2件報告される）。
+        # xlp 側は文字から幅を推定でき、そちらのほうが実描画に近いので、
+        # xlp があるときは `_ldraw_` を読まない。
         extra_labels = []
-        for grp in ("_hldraw_", "_tldraw_", "_ldraw_"):
+        groups = ("_hldraw_", "_tldraw_") if e.get("xlp") else ("_hldraw_", "_tldraw_", "_ldraw_")
+        for grp in groups:
             for op in e.get(grp, []):
                 if op.get("op") == "T" and op.get("pt"):
                     extra_labels.append((op["pt"][0], op["pt"][1],
                                          float(op.get("width") or 0.0)))
         edges.append({"tail": tail, "head": head, "path": epath,
-                      "xlp": e.get("xlp"), "labels": extra_labels})
+                      "xlp": e.get("xlp"), "xlabel": e.get("xlabel", ""),
+                      "labels": extra_labels})
 
     warnings = 0
 
@@ -255,7 +281,11 @@ def check_file(path, margin):
         if e["xlp"]:
             try:
                 lx, ly = (float(v) for v in e["xlp"].split(","))
-                points.append((lx, ly, 0.0))
+                # xlabel の幅は dot が報告しないので、文字から推定する。
+                # 幅を 0 にすると中心点だけの判定になり、箱の隙間に
+                # 収まらない長いラベル（両側の箱に食い込む形）を
+                # 構造的に見落とす。
+                points.append((lx, ly, estimate_text_width(e.get("xlabel", ""))))
             except ValueError:
                 pass
         points.extend(e["labels"])
@@ -291,7 +321,7 @@ def check_file(path, margin):
             lx0, lx1 = lx - lw / 2 - LABEL_EDGE_MARGIN, lx + lw / 2 + LABEL_EDGE_MARGIN
             ly0, ly1 = ly - LABEL_LINE_HALF_HEIGHT, ly + LABEL_LINE_HALF_HEIGHT
             for gvid, node in nodes.items():
-                if gvid in (e["tail"], e["head"]) or is_waypoint(node):
+                if is_waypoint(node):
                     continue
                 nx0, ny0, nx1, ny1 = node_bbox(node)
                 ox = min(lx1, nx1) - max(lx0, nx0)
@@ -301,6 +331,11 @@ def check_file(path, margin):
                           f"'{node.get('name')}' に{ox:.0f}x{oy:.0f}pt "
                           f"食い込んでいる（LABEL-ON-NODE）")
                     warnings += 1
+                    continue
+                # 距離の判定は、自分が説明している辺の両端だけ緩める。
+                # 矢印の根元と先端の箱にはラベルが近づくのが自然だが、
+                # 文字が箱の中まで入るのは上の食い込み判定で拾う。
+                if gvid in (e["tail"], e["head"]):
                     continue
                 d = dist_point_to_bbox((lx, ly), node_bbox(node))
                 if d < margin:

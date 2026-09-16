@@ -32,7 +32,10 @@ digraph ai_investigation_loop {
   verify -> query [xlabel=" 追加調査"];
   verify -> report [xlabel=" 確証"];
 
-  registry -> query [style=dashed, color="#9430A9", fontcolor="#6A2278", xlabel=" 正しい属性名を参照\l"];
+  // レジストリと query を rank=same で横に並べると、箱の間隔（nodesep）に
+  // 収まらない長さのラベルが両側の箱へ食い込む。ラベルはキャプションへ
+  // 移し、参照の向きだけを矢印で示す。
+  registry -> query [style=dashed, color="#9430A9", fontcolor="#6A2278"];
 
   { rank=same; query; registry; }
 }

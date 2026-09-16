@@ -18,10 +18,14 @@ digraph autonomy_stages {
     fontcolor="#171717"
   ];
 
-  read [label=<<b>read</b><br align="left"/>調査と要約。誤りのコストは<br align="left"/>「間違った報告」に留まる<br align="left"/>>, fillcolor="#D2F3DF", color="#038435"];
-  suggest [label=<<b>suggest</b><br align="left"/>修復手順を提案。実行は人間<br align="left"/>提案の質を継続評価する<br align="left"/>>, fillcolor="#FFE9D6", color="#AB5A13"];
-  act [label=<<b>act（承認付き）</b><br align="left"/>ロールバックなど可逆な操作から<br align="left"/>>, fillcolor="#F7DDFC", color="#9430A9"];
-  autonomous [label=<<b>autonomous</b><br align="left"/>定型化された障害のみ<br align="left"/>適用範囲を明示的に列挙する<br align="left"/>>, fillcolor="#FFFCD7", color="#736B10"];
+  // 同じカテゴリ（権限の段階）の4つは大きさを揃えて整列させる。
+  // ラベルの文字数で幅が変わると、段階ごとに重みが違うように見える。
+  node [width=4.9, height=1.0];
+
+  read [label=<<b>read（調査のみ）</b><br align="left"/>調査と要約。誤りのコストは<br align="left"/>「間違った報告」に留まる<br align="left"/>>, fillcolor="#D2F3DF", color="#038435"];
+  suggest [label=<<b>suggest（提案まで）</b><br align="left"/>修復手順を提案。実行は人間<br align="left"/>提案の質を継続評価する<br align="left"/>>, fillcolor="#FFE9D6", color="#AB5A13"];
+  act [label=<<b>act（承認付きの実行）</b><br align="left"/>ロールバックなど可逆な操作から<br align="left"/>>, fillcolor="#F7DDFC", color="#9430A9"];
+  autonomous [label=<<b>autonomous（範囲を限った自動対処）</b><br align="left"/>定型化された障害のみ<br align="left"/>適用範囲を明示的に列挙する<br align="left"/>>, fillcolor="#FFFCD7", color="#736B10"];
 
   read -> suggest [xlabel=" 報告が信頼できたら"];
   suggest -> act [xlabel=" 提案が信頼できたら"];

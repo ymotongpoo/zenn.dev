@@ -1,4 +1,4 @@
-// AI調査エージェントの二種類のMCP接続
+// AI調査エージェントのテレメトリーアクセス経路（スキーマ / 実データ）
 digraph two_mcp {
   graph [
     fontname="IBM Plex Sans JP", fontsize=13,
@@ -36,9 +36,14 @@ digraph two_mcp {
     label=<<b>実データを読む</b>>;
     labeljust="l"; style="rounded"; penwidth=1.6;
     color="#AB5A13"; bgcolor="#FFF5ED"; fontcolor="#783F0E"; margin=14;
+    // 同じカテゴリ（バックエンドへの経路）の2つは大きさを揃える。
+    node [width=3.5, height=0.78];
     telmcp [label=<<b>telemetry MCP</b><br align="left"/>バックエンド固有のツール定義<br align="left"/>>, fillcolor="#F7DDFC", color="#9430A9"];
+    cli [label=<<b>CLI</b><br align="left"/>logcli、promtool、grafanactl<br align="left"/>>, fillcolor="#D2F3DF", color="#038435"];
     backend [label=<<b>観測バックエンド</b><br align="left"/>トレース、メトリクス、ログ<br align="left"/>>];
     telmcp -> backend;
+    cli -> backend;
+    { rank=same; telmcp; cli; }
   }
 
   // ラベルは置かない。2本ともクラスタの角と縦線に挟まれた狭い場所へ
@@ -46,4 +51,5 @@ digraph two_mcp {
   // 空白での押し出しも効かない）。読む対象の違いはキャプションが述べる。
   ai -> regmcp;
   ai -> telmcp;
+  ai -> cli;
 }
