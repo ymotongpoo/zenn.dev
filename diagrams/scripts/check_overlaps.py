@@ -42,6 +42,9 @@ SAMPLES_PER_SEGMENT = 24
 # dot は横の枠線から 9pt 程度離してラベルを置くことがあり、それは視覚的に
 # 問題ないので、実際に文字が枠を跨ぐ範囲（中心が 6pt 以内）だけを検出する。
 LABEL_LINE_HALF_HEIGHT = 6.0
+# ラベルの文字矩形を左右に広げる余裕。dot の報告する width は実際の描画幅より
+# 小さく出るため、座標上わずかに空いていても目視では隣の図形に触れて見える。
+LABEL_EDGE_MARGIN = 3.0
 SELF_CROSS_THRESHOLD = 15.0
 
 
@@ -275,9 +278,29 @@ def check_file(path, margin):
                     print(f"  [{path}] {tail_name} -> {head_name} のラベルが "
                           f"{other_tail} -> {other_head} の経路に近すぎる（{d:.0f}pt, LABEL-TOO-CLOSE）")
                     warnings += 1
-            # 3b. 無関係なノードの矩形に近すぎる
+            # 3b. 無関係なノードの矩形に近すぎる／文字が食い込んでいる。
+            # 中心点だけで測ると、中心は箱の外でも文字の左右の端が箱に
+            # 食い込む位置（「 OTLP」の O だけが隣の箱に乗る形）を
+            # 見逃す。文字の外接矩形で判定する。
+            #
+            # 矩形は dot の報告する width から作るが、この値は実際の
+            # 描画幅より小さく出る（グリフの送り幅の合計であり、字体の
+            # サイドベアリングや先頭の空白の扱いで数pt食い違う）。
+            # 座標上は 0.8pt 空いていても目視では重なって見えた実例が
+            # あるので、接触の判定には LABEL_EDGE_MARGIN の余裕を持たせる。
+            lx0, lx1 = lx - lw / 2 - LABEL_EDGE_MARGIN, lx + lw / 2 + LABEL_EDGE_MARGIN
+            ly0, ly1 = ly - LABEL_LINE_HALF_HEIGHT, ly + LABEL_LINE_HALF_HEIGHT
             for gvid, node in nodes.items():
                 if gvid in (e["tail"], e["head"]) or is_waypoint(node):
+                    continue
+                nx0, ny0, nx1, ny1 = node_bbox(node)
+                ox = min(lx1, nx1) - max(lx0, nx0)
+                oy = min(ly1, ny1) - max(ly0, ny0)
+                if ox > 0 and oy > 0:
+                    print(f"  [{path}] {tail_name} -> {head_name} のラベルが "
+                          f"'{node.get('name')}' に{ox:.0f}x{oy:.0f}pt "
+                          f"食い込んでいる（LABEL-ON-NODE）")
+                    warnings += 1
                     continue
                 d = dist_point_to_bbox((lx, ly), node_bbox(node))
                 if d < margin:

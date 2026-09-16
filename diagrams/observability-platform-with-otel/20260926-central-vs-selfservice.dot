@@ -1,4 +1,5 @@
 // 中央集権モデルとセルフサービスモデルの対比
+// @divider: between-clusters
 digraph central_vs_selfservice {
   graph [
     fontname="IBM Plex Sans JP", fontsize=13,
@@ -45,6 +46,19 @@ digraph central_vs_selfservice {
     sC -> artifacts;
   }
 
-  // 2つのモデルを上下に並べるためのレイアウト調整
-  central -> sB [style=invis];
+  // 2つのモデルは別物であることを示すため、間隔を空けて区切り線を挟む。
+  // 区切り線は冒頭の `@divider: between-clusters` が指示し、
+  // draw_divider.py がSVG後処理で引く。
+  //
+  // 辺で引こうとして失敗した手を記録しておく。不可視ノード2つを
+  // rank=same で並べて間を実線で結ぶ方法（divL -> divR）は、線が中央に
+  // 短く浮くだけでなく、両クラスタの端へ揃えようと tA/tC への不可視辺を
+  // 足した時点でチームの並び順が崩れ（A B C が B A C になる）、線自体も
+  // 折れた。ランクを跨ぐ「装飾としての線」は dot のレイアウトモデルの
+  // 外にあるので、後処理で描くのが正しい。
+  // 上下の間隔は不可視辺で作る。左端を揃えようと tA -> platform で繋ぐと、
+  // その辺がランク内の順序決定に影響してチームの並びが B C A に崩れる。
+  // 枠の左端を揃えることより並び順が正しいことのほうが重要なので、
+  // 揃えるのは諦める。
+  central -> platform [style=invis, minlen=3];
 }

@@ -83,6 +83,7 @@ render_with_dot() {
         | python3 "$SCRIPT_DIR/nudge_xlabel_from_edge.py" "$XLABEL_MARGIN" \
         | python3 "$SCRIPT_DIR/spread_parallel_edges.py" "$PARALLEL_GAP" \
         | python3 "$SCRIPT_DIR/fix_tee_gap.py" "$TEE_GAP" \
+        | python3 "$SCRIPT_DIR/draw_divider.py" "$2" \
         | rsvg-convert --dpi-x "$DPI" --dpi-y "$DPI" -o "$3"
 }
 

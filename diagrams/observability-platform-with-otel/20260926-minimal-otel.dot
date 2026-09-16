@@ -29,10 +29,11 @@ digraph minimal_otel {
   collector [label=<<b>Collector</b><br align="left"/>テレメトリーを受信し、加工し、送信する中継プロセス<br align="left"/>>, fillcolor="#F7DDFC", color="#9430A9"];
   backend [label=<<b>バックエンド</b><br align="left"/>保存、検索、可視化を行う<br align="left"/>>];
 
-  // ラベルは2行あると経路から大きく離れた位置に置かれ、どの線の説明か
-  // 分からなくなる。点線の意味と propagator はキャプションが述べている。
+  // svcA から Collector へ下りる線は svcB の右脇を通る。ラベルは
+  // nudge_xlabel_from_edge.py が線から離す方向へ押し出すが、その際
+  // クラスタの枠を越えないよう制限がかかる。
   svcA -> svcB [style=dashed, color="#8A8A8A", fontcolor="#4A4A4A"];
-  svcA -> collector [xlabel=" OTLP"];
+  svcA:se -> collector [xlabel=" OTLP"];
   svcB -> collector [xlabel=" OTLP"];
   collector -> backend;
 }

@@ -21,16 +21,31 @@ import re
 import sys
 
 EDGE_GROUP = re.compile(r'(<g[^>]*class="edge"[^>]*>.*?</g>)', re.S)
+CLUSTER_GROUP = re.compile(r'<g[^>]*class="cluster"[^>]*>(.*?)</g>', re.S)
 PATH = re.compile(r'<path\b([^>]*?)/>')
 TEXT = re.compile(r'(<text\b([^>]*?)>)(.*?)(</text>)', re.S)
 ATTR = re.compile(r'([\w-]+)="([^"]*)"')
 NUM = re.compile(r'-?\d+(?:\.\d+)?')
+POINT = re.compile(r'(-?\d+(?:\.\d+)?),(-?\d+(?:\.\d+)?)')
 
 FULLWIDTH_EM = 1.0
 HALFWIDTH_EM = 0.6
 # 縦方向の文字の広がり: ベースラインから上に ascent、下に descent
 ASCENT_EM = 0.8
 DESCENT_EM = 0.2
+
+
+def cluster_frames(svg):
+    """クラスタの枠の矩形を返す。押し出しでラベルを枠の外へ出さないため。"""
+    frames = []
+    for m in CLUSTER_GROUP.finditer(svg):
+        pts = [(float(a), float(b)) for a, b in POINT.findall(m.group(1))]
+        if not pts:
+            continue
+        xs = [p[0] for p in pts]
+        ys = [p[1] for p in pts]
+        frames.append((min(xs), min(ys), max(xs), max(ys)))
+    return frames
 
 
 def text_width(s, font_size):
@@ -53,7 +68,26 @@ def path_axis(d):
     return None, None
 
 
-def process_group(group, margin):
+def _inside_frames(tx, ty, half_w, frames, font_size):
+    """ラベルの文字範囲が、どのクラスタの枠線とも重ならないか。
+
+    枠の外（どの枠にも属さない位置）は許容する——クラスタを持たない図や、
+    枠の外側に置かれたラベルを動かせなくする理由はない。禁じたいのは
+    「枠線の上に文字が乗る」ことだけなので、縦の枠線との交差だけを見る。
+    """
+    x0, x1 = tx - half_w, tx + half_w
+    top = ty - ASCENT_EM * font_size
+    bottom = ty + DESCENT_EM * font_size
+    for fx0, fy0, fx1, fy1 in frames:
+        if bottom < fy0 or top > fy1:
+            continue                       # 枠の高さの外
+        for fx in (fx0, fx1):
+            if x0 <= fx <= x1:
+                return False
+    return True
+
+
+def process_group(group, margin, frames=()):
     path_m = PATH.search(group)
     text_m = TEXT.search(group)
     if not path_m or not text_m:
@@ -72,12 +106,25 @@ def process_group(group, margin):
 
     if axis == 'v':
         tx = float(text_attrs['x'])
+        ty = float(text_attrs['y'])
         # 経路(coord)とラベルの近い側の端の距離が margin 未満なら押し出す
         dist = coord - (tx + half_w) if tx <= coord else (tx - half_w) - coord
         if dist < margin:
             shift = margin - dist
-            new_tx = tx - shift if tx <= coord else tx + shift
-            text_attrs['x'] = f'{new_tx:.2f}'
+            outward = -1.0 if tx <= coord else 1.0
+            new_tx = tx + outward * shift
+            # クラスタの枠を越えるなら押し出さない。矢印から離すだけを見て
+            # 動かすと、枠の内側にあったラベルを枠線の上へ押し出してしまう
+            # （「計装されたサービス群」の枠に OTLP の T が乗った実例）。
+            # 越える場合は、経路の反対側へ同じ距離だけ逃がせるかを試し、
+            # それも枠を越えるなら元の位置に留める（線に触れる方が、
+            # 枠線と文字が重なるより読みやすい）。
+            if _inside_frames(new_tx, ty, half_w, frames, font_size):
+                text_attrs['x'] = f'{new_tx:.2f}'
+            else:
+                mirrored = coord + (coord - new_tx)
+                if _inside_frames(mirrored, ty, half_w, frames, font_size):
+                    text_attrs['x'] = f'{mirrored:.2f}'
     else:
         # 横線の場合、縦方向の広がりはテキストの幅ではなく高さで測る。
         # y はベースライン: 線より上のラベルは下端 (descent) が、
@@ -100,7 +147,9 @@ def process_group(group, margin):
 def main():
     margin = float(sys.argv[1]) if len(sys.argv) > 1 else 6.0
     svg = sys.stdin.read()
-    sys.stdout.write(EDGE_GROUP.sub(lambda m: process_group(m.group(1), margin), svg))
+    frames = cluster_frames(svg)
+    sys.stdout.write(
+        EDGE_GROUP.sub(lambda m: process_group(m.group(1), margin, frames), svg))
 
 
 if __name__ == '__main__':
