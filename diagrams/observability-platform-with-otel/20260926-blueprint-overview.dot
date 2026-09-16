@@ -33,11 +33,11 @@ digraph blueprint_overview {
     label=<<b>Supervisor管理のエージェント</b>>;
     labeljust="l"; style="rounded"; penwidth=1.6;
     color="#4A4A4A"; bgcolor="#F3F3F3"; fontcolor="#343434"; margin=14;
-    agent [label=<<b>otelcol-internal</b><br align="left"/>OCBビルド。opampextension入り<br align="left"/>>, fillcolor="#FFE9D6", color="#AB5A13"];
+    agent [label=<<b>エージェント層</b><br align="left"/>otelcol-internalをOCBでビルド<br align="left"/>opampextension入り<br align="left"/>>, fillcolor="#FFE9D6", color="#AB5A13"];
   }
 
   opamp [label=<<b>opamp-server</b><br align="left"/>remote-configs/ を配布<br align="left"/>>, fillcolor="#F7DDFC", color="#9430A9"];
-  gateway [label=<<b>ゲートウェイ（otelcol-internal）</b><br align="left"/>テイルサンプリング、redaction<br align="left"/>>, fillcolor="#FFE9D6", color="#AB5A13"];
+  gateway [label=<<b>ゲートウェイ層</b><br align="left"/>同じotelcol-internalを別の設定で起動<br align="left"/>テイルサンプリング、リダクション<br align="left"/>>, fillcolor="#FFE9D6", color="#AB5A13"];
 
   subgraph cluster_backend {
     label=<<b>Grafanaスタック</b>>;
