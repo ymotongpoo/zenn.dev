@@ -1,47 +1,52 @@
 // Weaverによるスキーマ管理の循環
 digraph weaver_loop {
   graph [
-    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=13,
-    rankdir=TB, compound=true, splines=true,
+    fontname="IBM Plex Sans JP", fontsize=13,
+    rankdir=TB, compound=true, splines=ortho,
     nodesep=0.5, ranksep=0.55, pad=0.25,
     bgcolor="white", newrank=true
   ];
   node [
-    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=12,
+    fontname="IBM Plex Sans JP", fontsize=12,
     shape=box, style="rounded,filled",
-    fillcolor="#F1F5F9", color="#475569", penwidth=1.6,
+    fillcolor="#E4E4E4", color="#4A4A4A", penwidth=1.6,
     margin="0.2,0.14"
   ];
   edge [
-    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=11,
-    color="#334155", penwidth=1.4, arrowsize=0.9,
-    fontcolor="#1E293B"
+    fontname="IBM Plex Sans JP", fontsize=11,
+    color="#343434", penwidth=1.4, arrowsize=0.9,
+    fontcolor="#171717"
   ];
 
-  registry [label=<<b>レジストリ定義（YAML）</b><br align="left"/>属性の名前、型、意味の単一の定義<br align="left"/>>, fillcolor="#F3E8CE", color="#96742E"];
+  registry [label=<<b>レジストリ定義（YAML）</b><br align="left"/>属性の名前、型、意味の単一の定義<br align="left"/>>, fillcolor="#FFFCD7", color="#736B10"];
 
   subgraph cluster_pr {
     label=<<b>変更前（PR）</b>>;
     labeljust="l"; style="rounded"; penwidth=1.6;
-    color="#38638F"; bgcolor="#EFF5FB"; fontcolor="#2E4D6E"; margin=14;
-    check [label=<<b>check</b><br align="left"/>構文とRegoポリシー検査<br align="left"/>>, fillcolor="#D9E7F4", color="#38638F"];
-    diff [label=<<b>diff</b><br align="left"/>破壊的変更の検知<br align="left"/>>, fillcolor="#D9E7F4", color="#38638F"];
+    color="#AB5A13"; bgcolor="#FFF5ED"; fontcolor="#783F0E"; margin=14;
+    check [label=<<b>check</b><br align="left"/>構文とRegoポリシー検査<br align="left"/>>, fillcolor="#FFE9D6", color="#AB5A13"];
+    diff [label=<<b>diff</b><br align="left"/>破壊的変更の検知<br align="left"/>>, fillcolor="#FFE9D6", color="#AB5A13"];
   }
 
   subgraph cluster_merge {
     label=<<b>マージ後</b>>;
     labeljust="l"; style="rounded"; penwidth=1.6;
-    color="#38638F"; bgcolor="#EFF5FB"; fontcolor="#2E4D6E"; margin=14;
-    generate [label=<<b>generate</b><br align="left"/>SDK定数、ドキュメント<br align="left"/>gatewayの変換設定を導出<br align="left"/>>, fillcolor="#D9E7F4", color="#38638F"];
+    color="#AB5A13"; bgcolor="#FFF5ED"; fontcolor="#783F0E"; margin=14;
+    generate [label=<<b>generate</b><br align="left"/>SDK定数、ドキュメント<br align="left"/>gatewayの変換設定を導出<br align="left"/>>, fillcolor="#FFE9D6", color="#AB5A13"];
   }
 
-  system [label=<<b>実環境</b><br align="left"/>生成物を組み込んだサービスとCollector<br align="left"/>>, fillcolor="#D6E8D6", color="#3F6E3F"];
-  livecheck [label=<<b>live-check</b><br align="left"/>実テレメトリーを定義と突き合わせる<br align="left"/>違反はCIを落とす<br align="left"/>>, fillcolor="#E9DFF2", color="#75589C"];
+  system [label=<<b>実環境</b><br align="left"/>生成物を組み込んだサービスとCollector<br align="left"/>>, fillcolor="#D2F3DF", color="#038435"];
+  livecheck [label=<<b>live-check</b><br align="left"/>実テレメトリーを定義と突き合わせる<br align="left"/>違反はCIを落とす<br align="left"/>>, fillcolor="#F7DDFC", color="#9430A9"];
 
   registry -> check;
   check -> diff;
-  diff -> generate [label=" マージ"];
-  generate -> system [label=" 配布（10章、30章）"];
-  system -> livecheck [label=" OTLP"];
-  livecheck -> registry [label=" 定義とのずれを修正"];
+  // 「マージ」はクラスタ名（変更前（PR）→ マージ後）とキャプションが担う。
+  // ここに置くと、左を回る livecheck -> registry のラベルと隣接して
+  // 「定義とのずれを修正マージ」と一続きに読めてしまう。
+  diff -> generate;
+  generate -> system [xlabel=" 配布（10章、30章）"];
+  system -> livecheck [xlabel=" OTLP"];
+  // 戻りの意味はキャプション（検出した違反をレジストリの変更へ反映する）が
+  // 述べている。この辺はクラスタの右脇を通るので、ラベルを置くと枠線に乗る。
+  livecheck -> registry;
 }

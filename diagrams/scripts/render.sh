@@ -28,6 +28,23 @@
 #             → fix_tee_gap.py（arrowhead=tee の横棒を到達先の枠から離す）
 #             → rsvg-convert（PNG化）
 #
+# レイアウトエンジンは図ごとに選べる（RENDER_LAYOUT）。
+#   RENDER_LAYOUT=auto ./render.sh     # 両方で組んで測り、良い方を採る（推奨）
+#   RENDER_LAYOUT=elk  ./render.sh     # ELK を試す（組めない図は dot に落ちる）
+#   RENDER_LAYOUT=dot  ./render.sh     # 既定。dot だけを使う
+#
+# auto は pick_layout.py が交差数・折れ数・辺長・縦横比・占有面積・
+# ラベルの破綻を両エンジンで測り、点数の良い方を選ぶ。差がわずかなら
+# dot を採る（後処理パイプラインが使えるぶん dot に下駄を履かせている）。
+# スライド用に横長へ寄せたいときは RENDER_ASPECT=3.3 のように渡す。
+#
+# ELK を使うとき dot はラベルの組版だけを担当し、ノードの配置と直交配線は
+# dot2elk.py（ELK/elkjs）が決める。下のSVG後処理は通らない（dot2elk.py が
+# 角丸・進入禁止記号・端点クリップ・辺ラベルの再配置を自前で行う）。
+# **rank=same のメンバー間に辺がある図は ELK では組めない**（ELK layered は
+# 同一層内の辺をサポートしないため、横一列が縦に崩れる）。
+# 詳細はSKILL.mdの「レイアウトエンジンを ELK に替える」を参照。
+#
 # 前提:
 #   - graphviz（dot）。`layout=neato`（絶対座標指定）を使う図があるなら、
 #     `neato -V` で実際にneatoレイアウトが使えるか確認すること。
@@ -42,17 +59,40 @@
 #     システムにインストールせずに使える。
 #   - rsvg-convert（librsvg2-bin。Debian/Ubuntu なら `sudo apt-get install librsvg2-bin`）
 #   - 日本語のゴシック体フォント（Harano Aji Gothic / Noto Sans CJK JP / IPAGothic のいずれか）
+#   - RENDER_LAYOUT=elk / auto のときだけ node と elkjs（初回に dot2elk.py が
+#     scripts/ へ npm install する）
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PATTERN="${1:-}"
 DPI="${2:-${RENDER_DPI:-160}}"
 BGCOLOR="${RENDER_BGCOLOR:-}"
+LAYOUT="${RENDER_LAYOUT:-dot}"
+ASPECT="${RENDER_ASPECT:-}"
 NODE_RADIUS=6
 EDGE_RADIUS=6
 XLABEL_MARGIN=6
 PARALLEL_GAP=16
 TEE_GAP=14
+
+render_with_dot() {
+    dot -Tsvg ${BGCOLOR:+-Gbgcolor="$1"} "$2" \
+        | python3 "$SCRIPT_DIR/round.py" "$NODE_RADIUS" \
+        | python3 "$SCRIPT_DIR/round_edges.py" "$EDGE_RADIUS" \
+        | python3 "$SCRIPT_DIR/elbow.py" \
+        | python3 "$SCRIPT_DIR/nudge_xlabel_from_edge.py" "$XLABEL_MARGIN" \
+        | python3 "$SCRIPT_DIR/spread_parallel_edges.py" "$PARALLEL_GAP" \
+        | python3 "$SCRIPT_DIR/fix_tee_gap.py" "$TEE_GAP" \
+        | rsvg-convert --dpi-x "$DPI" --dpi-y "$DPI" -o "$3"
+}
+
+render_with_elk() {
+    local tmpsvg
+    tmpsvg="$(mktemp --suffix=.svg)"
+    python3 "$SCRIPT_DIR/dot2elk.py" "$1" "$tmpsvg" >/dev/null
+    rsvg-convert --dpi-x "$DPI" --dpi-y "$DPI" -o "$2" "$tmpsvg"
+    rm -f "$tmpsvg"
+}
 
 shopt -s nullglob
 for dotfile in diagrams/*/*.dot; do
@@ -60,13 +100,27 @@ for dotfile in diagrams/*/*.dot; do
     if [[ -n "$PATTERN" && "$name" != *"$PATTERN"* ]]; then
         continue
     fi
-    echo "  ${dotfile} → images/${name}.png (dpi=${DPI}${BGCOLOR:+, bgcolor=$BGCOLOR})"
-    dot -Tsvg ${BGCOLOR:+-Gbgcolor="$BGCOLOR"} "$dotfile" \
-        | python3 "$SCRIPT_DIR/round.py" "$NODE_RADIUS" \
-        | python3 "$SCRIPT_DIR/round_edges.py" "$EDGE_RADIUS" \
-        | python3 "$SCRIPT_DIR/elbow.py" \
-        | python3 "$SCRIPT_DIR/nudge_xlabel_from_edge.py" "$XLABEL_MARGIN" \
-        | python3 "$SCRIPT_DIR/spread_parallel_edges.py" "$PARALLEL_GAP" \
-        | python3 "$SCRIPT_DIR/fix_tee_gap.py" "$TEE_GAP" \
-        | rsvg-convert --dpi-x "$DPI" --dpi-y "$DPI" -o "images/${name}.png"
+
+    engine="$LAYOUT"
+    if [[ "$LAYOUT" == "auto" ]]; then
+        # 両方で組んで測り、良い方を選ぶ。1行目に dot か elk が出る。
+        engine="$(python3 "$SCRIPT_DIR/pick_layout.py" \
+                    ${ASPECT:+--target-aspect "$ASPECT"} "$dotfile" \
+                    2>/dev/null | head -1)"
+        [[ "$engine" == "elk" ]] || engine="dot"
+    elif [[ "$LAYOUT" == "elk" ]]; then
+        # ELK で組めない図（rank=same 内に辺がある）は dot に落とす
+        if python3 "$SCRIPT_DIR/check_flat_edges.py" "$dotfile" \
+                | grep -q '^FLAT-EDGE'; then
+            echo "    警告: rank=same 内に辺があるため ELK では組めない。dot で描画する" >&2
+            engine="dot"
+        fi
+    fi
+
+    echo "  ${dotfile} → images/${name}.png (dpi=${DPI}, layout=${engine}${BGCOLOR:+, bgcolor=$BGCOLOR})"
+    if [[ "$engine" == "elk" ]]; then
+        render_with_elk "$dotfile" "images/${name}.png"
+    else
+        render_with_dot "$BGCOLOR" "$dotfile" "images/${name}.png"
+    fi
 done
