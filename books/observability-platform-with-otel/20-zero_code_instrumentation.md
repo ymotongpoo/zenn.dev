@@ -107,7 +107,7 @@ metadata:
     instrumentation.opentelemetry.io/otel-go-auto-target-exe: "/app/server"
 ```
 
-注入されるエージェントはeBPFを使うため、特権コンテナとして動作し、マルチコンテナPodには対応していません。2026年9月時点でOperatorが注入するのはOBIではなく、開発が停滞している従来のopentelemetry-go-instrumentationです。これらの制約があるため、共通CIを変更できる環境ではotelcを先に検討します。
+注入されるエージェントはeBPFを使うため、特権コンテナとして動作し、マルチコンテナPodには対応していません。2026年9月時点でOperatorが注入するのはOBIではなく、従来のopentelemetry-go-instrumentationです。こちらは最新リリースが2026年4月27日のv0.24.0で、以降は依存更新が続いている状態です。これらの制約があるため、共通CIを変更できる環境ではotelcを先に検討します。
 
 ## Kubernetes以外での配布
 

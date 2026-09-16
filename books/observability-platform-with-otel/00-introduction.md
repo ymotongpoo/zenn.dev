@@ -92,5 +92,5 @@ AIエージェントを開発と運用へ組み込むプラットフォームで
 想定する読者は、組織へオブザーバビリティ基盤を提供するPlatform Engineer、Architect、Engineering Managerです。OpenTelemetryの実装経験は前提としません。コード例には主にGoを使いますが、設計上の論点はほかの言語にも適用でき、多言語展開で生じる違いは該当箇所で説明します。
 
 :::message
-本書の記述は2026年9月時点の情報に基づきます。OpenTelemetryの構成要素には安定性の段階（stable、beta、alpha、development）が明示されているため、本文でも確認時点のstabilityを示します。動作確認にはOSSのGrafanaスタック（Grafana、Tempo、Loki、Mimir）を使います。計装からOTLP送信までの設計は特定のバックエンドに依存しませんが、保存後の検索、シグナル間の相関、AIエージェントからの検索方法はバックエンドごとに異なります。バックエンド固有の箇所は本文で明記します。
+本書の記述は2026年9月16日時点の情報に基づきます。OpenTelemetryの構成要素には安定性の段階（stable、release candidate、beta、alpha、development）が明示されているため、本文でも確認時点のstabilityを示します。動作確認にはOSSのGrafanaスタック（Grafana、Tempo、Loki、Mimir）を使います。計装からOTLP送信までの設計は特定のバックエンドに依存しませんが、保存後の検索、シグナル間の相関、AIエージェントからの検索方法はバックエンドごとに異なります。バックエンド固有の箇所は本文で明記します。
 :::

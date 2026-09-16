@@ -89,7 +89,7 @@ extensions:
   - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/extension/healthcheckextension v0.161.0
 ```
 
-2026年9月時点のmanifestには、バージョンと設定項目に注意が必要です。
+2026年9月時点のmanifestには、バージョンと設定項目に注意が必要です。この構成例はv0.161.0を指定しており、ビルドには対応するOCB v0.161.0を使います。9章の測定はv0.159.0で行っているため、測定条件を再現する場合はリファレンス実装が固定している版を使ってください。
 
 Collectorのcoreリポジトリは、v1.67.0とv0.161.0の二つのバージョンを同時にリリースしています。v1系に到達しているのは、テレメトリーの内部表現を扱うpdataや、設定を読み込むconfmapなどのAPI層のモジュールです。レシーバーやプロセッサーなどのコンポーネントはv0系のモジュールなので、manifestにはv0.161.0のようなバージョンを書きます。
 
