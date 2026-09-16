@@ -18,15 +18,18 @@ digraph central_vs_selfservice {
     fontcolor="#171717"
   ];
 
+  // 辺のラベル（依頼、利用、整備）は置かない。同じ語が3本ずつ並ぶだけで、
+  // 矢じりや隣の箱に被る。矢印の意味はキャプションが述べ、「整備」は
+  // プラットフォームチームのノード内に書いてある。
   subgraph cluster_central {
     label=<<b>中央集権モデル</b>>;
     labeljust="l"; style="rounded"; penwidth=1.6;
     color="#AA3E6A"; bgcolor="#FEF2F7"; fontcolor="#7A2C4C"; margin=14;
     tA [label="チームA"]; tB [label="チームB"]; tC [label="チームC"];
     central [label=<<b>中央チーム</b><br align="left"/>レビュー、設定変更、命名相談が集中<br align="left"/>処理能力はそのままで、依頼だけ増える<br align="left"/>>, fillcolor="#FDE1EC", color="#AA3E6A"];
-    tA -> central [xlabel=" 依頼"];
-    tB -> central [xlabel=" 依頼"];
-    tC -> central [xlabel=" 依頼"];
+    tA -> central;
+    tB -> central;
+    tC -> central;
   }
 
   subgraph cluster_selfservice {
@@ -36,10 +39,10 @@ digraph central_vs_selfservice {
     platform [label=<<b>プラットフォームチーム</b><br align="left"/>配布物と検査を整備する<br align="left"/>>, fillcolor="#D2F3DF", color="#038435"];
     artifacts [label=<<b>配布物</b><br align="left"/>ディストリビューション、Collector、レジストリ<br align="left"/>>, fillcolor="#D2F3DF", color="#038435"];
     sA [label="チームA"]; sB [label="チームB"]; sC [label="チームC"];
-    platform -> artifacts [xlabel=" 整備"];
-    sA -> artifacts [xlabel=" 利用"];
-    sB -> artifacts [xlabel=" 利用"];
-    sC -> artifacts [xlabel=" 利用"];
+    platform -> artifacts;
+    sA -> artifacts;
+    sB -> artifacts;
+    sC -> artifacts;
   }
 
   // 2つのモデルを上下に並べるためのレイアウト調整

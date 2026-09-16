@@ -63,6 +63,8 @@ digraph blueprint_overview {
   mimir -> grafana;
   loki -> grafana;
 
-  opamp -> agent [style=dashed, color="#9430A9", fontcolor="#6A2278", xlabel=" リモート設定"];
-  weaverreg -> frontend [style=dashed, color="#9430A9", fontcolor="#6A2278", xlabel=" 生成定数"];
+  // 点線の意味（設定と生成物の配布先）はキャプションが述べている。
+  // ラベルを置くとクラスタの枠線や矢印の線に乗る。
+  opamp -> agent [style=dashed, color="#9430A9", fontcolor="#6A2278"];
+  weaverreg -> frontend [style=dashed, color="#9430A9", fontcolor="#6A2278"];
 }

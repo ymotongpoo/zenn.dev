@@ -41,6 +41,8 @@ digraph three_pillars {
   agent -> gateway;
   gateway -> backend;
 
-  registry -> app [style=dashed, color="#9430A9", fontcolor="#6A2278", xlabel=" 生成した属性定数を同梱\l"];
-  registry -> gateway [style=dashed, color="#9430A9", fontcolor="#6A2278", xlabel=" 変換設定を導出\l"];
+  // 点線の意味（レジストリから生成した成果物の配布先）はキャプションが
+  // 述べている。ラベルを置くと矢印の線の上に文字が乗る。
+  registry -> app [style=dashed, color="#9430A9", fontcolor="#6A2278"];
+  registry -> gateway [style=dashed, color="#9430A9", fontcolor="#6A2278"];
 }

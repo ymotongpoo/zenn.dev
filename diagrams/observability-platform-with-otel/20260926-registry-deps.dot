@@ -20,10 +20,12 @@ digraph registry_deps {
 
   division [label=<<b>事業部レジストリ（任意）</b><br align="left"/>全社の上にさらに重ねられる<br align="left"/>（依存は最大10階層）<br align="left"/>>, fillcolor="#F7DDFC", color="#9430A9"];
   internal [label=<<b>社内レジストリ</b><br align="left"/>com.example.* の属性を定義<br align="left"/>公式属性はrefで参照して上書き<br align="left"/>>, fillcolor="#FFE9D6", color="#AB5A13"];
-  official [label=<<b>公式semconvレジストリ</b><br align="left"/>タグ固定（例: v1.44.0）<br align="left"/>>, fillcolor="#FFFCD7", color="#736B10"];
+  official [label=<<b>公式semconvレジストリ</b><br align="left"/>タグ固定（例: v1.44.0）<br align="left"/>schema_urlを明記<br align="left"/>>, fillcolor="#FFFCD7", color="#736B10"];
   genai [label=<<b>GenAI規約レジストリ</b><br align="left"/>リリースがないためコミットSHA固定<br align="left"/>採用日と上流schema_urlを記録<br align="left"/>>, fillcolor="#FFFCD7", color="#736B10"];
 
-  division -> internal [xlabel=" 依存"];
-  internal -> official [xlabel=" 依存（schema_urlを明記）"];
-  internal -> genai [xlabel=" 依存（60章）"];
+  // 辺のラベルは置かない。3本とも「依存」で始まるため線や箱に被りやすく、
+  // 依存の向きと固定の方法はキャプションが述べている。
+  division -> internal;
+  internal -> official;
+  internal -> genai;
 }
