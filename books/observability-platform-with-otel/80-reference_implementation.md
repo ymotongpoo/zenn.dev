@@ -2,7 +2,7 @@
 title: "リファレンス実装で動かす"
 ---
 
-[otel-platform-blueprint](https://github.com/ymotongpoo/otel-platform-blueprint)は、SDKディストリビューション、ゼロコード計装、Collector、OpAMP、Weaverを組み合わせたリファレンス実装です。本章の挙動と数値は、2026年9月10日にLinux（x86_64、4コア）、Docker Engine 29.0.0、Go 1.26.0の環境で実測しました。実測時点のCollector v0.159.0、opentelemetry-go v1.45.0、Weaver v0.25.1、OpAMP Supervisor 0.159.0、otelc v1.1.0を使い、詳細をリポジトリの `docs/measurements.md` に記録しています。他章が示す最新版とは差がありますが、数値を再現できる組み合わせを残すため、実測時のバージョンをそのまま記載します。同じシナリオを2026年8月25日にmacOSでも実施しており、結果が分かれた箇所は本章で明示します。
+[otel-platform-blueprint](https://github.com/ymotongpoo/otel-platform-blueprint)は、SDKディストリビューション、ゼロコード計装、Collector、OpAMP、Weaverを組み合わせたリファレンス実装です。本章の挙動と数値は、2026年9月10日にLinux（x86_64、4コア）、Docker Engine 29.0.0、Go 1.26.0の環境で測定しました。測定時点のCollector v0.159.0、opentelemetry-go v1.45.0、Weaver v0.25.1、OpAMP Supervisor 0.159.0、otelc v1.1.0を使い、詳細をリポジトリの `docs/measurements.md` に記録しています。他章が示す最新版とは差がありますが、数値を再現できる組み合わせを残すため、測定時のバージョンをそのまま記載します。同じシナリオを2026年8月25日にmacOSでも実施しており、結果が分かれた箇所は本章で明示します。
 
 ## リポジトリの全体構成
 
@@ -32,7 +32,7 @@ otel-platform-blueprint/
 │   └── ai-app/       #   LLM呼び出しを含むエージェント風アプリ（7章）
 ├── ai-ops/           # AIにテレメトリーを読ませる構成例（8章）
 ├── deploy/           # docker composeとバックエンド設定
-└── docs/             # 実測記録
+└── docs/             # 測定記録
 ```
 
 ![リファレンス実装の全体構成](/images/20260926-blueprint-overview.png)
@@ -53,9 +53,9 @@ $ docker compose up -d --build
 
 初回は、OCBによるCollectorとGoサービスのビルドを実行します。4コアの環境では10分ほどかかりました。Grafanaスタック、OCBでビルドした社内Collector（gatewayとSupervisor管理のエージェント）、OpAMPサーバー、四つのデモサービスからなる10コンテナが起動します。
 
-手元で別のCollectorやGrafana Alloyが動いている場合、エージェントのポート公開が `address already in use` で失敗します。実測環境でもこれが起きたため、`deploy/docker-compose.override.yaml` で公開ポートをずらしました。
+手元で別のCollectorやGrafana Alloyが動いている場合、エージェントのポート公開が `address already in use` で失敗します。測定した環境でもこれが起きたため、`deploy/docker-compose.override.yaml` で公開ポートをずらしました。
 
-Tempoは起動後15秒から20秒ほど `/ready` を返さず、その間に届いたテレメトリーを保存しません。実測でも、起動直後に送ったトレースは保存されませんでした。Tempoの準備完了を確認してから、検証用のリクエストを送ります。
+Tempoは起動後15秒から20秒ほど `/ready` を返さず、その間に届いたテレメトリーを保存しません。測定した際も、起動直後に送ったトレースは保存されませんでした。Tempoの準備完了を確認してから、検証用のリクエストを送ります。
 
 ## 計装から保存までの検証
 
@@ -86,9 +86,9 @@ $ ./registry/weaver.sh generate
 
 checkは、公式semconvへの依存をGit URLで解決して約3秒で成功しました。違反を検出できることも確認します。`com.example.` 以外の名前空間として `myteam.custom.flag` を定義すると、checkはRegoポリシーの `internal_namespace_only` violationで失敗しました。この定義を削除すると成功します。generateは `sdk/semconv/semconv.go` を生成し、`com.example.delivery.id` を `ComExampleDeliveryId` 定数に変換しました。生成結果はコミット済みのファイルと一致し、差分は出ません。CIはこの差分の有無を検査します。
 
-実測データはlive-checkで検査します。live-checkをOTLPの受信口として起動し、テレメトリーを生成する公式のテストツールtelemetrygenから、レジストリにない属性を含むスパンを送りました。`myteam.rogue.attr` はviolationとして報告され、`com.example.delivery.id` はviolationになりませんでした。ただし、`com.example.delivery.id` にはstabilityがdevelopmentであるという改善提案が付きます。
+実際のテレメトリーはlive-checkで検査します。live-checkをOTLPの受信口として起動し、テレメトリーを生成する公式のテストツールtelemetrygenから、レジストリにない属性を含むスパンを送りました。`myteam.rogue.attr` はviolationとして報告され、`com.example.delivery.id` はviolationになりませんでした。ただし、`com.example.delivery.id` にはstabilityがdevelopmentであるという改善提案が付きます。
 
-live-checkをコンテナで動かす場合は、リスンアドレスを明示します。デフォルトのままではコンテナ外から送ったテレメトリーが届かず、検査対象が0件のまま終了します。実測でも最初はこれに気付かず、違反0件の結果を得ていました。`registry/weaver.sh` は `--otlp-grpc-address 0.0.0.0` を指定しています。
+live-checkをコンテナで動かす場合は、リスンアドレスを明示します。デフォルトのままではコンテナ外から送ったテレメトリーが届かず、検査対象が0件のまま終了します。測定した際も最初はこれに気付かず、違反0件の結果を得ていました。`registry/weaver.sh` は `--otlp-grpc-address 0.0.0.0` を指定しています。
 
 一方、依存先である公式レジストリの `service.name` や `network.peer.address` などもviolationになりました。live-checkが依存先を解決する範囲は追加調査が必要です。CIの合否に使う場合は、検出された違反を種類に応じて扱う必要があります。
 
@@ -104,7 +104,7 @@ Supervisor側でも、`automatic_config_rollback` を有効にしていたにも
 
 filterで全スパンをdropする設定は起動に成功し、ステータスもAPPLIEDかつhealthyのままでした。50リクエストを送ってもTempoへ到達したトレースは0件で、ロールバックも発生しません。正常な設定を再配布すると復旧し、25リクエストから6トレースが到達しました。
 
-この実測では、自動ロールバックだけでフリートを保護できませんでした。canary、テレメトリー到達の監視、FAILEDになった設定の再送防止、修正版の再配布を組み合わせる必要があります。
+この測定では、自動ロールバックだけでフリートを保護できませんでした。canary、テレメトリー到達の監視、FAILEDになった設定の再送防止、修正版の再配布を組み合わせる必要があります。
 
 ## ゼロコード計装を試す
 
@@ -120,7 +120,7 @@ $ OTEL_SERVICE_NAME=legacy-otelc OTEL_EXPORTER_OTLP_ENDPOINT=http://localhost:43
 
 `otelc pin` は初回に実行し、計装用の依存を `otel.instrumentation.go` と `go.mod` へ書き出します。以降は `go build` を `otelc go build` に置き換えます。生成されたバイナリは約25MBで、計装ランタイムを含みます。起動ログには「trace provider initialized with auto-export」「runtime metrics enabled」と出力され、100リクエストから、tail samplingを通過した11トレースがTempoへ届きました。
 
-pinが書き出す `go.mod` の `replace` は、作業ディレクトリ配下の絶対パスを指します。このため、**pinの生成物をリポジトリへコミットすると、別のマシンでpinが失敗します**（`package ... is not part of a module`）。最初の実測をmacOSで行い、その生成物がコミットされていたため、Linuxでの再実測はここで止まりました。生成物を `.gitignore` へ入れ、素の `go.mod` からpinを実行してビルドが通ることをCIで検査する構成へ変更しています。
+pinが書き出す `go.mod` の `replace` は、作業ディレクトリ配下の絶対パスを指します。このため、**pinの生成物をリポジトリへコミットすると、別のマシンでpinが失敗します**（`package ... is not part of a module`）。最初の測定をmacOSで行い、その生成物がコミットされていたため、Linuxでの再測定はここで止まりました。生成物を `.gitignore` へ入れ、素の `go.mod` からpinを実行してビルドが通ることをCIで検査する構成へ変更しています。
 
 `services/uninstrumented` は `:8082` で待ち受けます。composeの同名サービスと衝突するため、手元で動かす前に停止します。
 
@@ -144,7 +144,7 @@ GET /ask
 
 `ai-ops/` には、レジストリを読むregistry MCPと、実データを読むtelemetry MCPの構成例があります。registry MCPは `weaver registry mcp` を標準入出力で起動し、telemetry MCPはGrafanaスタック向けのMCPサーバーを使います。
 
-MCP経由でAIエージェントに調査させる一連の実験は、このリポジトリでは実測していません。構成例を試す場合も、レジストリと実データに別々の権限を設定します。
+MCP経由でAIエージェントに調査させる一連の実験は、このリポジトリでは行っていません。構成例を試す場合も、レジストリと実データに別々の権限を設定します。
 
 ## 章とディレクトリの対応
 
