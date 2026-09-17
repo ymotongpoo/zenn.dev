@@ -41,12 +41,16 @@ Goでは、コンパイル時に計装コードを組み込むこともできま
 
 [^otelc]: 経緯は[公式ブログのv1発表](https://opentelemetry.io/blog/2026/go-compile-time-instrumentation-v1/)にまとまっています。v1.0.0は不具合でretractされているため、使うならv1.0.1以降です。
 
-最初に計装用の依存を固定し、以降のビルドコマンドを置き換えます。
+ビルドコマンドを置き換えるだけで計装が入ります。
 
 ```console
-$ otelc pin
-$ otelc go build ./...
+$ go get -tool go.opentelemetry.io/otelc/tool/cmd/otelc
+$ go tool otelc go build ./...
 ```
+
+計装の構成をリポジトリへ固定する `otelc pin` もありますが、2026年9月時点では生成物をコミットする使い方が未対応です[^otelcpin]。CIやチーム開発では、構成をビルドのたびに生成する上のコマンドを使います。
+
+[^otelcpin]: 計装パッケージが擬似バージョンでotelc実行ファイルの内側でしか解決できないため、生成物をコミットした状態では `package ... is not part of a module` で失敗します。切り離す作業が[issue #585](https://github.com/open-telemetry/opentelemetry-go-compile-instrumentation/issues/585)で進んでいます。
 
 `otelc` はGoの `-toolexec` 機構を使い、コンパイルの過程で対象ライブラリの呼び出しに計装コードを差し込みます。2026年9月時点で `net/http` や `database/sql`、gRPC、Redis、Kafkaといった主要ライブラリに対応し、トレースとメトリクスを生成します。ログへのトレースコンテキスト注入にも対応しています。
 

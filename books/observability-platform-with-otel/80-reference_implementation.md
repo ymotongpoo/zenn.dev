@@ -129,15 +129,14 @@ filterで全スパンをdropする設定は起動に成功し、ステータス�
 
 ```console
 $ cd autoinstrument/otelc
-$ go run go.opentelemetry.io/otelc/tool/cmd/otelc pin
-$ go run go.opentelemetry.io/otelc/tool/cmd/otelc go build -o legacy-instrumented .
+$ go tool otelc go build -o legacy-instrumented .
 $ docker compose -f ../../deploy/docker-compose.yaml stop uninstrumented
 $ OTEL_SERVICE_NAME=legacy-otelc OTEL_EXPORTER_OTLP_ENDPOINT=http://localhost:4318 ./legacy-instrumented
 ```
 
-`otelc pin` は初回に実行し、計装用の依存を `otel.instrumentation.go` と `go.mod` へ書き出します。以降は `go build` を `otelc go build` に置き換えます。生成されたバイナリは約25MBで、計装ランタイムを含みます。起動ログには「trace provider initialized with auto-export」「runtime metrics enabled」と出力され、100リクエストから、テイルサンプリングを通過した11トレースがTempoへ届きました。
+`otelc go build` は、ビルドの間だけ計装の構成を生成します。生成されたバイナリは26,022,431バイトで、計装ランタイムを含みます。起動ログには「trace provider initialized with auto-export」「runtime metrics enabled」と出力され、100リクエストから、テイルサンプリングを通過した11トレースがTempoへ届きました。
 
-pinが書き出す `go.mod` の `replace` は、作業ディレクトリ配下の絶対パスを指します。このため、**pinの生成物をリポジトリへコミットすると、別のマシンでpinが失敗します**（`package ... is not part of a module`）。最初の測定をmacOSで行い、その生成物がコミットされていたため、Linuxでの再測定はここで止まりました。生成物を `.gitignore` へ入れ、素の `go.mod` からpinを実行してビルドが通ることをCIで検査する構成へ変更しています。
+構成をリポジトリへ固定する `otelc pin` は使いません。pinが書き出す `go.mod` の `replace` は作業ディレクトリ配下の絶対パスを指すため、**生成物をコミットすると別のマシンで失敗します**（`package ... is not part of a module`）。最初の測定をmacOSで行い、その生成物がコミットされていたため、Linuxでの再測定はここで止まりました。upstreamも3章の脚注のとおり、pinの生成物をコミットする使い方を未対応としています。CIでは、素の `go.mod` から `otelc go build` が通ることを検査します。
 
 `services/uninstrumented` は `:8082` で待ち受けます。composeの同名サービスと衝突するため、手元で動かす前に停止します。
 
@@ -175,7 +174,7 @@ MCP経由でAIエージェントに調査させる一連の実験は、このリ
 | 7章 | AIワークロードの観測 | services/ai-app/ |
 | 8章 | AIによる読み取り | ai-ops/ |
 
-`.github/workflows/` には、レジストリ変更時のcheckとdiff、生成コードが最新であることの検査、OCBビルド、`validate` による設定検証、素の状態からのotelc pinとビルドを実装しています。
+`.github/workflows/` には、レジストリ変更時のcheckとdiff、生成コードが最新であることの検査、OCBビルド、`validate` による設定検証、素の `go.mod` からの `otelc go build` を実装しています。
 
 ## 段階導入のチェックリスト
 
