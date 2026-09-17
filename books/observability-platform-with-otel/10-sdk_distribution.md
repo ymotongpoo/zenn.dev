@@ -84,7 +84,7 @@ defer func() {
 
 ログの組み込みでは、APIの安定度を考慮します。2026年9月時点で、Goのログ関連モジュール（`otel/log` と `otel/sdk/log`）の正式版はv0.22.0のベータであり、stableに達しているのはトレースとメトリクスです[^golog]。安定化に向けたv1.47.0-rc.1も公開されていますが、リリース候補の段階です。各チームがv0のAPIに直接依存すると、破壊的変更のたびに複数のサービスを修正することになります。ディストリビューションだけがv0のAPIに依存すれば、変更への対応箇所を1つに集約できます。
 
-[^golog]: opentelemetry-goのモジュール構成とバージョンは[v1.46.0のversions.yaml](https://github.com/open-telemetry/opentelemetry-go/blob/v1.46.0/versions.yaml)で確認できます。mainブランチはリリース候補を含むため、採用する版のタグで確認してください。
+[^golog]: opentelemetry-goのモジュール構成とバージョンは[v1.46.0のversions.yaml](https://github.com/open-telemetry/opentelemetry-go/blob/v1.46.0/versions.yaml)で確認できます。mainブランチはリリース候補を含むため、採用するバージョンのタグで確認してください。
 
 サンプリングのデフォルト値には、処理できる流量の前提が必要です。SDKがトレースの開始時に記録の可否を決める方式を**ヘッドサンプリング**、Collectorがトレースの完結後に決める方式を**テイルサンプリング**と呼びます[^sampling]。ParentBasedは、親スパンの決定に従い、親がない場合にどう判定するかを別のサンプラーに委ねる仕組みです。Go SDKのデフォルトは `ParentBased(AlwaysSample)` で、親のないトレースは記録します。このデフォルトのまま、上流から未サンプリングの親が渡ってこない限り、SDKはスパンを間引きません。外部からのリクエストを受けるサービスや、ヘッドサンプリングを併用する場合は、上流の判定が伝搬してくることを前提に確認します。
 
