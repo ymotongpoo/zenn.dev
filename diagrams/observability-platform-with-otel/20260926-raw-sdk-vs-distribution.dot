@@ -1,0 +1,69 @@
+// 素のSDKを各サービスが初期化する形と、社内ディストリビューションに
+// 判断を集めた形の対比。
+// @divider: between-clusters
+//
+// 矢印は「初期化の判断がどこで決まるか」の依存を表す。上下で意味を
+// 変えないため、結果（横断検索が成立しない／揃う）はノードにせず
+// キャプションへ置いた。上段が3つに分かれ、下段が1つに集まる形の差で
+// 主張は伝わる。
+digraph raw_sdk_vs_distribution {
+  graph [
+    fontname="IBM Plex Sans JP", fontsize=13,
+    rankdir=TB, compound=true, splines=ortho,
+    nodesep=0.4, ranksep=0.55, pad=0.25,
+    bgcolor="white", newrank=true
+  ];
+  node [
+    fontname="IBM Plex Sans JP", fontsize=12,
+    shape=box, style="rounded,filled",
+    fillcolor="#E4E4E4", color="#4A4A4A", penwidth=1.6,
+    margin="0.2,0.14"
+  ];
+  edge [
+    fontname="IBM Plex Sans JP", fontsize=11,
+    color="#343434", penwidth=1.4, arrowsize=0.9,
+    fontcolor="#171717"
+  ];
+
+  subgraph cluster_raw {
+    label=<<b>素のSDKを各サービスが初期化する</b>>;
+    labeljust="l"; style="rounded"; penwidth=1.6;
+    color="#AA3E6A"; bgcolor="#FEF2F7"; fontcolor="#7A2C4C"; margin=14;
+
+    // サービスの箱は同じ大きさに揃える（width/height は下限として働く）
+    node [width=1.5, height=0.5];
+    rawA [label="サービスA"]; rawB [label="サービスB"]; rawC [label="サービスC"];
+
+    // 初期化の箱も揃える。中身の差が「judgment がばらける」という主張なので、
+    // 箱の大きさが文字数で変わると差が見えにくくなる。
+    node [width=2.9, height=1.05, fillcolor="#FDE1EC", color="#AA3E6A"];
+    initA [label=<<b>独自の初期化</b><br align="left"/>エンドポイントを直書き<br align="left"/>リソース属性は<font face="JetBrains Mono">service.name</font>だけ<br align="left"/>>];
+    initB [label=<<b>独自の初期化</b><br align="left"/>バゲッジを伝搬しない<br align="left"/>トレースだけ設定<br align="left"/>>];
+    initC [label=<<b>独自の初期化</b><br align="left"/>サンプラーを設定しない<br align="left"/>ログは未実装<br align="left"/>>];
+
+    { rank=same; rawA; rawB; rawC; }
+    rawA -> initA;
+    rawB -> initB;
+    rawC -> initC;
+  }
+
+  subgraph cluster_dist {
+    label=<<b>社内ディストリビューションに判断を集める</b>>;
+    labeljust="l"; style="rounded"; penwidth=1.6;
+    color="#038435"; bgcolor="#EBFAF1"; fontcolor="#025E26"; margin=14;
+
+    node [width=1.5, height=0.5, fillcolor="#E4E4E4", color="#4A4A4A"];
+    dstA [label="サービスA"]; dstB [label="サービスB"]; dstC [label="サービスC"];
+
+    node [width=2.9, height=1.05, fillcolor="#D2F3DF", color="#038435"];
+    dist [label=<<b>社内ディストリビューション</b><br align="left"/><font face="JetBrains Mono">otelinit.Setup(ctx)</font>の1呼び出し<br align="left"/>エクスポーター、リソース、プロパゲーター、<br align="left"/>サンプラーのデフォルト値を持つ<br align="left"/>>];
+
+    { rank=same; dstA; dstB; dstC; }
+    dstA -> dist;
+    dstB -> dist;
+    dstC -> dist;
+  }
+
+  // 上下の間隔を空けて区切り線を挟む（draw_divider.py がSVG後処理で引く）。
+  initB -> dstB [style=invis, minlen=3];
+}
