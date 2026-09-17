@@ -86,15 +86,15 @@ defer func() {
 
 [^golog]: opentelemetry-goのモジュール構成とバージョンは[v1.46.0のversions.yaml](https://github.com/open-telemetry/opentelemetry-go/blob/v1.46.0/versions.yaml)で確認できます。mainブランチはリリース候補を含むため、採用する版のタグで確認してください。
 
-サンプリングのデフォルト値には、処理できる流量の前提が必要です。SDKがトレースの開始時に記録の可否を決める方式を**ヘッドサンプリング**、Collectorがトレースの完結後に決める方式を**テイルサンプリング**と呼びます。ParentBasedは、親スパンの決定に従い、親がない場合にどう判定するかを別のサンプラーに委ねる仕組みです。Go SDKのデフォルトは `ParentBased(AlwaysSample)` で、親のないトレースは記録します。このデフォルトのまま、上流から未サンプリングの親が渡ってこない限り、SDKはスパンを間引きません。外部からのリクエストを受けるサービスや、ヘッドサンプリングを併用する場合は、上流の判定が伝搬してくることを前提に確認します。
+サンプリングのデフォルト値には、処理できる流量の前提が必要です。SDKがトレースの開始時に記録の可否を決める方式を**ヘッドサンプリング**、Collectorがトレースの完結後に決める方式を**テイルサンプリング**と呼びます[^sampling]。ParentBasedは、親スパンの決定に従い、親がない場合にどう判定するかを別のサンプラーに委ねる仕組みです。Go SDKのデフォルトは `ParentBased(AlwaysSample)` で、親のないトレースは記録します。このデフォルトのまま、上流から未サンプリングの親が渡ってこない限り、SDKはスパンを間引きません。外部からのリクエストを受けるサービスや、ヘッドサンプリングを併用する場合は、上流の判定が伝搬してくることを前提に確認します。
+
+[^sampling]: サンプリングを慎重に扱わないと、原因を分析したいときに必要なデータが欠けます。設計は本書の範囲を超えるため、確率の一貫性、テイルサンプリングのポリシー設計、量とコストの見積もりは拙著『[OpenTelemetryではじめるテレメトリーサンプリング](https://amzn.to/4cQG9i6)』で扱っています。
 
 テイルサンプリングへ判断を集約すると、エラーの有無やレイテンシーを見て保存対象を選べます。ただし、すべてのスパンがアプリケーションからゲートウェイまで流れるため、SDK、エージェント、ネットワーク、ゲートウェイの負荷は減りません。この構成を使えるのは、各区間が全スパンの流量を処理できる場合です。高流量のサービスでは、SDKのヘッドサンプリングで先に量を減らします。プラットフォームは、`OTEL_TRACES_SAMPLER` 環境変数を調整して、どの段階で量を減らすかを決めます。
 
-ヘッドサンプリングの確率をトレース全体で一貫させるConsistent Probability Samplingには、contribの[Go実装](https://pkg.go.dev/go.opentelemetry.io/contrib/samplers/probability/consistent)があります。ただし2026年9月時点では実験的で、現行の仕様草案との差分も残っています[^cps]。この段階では、ディストリビューションのデフォルト値には採用しません。Consistent Probability Samplingの詳細は、[別の記事](https://zenn.dev/ymotongpoo/articles/20260717-cps)で解説しています[^sampling-book]。
+ヘッドサンプリングの確率をトレース全体で一貫させるConsistent Probability Samplingには、contribの[Go実装](https://pkg.go.dev/go.opentelemetry.io/contrib/samplers/probability/consistent)があります。ただし2026年9月時点では実験的で、現行の仕様草案との差分も残っています[^cps]。この段階では、ディストリビューションのデフォルト値には採用しません。Consistent Probability Samplingの詳細は、[別の記事](https://zenn.dev/ymotongpoo/articles/20260717-cps)で解説しています。
 
 [^cps]: 実装はtracestateにp値とr値を書く旧ドラフトに準拠しており、現行仕様のth値ベースの方式とは互換がありません。
-
-[^sampling-book]: テレメトリーのサンプリングは慎重に扱わないと、いざ原因分析を行いたいときに必要なデータが欠損してしまう可能性があります。詳細はこちらの書籍を参照してください。 https://amzn.to/4rgVYVe
 
 ## 設定の優先順位
 

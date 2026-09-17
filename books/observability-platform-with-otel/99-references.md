@@ -8,6 +8,7 @@ title: "参考リンク"
 
 - [OpenTelemetry公式ドキュメント](https://opentelemetry.io/ja/docs/)
 - [Platform Engineering Kaigi 2026 セッション概要](https://www.cnia.io/pek2026/sessions/eba4a57f-e4f0-4201-b731-0a37d6a53f7a/)
+- 『[OpenTelemetryではじめるテレメトリーサンプリング](https://amzn.to/4cQG9i6)』（自著。ヘッドサンプリングとテイルサンプリングの設計、量とコストの見積もりを扱った本。2章のサンプリングの節から参照しています）
 - サンプルリポジトリ [otel-platform-blueprint](https://github.com/ymotongpoo/otel-platform-blueprint)
 - 登壇スライド <!-- 公開後にURLを入れる -->
 
@@ -27,7 +28,7 @@ title: "参考リンク"
 - [OBI（OpenTelemetry eBPF Instrumentation）](https://opentelemetry.io/ja/docs/zero-code/obi/) と [2026年の目標を述べた公式ブログ](https://opentelemetry.io/blog/2026/obi-goals/)
 - [otelc v1の発表（Goのコンパイル時計装）](https://opentelemetry.io/blog/2026/go-compile-time-instrumentation-v1/)
 - [OpenTelemetry OperatorによるKubernetesでの自動計装](https://opentelemetry.io/ja/docs/platforms/kubernetes/operator/automatic/)
-- [「OpenTelemetry eBPF Instrumentationの舞台裏」](https://zenn.dev/ymotongpoo/books/go-ebpf-primer)（自著。GoバイナリへのeBPF計装の制約を扱った本）
+- 『[OpenTelemetry eBPF Instrumentationの舞台裏](https://zenn.dev/ymotongpoo/books/go-ebpf-primer)』（自著。GoバイナリへのeBPF計装の制約を扱った本）
 
 ## 4章 Collector層
 
@@ -67,5 +68,5 @@ title: "参考リンク"
 
 ## Platform Engineering関連
 
-- Matthew Skelton, Manuel Pais 著『Team Topologies』（邦訳『チームトポロジー』）
+- Matthew Skelton, Manuel Pais 著『[Team Topologies](https://teamtopologies.com/)』（邦訳『[チームトポロジー](https://amzn.to/4rhgFAt)』）
 - [Platform Engineering（CNCF Platforms White Paper）](https://tag-app-delivery.cncf.io/whitepapers/platforms/)
