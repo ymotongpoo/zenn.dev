@@ -1,0 +1,44 @@
+// 9章 リファレンス実装で行う5つの検証と、各検証が確かめる章
+//
+// 検証の順序（上から下）と、それぞれが本書のどの章の設計を確かめているかを
+// 対応させる。読者が「今どの部分を触っているか」を見失わないための地図。
+//
+// 柱をクラスタにして横に並べる案は捨てた。色だけが手がかりになって対応が
+// 読めず、1つの柱に2つの検証が対応する場合（柱1に計装の検証とゼロコード
+// 計装の検証）を表現できなかった。確かめる対象は各ノードのラベルに書く。
+digraph blueprint_verification {
+  graph [
+    fontname="IBM Plex Sans JP", fontsize=13,
+    rankdir=TB, compound=true, splines=ortho,
+    nodesep=0.5, ranksep=0.5, pad=0.25,
+    bgcolor="white", newrank=true
+  ];
+  node [
+    fontname="IBM Plex Sans JP", fontsize=12,
+    shape=box, style="rounded,filled",
+    fillcolor="#E4E4E4", color="#4A4A4A", penwidth=1.6,
+    margin="0.2,0.14"
+  ];
+  edge [
+    fontname="IBM Plex Sans JP", fontsize=11,
+    color="#343434", penwidth=1.4, arrowsize=0.9,
+    fontcolor="#171717"
+  ];
+
+  // 検証の手順。同じカテゴリなので大きさを揃える。
+  // 色は確かめている柱を表す（柱1=橙、柱2=黄、柱3=紫、AI=緑）。
+  node [width=5.6, height=1.0];
+
+  up [label=<<b>1　検証環境の起動</b><br align="left"/>docker compose upで10コンテナ<br align="left"/>ビルドに約10分<br align="left"/>>, fillcolor="#E4E4E4", color="#4A4A4A"];
+  pipeline [label=<<b>2　計装から保存までの検証</b>　柱1（2章）<br align="left"/>ディストリビューション入りのfrontendへ<br align="left"/>リクエストを送り、Tempoでトレースを見る<br align="left"/>>, fillcolor="#FFE9D6", color="#AB5A13"];
+  registry [label=<<b>3　レジストリの検査と生成</b>　柱3（6章）<br align="left"/>check、generate、live-checkを回す<br align="left"/>>, fillcolor="#F7DDFC", color="#9430A9"];
+  fleet [label=<<b>4　フリートに設定を配る</b>　柱2（4章、5章）<br align="left"/>正常な設定、起動できない設定、<br align="left"/>テレメトリーを止める設定の3つを試す<br align="left"/>>, fillcolor="#FFFCD7", color="#736B10"];
+  zerocode [label=<<b>5　ゼロコード計装を試す</b>　柱1（3章）<br align="left"/>計装コードのないサービスをotelcで計装<br align="left"/>>, fillcolor="#FFE9D6", color="#AB5A13"];
+  ai [label=<<b>6　AIにテレメトリーを読ませる</b>　7章、8章<br align="left"/>gen_ai属性を確認し、MCPで定義を渡す<br align="left"/>>, fillcolor="#D2F3DF", color="#038435"];
+
+  up -> pipeline;
+  pipeline -> registry;
+  registry -> fleet;
+  fleet -> zerocode;
+  zerocode -> ai;
+}

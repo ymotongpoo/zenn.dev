@@ -2,7 +2,26 @@
 title: "リファレンス実装で動かす"
 ---
 
-[otel-platform-blueprint](https://github.com/ymotongpoo/otel-platform-blueprint)は、SDKディストリビューション、ゼロコード計装、Collector、OpAMP、Weaverを組み合わせたリファレンス実装です。本章の挙動と数値は、2026年9月10日にLinux（x86_64、4コア）、Docker Engine 29.0.0、Go 1.26.0の環境で測定しました。測定時点のCollector v0.159.0、opentelemetry-go v1.45.0、Weaver v0.25.1、OpAMP Supervisor 0.159.0、otelc v1.1.0を使い、詳細をリポジトリの `docs/measurements.md` に記録しています。他章が示す最新版とは差がありますが、数値を再現できる組み合わせを残すため、測定時のバージョンをそのまま記載します。同じシナリオを2026年8月25日にmacOSでも実施しており、結果が分かれた箇所は本章で明示します。
+[otel-platform-blueprint](https://github.com/ymotongpoo/otel-platform-blueprint)は、SDKディストリビューション、ゼロコード計装、Collector、OpAMP、Weaverを組み合わせたリファレンス実装です。本章の挙動と数値は、次の環境で測定しました。
+
+| 項目 | 測定時の値 |
+|---|---|
+| 測定日 | 2026年9月10日 |
+| OS | Linux（x86_64、4コア） |
+| Docker Engine | 29.0.0 |
+| Go | 1.26.0 |
+| Collector | v0.159.0 |
+| opentelemetry-go | v1.45.0 |
+| Weaver | v0.25.1 |
+| OpAMP Supervisor | 0.159.0 |
+| otelc | v1.1.0 |
+
+詳細はリポジトリの `docs/measurements.md` に記録しています。他章が示す最新版とは差がありますが、数値を再現できる組み合わせを残すため、測定時のバージョンをそのまま記載します。同じシナリオを2026年8月25日にmacOSでも実施しており、結果が分かれた箇所は本章で明示します。
+
+本章で行う検証と、それぞれが確かめている設計は次のとおりです。
+
+![リファレンス実装で行う検証の流れ](/images/20260926-blueprint-verification.png)
+*図1　上から順に実行します。箱の色は確かめている柱を表し、柱1が橙、柱2が黄、柱3が紫、AIワークロードが緑です。ゼロコード計装は柱1に属しますが、環境を起動してから試すほうが差分を確認しやすいため、後半に置いています。*
 
 ## リポジトリの全体構成
 
@@ -36,7 +55,7 @@ otel-platform-blueprint/
 ```
 
 ![リファレンス実装の全体構成](/images/20260926-blueprint-overview.png)
-*図1　実線はテレメトリーの流れ、点線は設定と生成物の配布先を表します。1章の図2に実装上のコンポーネント名を加えています。*
+*図2　実線はテレメトリーの流れ、点線は設定と生成物の配布先を表します。1章の図2に実装上のコンポーネント名を加えています。*
 
 ## 検証環境の起動
 
@@ -53,9 +72,7 @@ $ docker compose up -d --build
 
 初回は、OCBによるCollectorとGoサービスのビルドを実行します。4コアの環境では10分ほどかかりました。Grafanaスタック、OCBでビルドした社内Collector（gatewayとSupervisor管理のエージェント）、OpAMPサーバー、4つのデモサービスからなる10コンテナが起動します。
 
-手元で別のCollectorやGrafana Alloyが動いている場合、エージェントのポート公開が `address already in use` で失敗します。測定した環境でもこれが起きたため、`deploy/docker-compose.override.yaml` で公開ポートをずらしました。
-
-Tempoは起動後15秒から20秒ほど `/ready` を返さず、その間に届いたテレメトリーを保存しません。測定した際も、起動直後に送ったトレースは保存されませんでした。Tempoの準備完了を確認してから、検証用のリクエストを送ります。
+ポートの衝突とTempoの起動待ちでつまずくことがあります。対処はリポジトリのREADMEにまとめてあります。
 
 ## 計装から保存までの検証
 
@@ -88,7 +105,7 @@ checkは、公式semconvへの依存をGit URLで解決して約3秒で成功し
 
 実際のテレメトリーはlive-checkで検査します。live-checkをOTLPの受信口として起動し、テレメトリーを生成する公式のテストツール[telemetrygen](https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/cmd/telemetrygen)から、レジストリにない属性を含むスパンを送りました。`myteam.rogue.attr` はviolationとして報告され、`com.example.delivery.id` はviolationになりませんでした。ただし、`com.example.delivery.id` には安定度がdevelopmentであるという改善提案が付きます。
 
-live-checkをコンテナで動かす場合は、リスンアドレスとポートを明示します。測定した際は、指定なしで起動したところコンテナ外から送ったテレメトリーが届かず、検査対象が0件のまま終了しました。`registry/weaver.sh` では `--otlp-grpc-address 0.0.0.0 --otlp-grpc-port 4317` を指定して解決しています。ただしv0.25.1のデフォルト値はこの指定と同じ `0.0.0.0:4317` なので、0件になった原因はデフォルトのリスンアドレスではありません。ポート公開の状態や、デフォルトで10秒の無通信タイムアウトが関わった可能性があり、原因は特定していません。なお、v0.26.0でデフォルトのリスンアドレスは `127.0.0.1` に変更されたため、この版以降はコンテナで動かすときに明示指定が必要になります。
+live-checkをコンテナで動かす場合は、リッスンアドレスとポートを明示します。測定した際は、指定なしで起動したところコンテナ外から送ったテレメトリーが届かず、検査対象が0件のまま終了しました。`registry/weaver.sh` では `--otlp-grpc-address 0.0.0.0 --otlp-grpc-port 4317` を指定して解決しています。ただしv0.25.1のデフォルト値はこの指定と同じ `0.0.0.0:4317` なので、0件になった原因はデフォルトのリッスンアドレスではありません。ポート公開の状態や、デフォルトで10秒の無通信タイムアウトが関わった可能性があり、原因は特定していません。なお、v0.26.0でデフォルトのリッスンアドレスは `127.0.0.1` に変更されたため、この版以降はコンテナで動かすときに明示指定が必要になります。
 
 一方、依存先である公式レジストリの `service.name` や `network.peer.address` などもviolationになりました。live-checkが依存先を解決する範囲は追加調査が必要です。CIの合否に使う場合は、検出された違反を種類に応じて扱う必要があります。
 
