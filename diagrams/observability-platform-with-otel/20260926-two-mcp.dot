@@ -27,7 +27,7 @@ digraph two_mcp {
     label=<<b>スキーマを読む</b>>;
     labeljust="l"; style="rounded"; penwidth=1.6;
     color="#9430A9"; bgcolor="#FCF0FE"; fontcolor="#6A2278"; margin=14;
-    regmcp [label=<<b>registry MCP</b><br align="left"/>weaver registry mcp<br align="left"/>>, fillcolor="#F7DDFC", color="#9430A9"];
+    regmcp [label=<<b>レジストリMCP</b><br align="left"/>weaver registry mcp<br align="left"/>>, fillcolor="#F7DDFC", color="#9430A9"];
     registry [label=<<b>社内レジストリ</b><br align="left"/>属性の意味と規約<br align="left"/>>, fillcolor="#FFFCD7", color="#736B10"];
     regmcp -> registry;
   }
@@ -38,7 +38,7 @@ digraph two_mcp {
     color="#AB5A13"; bgcolor="#FFF5ED"; fontcolor="#783F0E"; margin=14;
     // 同じカテゴリ（バックエンドへの経路）の2つは大きさを揃える。
     node [width=3.5, height=0.78];
-    telmcp [label=<<b>telemetry MCP</b><br align="left"/>バックエンド固有のツール定義<br align="left"/>>, fillcolor="#F7DDFC", color="#9430A9"];
+    telmcp [label=<<b>テレメトリーMCP</b><br align="left"/>バックエンド固有のツール定義<br align="left"/>>, fillcolor="#F7DDFC", color="#9430A9"];
     cli [label=<<b>CLI</b><br align="left"/>logcli、promtool、grafanactl<br align="left"/>>, fillcolor="#D2F3DF", color="#038435"];
     backend [label=<<b>観測バックエンド</b><br align="left"/>トレース、メトリクス、ログ<br align="left"/>>];
     telmcp -> backend;
