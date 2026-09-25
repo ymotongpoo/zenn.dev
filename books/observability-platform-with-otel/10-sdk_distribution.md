@@ -4,7 +4,7 @@ title: "SDKディストリビューションの設計"
 
 「サービスにOpenTelemetryを入れてください」と依頼された開発チームは、公式ドキュメントの初期化コードを自分のリポジトリに写すことから始めます。
 
-本章はコード例にGoを使います。Goは静的にコンパイルされ、実行時にエージェントを差し込めないため、ディストリビューションを配る設計が分かりやすく現れます。ただし本章の論点はGo固有ではありません。どの言語でも、初期化の判断をライブラリ側へ移し、開発チームが書く量を減らす設計は同じです。言語ごとの違いは本章の最後で扱います。
+本章はコード例にGoを使います。Goは静的にコンパイルされ、実行時にエージェントを差し込めないため、ディストリビューションを配る設計の効果が分かりやすく現れます。ただし本章の論点はGo固有ではありません。どの言語でも、初期化の判断をライブラリ側へ移し、開発チームが書く量を減らす設計は同じです。言語ごとの違いは本章の最後で扱います。
 
 Goの初期化コードは、次のようになります。
 
@@ -56,7 +56,7 @@ func initTracer(ctx context.Context) (func(context.Context) error, error) {
 
 ## ディストリビューションの役割
 
-OpenTelemetryでは、SDKにデフォルト値やカスタマイズを加えて再パッケージしたものを[ディストリビューション](https://opentelemetry.io/ja/docs/concepts/distributions/)と呼びます。SDK本体を変更するフォークとは異なり、SDKの上に設定と部品の選択を重ねます。
+OpenTelemetryでは、SDKにデフォルト値やカスタマイズを加えて再パッケージしたものを[ディストリビューション](https://opentelemetry.io/ja/docs/concepts/distributions/)と呼びます。SDK本体を変更するフォークとは異なり、SDKの上に設定と部品の選択を重ねていきます。
 
 オブザーバビリティベンダーが提供するSDKもディストリビューションの一例です。OTel SDKへ、自社バックエンド向けのデフォルト値、推奨する計装ライブラリとプロパゲーター、共通の初期化処理を追加しています。
 
@@ -82,7 +82,7 @@ defer func() {
 
 - OTLP エクスポーターを構築する。エンドポイントのデフォルト値は各環境のエージェント Collector（4章）に向ける
 - プロパゲーターをW3C TraceContext（トレースの文脈を運ぶ標準のヘッダ形式）とバゲッジの組み合わせに設定する
-- サンプラーのデフォルトを `ParentBased(AlwaysSample)` にする。間引きの主体はゲートウェイ側（4章）に寄せる
+- サンプラーのデフォルトを `ParentBased(AlwaysSample)` にする。サンプリングの主体はゲートウェイ側（4章）に寄せる
 - 実行環境（Kubernetesやクラウドプロバイダー）のメタデータからリソース属性を自動検出する
 - トレース、メトリクス、ログのプロバイダー（計装のためのインスタンスを返すもの）を構築してグローバルに登録する
 
@@ -96,7 +96,7 @@ defer func() {
 
 テイルサンプリングへ判断を集約すると、エラーの有無やレイテンシーを見て保存対象を選べます。ただし、すべてのスパンがアプリケーションからゲートウェイまで流れるため、SDK、エージェント、ネットワーク、ゲートウェイの負荷は減りません。この構成を使えるのは、各区間が全スパンの流量を処理できる場合です。高流量のサービスでは、SDKのヘッドサンプリングで先に量を減らします。プラットフォームは、`OTEL_TRACES_SAMPLER` 環境変数を調整して、どの段階で量を減らすかを決めます。
 
-ヘッドサンプリングの確率をトレース全体で一貫させるConsistent Probability Samplingには、contribの[Go実装](https://pkg.go.dev/go.opentelemetry.io/contrib/samplers/probability/consistent)があります。ただし2026年9月時点では実験的で、現行の仕様草案との差分も残っています[^cps]。この段階では、ディストリビューションのデフォルト値には採用しません。Consistent Probability Samplingの詳細は、[別の記事](https://zenn.dev/ymotongpoo/articles/20260717-cps)で解説しています。
+ヘッドサンプリングの確率をトレース全体で一貫させるConsistent Probability Samplingには、contribの[Go実装](https://pkg.go.dev/go.opentelemetry.io/contrib/samplers/probability/consistent)があります。ただし2026年9月時点では実験的段階で、現行の仕様草案との差分も残っています[^cps]。この段階では、ディストリビューションのデフォルト値には採用しません。Consistent Probability Samplingの詳細は、[別の記事](https://zenn.dev/ymotongpoo/articles/20260717-cps)で解説しています。
 
 [^cps]: 実装はtracestateにp値とr値を書く旧ドラフトに準拠しており、現行仕様のth値ベースの方式とは互換がありません。
 

@@ -29,7 +29,7 @@ JavaやPythonのように動的なランタイムを持つ言語では、実行�
 
 ## GoのeBPF自動計装
 
-GoのeBPF計装は、**OBI**（OpenTelemetry eBPF Instrumentation）で開発されています。Grafana LabsがBeylaを寄贈して始まったプロジェクトで、2026年9月時点の最新版はv0.13.0です。v0系のため、破壊的変更の可能性が残っています[^obi]。対象プロセスの外からeBPFでシステムコールや関数呼び出しを観測するため、バイナリを変更しません。HTTP、gRPC、主要なデータベースやメッセージングのプロトコル、OpenAIやAnthropicなどのGenAI API呼び出しを捕捉できます。
+GoのeBPF計装は、[**OBI**（OpenTelemetry eBPF Instrumentation）](https://opentelemetry.io/docs/zero-code/obi/)で開発されています。Grafana LabsがBeylaを寄贈して始まったプロジェクトで、2026年9月時点の最新版はv0.13.0です。v0系のため、破壊的変更の可能性が残っています[^obi]。対象プロセスの外からeBPFでシステムコールや関数呼び出しを観測するため、バイナリを変更しません。HTTP、gRPC、主要なデータベースやメッセージングのプロトコル、OpenAIやAnthropicなどのGenAI API呼び出しを捕捉できます。
 
 [^obi]: 2026年8月17日のv0.11.0ではGoのトレースAPIの自動計装が入り、従来 opentelemetry-go-instrumentation が担っていた領域を取り込みつつあります。プロジェクトの2026年の目標はstable 1.0です（[公式ブログ](https://opentelemetry.io/blog/2026/obi-goals/)）。
 
@@ -37,7 +37,7 @@ GoのeBPF計装は、**OBI**（OpenTelemetry eBPF Instrumentation）で開発さ
 
 ## コンパイル時計装
 
-Goでは、コンパイル時に計装コードを組み込むこともできます。DatadogのOrchestrionとAlibabaの計装ツールを統合して開発された公式ツール**otelc**は、2026年7月にv1.0でstableへ達しました。2026年9月時点の最新版はv1.1.0です[^otelc]。
+Goでは、コンパイル時に計装コードを組み込むこともできます。DatadogのOrchestrionとAlibabaの計装ツールを統合して開発された公式ツール[**otelc**](https://opentelemetry.io/docs/zero-code/go/compile-time/)は、2026年7月にv1.0でstableへ達しました。2026年9月時点の最新版はv1.1.0です[^otelc]。
 
 [^otelc]: 経緯は[公式ブログのv1発表](https://opentelemetry.io/blog/2026/go-compile-time-instrumentation-v1/)にまとまっています。v1.0.0は不具合でretractされているため、使うならv1.0.1以降です。
 
@@ -45,7 +45,7 @@ Goでは、コンパイル時に計装コードを組み込むこともできま
 
 ```console
 $ go get -tool go.opentelemetry.io/otelc/tool/cmd/otelc
-$ go tool otelc go build ./...
+$ otelc go build ./...
 ```
 
 計装の構成をリポジトリへ固定する `otelc pin` もありますが、2026年9月時点では生成物をコミットする使い方が未対応です[^otelcpin]。CIやチーム開発では、構成をビルドのたびに生成する上のコマンドを使います。
