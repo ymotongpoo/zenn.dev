@@ -19,7 +19,7 @@ digraph opamp_topology {
   ];
 
   git [label=<<b>設定リポジトリ（Git）</b><br align="left"/>真実の源。PRとCI検査を通る<br align="left"/>>, fillcolor="#FFFCD7", color="#736B10"];
-  server [label=<<b>OpAMPサーバー</b><br align="left"/>最後の配達区間を担う<br align="left"/>>, fillcolor="#F7DDFC", color="#9430A9"];
+  server [label=<<b>OpAMPサーバー</b><br align="left"/>最後のデリバリー区間を担う<br align="left"/>>, fillcolor="#F7DDFC", color="#9430A9"];
 
   subgraph cluster_node {
     label=<<b>各ノード</b>>;

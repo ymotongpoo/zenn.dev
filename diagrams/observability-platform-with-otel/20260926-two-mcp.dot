@@ -39,7 +39,7 @@ digraph two_mcp {
     // 同じカテゴリ（バックエンドへの経路）の2つは大きさを揃える。
     node [width=3.5, height=0.78];
     telmcp [label=<<b>テレメトリーMCP</b><br align="left"/>バックエンド固有のツール定義<br align="left"/>>, fillcolor="#F7DDFC", color="#9430A9"];
-    cli [label=<<b>CLI</b><br align="left"/>logcli、promtool、grafanactl<br align="left"/>>, fillcolor="#D2F3DF", color="#038435"];
+    cli [label=<<b>CLI</b><br align="left"/>gcx<br align="left"/>>, fillcolor="#D2F3DF", color="#038435"];
     backend [label=<<b>観測バックエンド</b><br align="left"/>トレース、メトリクス、ログ<br align="left"/>>];
     telmcp -> backend;
     cli -> backend;
