@@ -18,13 +18,13 @@ digraph broken_trace_waterfall {
     color="#6B6B6B", penwidth=1.2, arrowsize=0.7
   ];
 
-  title [label=<<b>トレースのウォーターフォール</b>>, shape=plain,
+  title [label=<<b>トレースのウォーターフォール</b>>, shape=plain, style="",
          fontsize=16, pos="5.0,5.25!"];
-  axis [label="時間", shape=plain, fontsize=11, pos="10.1,0.18!"];
+  axis [label="時間", shape=plain, style="", fontsize=11, pos="10.1,0.18!"];
 
-  fe_label [label="フロントエンド", shape=plain, fontsize=12, pos="1.15,4.35!"];
-  order_label [label="注文サービス", shape=plain, fontsize=12, pos="1.15,3.25!"];
-  stock_label [label="在庫サービス", shape=plain, fontsize=12, pos="1.15,2.15!"];
+  fe_label [label="フロントエンド", shape=plain, style="", fontsize=12, pos="1.15,4.35!"];
+  order_label [label="注文サービス", shape=plain, style="", fontsize=12, pos="1.15,3.25!"];
+  stock_label [label="在庫サービス", shape=plain, style="", fontsize=12, pos="1.15,2.15!"];
 
   fe [label=<<b>フロントエンドのスパン</b>>, fillcolor="#D9E9FF", color="#3274B9",
       width=4.35, height=0.52, pos="5.35,4.35!"];
@@ -33,8 +33,8 @@ digraph broken_trace_waterfall {
   stock [label=<<b>在庫サービスのスパン</b>>, fillcolor="#FFE1E1", color="#C23B3B",
          width=2.10, height=0.52, pos="7.55,2.15!"];
 
-  trace_a [label="トレース A", shape=plain, fontsize=11, fontcolor="#245B96", pos="1.05,5.0!"];
-  trace_b [label="トレース B", shape=plain, fontsize=11, fontcolor="#A12626", pos="8.65,1.25!"];
+  trace_a [label="トレース A", shape=plain, style="", fontsize=11, fontcolor="#245B96", pos="1.05,5.0!"];
+  trace_b [label="トレース B", shape=plain, style="", fontsize=11, fontcolor="#A12626", pos="8.65,1.25!"];
 
   fe -> order [style=invis];
   order -> stock [style=invis];
@@ -43,12 +43,12 @@ digraph broken_trace_waterfall {
               fixedsize=true, style="filled", fillcolor="#C23B3B",
               color="#C23B3B", pos="7.0,3.25!"];
   break_text [label=<<b>ここで親子関係が切れ、
-別のトレースになる</b>>, shape=plain,
+別のトレースになる</b>>, shape=plain, style="",
               fontsize=11, fontcolor="#A12626", pos="7.0,0.78!"];
 
   t0 [label="", shape=point, width=0.01, pos="2.15,0.55!", color="#777777"];
   t1 [label="", shape=point, width=0.01, pos="9.35,0.55!", color="#777777"];
   t0 -> t1 [dir=none, color="#777777", penwidth=1.0];
-  tick0 [label="開始", shape=plain, fontsize=10, pos="2.15,0.25!"];
-  tick1 [label="終了", shape=plain, fontsize=10, pos="9.35,0.25!"];
+  tick0 [label="開始", shape=plain, style="", fontsize=10, pos="2.15,0.25!"];
+  tick1 [label="終了", shape=plain, style="", fontsize=10, pos="9.35,0.25!"];
 }
