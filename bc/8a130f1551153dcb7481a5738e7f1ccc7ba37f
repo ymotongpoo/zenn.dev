@@ -1,0 +1,14 @@
+books/tinygo-otel-esp32/config.yaml
+  h_bf0ada3931f770 1-20
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "bc8a130f1551153dcb7481a5738e7f1ccc7ba37f",
+  "prompts": {},
+  "humans": {
+    "h_bf0ada3931f770": {
+      "author": "Yoshi Yamaguchi <ymotongpoo@gmail.com>"
+    }
+  }
+}
