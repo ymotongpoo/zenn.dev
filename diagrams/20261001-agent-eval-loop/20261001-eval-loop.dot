@@ -4,11 +4,11 @@
 // 出典: Yasir Ekinci「Building an evaluation loop for Grafana Assistant」
 // "It is a practical loop where AI proposes, benchmarks verify, and humans decide."
 //
-// 色はブランドパレットに従う。周回の3段は主系列（Orange）、人間の判断は中立（Neutral）。
-// 矢印はすべて実線（周回の本筋であり、従属・非同期の経路はない）。
+// 色はブランドパレットに従う。ループの3段は主系列（Orange）、人間の判断は中立（Neutral）。
+// 矢印はすべて実線（ループの本筋であり、従属・非同期の経路はない）。
 //
 // レイアウトの経緯:
-// 周回3段を rank=same で横に並べ、人間の判断をその下のランクに置く。こうすると
+// ループの3段を rank=same で横に並べ、人間の判断をその下のランクに置く。こうすると
 // 戻りの辺は「人間が決める」から左へ回り、クラスタの下辺よりさらに下を通って
 // Evaluate の下端に届く。枠との間隔も ranksep で制御できる。
 //
@@ -45,7 +45,7 @@ digraph eval_loop {
 
   subgraph cluster_auto {
     graph [
-      label=<<b>周回の3段</b>>,
+      label=<<b>ループの3段</b>>,
       labeljust="l",
       style="rounded", color="#AB5A13", penwidth=1.6,
       margin=16, bgcolor="#FFF5ED",
@@ -61,7 +61,7 @@ digraph eval_loop {
       fillcolor="#FFE9D6", color="#AB5A13"
     ];
     change [
-      label=<<b>Change</b><br align="left"/>グレーダーの較正と<br align="left"/>エージェントの改善を提案する<br align="left"/>>,
+      label=<<b>Change</b><br align="left"/>グレーダーのキャリブレーションと<br align="left"/>エージェントの改善を提案する<br align="left"/>>,
       fillcolor="#FFE9D6", color="#AB5A13"
     ];
 
