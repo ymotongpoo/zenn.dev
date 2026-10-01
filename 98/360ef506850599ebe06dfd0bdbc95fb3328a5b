@@ -1,0 +1,20 @@
+articles/20261001-agent-eval-loop.md
+  s_bf01dc35a39710::t_91be928a57fc5d 184,190,192,194,196,198,200,208,210,214,220,224-229,231,233,261,265,285,289,291
+  s_bf01dc35a39710::t_d67130af18cf79 16,20,37,51,62,128,130,142,146,148,150,154,168,178,295,303,307,311,319,321,323,329,337
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "98360ef506850599ebe06dfd0bdbc95fb3328a5b",
+  "prompts": {},
+  "sessions": {
+    "s_bf01dc35a39710": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "b9fcfef2-c624-4213-854a-25fe084fa4bd",
+        "model": "claude-sonnet-5-5"
+      },
+      "human_author": "Yoshi Yamaguchi <ymotongpoo@gmail.com>"
+    }
+  }
+}
