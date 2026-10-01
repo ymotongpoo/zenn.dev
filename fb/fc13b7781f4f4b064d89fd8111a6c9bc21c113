@@ -1,0 +1,14 @@
+.gitignore
+  h_bf0ada3931f770 2-4
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "fbfc13b7781f4f4b064d89fd8111a6c9bc21c113",
+  "prompts": {},
+  "humans": {
+    "h_bf0ada3931f770": {
+      "author": "Yoshi Yamaguchi <ymotongpoo@gmail.com>"
+    }
+  }
+}
