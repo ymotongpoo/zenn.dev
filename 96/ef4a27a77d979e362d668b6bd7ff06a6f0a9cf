@@ -1,0 +1,14 @@
+articles/20261007-what-made-agents-better.md
+  h_bf0ada3931f770 6
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "96ef4a27a77d979e362d668b6bd7ff06a6f0a9cf",
+  "prompts": {},
+  "humans": {
+    "h_bf0ada3931f770": {
+      "author": "Yoshi Yamaguchi <ymotongpoo@gmail.com>"
+    }
+  }
+}
