@@ -1,0 +1,24 @@
+articles/20261001-agent-eval-loop.md
+  s_cdbd697f3c84b5::t_fd9a52a784c37a 1-5,7-348
+  s_cdbd697f3c84b5::t_f18f82a0ab00f3 6
+articles/20261007-what-made-agents-better.md
+  s_cdbd697f3c84b5::t_fd9a52a784c37a 1-255
+diagrams/20261001-agent-eval-loop/20261001-eval-loop.dot
+  s_cdbd697f3c84b5::t_64b5f30c79ed9d 7-8,11,48,64
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "18acc15da3c0b4012746a24cea0b08424b2e8d9f",
+  "prompts": {},
+  "sessions": {
+    "s_cdbd697f3c84b5": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "334afcd0-ff17-494d-9568-5e3d64902a9f",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Yoshi Yamaguchi <ymotongpoo@gmail.com>"
+    }
+  }
+}
