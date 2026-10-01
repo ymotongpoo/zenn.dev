@@ -1,0 +1,20 @@
+---
+title: "TinyGoでOpenTelemetryは使えるのか"
+summary: "TinyGo Conference 2026の登壇「TinyGoでオブザーバビリティ？OpenTelemetryはTinyGoで使えるのか」の解説資料です。OpenTelemetryは組み込み向けには設計されていません。その前提のもとで、M5Stack CoreS3（ESP32-S3）からOTLPでメトリクスを送る最小実装を作り、どこで詰まるのかを実機で測りました。登壇のプロポーザル時点で書いた技術的な見立てのうち、いくつかは実機で検証したところ誤りでした。その訂正も含めて記録しています。"
+topics: ["tinygo", "opentelemetry", "esp32", "go", "observability"]
+published: false
+price: 0
+chapters:
+  - 00-introduction
+  - 05-not-designed-for-embedded
+  - 10-prior-art
+  - 15-go-sdk-does-not-fit
+  - 20-protobuf-and-reflect
+  - 25-encoder-choice
+  - 30-network-and-clock
+  - 35-memory-and-churn
+  - 40-stack-size
+  - 45-operating-it
+  - 50-what-to-offload
+  - 55-conclusion
+  - 99-references
