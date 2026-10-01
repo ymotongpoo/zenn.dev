@@ -1,0 +1,19 @@
+articles/20260922-bedrock-sagemaker-otel.md
+  s_3eb3d46109bf92::t_562adbdcb2199a 1-333
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "69a47dd3dae0acf65730688cb15e4e21ff19a19b",
+  "prompts": {},
+  "sessions": {
+    "s_3eb3d46109bf92": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "80296eca-248c-4d96-9f27-715b58e2687b",
+        "model": "unknown"
+      },
+      "human_author": "Yoshi Yamaguchi <ymotongpoo@gmail.com>"
+    }
+  }
+}
