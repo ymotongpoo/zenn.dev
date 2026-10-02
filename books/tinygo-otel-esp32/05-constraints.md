@@ -18,7 +18,7 @@ title: "前提と制約"
 
 ## ハードウェアの制約
 
-本書で使う[M5Stack CoreS3](https://docs.m5stack.com/ja/core/CoreS3)は、Espressif社の[ESP32-S3](https://www.espressif.com/en/products/socs/esp32-s3)を載せたボードです。ESP32-S3は240MHzで動くデュアルコアのマイコンで、Wi-Fiを内蔵しています。ボードの仕様には、16MBのフラッシュメモリと8MBの**PSRAM**が並んでいます。フラッシュメモリはプログラムを書き込んでおく不揮発の記憶領域、PSRAMはチップの外に付けた追加のRAMです。
+本書で使う[M5Stack CoreS3](https://docs.m5stack.com/ja/core/CoreS3)は、Espressif社の[ESP32-S3](https://www.espressif.com/en/products/socs/esp32-s3)を載せたボードです。ESP32-S3は最大240MHzで動くデュアルコアのマイコンで、Wi-Fiを内蔵しています[^s3ds]。ボードの仕様には、16MBのフラッシュメモリと8MBの**PSRAM**が並んでいます。フラッシュメモリはプログラムを書き込んでおく不揮発の記憶領域、PSRAMはチップの外に付けた追加のRAMです。
 
 ただし、TinyGo 0.42.0が扱えるのはチップに内蔵されたSRAMだけです。リンカースクリプトがデータ用に割り当てるRAM（DRAM）は416KB、つまり425,984バイトで、そのうちヒープの上限は298,287バイトでした。PSRAMの8MBは、TinyGoからはまだ使えません[^psram]。
 
@@ -51,4 +51,5 @@ Wi-Fiの接続には[espradio](https://github.com/tinygo-org/espradio)を使い�
 この分け方には利点もあります。バックエンドの認証情報や証明書をマイコンに持たせずに済み、バックエンドを変えるときもファームウェアを書き換えずに済みます。その代わり、デバイスとCollectorの間の通信は暗号化されないので、信頼できるネットワークの中に置くことが条件です。Collectorの構成は11章で扱います。
 
 [^tedsuo]: Ted YoungはOpenTelemetryの共同創設者の一人です。執筆時点で、[GitHubのプロフィール](https://github.com/tedsuo)にはGrafana Labsで働いていると書かれています。引用したコメントは2024年6月21日のものです。
+[^s3ds]: Espressif社の[ESP32-S3のデータシート](https://www.espressif.com/sites/default/files/documentation/esp32-s3_datasheet_en.pdf)による値です。
 [^psram]: ESP32-S3のPSRAMへの対応は、執筆時点でTinyGoの[PR #5554](https://github.com/tinygo-org/tinygo/pull/5554)として進行中です。
