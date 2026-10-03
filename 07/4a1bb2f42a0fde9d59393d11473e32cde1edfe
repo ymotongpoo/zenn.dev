@@ -1,0 +1,16 @@
+books/tinygo-otel-esp32/05-constraints.md
+  h_bf0ada3931f770 21,54
+books/tinygo-otel-esp32/55-conclusion.md
+  h_bf0ada3931f770 7
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "074a1bb2f42a0fde9d59393d11473e32cde1edfe",
+  "prompts": {},
+  "humans": {
+    "h_bf0ada3931f770": {
+      "author": "Yoshi Yamaguchi <ymotongpoo@gmail.com>"
+    }
+  }
+}
