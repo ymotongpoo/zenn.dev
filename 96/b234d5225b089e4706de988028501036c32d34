@@ -1,0 +1,40 @@
+.reviewer/rounds/1/response.json
+  h_bf0ada3931f770 1-37
+books/tinygo-otel-esp32/00-introduction.md
+  h_bf0ada3931f770 9,11,14,27
+books/tinygo-otel-esp32/05-constraints.md
+  h_bf0ada3931f770 5,25,27
+books/tinygo-otel-esp32/10-prior-art.md
+  h_bf0ada3931f770 23
+books/tinygo-otel-esp32/15-official-sdk.md
+  h_bf0ada3931f770 23,46,48
+books/tinygo-otel-esp32/20-protobuf.md
+  h_bf0ada3931f770 39,59,72,96,100,102,124
+books/tinygo-otel-esp32/25-otlp-json.md
+  h_bf0ada3931f770 95,101
+books/tinygo-otel-esp32/30-http.md
+  h_bf0ada3931f770 7,16,18,43,70,117
+books/tinygo-otel-esp32/35-clock.md
+  h_bf0ada3931f770 9,38,57,125
+books/tinygo-otel-esp32/40-memory.md
+  h_bf0ada3931f770 22-24
+books/tinygo-otel-esp32/45-three-signals.md
+  h_bf0ada3931f770 11
+books/tinygo-otel-esp32/50-collector.md
+  h_bf0ada3931f770 32
+books/tinygo-otel-esp32/55-conclusion.md
+  h_bf0ada3931f770 5,7
+books/tinygo-otel-esp32/99-references.md
+  h_bf0ada3931f770 41
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "96b234d5225b089e4706de988028501036c32d34",
+  "prompts": {},
+  "humans": {
+    "h_bf0ada3931f770": {
+      "author": "Yoshi Yamaguchi <ymotongpoo@gmail.com>"
+    }
+  }
+}
