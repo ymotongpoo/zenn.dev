@@ -38,6 +38,7 @@ title: "参考文献"
 
 - [TinyGo](https://tinygo.org/)：マイコンとWebAssembly向けのGoコンパイラ
 - [tinygo-org/tinygo](https://github.com/tinygo-org/tinygo)：TinyGoのリポジトリ
+- [tinygo-otel-esp32](https://github.com/ymotongpoo/tinygo-otel-esp32)：本書で使った独立した公開ブループリント
 - [tinygo-org/tinygo#5554](https://github.com/tinygo-org/tinygo/pull/5554)：ESP32-S3のPSRAM対応のプルリクエスト
 - [espradio](https://github.com/tinygo-org/espradio)：TinyGoからESP32のWi-Fiを使うドライバ
 - [lneto](https://github.com/soypat/lneto)：espradioが使うTCP/IPスタック
