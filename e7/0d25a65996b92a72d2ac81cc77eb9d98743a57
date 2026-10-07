@@ -1,0 +1,146 @@
+books/otel-for-perl/15-sdk-setup.md
+  s_ff65d3f1cc7ef1::t_45ca4917daf7e4 114
+  s_ff65d3f1cc7ef1::t_4fec635e5ef9a8 50
+  s_ff65d3f1cc7ef1::t_05059824ae0325 143
+  s_ff65d3f1cc7ef1::t_583b53e6162ca9 21
+  s_ff65d3f1cc7ef1::t_0d539ef577f083 157
+  s_ff65d3f1cc7ef1::t_d28f41c943ded7 38,101-108
+  s_ff65d3f1cc7ef1::t_e8a6f7f3d4e1d9 145
+  s_ff65d3f1cc7ef1::t_907e433b3bb10a 77
+  s_ff65d3f1cc7ef1::t_bbe7d79b76c2bd 7
+  s_ff65d3f1cc7ef1::t_b99dd4b72177aa 1-6,8-20,22-37,39-49,51-76,78-100,109-113,115-142,144,146-156,158,160-180
+  s_ff65d3f1cc7ef1::t_c53eddb979899e 159
+  s_ff65d3f1cc7ef1::t_0d2b4bbf8269e6 181
+books/otel-for-perl/config.yaml
+  s_ff65d3f1cc7ef1::t_5255af738fe8c7 1-18
+books/otel-for-perl/35-psgi-runtime.md
+  s_ff65d3f1cc7ef1::t_92050e0adc1ca8 25
+  s_ff65d3f1cc7ef1::t_d28f41c943ded7 109,175,182
+  s_ff65d3f1cc7ef1::t_2498cf8c7a9495 56
+  s_ff65d3f1cc7ef1::t_b25ec27f952491 165,176
+  s_ff65d3f1cc7ef1::t_d589a0807dff73 173
+  s_ff65d3f1cc7ef1::t_12837690c8f840 1-6,8-22,24,26-46,48-50,52,54-55,57-59,61-63,65,67-69,71-102,104-108,110-113,115-117,119,121-144,146-153,155,157-159,161-164,166-168,170,172,177-179,181,183,185
+  s_ff65d3f1cc7ef1::t_7106753255e5cc 7,23,47,51,53,60,64,70,103,114,118,120,145,154,156,160,169,171,174,180,184,186
+  s_ff65d3f1cc7ef1::t_3bcfaa23435b2c 66
+books/otel-for-perl/50-contributing.md
+  s_ff65d3f1cc7ef1::t_d28f41c943ded7 12,19,28,30
+  s_ff65d3f1cc7ef1::t_3bcfaa23435b2c 24,32
+  s_ff65d3f1cc7ef1::t_d2d378a5915d51 18
+  s_ff65d3f1cc7ef1::t_77445b8dc7e67b 21
+  s_ff65d3f1cc7ef1::t_ef0d54e8a24b25 7,36,48
+  s_ff65d3f1cc7ef1::t_155a7c393a879b 40,42,44,50
+  s_ff65d3f1cc7ef1::t_4b1dc2071efa80 1-6,8-11,13-17,20,22-23,25-27,29,31,33-35,37-39,41,43,45-47,49
+books/otel-for-perl/00-introduction.md
+  s_ff65d3f1cc7ef1::t_d28f41c943ded7 38
+  s_ff65d3f1cc7ef1::t_5316af2bea3219 27
+  s_ff65d3f1cc7ef1::t_43e9b3a98c15af 13
+  s_ff65d3f1cc7ef1::t_8f9bb637fb03fb 11
+  s_ff65d3f1cc7ef1::t_7f99071256dc56 5
+  s_ff65d3f1cc7ef1::t_ba18a92d1faab9 9
+  s_ff65d3f1cc7ef1::t_44fb35a431c361 1-4,6,8,10,12,14-24,28-35,37,39-40
+  s_ff65d3f1cc7ef1::t_aaff7ec7725040 36
+  s_ff65d3f1cc7ef1::t_7f65bd498a790f 7
+  s_ff65d3f1cc7ef1::t_2b60c8164a9ead 25-26
+books/otel-for-perl/40-obi.md
+  s_ff65d3f1cc7ef1::t_70be6e77d5da13 57
+  s_ff65d3f1cc7ef1::t_3bcfaa23435b2c 78
+  s_ff65d3f1cc7ef1::t_2498cf8c7a9495 100
+  s_ff65d3f1cc7ef1::t_5b3b0b27b8824a 59
+  s_ff65d3f1cc7ef1::t_ae1ee442d14b52 38
+  s_ff65d3f1cc7ef1::t_1ba9774874d99e 74
+  s_ff65d3f1cc7ef1::t_740cd46ab1f927 7,9,13,70,84,97
+  s_ff65d3f1cc7ef1::t_c3898219b60f6f 1-6,8,10,14-16,18,20-37,39-45,51-52,54,56,58,60-69,71-73,75,77,79-81,83,85-92,98-99,101
+  s_ff65d3f1cc7ef1::t_becde7318ebcd3 11-12,46-50
+  s_ff65d3f1cc7ef1::t_b70e48e7d8ad55 94,96
+  s_ff65d3f1cc7ef1::t_bb68440587a61f 93
+  s_ff65d3f1cc7ef1::t_d28f41c943ded7 17,53,82
+  s_ff65d3f1cc7ef1::t_52daaa51777c08 76
+  s_ff65d3f1cc7ef1::t_19825346a8e0ec 55
+  s_ff65d3f1cc7ef1::t_ae8766bc489fe7 19
+  s_ff65d3f1cc7ef1::t_cd2907fd4ab470 95
+  s_ff65d3f1cc7ef1::t_9dbaac98b274e3 102
+books/otel-for-perl/10-perl-ecosystem.md
+  s_ff65d3f1cc7ef1::t_644114a177fa24 7
+  s_ff65d3f1cc7ef1::t_d28f41c943ded7 11,34
+  s_ff65d3f1cc7ef1::t_50fedc8237b744 9
+  s_ff65d3f1cc7ef1::t_dd79c5323e33ff 77
+  s_ff65d3f1cc7ef1::t_0f7ac01cc9c179 54
+  s_ff65d3f1cc7ef1::t_e44bc2b9aeef85 17
+  s_ff65d3f1cc7ef1::t_c56907b8179349 79
+  s_ff65d3f1cc7ef1::t_2a98dd7bd55268 49
+  s_ff65d3f1cc7ef1::t_e7d675d684da71 23
+  s_ff65d3f1cc7ef1::t_7c6de459e4ffd4 36
+  s_ff65d3f1cc7ef1::t_2498cf8c7a9495 52
+  s_ff65d3f1cc7ef1::t_115f94dd263cf9 1-6,8,10,12-16,18-22,24-33,35,37-48,50-51,53,55-76,78
+books/otel-for-perl/30-signal-coverage.md
+  s_ff65d3f1cc7ef1::t_d2d378a5915d51 72-73
+  s_ff65d3f1cc7ef1::t_92050e0adc1ca8 7,21,90
+  s_ff65d3f1cc7ef1::t_bd586eda14100f 9,17,24,68,74,84,88
+  s_ff65d3f1cc7ef1::t_b25ec27f952491 49
+  s_ff65d3f1cc7ef1::t_d28f41c943ded7 23,47,70
+  s_ff65d3f1cc7ef1::t_1c736b71f10ddd 1-6,8,10-16,18-20,22,25-46,48,50-67,69,71,75-83,85-87,89
+books/otel-for-perl/20-plack-tracing.md
+  s_ff65d3f1cc7ef1::t_78a0d9aaa2bfc9 1-49,51-60,62-83,85-87,89,91-111,113-131,133-139,141
+  s_ff65d3f1cc7ef1::t_b60c85383196d1 112
+  s_ff65d3f1cc7ef1::t_48727e20413a57 90
+  s_ff65d3f1cc7ef1::t_40385d1c2660c9 132
+  s_ff65d3f1cc7ef1::t_d28f41c943ded7 50
+  s_ff65d3f1cc7ef1::t_fa6488c9e310fe 84
+  s_ff65d3f1cc7ef1::t_e65398ccd72e42 88
+  s_ff65d3f1cc7ef1::t_7d92441904fdd7 140
+  s_ff65d3f1cc7ef1::t_5ec48c4a1095dc 61
+  s_ff65d3f1cc7ef1::t_e4a6ab87b10ce9 142
+books/otel-for-perl/25-http-propagation.md
+  s_ff65d3f1cc7ef1::t_2498cf8c7a9495 76
+  s_ff65d3f1cc7ef1::t_92c66b4bfdb252 61
+  s_ff65d3f1cc7ef1::t_a88009b5855a68 15
+  s_ff65d3f1cc7ef1::t_b1389ee139cd60 1-6,8-12,14,16,18-30,32-34,36-58,60,62-75,77
+  s_ff65d3f1cc7ef1::t_61d93d990f68b4 17
+  s_ff65d3f1cc7ef1::t_50501f314e4179 31
+  s_ff65d3f1cc7ef1::t_e2e0ba4c86e1c6 7
+  s_ff65d3f1cc7ef1::t_5cf7fbaa17fc7d 78
+  s_ff65d3f1cc7ef1::t_6f23638bf1a025 59
+  s_ff65d3f1cc7ef1::t_944e8379a6f368 35
+  s_ff65d3f1cc7ef1::t_ca766b12e4b8f7 13
+books/otel-for-perl/99-references.md
+  s_ff65d3f1cc7ef1::t_0f52281d953adf 31
+  s_ff65d3f1cc7ef1::t_a642743455b57b 56-58
+  s_ff65d3f1cc7ef1::t_fb4cdc92d1d1eb 1-30,32-55
+books/otel-for-perl/45-sdk-vs-obi.md
+  s_ff65d3f1cc7ef1::t_55b5493b743882 7
+  s_ff65d3f1cc7ef1::t_f1f904217822ee 12,41-42
+  s_ff65d3f1cc7ef1::t_52daaa51777c08 17
+  s_ff65d3f1cc7ef1::t_d28f41c943ded7 18,28
+  s_ff65d3f1cc7ef1::t_0409d50a3ae530 22,26,36,40,44
+  s_ff65d3f1cc7ef1::t_54b5c4fb6e2145 1-6,8-11,13-16,19-21,23-25,27,29-35,37-39,43
+books/otel-for-perl/05-tracing-basics.md
+  s_ff65d3f1cc7ef1::t_1e7c24c0435b05 7
+  s_ff65d3f1cc7ef1::t_54ef5219e70840 99
+  s_ff65d3f1cc7ef1::t_04d16658b2f461 74
+  s_ff65d3f1cc7ef1::t_6c4b5c0090ca06 88
+  s_ff65d3f1cc7ef1::t_f402c7aa2f8709 107
+  s_ff65d3f1cc7ef1::t_77445b8dc7e67b 25-26
+  s_ff65d3f1cc7ef1::t_2498cf8c7a9495 12,97
+  s_ff65d3f1cc7ef1::t_b25ec27f952491 110
+  s_ff65d3f1cc7ef1::t_7d3945acf31647 1-6,8,10-11,13,15-24,27-73,75-85,87,89-93,95-96,98,100-106,108-109
+  s_ff65d3f1cc7ef1::t_8b49420a016ed3 86
+  s_ff65d3f1cc7ef1::t_a4188d87e1b02c 14
+  s_ff65d3f1cc7ef1::t_1562b65bb18d8b 94
+  s_ff65d3f1cc7ef1::t_4ad839e86a3220 9
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "e70d25a65996b92a72d2ac81cc77eb9d98743a57",
+  "prompts": {},
+  "sessions": {
+    "s_ff65d3f1cc7ef1": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "afb5e511-29a5-465f-8c60-b7af60da667d",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Yoshi Yamaguchi <ymotongpoo@gmail.com>"
+    }
+  }
+}
