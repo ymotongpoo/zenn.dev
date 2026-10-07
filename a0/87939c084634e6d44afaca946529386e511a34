@@ -1,0 +1,23 @@
+books/otel-for-perl/50-contributing.md
+  s_ff65d3f1cc7ef1::t_442e44fd5ac3fc 18
+books/otel-for-perl/99-references.md
+  s_ff65d3f1cc7ef1::t_442e44fd5ac3fc 30
+books/otel-for-perl/30-signal-coverage.md
+  s_ff65d3f1cc7ef1::t_442e44fd5ac3fc 72
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "a087939c084634e6d44afaca946529386e511a34",
+  "prompts": {},
+  "sessions": {
+    "s_ff65d3f1cc7ef1": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "afb5e511-29a5-465f-8c60-b7af60da667d",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Yoshi Yamaguchi <ymotongpoo@gmail.com>"
+    }
+  }
+}
