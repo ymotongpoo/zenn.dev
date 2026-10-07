@@ -1,0 +1,19 @@
+books/tinygo-otel-esp32/config.yaml
+  s_c055264993563c::t_45661b6969bdc4 2
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "2a5ba2aaa573d970fedc018c64a9c7f4c0b2e6ee",
+  "prompts": {},
+  "sessions": {
+    "s_c055264993563c": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a11643-3c43-7250-9c5e-2f3230a6e5db",
+        "model": "gpt-6-luna"
+      },
+      "human_author": "Yoshi Yamaguchi <ymotongpoo@gmail.com>"
+    }
+  }
+}
