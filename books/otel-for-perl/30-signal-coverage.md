@@ -69,7 +69,7 @@ Collectorに届いたログレコードのうち、スパンの中で出した `
 
 `debugf` のログは届きませんでした。アダプターは送るログのレベルを環境変数 `OTEL_PERL_LOG_LEVEL` で決め、未設定なら `OTEL_LOG_LEVEL` を読み、どちらも無ければ `info` 以上だけを送ります[^loglevel]。ログのSDKもBatchプロセッサーを使うので、トレースと同じくスクリプトの最後で `force_flush` を呼ぶ必要がありました。
 
-試験版には、もう1つ注意点があります。0.029-TRIALのSDKを読み込んだプログラムは、何もせずに終わろうとしても終了しませんでした。`perl -MOpenTelemetry::SDK -e 1` だけで再現します。プロセスは `END` ブロックの後で止まったままで、0.028では起きません。`OTEL_TRACES_EXPORTER` か `OTEL_LOGS_EXPORTER` のどちらかを `none` にすると終了するので、トレースとログの両方にBatchプロセッサーが組まれることが条件です。上の `e5_logs.pl` は両方の `force_flush` を呼んでいて、この現象には当たりませんでした。原因は調べていません。
+試験版には、もう1つ注意点があります。0.029-TRIALのSDKを読み込んだプログラムは、何もせずに終わろうとしても終了しませんでした。`perl -MOpenTelemetry::SDK -e 1` だけで再現します。プロセスは `END` ブロックの後で止まったままで、0.028では起きません。`OTEL_TRACES_EXPORTER` か `OTEL_LOGS_EXPORTER` のどちらかを `none` にすると終了するので、トレースとログの両方にBatchプロセッサーが組まれることが条件です。上の `e5_logs.pl` は両方の `force_flush` を呼んでいて、この現象には当たりませんでした。原因は調べていません。0.028で終了しないことがあるという既存のissue #24に、この再現手順を[コメント](https://github.com/jjatria/perl-opentelemetry-sdk/issues/24#issuecomment-6048489586)として報告しました（2026年10月7日）。
 
 ログには、CPANのクライアントがデフォルトで入れる安定版では送れないという制約があります。いまPerlのアプリケーションのログをOpenTelemetryで扱うなら、方法は2つあります。試験版のSDKを使うか、ファイルに書いたログをCollectorに読ませるかです。ファイルを読ませる方法は、本書では試していません。
 

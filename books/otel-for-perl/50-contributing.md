@@ -15,7 +15,7 @@ title: "Perl実装にいま必要なもの"
 | プロセスの終了時に、SDKが `shutdown` も `force_flush` も呼ばない | SDKの未実装 | 8章 | perl-opentelemetry-sdk |
 | Plackのミドルウェアのスパン名と `server.address`、`server.port` がセマンティック規約と食い違い、SDKに依存している | 計装ライブラリ | 5章 | [Plack-Middleware-OpenTelemetry](https://github.com/abh/Plack-Middleware-OpenTelemetry) |
 | ログは試験版のSDKでしか送れず、メトリクスはAPIも無い | 未実装 | 7章 | perl-opentelemetry、perl-opentelemetry-sdk |
-| 0.029-TRIALのSDKを読み込んだプログラムが、トレースとログの両方にBatchプロセッサーがあると終了しない | 試験版の不具合（原因は未調査） | 7章 | perl-opentelemetry-sdk |
+| 0.029-TRIALのSDKを読み込んだプログラムが、トレースとログの両方にBatchプロセッサーがあると終了しない | 試験版の不具合（原因は未調査） | 7章 | perl-opentelemetry-sdk（[#24に報告済み](https://github.com/jjatria/perl-opentelemetry-sdk/issues/24#issuecomment-6048489586)） |
 | READMEやPODが実装より古い、または実装と食い違う | 文書 | 3章、6章、7章 | 各リポジトリ |
 | OBIの伝搬に必要なマウントが、Dockerのセットアップの説明からたどれない | OBIの文書 | 9章 | [opentelemetry.io](https://github.com/open-telemetry/opentelemetry.io)のOBIのドキュメント |
 | OBIがPerlのイベントループで並行するリクエストの親子を誤って対応づける。ドキュメントのLimitationsが述べる制約の範囲で、Perl向けのランタイム固有の仕組みが無い | OBIの未実装 | 9章 | [opentelemetry-ebpf-instrumentation](https://github.com/open-telemetry/opentelemetry-ebpf-instrumentation) |
