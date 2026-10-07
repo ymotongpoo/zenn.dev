@@ -1,0 +1,35 @@
+diagrams/otel-for-perl/20261128-distributed-trace-basics.dot
+  s_ff65d3f1cc7ef1::t_4b773e294f31b4 36
+  s_ff65d3f1cc7ef1::t_4adbfb3490a1e4 1-31,33-35,37
+  s_ff65d3f1cc7ef1::t_f46e0eb8027dac 32
+diagrams/otel-for-perl/20261128-batch-processor-fork.dot
+  s_ff65d3f1cc7ef1::t_f46e0eb8027dac 32,35
+  s_ff65d3f1cc7ef1::t_4adbfb3490a1e4 1-31,33-34,36-44
+diagrams/otel-for-perl/20261128-api-sdk-exporter.dot
+  s_ff65d3f1cc7ef1::t_4adbfb3490a1e4 1-38
+diagrams/otel-for-perl/20261128-plack-request-spans.dot
+  s_ff65d3f1cc7ef1::t_4b773e294f31b4 38
+  s_ff65d3f1cc7ef1::t_f46e0eb8027dac 33
+  s_ff65d3f1cc7ef1::t_4adbfb3490a1e4 1-32,34-37,39
+diagrams/otel-for-perl/20261128-demo-topology.dot
+  s_ff65d3f1cc7ef1::t_4adbfb3490a1e4 1-41
+diagrams/otel-for-perl/20261128-obi-observation-points.dot
+  s_ff65d3f1cc7ef1::t_f46e0eb8027dac 2,7,22-23,25,28,30-31
+  s_ff65d3f1cc7ef1::t_4adbfb3490a1e4 1,3-6,8-21,24,26-27,29,32-40
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "cb314826fd2eeea443797141b106577d0b25d958",
+  "prompts": {},
+  "sessions": {
+    "s_ff65d3f1cc7ef1": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "afb5e511-29a5-465f-8c60-b7af60da667d",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Yoshi Yamaguchi <ymotongpoo@gmail.com>"
+    }
+  }
+}
