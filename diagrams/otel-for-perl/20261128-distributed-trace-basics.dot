@@ -1,0 +1,37 @@
+// 目指すトレースの形（2章 図2）
+// 矢印は親のスパンから子のスパンへ
+digraph trace_basics {
+  graph [
+    fontname="IBM Plex Sans JP", fontsize=13,
+    rankdir=TB, compound=true, splines=ortho,
+    nodesep=0.45, ranksep=0.5, pad=0.25,
+    bgcolor="white", newrank=true
+  ];
+  node [
+    fontname="IBM Plex Sans JP", fontsize=12,
+    shape=box, style="rounded,filled",
+    fillcolor="#FFE9D6", color="#AB5A13", penwidth=1.6,
+    margin="0.2,0.14", width=2.9, height=0.8
+  ];
+  edge [
+    fontname="IBM Plex Sans JP", fontsize=11,
+    color="#343434", penwidth=1.4, arrowsize=0.9,
+    fontcolor="#171717"
+  ];
+
+  subgraph cluster_perl {
+    label=<<b>Perlのプロセス（report）</b>>;
+    labeljust="l"; style="rounded"; penwidth=1.6;
+    color="#AB5A13"; bgcolor="#FFF5ED"; fontcolor="#783F0E"; margin=14;
+    server [label=<<b>リクエストを受けた区間</b><br/>トレースの根>];
+    aggregate [label=<<b>集計処理の区間</b><br/>日数に比例して長い>];
+    client [label=<<b>ratesを呼ぶ区間</b><br/>HTTPクライアント>];
+    { rank=same; aggregate; client; }
+  }
+
+  rates [label=<<b>ratesがリクエストを処理した区間</b><br/>Goのプロセス。通貨によって長い>, fillcolor="#E4E4E4", color="#4A4A4A"];
+
+  server -> aggregate;
+  server -> client;
+  client -> rates [minlen=2, xlabel=<<font face="JetBrains Mono">traceparent</font> >];
+}

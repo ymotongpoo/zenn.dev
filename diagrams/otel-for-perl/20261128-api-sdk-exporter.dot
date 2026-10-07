@@ -1,0 +1,38 @@
+// CPANの配布物の関係（3章 図1）
+// 矢印は呼び出しの向き。破線はSDKを読み込んだときだけ通る経路
+digraph api_sdk_exporter {
+  graph [
+    fontname="IBM Plex Sans JP", fontsize=13,
+    rankdir=TB, compound=true, splines=ortho,
+    nodesep=0.5, ranksep=0.5, pad=0.25,
+    bgcolor="white", newrank=true
+  ];
+  node [
+    fontname="IBM Plex Sans JP", fontsize=12,
+    shape=box, style="rounded,filled",
+    fillcolor="#E4E4E4", color="#4A4A4A", penwidth=1.6,
+    margin="0.2,0.14", width=2.9, height=0.8
+  ];
+  edge [
+    fontname="IBM Plex Sans JP", fontsize=11,
+    color="#343434", penwidth=1.4, arrowsize=0.9,
+    fontcolor="#171717"
+  ];
+
+  app [label=<<b>アプリケーション</b><br/><font face="JetBrains Mono">in_span</font> などを呼ぶ>];
+  instr [label=<<b>計装ライブラリ</b><br/><font face="JetBrains Mono">HTTP::Tiny</font> の計装など>];
+  { rank=same; app; instr; }
+
+  api [label=<<b>API</b><br/><font face="JetBrains Mono">OpenTelemetry</font>>, fillcolor="#FFE9D6", color="#AB5A13"];
+  sdk [label=<<b>SDK</b><br/><font face="JetBrains Mono">OpenTelemetry::SDK</font>>, fillcolor="#FFE9D6", color="#AB5A13"];
+  processor [label=<<b>プロセッサー</b><br/>Simple または Batch>, fillcolor="#FFFCD7", color="#736B10"];
+  exporter [label=<<b>OTLPエクスポーター</b><br/><font face="JetBrains Mono">OpenTelemetry::Exporter::OTLP</font>>, fillcolor="#FFE9D6", color="#AB5A13"];
+  collector [label=<<font face="Poppins"><b>OpenTelemetry Collector</b></font>>];
+
+  app -> api;
+  instr -> api;
+  api -> sdk [style=dashed, color="#8A8A8A"];
+  sdk -> processor [style=dashed, color="#8A8A8A"];
+  processor -> exporter [style=dashed, color="#8A8A8A"];
+  exporter -> collector [style=dashed, color="#8A8A8A"];
+}

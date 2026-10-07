@@ -1,0 +1,41 @@
+// 題材のアプリケーションの構成（2章 図1）
+// 実線はリクエスト、破線はテレメトリーの送信、紫の破線はOBIによる観測
+digraph demo_topology {
+  graph [
+    fontname="IBM Plex Sans JP", fontsize=13,
+    rankdir=TB, compound=true, splines=ortho,
+    nodesep=0.55, ranksep=0.55, pad=0.25,
+    bgcolor="white", newrank=true
+  ];
+  node [
+    fontname="IBM Plex Sans JP", fontsize=12,
+    shape=box, style="rounded,filled",
+    fillcolor="#E4E4E4", color="#4A4A4A", penwidth=1.6,
+    margin="0.2,0.14"
+  ];
+  edge [
+    fontname="IBM Plex Sans JP", fontsize=11,
+    color="#343434", penwidth=1.4, arrowsize=0.9,
+    fontcolor="#171717"
+  ];
+
+  user [label=<<b>利用者</b><br/><font face="JetBrains Mono">curl</font>>];
+
+  node [width=2.4, height=0.9];
+  obi [label=<<font face="Poppins"><b>OBI</b></font><br/>9章でだけ使う>, fillcolor="#F7DDFC", color="#9430A9"];
+  report [label=<<font face="JetBrains Mono"><b>report</b></font><br/>Perl、PSGI>, fillcolor="#FFE9D6", color="#AB5A13"];
+  rates [label=<<font face="JetBrains Mono"><b>rates</b></font><br/>Go、<font face="JetBrains Mono">net/http</font>>];
+  { rank=same; obi; report; rates; }
+
+  node [width=2.4, height=0.62];
+  collector [label=<<font face="Poppins"><b>OpenTelemetry Collector</b></font>>];
+  lgtm [label=<<font face="Poppins"><b>Grafana、Tempo、Loki</b></font><br/><font face="JetBrains Mono">grafana/otel-lgtm</font>>, fillcolor="#FFFCD7", color="#736B10"];
+
+  user -> report [penwidth=1.8];
+  report -> rates [penwidth=1.8];
+  obi -> report [style=dashed, color="#9430A9"];
+  report -> collector [style=dashed, color="#8A8A8A"];
+  rates -> collector [style=dashed, color="#8A8A8A"];
+  obi -> collector [style=dashed, color="#8A8A8A"];
+  collector -> lgtm [style=dashed, color="#8A8A8A"];
+}

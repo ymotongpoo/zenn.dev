@@ -1,0 +1,40 @@
+// OBIが観測する位置（9章 図1）
+// 実線はHTTPのリクエストの流れ、紫の破線はOBIのeBPFのプログラムが読み書きする箇所、灰の破線はOBIへのデータの受け渡し
+digraph obi_observation_points {
+  graph [
+    fontname="IBM Plex Sans JP", fontsize=13,
+    rankdir=TB, compound=true, splines=ortho,
+    nodesep=0.7, ranksep=0.45, pad=0.25,
+    bgcolor="white", newrank=true
+  ];
+  node [
+    fontname="IBM Plex Sans JP", fontsize=12,
+    shape=box, style="rounded,filled",
+    fillcolor="#E4E4E4", color="#4A4A4A", penwidth=1.6,
+    margin="0.2,0.14", width=2.8, height=0.8
+  ];
+  edge [
+    fontname="IBM Plex Sans JP", fontsize=11,
+    color="#343434", penwidth=1.4, arrowsize=0.9,
+    fontcolor="#171717"
+  ];
+
+  user [label=<<b>利用者</b>>, height=0.62];
+  inbound [label=<<b>受信</b><br/><font face="JetBrains Mono">GET /report</font>>, fillcolor="#F3F3F3"];
+  perl [label=<<b>Perlのプロセス</b><br/>1つのOSスレッドで受信と送信>, fillcolor="#FFE9D6", color="#AB5A13"];
+  outbound [label=<<b>送信</b><br/><font face="JetBrains Mono">GET /rates</font>>, fillcolor="#F3F3F3"];
+  rates [label=<<font face="JetBrains Mono"><b>rates</b></font><br/>Goのサービス>];
+
+  ebpf [label=<<b>eBPFのプログラム</b><br/>受信を読み、送信に<br/><font face="JetBrains Mono">traceparent</font> を書く>, fillcolor="#F7DDFC", color="#9430A9"];
+  obi [label=<<font face="Poppins"><b>OBI</b></font><br/>受信と送信を親子にする>, fillcolor="#F7DDFC", color="#9430A9"];
+  { rank=same; perl; ebpf; }
+  { rank=same; outbound; obi; }
+
+  user -> inbound;
+  inbound -> perl;
+  perl -> outbound;
+  outbound -> rates;
+  ebpf -> inbound [style=dashed, color="#9430A9"];
+  ebpf -> outbound [style=dashed, color="#9430A9"];
+  ebpf -> obi [style=dashed, color="#8A8A8A"];
+}

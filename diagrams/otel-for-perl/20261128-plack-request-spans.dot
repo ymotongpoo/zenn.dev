@@ -1,0 +1,39 @@
+// 受け取ったトレースの構造（6章 図1）
+// 矢印はリクエストの処理の中での呼び出しの向き
+digraph plack_request_spans {
+  graph [
+    fontname="IBM Plex Sans JP", fontsize=13,
+    rankdir=TB, compound=true, splines=ortho,
+    nodesep=0.45, ranksep=0.5, pad=0.25,
+    bgcolor="white", newrank=true
+  ];
+  node [
+    fontname="IBM Plex Sans JP", fontsize=12,
+    shape=box, style="rounded,filled",
+    fillcolor="#FFE9D6", color="#AB5A13", penwidth=1.6,
+    margin="0.2,0.14", width=3.0, height=0.8
+  ];
+  edge [
+    fontname="IBM Plex Sans JP", fontsize=11,
+    color="#343434", penwidth=1.4, arrowsize=0.9,
+    fontcolor="#171717"
+  ];
+
+  subgraph cluster_perl {
+    label=<<b>Perlのプロセス（report）</b>>;
+    labeljust="l"; style="rounded"; penwidth=1.6;
+    color="#AB5A13"; bgcolor="#FFF5ED"; fontcolor="#783F0E"; margin=14;
+    mw [label=<<font face="JetBrains Mono"><b>Plack::Middleware::OpenTelemetry</b></font><br/>SERVERのスパン>];
+    app [label=<<font face="JetBrains Mono"><b>app_otel.psgi</b></font><br/>アプリケーションの本体>, fillcolor="#E4E4E4", color="#4A4A4A"];
+    agg [label=<<font face="JetBrains Mono"><b>in_span</b></font><br/>INTERNALのスパン（aggregate）>];
+    tiny [label=<<font face="JetBrains Mono"><b>HTTP::Tiny</b></font> の計装<br/>CLIENTのスパン>];
+    { rank=same; agg; tiny; }
+  }
+
+  otelhttp [label=<<font face="JetBrains Mono"><b>otelhttp</b></font><br/>Goのプロセス（rates）のSERVERのスパン>, fillcolor="#E4E4E4", color="#4A4A4A"];
+
+  mw -> app;
+  app -> agg;
+  app -> tiny;
+  tiny -> otelhttp [minlen=2, xlabel=<<font face="JetBrains Mono">traceparent</font> >];
+}

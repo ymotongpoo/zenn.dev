@@ -1,0 +1,44 @@
+// Batchプロセッサーの送信の流れ（8章 図1）
+// 実線はスパンの流れ。ピンクの破線は、PSGIサーバーでは完了しない結果の受け取り
+digraph batch_processor_fork {
+  graph [
+    fontname="IBM Plex Sans JP", fontsize=13,
+    rankdir=TB, compound=true, splines=ortho,
+    nodesep=0.5, ranksep=0.55, pad=0.25,
+    bgcolor="white", newrank=true
+  ];
+  node [
+    fontname="IBM Plex Sans JP", fontsize=12,
+    shape=box, style="rounded,filled",
+    fillcolor="#FFE9D6", color="#AB5A13", penwidth=1.6,
+    margin="0.2,0.14", width=3.0, height=0.8
+  ];
+  edge [
+    fontname="IBM Plex Sans JP", fontsize=11,
+    color="#343434", penwidth=1.4, arrowsize=0.9,
+    fontcolor="#171717"
+  ];
+
+  subgraph cluster_app {
+    label=<<b>アプリケーションのプロセス</b>>;
+    labeljust="l"; style="rounded"; penwidth=1.6;
+    color="#AB5A13"; bgcolor="#FFF5ED"; fontcolor="#783F0E"; margin=14;
+    request [label=<<b>PSGIのリクエスト処理</b><br/>終わったスパンを渡す>];
+    queue [label=<<b>Batchプロセッサーのキュー</b><br/>512件に達するまで送らない>, fillcolor="#FFFCD7", color="#736B10"];
+    loop [label=<<b>IO::Asyncのループ</b><br/>PSGIサーバーは回さない>, fillcolor="#FDE1EC", color="#AA3E6A"];
+  }
+
+  subgraph cluster_worker {
+    label=<<b>ワーカープロセス</b>>;
+    labeljust="l"; style="rounded"; penwidth=1.6;
+    color="#9430A9"; bgcolor="#FCF0FE"; fontcolor="#6A2278"; margin=14;
+    worker [label=<<font face="JetBrains Mono"><b>IO::Async::Function</b></font><br/>エクスポーターを呼ぶ（最大8つ）>, fillcolor="#F7DDFC", color="#9430A9"];
+  }
+
+  collector [label=<<font face="Poppins"><b>OpenTelemetry Collector</b></font>>, fillcolor="#E4E4E4", color="#4A4A4A"];
+
+  request -> queue;
+  queue -> worker;
+  worker -> collector;
+  worker -> loop [style=dashed, color="#AA3E6A"];
+}
