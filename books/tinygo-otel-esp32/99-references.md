@@ -76,3 +76,13 @@ title: "参考文献"
 - [Tempo](https://grafana.com/oss/tempo/)
 - [Span metrics](https://grafana.com/docs/tempo/latest/metrics-generator/span_metrics/)：Tempoがスパンからメトリクスを作る機能
 - [Docker Compose](https://docs.docker.com/compose/)
+
+## 本書の調査から報告したissue
+
+本書の調査で見つけた制約のうち、次の5件を2026年10月7日に各プロジェクトへ報告しました。
+
+- [tinygo-org/espradio#75](https://github.com/tinygo-org/espradio/issues/75)：`netlink`で接続したプログラムから時刻を合わせる手段がないことの報告（8章）
+- [tinygo-org/espradio#76](https://github.com/tinygo-org/espradio/issues/76)：接続中のアクセスポイントのRSSIを返す関数の提案（10章）
+- [tinygo-org/tinygo#5839](https://github.com/tinygo-org/tinygo/issues/5839)：ESP32-S3でgoroutineのスタックがあふれても`goroutine stack overflow`と報告されず、無言で止まるか別のエラーで落ちることの報告（9章）
+- [tinygo-org/tinygo#5204へのコメント](https://github.com/tinygo-org/tinygo/issues/5204#issuecomment-6036833704)：`tls.X509KeyPair`が無いために`otlpmetrichttp`がビルドできない事例（4章）
+- [tinygo-org/tinygo#3862へのコメント](https://github.com/tinygo-org/tinygo/issues/3862#issuecomment-6036834071)：`(reflect.Type).MethodByName`が未実装のために、protobuf-goの`proto.Marshal`がpanicする事例（5章）
