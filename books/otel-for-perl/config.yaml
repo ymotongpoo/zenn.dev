@@ -1,0 +1,18 @@
+title: "OpenTelemetryのPerl実装にいまこそ必要なもの"
+summary: "PerlはOpenTelemetryの公式の対応言語ではありません。それでもCPANにはAPIとSDKがあり、トレースを送れます。小さなPSGIアプリケーションとGoのサービスを用意し、CPANの実装とOpenTelemetry eBPF Instrumentation（OBI）の両方で観測しました。何が動き、どこで止まり、何を直せばよいのかを、動かしたコードと測った値で示します。YAPC::Tokyo 2026の登壇の解説資料です。"
+topics: ["perl", "opentelemetry", "observability", "plack", "ebpf"]
+published: false
+price: 0
+chapters:
+  - 00-introduction
+  - 05-tracing-basics
+  - 10-perl-ecosystem
+  - 15-sdk-setup
+  - 20-plack-tracing
+  - 25-http-propagation
+  - 30-signal-coverage
+  - 35-psgi-runtime
+  - 40-obi
+  - 45-sdk-vs-obi
+  - 50-contributing
+  - 99-references
