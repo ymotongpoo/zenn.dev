@@ -1,0 +1,38 @@
+books/otel-for-perl/20-plack-tracing.md
+  s_ff65d3f1cc7ef1::t_1f6f71b6ff71a7 90,138
+  s_ff65d3f1cc7ef1::t_2d6b39c590bdef 92,95-96,122-137
+  s_ff65d3f1cc7ef1::t_7ccf1d24bfbee4 91
+books/otel-for-perl/45-sdk-vs-obi.md
+  s_ff65d3f1cc7ef1::t_df4fbd1a096ec0 12,16,19,28
+books/otel-for-perl/50-contributing.md
+  s_ff65d3f1cc7ef1::t_df4fbd1a096ec0 12,15-17,24
+books/otel-for-perl/40-obi.md
+  s_ff65d3f1cc7ef1::t_6408dc034b05ab 57
+  s_ff65d3f1cc7ef1::t_df4fbd1a096ec0 59,97,99
+  s_ff65d3f1cc7ef1::t_1a1dca1993a95c 58
+books/otel-for-perl/25-http-propagation.md
+  s_ff65d3f1cc7ef1::t_6408dc034b05ab 97
+  s_ff65d3f1cc7ef1::t_1f6f71b6ff71a7 31
+  s_ff65d3f1cc7ef1::t_2d6b39c590bdef 15,21-29,39-42,58-75,81-83,102
+  s_ff65d3f1cc7ef1::t_7fae2b8884cad8 84
+books/otel-for-perl/35-psgi-runtime.md
+  s_ff65d3f1cc7ef1::t_ee0073b4e65158 49,58,70,118,122,156,182
+  s_ff65d3f1cc7ef1::t_1f6f71b6ff71a7 120
+  s_ff65d3f1cc7ef1::t_6408dc034b05ab 53
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "4a48472fc9c281a67484e672a98eba5a6799fd39",
+  "prompts": {},
+  "sessions": {
+    "s_ff65d3f1cc7ef1": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "afb5e511-29a5-465f-8c60-b7af60da667d",
+        "model": "unknown"
+      },
+      "human_author": "Yoshi Yamaguchi <ymotongpoo@gmail.com>"
+    }
+  }
+}
