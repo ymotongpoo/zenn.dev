@@ -41,7 +41,7 @@ srv := &http.Server{Addr: ":8080", Handler: otelhttp.NewHandler(mux, "catalog")}
 
 これで1件のリクエストに対して3つのスパンが記録されます。`catalog-api`のサーバースパン`GET /items/{id}`、その子で`inventory`を呼ぶクライアントスパン`HTTP GET`、さらにその子で`inventory`のサーバースパン`GET /stock/{id}`です。`inventory`では、在庫を調べる処理を`lookup stock`という子のスパンで囲みました。
 
-メトリクスは、otelhttpがサーバーとクライアントの処理時間のヒストグラム（`http.server.request.duration`と`http.client.request.duration`）を記録します。処理中のリクエストの数を表す`http.server.active_requests`は、otelhttp v0.72.0の記録の対象外です。`inventory`では、同じ名前のカウンターを自分で記録し、待ち行列で待っている件数（`inventory.queue.waiting`）とあふれて断った件数（`inventory.queue.rejected`）も足しました。
+メトリクスは、otelhttpがサーバーとクライアントの処理時間のヒストグラム（`http.server.request.duration`と`http.client.request.duration`）を記録します。処理中のリクエストの数を表す`http.server.active_requests`は、otelhttp v0.72.0の記録の対象外です。`inventory`では、同じ名前のメトリクスを増減するカウンター（UpDownCounter）として自分で記録しました。増減するカウンターは、加算と減算で現在の件数を表す計器です。あわせて、現在待ち行列で待っている件数（`inventory.queue.waiting`、増減するカウンター）と、あふれて断った件数の累計（`inventory.queue.rejected`、増えるだけのカウンター）も足しています。
 
 ログは、[Go](https://go.dev/)の標準の`log/slog`を[otelslog](https://pkg.go.dev/go.opentelemetry.io/contrib/bridges/otelslog@v0.21.0)でOpenTelemetryのログに変換して送ります。`logger.WarnContext(ctx, ...)`のようにコンテキストを渡して書くと、そのとき実行中のスパンのトレースIDとスパンIDがログに付きます。
 
