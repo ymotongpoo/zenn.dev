@@ -87,9 +87,13 @@ FRONTEND_CMD="plackup -E deployment -s HTTP::Server::PSGI -p 5000 app_otel_simpl
 
 集計処理の区間は、トレーサーの `in_span` で作りました。`in_span` は名前と属性とコードブロックを受け取り、スパンを開始して現在のコンテキストに入れてからブロックを実行します。ブロックの戻り値は、そのまま `in_span` の戻り値です。そのため `$totals` には集計結果が入ります。ブロックが例外を投げると、`in_span` は例外をスパンに記録し、ステータスをERRORにしてから例外を投げ直します。
 
-ブロックが例外なく終わったとき、`in_span` はステータスを自動でOKにします。一方、PerlのInstrumentation Guideは「By default, all spans are Unset」と書いています。ガイドの説明では、OKは明示的に成功を記録したいときのためのものです。仕様は計装ライブラリにOKを設定しないよう求めていますが、アプリケーションの開発者がOKを設定することは認めています[^status]。`in_span` はアプリケーションのコードから呼ぶAPIなので、仕様に反するわけではありません。ただ、ミドルウェアが作るスパンのステータスは未設定のままです。そのため同じトレースの中に、OKのスパンと未設定のスパンが混在します。
+ブロックが例外なく終わると、`in_span` はステータスを自動でOKにします。ブロックの中で `set_status` を呼んでERRORにしていても、例外を投げずに戻れば、終了時にOKで上書きされます[^override]。仕様の推奨は、ステータスを通常は未設定のままにし、OKは開発者や運用者が成功を確かめたときに設定するというものです[^status]。PerlのInstrumentation Guideにも「By default, all spans are Unset」とあります。`in_span` の自動のOKは成功を確かめていない呼び出しにも付くので、この推奨とは異なる振る舞いです。
+
+戻り値やHTTPのステータスで失敗を伝える処理を `in_span` で包むと、トレースの上では失敗が成功に見えてしまいます。そうした処理では、`create_span` でスパンを作り、ステータスを自分で設定してから `end` を呼ぶ形のほうが安全です。なお、ミドルウェアが作るスパンのステータスは未設定のままなので、同じトレースの中にOKと未設定のスパンが混在します。
 
 [^status]: 仕様の[Set Status](https://github.com/open-telemetry/opentelemetry-specification/blob/v1.61.0/specification/trace/api.md#set-status)の節にあります。
+[^json]: [JSONエンコーダー（0.021）](https://github.com/jjatria/perl-opentelemetry-exporter-otlp/blob/0.021/lib/OpenTelemetry/Exporter/OTLP/Encoder/JSON.pm)の `encode_anyvalue` で確認できます。文字列にする行には「TODO: not strings」のコメントがあります。
+[^override]: 0.039の[`in_span`](https://github.com/jjatria/perl-opentelemetry/blob/0.039/lib/OpenTelemetry/Trace/Tracer.pm)は、`finally` で例外の有無だけを見てステータスを設定します。SDKのスパンの `set_status` は、すでにOKのときだけ変更を拒むので、ERRORからOKへの変更は通ります。ブロックの中でERRORにしたスパンが終了後にOKになることを、0.039と0.028の組み合わせで確かめました。
 
 ## 受け取ったトレース
 
@@ -115,21 +119,23 @@ report: 'GET request'   SERVER   576.7ms
 
 ミドルウェアのサーバースパンには、次の属性が付いていました。
 
-| 属性 | 値の例 |
-| --- | --- |
-| `http.request.method` | `GET` |
-| `http.response.status_code` | `200` |
-| `url.full` | `http://localhost:5000/report?days=7&currency=USD` |
-| `url.path` | `/report` |
-| `url.query` | `days=7&currency=USD` |
-| `url.scheme` | `http` |
-| `server.address` | `localhost:5000` |
-| `client.address` | `172.20.0.1` |
-| `user_agent.original` | `curl/8.18.0` |
-| `http.response.body.size` | `49` |
-| `plack.version` | `1.0054` |
+| 属性 | 値の例 | 受信時の型 |
+| --- | --- | --- |
+| `http.request.method` | `GET` | 文字列 |
+| `http.response.status_code` | `200` | 文字列（規約では整数） |
+| `url.full` | `http://localhost:5000/report?days=7&currency=USD` | 文字列 |
+| `url.path` | `/report` | 文字列 |
+| `url.query` | `days=7&currency=USD` | 文字列 |
+| `url.scheme` | `http` | 文字列 |
+| `server.address` | `localhost:5000` | 文字列 |
+| `client.address` | `172.20.0.1` | 文字列 |
+| `user_agent.original` | `curl/8.18.0` | 文字列 |
+| `http.response.body.size` | `49` | 文字列（規約では整数） |
+| `plack.version` | `1.0054` | 文字列 |
 
-属性の名前は、OpenTelemetryの**セマンティック規約**に沿っています。セマンティック規約は、スパンの名前と属性を決めた取り決めです。対象は、HTTPのリクエストやデータベースの呼び出しのような共通の処理です。規約に揃っていれば、言語の違うサービスのスパンを同じクエリで集計できます。
+属性の名前は、OpenTelemetryの**セマンティック規約**に沿っています。セマンティック規約は、スパンの名前と属性を決めた取り決めです。対象は、HTTPのリクエストやデータベースの呼び出しのような共通の処理です。属性の名前と型が規約に揃っていれば、言語の違うサービスのスパンを同じクエリで集計できます。
+
+ところが、表のとおり数値の属性も文字列で届いていました。本書の構成では、エクスポーターの送信形式がOTLP/JSONです。0.021のJSONエンコーダーは、配列とハッシュ以外の値をすべて文字列（`stringValue`）にします[^json]。同じトレースのGoのスパンでは、`http.response.status_code` は整数でした。型を区別する検索や集計では、Perlのスパンに他の言語と同じ条件を使えない場合があります。protobufで送った場合は未確認です。
 
 ただし、スパンの名前と一部の属性は規約と食い違っています。[HTTPのスパンの規約](https://github.com/open-telemetry/semantic-conventions/blob/v1.44.0/docs/http/http-spans.md)は、スパン名を次のように定めています。
 

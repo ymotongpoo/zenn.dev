@@ -54,7 +54,9 @@ perl: 'GET /report'        SERVER   563.8ms  http.route=/report
 
 `processing` の563.5msのうち、HTTPクライアントの区間は21.1msです。残りの540ms余りがPerlのプロセスの中で使われたことまでは分かります。ただし、それが集計処理だったことは分かりません。OBIはプロセスの外から通信を見ているので、5章の `aggregate` のようなプロセスの中の区間は作れないからです。
 
-OBIのスパンのリソースは、`service.name` が `perl`、`telemetry.sdk.language` が `generic` でした。コンテナのプロセスには `OTEL_SERVICE_NAME=report` を設定してあり、`/proc` から読むとその値が入っていました。OBIのドキュメントの[サービス名の決め方](https://opentelemetry.io/docs/zero-code/obi/configure/service-discovery/#override-service-name-and-namespace)では、計装対象のプロセスやコンテナの `OTEL_SERVICE_NAME` を最初の手がかりにするとしています。今回はそうなりませんでした。原因は調べていません。このままでは、同じホストで動くPerlのサービスはすべて `perl` という名前になります。
+OBIのスパンのリソースは、`service.name` が `perl`、`telemetry.sdk.language` が `generic` でした。コンテナのプロセスには `OTEL_SERVICE_NAME=report` を設定してあり、`/proc` から読むとその値が入っていました。OBIのドキュメントの[サービス名の決め方](https://opentelemetry.io/docs/zero-code/obi/configure/service-discovery/#override-service-name-and-namespace)では、計装対象のプロセスやコンテナの `OTEL_SERVICE_NAME` を最初の手がかりにするとしています。今回はそうなりませんでした。v0.14.0には、プロセスの環境変数を読んでサービス名に反映するコードとテストがあるので、Perlに対応していないとは言えません[^svcname]。原因は未調査です。本書の構成のままでは、同じホストで動くPerlのサービスが、どれも `perl` という名前で記録されるおそれがあります。
+
+[^svcname]: v0.14.0の[`elf_linux.go`](https://github.com/open-telemetry/opentelemetry-ebpf-instrumentation/blob/v0.14.0/pkg/appolly/discover/elf_linux.go)がプロセスの環境変数を読み、[`file.go`](https://github.com/open-telemetry/opentelemetry-ebpf-instrumentation/blob/v0.14.0/pkg/appolly/discover/exec/file.go)の `ApplyEnvVariables` が `OTEL_SERVICE_NAME` をサービス名に反映します。検出したときのプロセスや、fork前後のどちらを見たか、後の段階で名前が上書きされていないかは確かめていません。
 
 応答時間は、計装していないときとほとんど変わりませんでした。3種類のリクエストを3回ずつ送ると、45〜48ms、565ms、627〜628msかかりました。2章の43〜45ms、562ms、623〜626msとの差は数ミリ秒です。
 
@@ -92,9 +94,9 @@ Perlのクライアントのスパンがサーバーのスパンの子になっ�
 
 件数には、測定の直前に送った確認用の3回のリクエストを含む場合があり、400と403が混在しています[^count]。
 
-[^count]: Collectorが保存したデータから数えました。数えたのは、Perlのサーバースパンごとの子孫にあるクライアントスパンの数、どのサーバースパンの子孫にもないクライアントスパンの数、親がPerlのクライアントスパンになっている `rates` のスパンの数です。
+[^count]: Collectorが保存したデータから数えました。数えたのは、Perlのサーバースパンごとの子孫にあるクライアントスパンの数、どのサーバースパンの子孫にもないクライアントスパンの数、親がPerlのクライアントスパンになっている `rates` のスパンの数です。あわせて、クライアントスパンの時間がサーバースパンの時間に収まるかを見ました。この検査は件数と時間の包含を見るだけなので、同じ時間帯に重なった2つのリクエストのクライアントスパンが入れ替わっていても区別できません。
 
-予想どおりの結果でした。単一プロセスのサーバーとpreforkのStarmanでは、どのサーバースパンも子のクライアントスパンがちょうど1つでした。Twiggyでは、子のクライアントスパンを持たないサーバースパンが296本、2本以上持つものが38本ありました。どのサーバースパンにもつながらないクライアントスパンは193本でした。同じTwiggyでも、1並列で送るとすべて正しく対応づきました。対応づけを誤る原因は、イベントループで複数のリクエストを並行して処理していることです。
+予想どおりの結果でした。本書の検査では、単一プロセスのサーバーとpreforkのStarmanのどちらも、すべてのサーバースパンにクライアントスパンが1つずつ対応し、どこにもつながらないクライアントスパンはありませんでした。Twiggyでは、子のクライアントスパンを持たないサーバースパンが296本、2本以上持つものが38本ありました。どのサーバースパンにもつながらないクライアントスパンは193本でした。同じTwiggyでも、1並列で送ると同じ検査ですべてが1対1に対応しました。対応づけを誤る原因は、イベントループで複数のリクエストを並行して処理していることです。
 
 ![OBIが観測する位置](/images/20261128-obi-observation-points.png)
 *図1: OBIが観測する位置。実線はHTTPのリクエスト、紫の破線はeBPFのプログラムが読み書きする箇所、灰の破線はOBIへのデータの受け渡しを表す。OBIはPerlのプロセスが受けるHTTPと送るHTTPをカーネルの側で読み、同じOSのスレッドで起きた受信と送信を親子にする。送信には `traceparent` を書き込む。イベントループでは1つのスレッドが複数のリクエストの受信と送信を交互に行うので、どの受信がどの送信の親なのかを決められない*

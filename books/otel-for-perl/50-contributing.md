@@ -9,17 +9,19 @@ title: "Perl実装にいま必要なもの"
 | 課題 | 種類 | 確かめた章 | 修正先 |
 | --- | --- | --- | --- |
 | Batchプロセッサーが `OTEL_BSP_SCHEDULE_DELAY` の間隔で送らず、キューが512件に達するまで送らない | SDKの未実装 | 8章 | [perl-opentelemetry-sdk](https://github.com/jjatria/perl-opentelemetry-sdk) |
-| IO::Asyncのループを回さないアプリケーションでは、送信が8回で止まる。Mojoliciousでの方法はGuidesにあるが、PSGIサーバーでの回避策は無い | SDKの設計と文書 | 8章 | perl-opentelemetryのGuides |
+| IO::Asyncのループを回さないアプリケーションでは、送信が止まる（本書の構成では8回）。Mojoliciousでの方法はGuidesにあるが、PSGIサーバーでの回避策は無い | SDKの設計と文書 | 8章 | perl-opentelemetryのGuides |
 | `shutdown` がキューを送らずに捨てる | SDKの不具合 | 4章、8章 | perl-opentelemetry-sdk |
 | SIGTERMで終了するとき、`shutdown` がタイムアウトを過ぎても戻らない | SDKの不具合の可能性（原因は未特定） | 8章 | perl-opentelemetry-sdk |
-| プロセスの終了時に、SDKが `shutdown` も `force_flush` も呼ばない | SDKの未実装 | 8章 | perl-opentelemetry-sdk |
+| プロセスの終了時に、SDKが `shutdown` も `force_flush` も呼ばない | ライフサイクルの改善提案（仕様の要求ではない） | 8章 | perl-opentelemetry-sdk |
+| `in_span` が、例外が無ければステータスをOKにし、ブロックの中で設定したERRORも上書きする | APIの振る舞い（仕様はステータスを通常は未設定のままにするよう求めている） | 5章 | [perl-opentelemetry](https://github.com/jjatria/perl-opentelemetry) |
+| OTLP/JSONで送ると、数値の属性も文字列になる | OTLPエクスポーターのJSONエンコーダー | 5章、6章 | [perl-opentelemetry-exporter-otlp](https://github.com/jjatria/perl-opentelemetry-exporter-otlp) |
 | Plackのミドルウェアのスパン名と `server.address`、`server.port` がセマンティック規約と食い違い、SDKに依存している | 計装ライブラリ | 5章 | [Plack-Middleware-OpenTelemetry](https://github.com/abh/Plack-Middleware-OpenTelemetry) |
 | ログは試験版のSDKでしか送れず、メトリクスはAPIも無い | 未実装 | 7章 | perl-opentelemetry、perl-opentelemetry-sdk |
 | 0.029-TRIALのSDKを読み込んだプログラムが、トレースとログの両方にBatchプロセッサーがあると終了しない | 試験版の不具合（原因は未調査） | 7章 | perl-opentelemetry-sdk（[#24に報告済み](https://github.com/jjatria/perl-opentelemetry-sdk/issues/24#issuecomment-6048489586)） |
 | READMEやPODが実装より古い、または実装と食い違う | 文書 | 3章、6章、7章 | 各リポジトリ |
 | OBIの伝搬に必要なマウントが、Dockerのセットアップの説明からたどれない | OBIの文書 | 9章 | [opentelemetry.io](https://github.com/open-telemetry/opentelemetry.io)のOBIのドキュメント |
 | OBIがPerlのイベントループで並行するリクエストの親子を誤って対応づける。ドキュメントのLimitationsが述べる制約の範囲で、Perl向けのランタイム固有の仕組みが無い | OBIの未実装 | 9章 | [opentelemetry-ebpf-instrumentation](https://github.com/open-telemetry/opentelemetry-ebpf-instrumentation) |
-| OBIがPerlのプロセスの `OTEL_SERVICE_NAME` を使わない | OBIの不具合か文書の誤り（未調査） | 9章 | opentelemetry-ebpf-instrumentation |
+| 本書の構成では、OBIがPerlのプロセスの `OTEL_SERVICE_NAME` を使わなかった | 原因は未調査（v0.14.0には環境変数を読むコードとテストがある） | 9章 | opentelemetry-ebpf-instrumentation |
 
 READMEの古さは、たとえば次のような記述です。APIのREADMEには、APIの具体的な実装は「None exists at the moment」とあり、SDKの存在と食い違っています。SDKのREADMEは「Currently only distributed traces are supported」のままで、0.029-TRIALのログには触れていません。7章で見た、`Log::Any` のアダプターのPODが説明する環境変数の読み順とコードの違いも、同じ種類の課題です。
 
