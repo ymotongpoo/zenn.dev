@@ -1,0 +1,49 @@
+// 題材の構成（2章）
+// 実線はHTTPリクエスト、灰色の破線はテレメトリーの流れ
+digraph demo_topology {
+  graph [
+    fontname="IBM Plex Sans JP", fontsize=13,
+    rankdir=TB, compound=true, splines=ortho,
+    nodesep=0.5, ranksep=0.55, pad=0.25,
+    bgcolor="white", newrank=true
+  ];
+  node [
+    fontname="IBM Plex Sans JP", fontsize=12,
+    shape=box, style="rounded,filled",
+    fillcolor="#E4E4E4", color="#4A4A4A", penwidth=1.6,
+    margin="0.2,0.14"
+  ];
+  edge [
+    fontname="IBM Plex Sans JP", fontsize=11,
+    color="#343434", penwidth=1.4, arrowsize=0.9,
+    fontcolor="#171717"
+  ];
+
+  node [width=2.3, height=0.9];
+  k6 [label=<<font face="Poppins"><b>k6</b></font><br/>負荷を生成する>];
+  api [label=<<font face="JetBrains Mono"><b>catalog-api</b></font><br/>同時実行数を制限して呼ぶ>, fillcolor="#FFE9D6", color="#AB5A13"];
+  inv [label=<<font face="JetBrains Mono"><b>inventory</b></font><br/>6件ずつ処理する>, fillcolor="#FFE9D6", color="#AB5A13"];
+  { rank=same; k6; api; inv; }
+  k6 -> api [penwidth=1.8];
+  api -> inv [penwidth=1.8];
+
+  node [width=2.3, height=0.62];
+  alloy [label=<<font face="Poppins"><b>Grafana Alloy</b></font>>, fillcolor="#F7DDFC", color="#9430A9"];
+  k6 -> alloy [style=dashed, color="#8A8A8A"];
+  api -> alloy [style=dashed, color="#8A8A8A"];
+  inv -> alloy [style=dashed, color="#8A8A8A"];
+
+  node [width=1.9, height=0.9, fillcolor="#FFFCD7", color="#736B10"];
+  mimir [label=<<font face="Poppins"><b>Mimir</b></font><br/>メトリクス>];
+  tempo [label=<<font face="Poppins"><b>Tempo</b></font><br/>トレース>];
+  loki [label=<<font face="Poppins"><b>Loki</b></font><br/>ログ>];
+  { rank=same; mimir; tempo; loki; }
+  alloy -> mimir [style=dashed, color="#8A8A8A"];
+  alloy -> tempo [style=dashed, color="#8A8A8A"];
+  alloy -> loki [style=dashed, color="#8A8A8A"];
+
+  grafana [label=<<font face="Poppins"><b>Grafana</b></font><br/>3つを横断して調べる>, width=2.3, fillcolor="#E4E4E4", color="#4A4A4A"];
+  mimir -> grafana [style=dashed, color="#8A8A8A"];
+  tempo -> grafana [style=dashed, color="#8A8A8A"];
+  loki -> grafana [style=dashed, color="#8A8A8A"];
+}

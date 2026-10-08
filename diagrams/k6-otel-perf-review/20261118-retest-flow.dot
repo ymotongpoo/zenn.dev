@@ -1,0 +1,32 @@
+// 変更を評価する手順の順序（9章）
+// 矢印は作業の順序。最後の矢印は、次の担当者が記録から試験をやり直して次の仮説を立てる流れ
+digraph retest_flow {
+  graph [
+    fontname="IBM Plex Sans JP", fontsize=13,
+    rankdir=TB, compound=true, splines=ortho,
+    nodesep=0.6, ranksep=0.4, pad=0.25,
+    bgcolor="white", newrank=true
+  ];
+  node [
+    fontname="IBM Plex Sans JP", fontsize=12,
+    shape=box, style="rounded,filled",
+    fillcolor="#FFE9D6", color="#AB5A13", penwidth=1.6,
+    margin="0.16,0.12", width=3.0, height=0.75
+  ];
+  edge [
+    fontname="IBM Plex Sans JP", fontsize=11,
+    color="#343434", penwidth=1.4, arrowsize=0.9,
+    fontcolor="#171717"
+  ];
+
+  hyp [label=<<b>仮説を立てる</b><br/>測る区間を言葉で決める>];
+  inst [label=<<b>計装を足す</b><br/>その区間だけ>];
+  fix [label=<<b>変更する</b><br/>1つずつ>];
+  retest [label=<<b>再試験する</b><br/>同じ負荷と条件で>];
+  rec [label=<<b>記録を残す</b><br/>改善しなかった結果も>, fillcolor="#FFFCD7", color="#736B10"];
+  hyp -> inst;
+  inst -> fix;
+  fix -> retest;
+  retest -> rec;
+  rec -> hyp [constraint=false];
+}

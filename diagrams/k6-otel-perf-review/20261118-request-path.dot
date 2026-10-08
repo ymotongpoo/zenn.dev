@@ -1,0 +1,41 @@
+// 1件のリクエストが通る区間と、それぞれを表すスパン（7章）
+// 矢印は処理の順序。紫は7章で足すスパン、灰色はスパンを持たない区間
+digraph request_path {
+  graph [
+    fontname="IBM Plex Sans JP", fontsize=13,
+    rankdir=TB, compound=true, splines=ortho,
+    nodesep=0.45, ranksep=0.5, pad=0.25,
+    bgcolor="white", newrank=true
+  ];
+  node [
+    fontname="IBM Plex Sans JP", fontsize=12,
+    shape=box, style="rounded,filled",
+    fillcolor="#FFE9D6", color="#AB5A13", penwidth=1.6,
+    margin="0.2,0.14", width=3.4, height=0.75
+  ];
+  edge [
+    fontname="IBM Plex Sans JP", fontsize=11,
+    color="#343434", penwidth=1.4, arrowsize=0.9,
+    fontcolor="#171717"
+  ];
+
+  subgraph cluster_api {
+    graph [label=<<b>サーバースパン<font face="JetBrains Mono"> GET /items/{id}</font></b>>, labeljust="l",
+           style="rounded,filled", fillcolor="#FFF5ED", color="#AB5A13", fontcolor="#783F0E", penwidth=1.6, margin=14];
+    local [label=<<b>api内の処理</b><br/>約5ms、スパンなし>, fillcolor="#E4E4E4", color="#4A4A4A"];
+    wait [label=<<b>空きを待つ</b><br/><font face="JetBrains Mono">wait for backend slot</font>>, fillcolor="#F7DDFC", color="#9430A9"];
+    subgraph cluster_client {
+      graph [label=<<b>クライアントスパン<font face="JetBrains Mono"> HTTP GET</font></b>>, labeljust="l", labelloc="b",
+             style="rounded,filled", fillcolor="#FFFFFF", color="#AB5A13", fontcolor="#783F0E", penwidth=1.4, margin=12];
+      subgraph cluster_inv {
+        graph [label=<<b>サーバースパン<font face="JetBrains Mono"> GET /stock/{id}</font></b>>, labeljust="l", labelloc="b",
+               style="rounded,filled", fillcolor="#FFF5ED", color="#AB5A13", fontcolor="#783F0E", penwidth=1.4, margin=12];
+        queue [label=<<b>処理枠の空きを待つ</b><br/>スパンなし>, fillcolor="#E4E4E4", color="#4A4A4A"];
+        lookup [label=<<b>在庫を調べる</b><br/><font face="JetBrains Mono">lookup stock</font>、約50ms>];
+      }
+    }
+  }
+  local -> wait;
+  wait -> queue;
+  queue -> lookup;
+}

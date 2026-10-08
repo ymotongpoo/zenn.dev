@@ -1,0 +1,46 @@
+// 閉じたモデルと開いたモデルで、次のリクエストを送る契機の違い（3章）
+// @divider: between-clusters
+// 矢印は「これが起きると次にこれが起きる」の順序。ピンクの破線は反復を始められない経路
+digraph closed_vs_open {
+  graph [
+    fontname="IBM Plex Sans JP", fontsize=13,
+    rankdir=TB, compound=true, splines=ortho,
+    nodesep=0.45, ranksep=0.55, pad=0.25,
+    bgcolor="white", newrank=true
+  ];
+  node [
+    fontname="IBM Plex Sans JP", fontsize=12,
+    shape=box, style="rounded,filled",
+    fillcolor="#FFE9D6", color="#AB5A13", penwidth=1.6,
+    margin="0.2,0.14", width=2.4, height=0.62
+  ];
+  edge [
+    fontname="IBM Plex Sans JP", fontsize=11,
+    color="#343434", penwidth=1.4, arrowsize=0.9,
+    fontcolor="#171717"
+  ];
+
+  subgraph cluster_closed {
+    graph [label=<<b>閉じたモデル<font face="JetBrains Mono"> constant-vus</font></b>>, labeljust="l",
+           style="rounded,filled", fillcolor="#FFF5ED", color="#AB5A13", fontcolor="#783F0E", penwidth=1.6, margin=14];
+    c_resp [label="前の応答が返る"];
+    c_send [label="次のリクエストを送る"];
+    c_resp -> c_send;
+    { rank=same; c_resp; c_send; }
+  }
+
+  subgraph cluster_open {
+    graph [label=<<b>開いたモデル<font face="JetBrains Mono"> constant-arrival-rate</font></b>>, labeljust="l",
+           style="rounded,filled", fillcolor="#FFF5ED", color="#AB5A13", fontcolor="#783F0E", penwidth=1.6, margin=14];
+    o_tick [label="決めた間隔が経つ"];
+    o_vu [label="空いているVUに渡す"];
+    o_send [label="リクエストを送る"];
+    o_drop [label=<<font face="JetBrains Mono">dropped_iterations</font><br/>に数える>, fillcolor="#FDE1EC", color="#AA3E6A"];
+    o_tick -> o_vu;
+    o_vu -> o_send;
+    o_vu -> o_drop [style=dashed, color="#AA3E6A"];
+    { rank=same; o_tick; o_vu; o_send; }
+  }
+
+  c_resp -> o_tick [style=invis, minlen=2];
+}
