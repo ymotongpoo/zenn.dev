@@ -14,7 +14,7 @@ use OpenTelemetry::Instrumentation 'HTTP::Tiny';
 
 `HTTP::Tiny` の計装は、`HTTP::Tiny::request` メソッドの周りに処理を差し込みます。差し込んだ処理は、リクエストのたびに種類がCLIENTのスパンを作り、現在のコンテキストに入れます。続いてリクエストのヘッダーに `traceparent` を書き込み、元のメソッドを呼ぶ流れです。`app_otel.psgi` では計装を有効にする `use` が `use Demo::Report` より前にあるので、`Demo::Report` は計装の後で `HTTP::Tiny` のオブジェクトを作ります。差し込みはメソッドそのものに対して行われるため、計装の前に作ったオブジェクトからの呼び出しでも計装されます。
 
-[^legacy]: 0.026より前は、計装は `OpenTelemetry::Integration` の名前空間にありました。いまのバージョンでも古い名前空間を探しますが、新しいコードでは `OpenTelemetry::Instrumentation` を使います。SDKのPOD（0.028）のSYNOPSISには、古い `OpenTelemetry::Integration` の書き方が残っています。
+[^legacy]: 0.026より前は、計装は `OpenTelemetry::Integration` の名前空間にありました。いまのバージョンでも古い名前空間を探しますが、新しいコードでは `OpenTelemetry::Instrumentation` を使います。SDKのPOD（0.028）のSYNOPSISには、古い `OpenTelemetry::Integration` の書き方が残っています。0.029-TRIALでは直っています（[SDKのissue #23](https://github.com/jjatria/perl-opentelemetry-sdk/issues/23)）。
 
 クライアントのスパンには、次の属性が付いていました。
 
