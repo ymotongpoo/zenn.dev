@@ -145,4 +145,8 @@ report: 'GET request'   SERVER   576.7ms
 
 サーバーのスパンで `{target}` に入るのは、`/users/{id}` のようなルートの型を表す `http.route` です。PSGIのアプリケーションは、環境変数を受け取るコードリファレンスにすぎません。ルーティングはアプリケーションの内側でフレームワークが行うので、ミドルウェアからはルートが分かりません。この場合の規約どおりのスパン名は `GET` です。ミドルウェアは `GET request` という名前を付けていました。HTTPのスパンの規約は、サーバーのスパンでは `server.address` と `server.port` をHostヘッダーなどから分けて入れることも求めています。ミドルウェアの `server.address` は、Hostヘッダーの値そのままの `localhost:5000` です。値にはポートまで入り、`server.port` はありません。
 
+ルートを知っているのは、アプリケーションやその内側のフレームワークです。CPANのAPIとSDKの作者のjjatriaは、ルートが決まった処理の中で `otel_span_from_context->set_name("GET /users/:user")` のようにスパン名を付け直す方法を勧めています[^rename]。ただし、サンプリングの判断はスパンを作った時点で行われるので、付け直した名前はサンプラーには使われません。
+
+[^rename]: [ミドルウェアのissue #10へのjjatriaのコメント](https://github.com/abh/Plack-Middleware-OpenTelemetry/issues/10#issuecomment-6034718821)にあります。サンプリングの判断がスパンの作成時に行われることは、APIのInstrumentation Guideでも確認できます。
+
 もう1つ、ミドルウェアの依存関係も3章の指針と食い違います。0.262410のメタデータは、実行時の依存として `OpenTelemetry::SDK` を宣言しています。ミドルウェアの `resource_attributes` オプションを指定したときに、SDKのResourceのクラスを使うためです。そのため、ミドルウェアを入れるとSDKとIO::Asyncなどの依存も入ります。計装ライブラリはAPIにだけ依存してSDKの選択をアプリケーションに任せる、という分担がここでは成り立っていません。

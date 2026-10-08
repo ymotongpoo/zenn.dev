@@ -33,7 +33,7 @@ IO::Asyncのループの問題については、作者がissue #23で文書化�
 
 `OTEL_BSP_SCHEDULE_DELAY` で送る機能を作るのは、それより大きな作業です。IO::Asyncのループを回さないプロセスで、5秒ごとに何かを動かす仕組みそのものが無いからです。定期的に送られないこと自体は、[issue #27](https://github.com/jjatria/perl-opentelemetry-sdk/issues/27)として報告しました。アプリケーションのプロセスの中で送信できるようにする変更は、2023年11月にSDKの[pull request #7](https://github.com/jjatria/perl-opentelemetry-sdk/pull/7)として出され、デバッグ用の提案としてdraftのまま残っています。作者の返答は、この形でマージするものではないとしつつ「it must not block the main process」というものでした。メインのプロセスを止めずに定期的に送る仕組みをどう作るかは、作者と相談しながら決めることになります。
 
-Plackのミドルウェアは、APIとSDKとは別の作者のリポジトリです。スパン名については既存のissue #10に規約の該当箇所を[コメント](https://github.com/abh/Plack-Middleware-OpenTelemetry/issues/10#issuecomment-6049918698)し、`server.address` とSDKへの依存は[issue #11](https://github.com/abh/Plack-Middleware-OpenTelemetry/issues/11)で提案しました。スパン名を `{method}` にする修正と、`server.address` と `server.port` を分けて入れる修正は、セマンティック規約の該当箇所を根拠に説明できる内容です。SDKへの依存を外すには、`resource_attributes` のオプションをどう扱うかを決める必要があります。
+Plackのミドルウェアは、APIとSDKとは別の作者のリポジトリです。スパン名については、スパン名の付け方を話し合っていた既存のissue #10に規約の該当箇所を[コメント](https://github.com/abh/Plack-Middleware-OpenTelemetry/issues/10#issuecomment-6049918698)し、`server.address` とSDKへの依存は[issue #11](https://github.com/abh/Plack-Middleware-OpenTelemetry/issues/11)で提案しました。スパン名を `{method}` にする修正と、`server.address` と `server.port` を分けて入れる修正は、セマンティック規約の該当箇所を根拠に説明できる内容です。SDKへの依存を外すには、`resource_attributes` のオプションをどう扱うかを決める必要があります。
 
 OBIの側の課題は性質が違います。マウントの説明について必要なのは、Dockerのセットアップのページから参照できるようにする修正です。この修正は、opentelemetry.ioのドキュメントへのpull requestで済みます（[#12006](https://github.com/open-telemetry/opentelemetry.io/pull/12006)として送りました）。Perlのイベントループでの親子の対応づけは、AnyEventやMojoliciousに固有の仕組みをOBIに足す作業です。9章で見たNode.jsやPythonのasyncioと同じ規模の対応が必要になります。
 
