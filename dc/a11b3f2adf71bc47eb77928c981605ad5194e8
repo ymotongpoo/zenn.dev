@@ -1,0 +1,21 @@
+books/otel-for-perl/50-contributing.md
+  s_ff65d3f1cc7ef1::t_4571b115079b55 36
+books/otel-for-perl/20-plack-tracing.md
+  s_ff65d3f1cc7ef1::t_4571b115079b55 148-151
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "dca11b3f2adf71bc47eb77928c981605ad5194e8",
+  "prompts": {},
+  "sessions": {
+    "s_ff65d3f1cc7ef1": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "afb5e511-29a5-465f-8c60-b7af60da667d",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Yoshi Yamaguchi <ymotongpoo@gmail.com>"
+    }
+  }
+}
