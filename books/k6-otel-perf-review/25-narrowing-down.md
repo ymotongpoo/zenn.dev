@@ -1,0 +1,84 @@
+---
+title: "試験結果から調べる処理を絞る"
+---
+
+修正前の版に毎秒100件をかけると、[k6](https://grafana.com/docs/k6/v2.3.x/)から見た応答時間は2.6秒でした。この2.6秒を`catalog-api`と`inventory`のどちらが使っていたのでしょうか。2章の計算では`catalog-api`の同時実行数の制限が疑わしいのですが、計算は仮説であって観測ではありません。この章では5章で集めたテレメトリーから、調べる処理を絞っていきます。
+
+## 同じ時間範囲のメトリクス
+
+最初に見るのは、試験と同じ時間範囲のメトリクスです。k6のメトリクスで試験を選ぶ条件は`testid`です。アプリケーションのメトリクスは、試験の開始と終了の時刻で範囲を選びます。題材では、試験の終了の10秒前を基準に直前40秒の値を[PromQL](https://prometheus.io/docs/prometheus/latest/querying/basics/)で求めました。
+
+```promql
+# k6が実際に送った頻度
+sum(rate(http_reqs_total{testid="e2-open-l4-r100"}[40s]))
+
+# k6から見た応答時間のp(95)（ミリ秒）
+histogram_quantile(0.95,
+  sum by (le)(rate(http_req_duration_milliseconds_bucket{testid="e2-open-l4-r100"}[40s])))
+
+# サービスごとのサーバー側の処理時間のp(95)（秒）
+histogram_quantile(0.95,
+  sum by (le, job)(rate(http_server_request_duration_seconds_bucket[40s])))
+
+# catalog-apiがinventoryを呼んだ時間のp(95)（秒）
+histogram_quantile(0.95,
+  sum by (le, job)(rate(http_client_request_duration_seconds_bucket[40s])))
+```
+
+修正前の版に毎秒100件をかけた試験と、修正後の版に毎秒150件をかけた試験で、結果を並べます。
+
+| 値 | 修正前、毎秒100件 | 修正後、毎秒150件 |
+| --- | --- | --- |
+| k6が実際に送った頻度 | 77.2件/秒 | 150.0件/秒 |
+| k6から見たp(95) | 4,842ms | 240ms |
+| `catalog-api`のサーバー側のp(95) | 4,868ms | 240ms |
+| `catalog-api`が`inventory`を呼んだ時間のp(95) | 73ms | 239ms |
+| `inventory`のサーバー側のp(95) | 73ms | 239ms |
+| `inventory`が503を返した頻度 | 0件/秒 | 31.9件/秒 |
+| `inventory`の待ち行列の最大 | 0件 | 8件 |
+
+最初に目につくのは、k6から見たp(95)の4,842msです。3章で示したk6の要約では、同じ試験のp(95)は2,619msでした。値が違う理由は、[Mimir](https://grafana.com/docs/mimir/v3.2.x/)に入ったヒストグラムが決まった境界のバケットで件数を数えていることにあります。k6の出力も[otelhttp](https://pkg.go.dev/go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp@v0.72.0)も境界は5、10、25、50、75、100、250、500、750、1,000、2,500、5,000ms…の並びでした。この時間範囲では応答の約8割が2,500msから5,000msのバケットに入り、p(95)もこのバケットの中です。`histogram_quantile`は、バケットの中の値を両端の間に一様に散らばっているとみなして直線で補間します。p(95)の推定値はこのバケットの幅の中で決まってしまいます[^buckets]。
+
+[^buckets]: バケットの境界は、計装の側で細かくできます。OpenTelemetryには境界を自動で決める指数ヒストグラムもありますが、題材では扱っていません。
+
+それでも、同じ境界で数えた値どうしなら比べられます。修正前の版では、`catalog-api`のサーバー側の時間が4.9秒前後なのに、`catalog-api`が`inventory`を呼んだ時間と`inventory`自身の時間は73msでした。`inventory`は普段どおりに応答しています。時間を使っているのは`catalog-api`の中で、`inventory`を呼んでいる時間の外です。修正後の版に毎秒150件をかけたときは、`catalog-api`と`inventory`の時間がほぼ同じでした。時間は`inventory`の中で使われています。`inventory`は待ち行列の上限の8件まで詰まり、毎秒32件を断っています。
+
+## 時間範囲の一致とリクエストの対応
+
+ここまでの読み取りには1つ飛躍があります。メトリクスが示しているのは、同じ40秒の間にk6から見た応答時間が伸び、`catalog-api`のサーバー側の時間も伸びたという事実です。k6のどの遅いリクエストが`catalog-api`のどの遅い処理に当たるのかまでは示していません。
+
+この飛躍が題材で問題にならないのは、`catalog-api`を呼ぶのがk6だけだからです。本番の環境では、試験の時間帯にも別の利用者や定期処理が同じサービスを呼びます。`inventory`の時間が伸びたとしても、伸ばしたのは試験のリクエストではなく、別の呼び出し元かもしれません。同じ時間範囲のメトリクスは調べる候補を絞る材料です。1件ずつの対応を確かめるのはトレースの役割です。
+
+## トレースで1件ずつ確かめる
+
+[Tempo](https://grafana.com/docs/tempo/v3.1.x/)では、[TraceQL](https://grafana.com/docs/tempo/v3.1.x/traceql/)でスパンの条件を書いてトレースを探します。修正前の版に毎秒100件をかけた試験の時間範囲で、1秒を超えた`catalog-api`のサーバースパンを探すと、4,400件見つかりました。同じ条件で`inventory`を探すと0件です。
+
+```traceql
+{ resource.service.name = "catalog-api" && kind = server && duration > 1s }
+```
+
+試験の時間範囲のトレースを300件取り出し、スパンごとの時間を集計しました[^analyze]。
+
+[^analyze]: 集計に使ったスクリプトは、題材のリポジトリの[`analyze_traces.py`](https://github.com/ymotongpoo/k6-otel-perf-review/blob/a054e3bf4ac306a86bc5c2ce65ab78e4b2f7111e/analyze_traces.py)です。TempoのHTTP APIでトレースを検索し、1件ずつ取得してスパンの時間を集めます。
+
+| スパン | 修正前、毎秒100件 中央値 | p(95) | 修正後、毎秒150件 中央値 | p(95) |
+| --- | --- | --- | --- | --- |
+| `catalog-api`のサーバースパン | 2,570.0ms | 2,618.6ms | 114.1ms | 134.8ms |
+| `catalog-api`のクライアントスパン | 51.5ms | 61.1ms | 108.3ms | 129.2ms |
+| `inventory`のサーバースパン | 50.6ms | 60.3ms | 112.1ms | 128.5ms |
+| `inventory`の`lookup stock` | 50.5ms | 60.1ms | 51.5ms | 60.1ms |
+
+トレースの値はヒストグラムの補間を通らないので、k6の要約とほぼ一致します。修正前の版では、サーバースパンの2,570msのうちクライアントスパンは51.5msだけです。クライアントスパンは、サーバースパンが始まってから中央値で約2,519ms後に始まり、サーバースパンとほぼ同時に終わっていました。この約2,519msは、`catalog-api`が`inventory`を呼ぶ前に使った時間です。修正後の版では、`inventory`のサーバースパンの112.1msのうち在庫を調べていたのは51.5msでした。残りの約61msは、`inventory`の中で処理枠の空きを待っていた時間にあたります。
+
+## トレースからログへ
+
+修正後の版に毎秒150件をかけた試験では、21.2%のリクエストが502になりました。エラーになったトレースを1件選び、5章で設定した「トレースからログへ」の移動を使うと、そのトレースIDで2つのサービスのログが見つかります。
+
+| サービス | レベル | メッセージ | 属性 |
+| --- | --- | --- | --- |
+| `inventory` | WARN | queue full | `queue_limit=8` |
+| `catalog-api` | WARN | backend returned error | `status=503` |
+
+`inventory`が待ち行列の上限で断り、`catalog-api`がその503を受け取って502を返したことが、1件のリクエストの中でつながりました。メトリクスで見えていた「毎秒32件の503」と「毎秒32件の502」が、同じリクエストの両端だったことになります。
+
+修正後の版で起きていたことは、トレースとログでほぼ説明がつきました。修正前の版はそうではありません。分かったのは、約2,519msが`inventory`を呼ぶ前に使われていたことまでです。その時間が同時実行数の制限の前で待っていた時間なのか、`catalog-api`の別の処理なのかは、いまのスパンでは区別できません。
