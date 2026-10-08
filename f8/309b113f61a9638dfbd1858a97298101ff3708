@@ -1,0 +1,25 @@
+diagrams/k6-otel-perf-review/20261118-closed-vs-open.dot
+  s_9cbfbcbfb549ab::t_41e5207b0341ae 1-46
+diagrams/k6-otel-perf-review/20261118-demo-topology.dot
+  s_9cbfbcbfb549ab::t_91b18aa0b39481 1-49
+diagrams/k6-otel-perf-review/20261118-request-path.dot
+  s_9cbfbcbfb549ab::t_2725ab720bbab9 1-41
+diagrams/k6-otel-perf-review/20261118-retest-flow.dot
+  s_9cbfbcbfb549ab::t_88f45510db32c7 1-32
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "f8309b113f61a9638dfbd1858a97298101ff3708",
+  "prompts": {},
+  "sessions": {
+    "s_9cbfbcbfb549ab": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f65ddf87-97e8-4c2f-9803-5e752cea6020",
+        "model": "unknown"
+      },
+      "human_author": "Yoshi Yamaguchi <ymotongpoo@gmail.com>"
+    }
+  }
+}
