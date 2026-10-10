@@ -1,0 +1,22 @@
+books/tinygo-otel-esp32/00-introduction.md
+  s_f6d483efe60d1d::t_21a497af15baf0 13,15
+  s_f6d483efe60d1d::t_fdd3c81f236fce 14,16
+books/tinygo-otel-esp32/99-references.md
+  s_f6d483efe60d1d::t_fdd3c81f236fce 41
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "063b9bd12edec7a870bde4fd94029426cfd66494",
+  "prompts": {},
+  "sessions": {
+    "s_f6d483efe60d1d": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "3d5b397d-fdba-4bf1-afa0-076ba9521a86",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Yoshi Yamaguchi <ymotongpoo@gmail.com>"
+    }
+  }
+}
