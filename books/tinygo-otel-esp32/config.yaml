@@ -1,8 +1,8 @@
 ---
 title: "検証 TinyGoでOpenTelemetryは使えるのか（2026年10月版）"
-summary: "OpenTelemetryは組み込み向けには設計されていません。その前提のもとで、TinyGoで動くM5Stack CoreS3（ESP32-S3）から、メトリクス、ログ、トレースをOTLPでOpenTelemetry Collectorへ送る実装を作り、実機で測りました。公式のGo SDKがなぜ載らないのか、OTLPを話すために何を自分で書く必要があるのか、メモリやスタックや時刻のどこで詰まるのかを、動くコードと計測値で確かめながら読める構成にしています。TinyGo Conference 2026の登壇の解説資料です。"
+summary: "OpenTelemetryは組み込み向けには設計されていません。その前提のもとで、TinyGoで動くM5Stack CoreS3（ESP32-S3）から、メトリクス、ログ、トレースをOTLPでOpenTelemetry Collectorへ送る実装を作り、実機で実験しました。公式のGo SDKがなぜ使えないのか、OTLPを話すために何を自分で書く必要があるのか、メモリやスタックや時刻のどこで詰まるのかを、検証用コードと計測値で確かめながら読める構成にしています。TinyGo Conference 2026の登壇の解説資料です。"
 topics: ["tinygo", "opentelemetry", "esp32", "go", "observability"]
-published: false
+published: true
 price: 0
 chapters:
   - 00-introduction
