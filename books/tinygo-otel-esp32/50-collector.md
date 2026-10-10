@@ -29,7 +29,7 @@ receivers:
   otlp:
     protocols:
       http:
-        endpoint: 0.0.0.0:4319
+        endpoint: 0.0.0.0:4318
 
 processors:
   resource:
