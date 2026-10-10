@@ -10,6 +10,10 @@ title: "はじめに"
 
 本書では、[M5Stack CoreS3](https://docs.m5stack.com/ja/core/CoreS3)からメトリクス、ログ、トレースの3つのシグナルを送り、[Grafana](https://grafana.com/oss/grafana/)のダッシュボードで見られるところまで進みます。CoreS3は、Espressif社のマイコン[ESP32-S3](https://www.espressif.com/en/products/socs/esp32-s3)を載せた開発ボードです。送り先は[OpenTelemetry Collector](https://opentelemetry.io/ja/docs/collector/)で、テレメトリーを受け取って加工し、保存先へ転送するサーバープログラムです。デバイス側では公式のSDKを使わず、公式の部品から借りたのはOTLPのスキーマ（メッセージの構造とフィールド番号）だけで、エンコーダ、HTTPクライアント、時刻同期は自分で書きました。どこで公式の部品が使えなくなり、かわりに何を書いたのかを、実機で測った値とともに示します。
 
+本書に載せるコードは、参照実装として公開している[tinygo-otel-esp32](https://github.com/ymotongpoo/tinygo-otel-esp32)から抜き出したものです。本文で「本書の実装」や「本書のデモ」と呼ぶのは、このリポジトリのコードを指します。リポジトリには、デバイスのファームウェアのほか、Collectorの設定、Grafanaのダッシュボード、Collectorとバックエンドをまとめて立ち上げるDocker Composeの構成も入っています。ライセンスはApache License 2.0です。
+
+リポジトリのパッケージは、本書の章に対応しています。手書きのprotobufエンコーダは`wire`（5章）、OTLP/JSONのエンコーダは`otlpjson`（6章）にあります。手書きのHTTPクライアントは`otlpmini`（7章）、SNTPクライアントは`sntp`（8章）で、それらを組み合わせたファームウェアが`cmd/device`です。同じ送信の処理をホストで動かす`cmd/hostsim`もあり、実機がなくてもCollectorへ送るところまで試せます。
+
 :::message
 本書のコードと測定した値は、次の環境で確かめたものです。
 
