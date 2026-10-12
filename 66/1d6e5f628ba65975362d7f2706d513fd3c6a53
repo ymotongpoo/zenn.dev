@@ -1,0 +1,23 @@
+articles/20261015-gke-prometheus-to-otlp-metrics.md
+  s_e5b1b8b983d27e::t_26f3bac18082f7 1-280
+articles/20261016-vertex-ai-genai-otel.md
+  s_e5b1b8b983d27e::t_26f3bac18082f7 1-257
+articles/20261014-bedrock-sagemaker-otel.md
+  s_e5b1b8b983d27e::t_26f3bac18082f7 1-334
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "661d6e5f628ba65975362d7f2706d513fd3c6a53",
+  "prompts": {},
+  "sessions": {
+    "s_e5b1b8b983d27e": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "3d528746-7d12-4e68-bcbf-9807878e5254",
+        "model": "claude-haiku-5-5"
+      },
+      "human_author": "Yoshi Yamaguchi <ymotongpoo@gmail.com>"
+    }
+  }
+}
