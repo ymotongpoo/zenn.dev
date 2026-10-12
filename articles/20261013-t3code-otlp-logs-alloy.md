@@ -1,17 +1,17 @@
 ---
-title: "T3 CodeのOTLPログをAlloyのOTTLで構造化してからLokiに送る"
+title: "OTLPログの本文に入ったJSON文字列をAlloyのOTTLで属性に展開する"
 emoji: "🧹"
 type: "tech"
 topics: ["OpenTelemetry", "grafana", "Loki", "Alloy", "OTTL"]
 published: true
-published_at: 2026-10-12 09:00
+published_at: 2026-10-13 09:00
 ---
 
 ## はじめに
 
 こんにちは、Grafana Labsでデベロッパーアドボケイトをしているものです。
 
-最近、コーディングエージェントのGUIとして[T3 Code](https://github.com/pingdotgg/t3code)を試しています。T3 CodeはOTLPでトレース、メトリクス、ログを送れるので、手元で動かしているGrafana Alloyを経由してGrafana Cloudに集め、ダッシュボードを作って眺めていました。
+最近、コーディングエージェントのGUIとして[T3 Code](https://github.com/pingdotgg/t3code)を試しています。T3 CodeはOTLPでトレース、メトリクス、ログを送れるので、手元で動かしているGrafana Alloy（OpenTelemetry Collector）を経由してGrafana Cloudに集め、ダッシュボードを作って眺めていました。
 
 ところが、Grafana CloudのLogs（Loki）でT3 Codeのログを開くと、本文に `\"` とエスケープが大量に入った文字列が並んでいました。中身はJSONのように見えるのに、フィールドとして検索も集計もできません。この記事では、このログをAlloyの `otelcol.processor.transform` で書き換え、Lokiに届いた時点で構造化ログになっている状態にした作業をまとめます。
 
@@ -252,7 +252,7 @@ curl -fsS http://127.0.0.1:12345/-/healthy
 }
 ```
 
-属性名の `.` は `_` に置き換わり、`lastFailure` のような入れ子のマップは `_` でつないだキーに平坦化されています。`_tag` のキーは、アンダースコアが重ならずに `lastFailure_cause_tag` となっていました。OTTLの側で平坦化を書かなくても、Grafana Cloudの取り込みで扱いやすい形になります。
+属性名の `.` は `_` に置き換わり、`lastFailure` のような入れ子のマップは `_` でつないだキーにフラット化されています。`_tag` のキーは、アンダースコアが重ならずに `lastFailure_cause_tag` となっていました。OTTLの側でフラット化を書かなくても、Grafana Cloudの取り込みで扱いやすい形になります。
 
 これで、LogQLから前処理が消えました。イベント名で絞るなら次の1行で済みます。
 
@@ -270,11 +270,11 @@ sum by (event_name) (
 
 ## 残っている課題
 
-この変換が効くのは、Alloyに設定を入れた後に届いたログだけです。それ以前にLokiへ保存されたログは配列のままなので、過去のログを調べるときはLogQL版の前処理がまだ必要です。
+この変換は、Alloyに設定を入れた後に届いたログにだけ有効です。それ以前にLokiへ保存されたログは配列のままなので、過去のログを調べるときはLogQL版の前処理が必要です（もっとも今回はOTTLの変換の記事を書くためだけに行ってるので特に実施しませんが）。
 
 また、`Cause(...)` を含むイベントを名前で列挙しているので、T3 Codeが同じ書き方のイベントを増やすと、その分はJSONとしてのパースに回って失敗します。その場合、属性は展開されず、最後の文で本文がイベント名に置き換わるので、2要素目の文字列はLokiに残りません。対策としては、`ParseJSON` が使えなかったときにも `t3.context.raw` に元の文字列を残す文を足すのがよさそうです。
 
-根本的には、T3 Code側でオブジェクトをマップのbodyか属性として送れば、この変換はいりません。Alloyでの変換は、本体が直るまでのつなぎとして使い、直ったら外すつもりです。
+根本的には、T3 Code側でオブジェクトをマップのbodyか属性として送れば、この変換は必要ありません。Alloyでの変換は、本体が直るまでのつなぎとして使い、直ったら外すつもりです。
 
 ## おわりに
 
