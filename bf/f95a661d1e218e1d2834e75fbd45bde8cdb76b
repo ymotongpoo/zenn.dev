@@ -1,0 +1,19 @@
+articles/20261013-t3code-otlp-logs-alloy.md
+  s_e5b1b8b983d27e::t_38c588cc9b980a 2,7,14,255,273,277
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "bff95a661d1e218e1d2834e75fbd45bde8cdb76b",
+  "prompts": {},
+  "sessions": {
+    "s_e5b1b8b983d27e": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "3d528746-7d12-4e68-bcbf-9807878e5254",
+        "model": "claude-haiku-5-5"
+      },
+      "human_author": "Yoshi Yamaguchi <ymotongpoo@gmail.com>"
+    }
+  }
+}
