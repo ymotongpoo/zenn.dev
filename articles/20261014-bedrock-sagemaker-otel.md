@@ -4,6 +4,7 @@ emoji: "🛰️"
 type: "tech"
 topics: ["OpenTelemetry", "AWS", "Bedrock", "SageMaker", "Observability"]
 published: false
+published_at: 2026-10-14 09:00
 ---
 
 :::message
