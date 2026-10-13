@@ -24,6 +24,7 @@ W-01、W-05、W-07（ローカル）とW-08（一次資料）は今回実施し�
 4. **少数のトレースはX-Rayのトレース詳細に出ない。** インデックスが1%のため、検証用の2件はX-Rayの `BatchGetTraces` でもコンソールのトレース詳細でも見えませんでした。CloudWatchのTransaction Searchの画面（`aws/spans` を直接検索する）には出ます。取り込みから検索できるまでに約10分かかりました。
 5. **0.66b1でも `gen_ai.system` のまま。** TL;DRの「現行の0.65b0」は9月22日時点の記述として正しいままです。公開日の時点では0.66b1が最新なので、版を更新するなら「0.66b1でも同じ」と書けます。
 6. **SSOのプロファイルで手元から動かすと、認証情報の取得もトレースに入る。** `BotocoreInstrumentor` は `SSO OIDC.CreateToken` と `SSO.GetRoleCredentials` もスパンにし、最初の呼び出しのトレースに子として入れました。記事の範囲外ですが、手元で試す読者が見かける可能性があります。
+8. **Bedrock版の計装は9月24日にPyPIに公開されていた。** 記事は9月22日の時点で「PyPIに公開されておらず `pip install` はできない」と書いていましたが、`opentelemetry-instrumentation-genai-bedrock` は2026年9月24日に1.2b0として公開されています。配布物のソースでは `gen_ai.provider.name` の列挙値 `aws.bedrock` を使っています。実際の呼び出しは未実施で、記事にもそう書きました（DOCUMENTED）。
 7. **us-east-2のNova Microは推論プロファイル経由になる。** `us.amazon.nova-micro-v1:0` で呼ぶ必要がありました。記事のコード例はus-east-1でモデルIDを直接指定しており、そのままで正しく動きました（W-02）。
 
 ## 画像
@@ -35,7 +36,7 @@ W-01、W-05、W-07（ローカル）とW-08（一次資料）は今回実施し�
 | W-S1′ | W-02 | `images/20261014-bedrock-botocore-span.png` | Grafanaのトレース詳細で、ライブラリーの版0.65b0のConverseのスパンに `gen_ai.system=aws.bedrock` が付き、`gen_ai.provider.name` はない |
 | W-S1 | W-06 | `images/20261014-cloudwatch-transaction-search-spans.png` | CollectorからSigV4で送ったBedrockのスパンがCloudWatchのTransaction Searchに入り、CloudWatchが `InternalOperation` のスパンを足している |
 | W-S5 | W-06 | `images/20261014-grafana-same-trace-one-span.png` | W-S1と同じトレースをGrafanaで開くとスパンは1つで、送ったクライアントスパンが根のまま（CloudWatch側の `InternalOperation` はない） |
-| W-S2 | W-04 | `images/20261014-sagemaker-endpoint-inservice.png` | リアルタイムのエンドポイントが `InService`（ARNは塗りつぶし） |
+| W-S2 | W-04 | `images/20261014-sagemaker-endpoint-inservice.png`（本文に追加） | リアルタイムのエンドポイントが `InService`（ARNは塗りつぶし） |
 | W-S3 | W-04 | `images/20261014-sagemaker-customattributes-log.png` | ヘッダーと `CustomAttributes` の両方で送ったとき、コンテナには `traceparent` ヘッダーが届かず（`null`）、`CustomAttributes` の値から呼び出し側のスパンを親に復元した |
 
 画像にはサービス名やエンドポイント名として検証用の名前（`ymo-1014-...`）が写っています。

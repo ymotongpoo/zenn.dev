@@ -8,22 +8,22 @@ published_at: 2026-10-14 09:00
 ---
 
 :::message
-一次情報を確認した日付は2026年9月22日です。AWSのサービス側の仕様もOpenTelemetry側の規約も動いている最中なので、採用前に同じページを読み直してください。本文のうち実際に動かして確かめた部分は2026年10月13日に実施したもので、リージョンとバージョンを該当箇所に書いています。
+一次情報を確認した日付は2026年9月22日です。AWSのサービス側の仕様もOpenTelemetry側の規約も動いている最中なので、採用前に同じページを読み直してください。本文のうち実際に動かして確かめた部分は2026年10月13日に実施したもので、リージョンとバージョンを該当箇所に書いています。対象にした一次情報は次のとおりです。
 
-- GenAI規約のBedrock編: [semantic-conventions-genai](https://github.com/open-telemetry/semantic-conventions-genai) のコミット `cc07f72`、`docs/gen-ai/aws-bedrock.md`。安定度は Development
-- 計装: [`opentelemetry-instrumentation-botocore`](https://pypi.org/project/opentelemetry-instrumentation-botocore/) のBedrock Runtime拡張、および [opentelemetry-python-genai](https://github.com/open-telemetry/opentelemetry-python-genai) の `opentelemetry-instrumentation-genai-bedrock`
-- AWS側: [AWS Distro for OpenTelemetry](https://aws-otel.github.io/)（ADOT）Python `aws-opentelemetry-distro` 0.18.0以降、[CloudWatchのOTLPエンドポイント](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/CloudWatch-OTLPEndpoint.html)
+- GenAI規約のBedrock編。[semantic-conventions-genai](https://github.com/open-telemetry/semantic-conventions-genai) のコミット `cc07f72` の `docs/gen-ai/aws-bedrock.md` で、安定度は Development
+- 計装。[`opentelemetry-instrumentation-botocore`](https://pypi.org/project/opentelemetry-instrumentation-botocore/) のBedrock Runtime拡張と、[opentelemetry-python-genai](https://github.com/open-telemetry/opentelemetry-python-genai) の `opentelemetry-instrumentation-genai-bedrock`
+- AWS側。[AWS Distro for OpenTelemetry](https://aws-otel.github.io/)（ADOT）Python `aws-opentelemetry-distro` 0.18.0以降と、[CloudWatchのOTLPエンドポイント](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/CloudWatch-OTLPEndpoint.html)
 :::
 
 ## はじめに
 
-AWS上で生成AIを使う構成を「Bedrockのエージェント」と一括りに呼んでしまうと、計装の話がかみ合わなくなります。モデルを1回呼ぶだけの [Amazon Bedrock](https://aws.amazon.com/jp/bedrock/) のRuntime API、自分で用意したモデルをホストする [Amazon SageMaker AI](https://aws.amazon.com/jp/sagemaker/) のエンドポイント、そしてエージェントの実行そのものをAWS側が受け持つ [Amazon Bedrock AgentCore](https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/) は、自動で計装できる範囲もトレースの切れ目も違います。どこまでが自動で付いて、どこから手で書くのかを一次情報で確かめたのが本記事です。
+AWS上で生成AIを使う構成を「Bedrockのエージェント」と一括りに呼んでしまうと、計装の話がかみ合わなくなります。モデルを1回呼ぶだけの [Amazon Bedrock](https://aws.amazon.com/jp/bedrock/) のRuntime API、自分で用意したモデルをホストする [Amazon SageMaker AI](https://aws.amazon.com/jp/sagemaker/) のエンドポイント、そしてエージェントの実行そのものをAWS側が受け持つ [Amazon Bedrock AgentCore](https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/) は、自動で計装できる範囲もトレースの切れ目も違います。どこまでが自動で付いて、どこから手で書くのかを、一次情報と実際の呼び出しで確かめたのが本記事です。
 
 GenAI規約の共通部分については別の記事で扱ったので、本記事ではAWS固有の部分、とくにサービスをまたぐトレースコンテキストの伝播と、プロンプトの本文をどこに置くかに紙幅を割きます。
 
 ## TL;DR
 
-Bedrockのモデル呼び出しは、Converse系とInvokeModel系の4つのAPIが計装済みで、スパンとメトリクスが自動で出ます。ただし `opentelemetry-instrumentation-botocore` の0.65b0も、その後に出た0.66b1も、プロバイダーの識別に使うのは旧規約の `gen_ai.system` で、本記事が基準にする新しい規約の `gen_ai.provider.name` ではありません。SageMaker AIのエンドポイントには専用の拡張が無く、AWS SDKの汎用スパンになるので、モデル名やトークン数の属性は手で足すことになります。さらにSageMakerは「APIが受け付けるヘッダー以外のPOSTヘッダーをすべて取り除く」と明記していて、実際に `traceparent` をHTTPヘッダーで送ってもコンテナには届きませんでした。コンテキストは `CustomAttributes`（1024文字まで）に載せ替える必要があります。CloudWatchのOTLPエンドポイントでトレースを受けるには、アカウントとリージョン単位の設定であるTransaction Searchを先に有効にしておく必要もあります。AgentCoreについては、AWSのドキュメントがエージェントの観測性にADOT Collectorは対応しないと明言しているので、公式の手順に沿うかぎりCollectorをゲートウェイに挟む構成は採れません。
+Bedrockのモデル呼び出しは、Converse系とInvokeModel系の4つのAPIが計装済みで、スパンとメトリクスが自動で出ます。ただし `opentelemetry-instrumentation-botocore` の0.65b0も、その後に出た0.66b1も、プロバイダーの識別に使うのは旧規約の `gen_ai.system` で、本記事が基準にする新しい規約の `gen_ai.provider.name` ではありません。新しい規約で出す `opentelemetry-instrumentation-genai-bedrock` は、2026年9月24日に1.2b0としてPyPIに公開されました。SageMaker AIのエンドポイントには専用の拡張が無く、AWS SDKの汎用スパンになるので、モデル名やトークン数の属性は手で足すことになります。さらにSageMakerは「APIが受け付けるヘッダー以外のPOSTヘッダーをすべて取り除く」と明記していて、実際に `traceparent` をHTTPヘッダーで送ってもコンテナには届きませんでした。コンテキストは `CustomAttributes`（1024文字まで）に載せ替える必要があります。CloudWatchのOTLPエンドポイントでトレースを受けるには、アカウントとリージョン単位の設定であるTransaction Searchを先に有効にしておく必要もあります。AgentCoreについては、AWSのドキュメントがエージェントの観測性にADOT Collectorは対応しないと明言しているので、公式の手順に沿うかぎりCollectorをゲートウェイに挟む構成は採れません。
 
 ## 3つの呼び出しを区別する
 
@@ -37,20 +37,20 @@ Bedrockのモデル呼び出しは、Converse系とInvokeModel系の4つのAPI�
 
 Bedrockについては、GenAI規約に専用のページがあります。`docs/gen-ai/aws-bedrock.md` は共通のスパン規約を拡張する形で、`gen_ai.provider.name` を `"aws.bedrock"` に固定し、しかも「スパンの生成時に設定すべき」と指定しています。属性としてはガードレールの識別子 `aws.bedrock.guardrail.id` とナレッジベースの識別子 `aws.bedrock.knowledge_base.id` が追加されています。共通規約側の `gen_ai.conversation.id` の注記には、バックエンドで会話を保持するライブラリの例として [Bedrockのエージェントセッション](https://docs.aws.amazon.com/bedrock/latest/userguide/agents-session-state.html)が挙げられています。
 
-計装の実装は現在2系統あります。contrib側の `opentelemetry-instrumentation-botocore` はBedrock Runtime用の拡張を持ち、READMEによると4つのAPIについてGenAI規約を実装しています。ただしInvokeModelとInvokeModelWithResponseStreamについては、トレースとイベントとメトリクスが実装されているのがAmazon Titan、Amazon Nova、Anthropic Claudeに限られます。他のモデルをInvokeModelで叩いている場合、属性が埋まらない前提で見積もる必要があります。
+計装の実装は現在2系統あります。contrib側の `opentelemetry-instrumentation-botocore` はBedrock Runtime用の拡張を持ち、READMEによると4つのAPIについてGenAI規約を実装しています。ただしInvokeModelとInvokeModelWithResponseStreamについては、トレースとイベントとメトリクスが実装されているのがAmazon Titan、Amazon Nova、Anthropic Claudeに限られます。他のモデルをInvokeModelで呼んでいる場合、属性が埋まらない前提で見積もる必要があります。
 
 ここで、規約の定義と実装の出力を分けて見る必要があります。上で挙げた `gen_ai.provider.name` は、専用リポジトリへ分離された新しい規約の属性です。一方、2026年9月22日の時点で最新の `opentelemetry-instrumentation-botocore` 0.65b0（2026年7月16日リリース）のBedrock拡張が設定するのは、旧規約の `gen_ai.system` で、値は `aws.bedrock` です。同じタグのソースで、スパンとメトリクスの両方がこの属性を使っていることと、新旧を切り替えるオプトインの処理が入っていないことを確認しました[^botocore]。その後に出た0.66b1でも、この部分は変わっていません。2026年10月13日に、us-east-1でAmazon Nova Micro（`amazon.nova-micro-v1:0`）を4つのAPIで実際に呼んだところ、0.65b0と0.66b1のどちらでも、4つのスパンすべてに `gen_ai.system` の `aws.bedrock` が付き、`gen_ai.provider.name` は出ませんでした。
 
 [^botocore]: 確認したのはタグ `v0.65b0` の `instrumentation/opentelemetry-instrumentation-botocore/src/opentelemetry/instrumentation/botocore/extensions/bedrock.py` です。バージョンを上げるときは同じファイルを読み直してください。
 
-このバージョンが設定する `gen_ai.*` の属性は、`gen_ai.system`、`gen_ai.operation.name`、`gen_ai.request.model`、`gen_ai.request.max_tokens`、`gen_ai.request.temperature`、`gen_ai.request.top_p`、`gen_ai.request.stop_sequences`、`gen_ai.response.finish_reasons`、`gen_ai.usage.input_tokens`、`gen_ai.usage.output_tokens` です。メトリクスは `gen_ai.client.operation.duration` と `gen_ai.client.token.usage` の2つです。規約側にある `gen_ai.response.model` と `gen_ai.response.id`、そしてBedrock専用のページが定義するガードレールとナレッジベースの属性は、この一覧に含まれません。実際の呼び出しでも、この一覧にない `gen_ai.*` の属性は出ませんでした（生成パラメーターの属性は、指定した `gen_ai.request.max_tokens` だけが付き、指定しなかった温度などの属性は付きませんでした）。イベントとしては `gen_ai.user.message` と `gen_ai.choice` が出ました。新しい規約に揃えたクエリを書くなら、その差はCollectorの側か自分の計装で埋めることになります。
+このバージョンが設定する `gen_ai.*` の属性は、`gen_ai.system`、`gen_ai.operation.name`、`gen_ai.request.model`、`gen_ai.request.max_tokens`、`gen_ai.request.temperature`、`gen_ai.request.top_p`、`gen_ai.request.stop_sequences`、`gen_ai.response.finish_reasons`、`gen_ai.usage.input_tokens`、`gen_ai.usage.output_tokens` です。メトリクスは `gen_ai.client.operation.duration` と `gen_ai.client.token.usage` の2つです。規約側にある `gen_ai.response.model` と `gen_ai.response.id`、そしてBedrock専用のページが定義するガードレールとナレッジベースの属性は、この一覧に含まれません。実際の呼び出しでも、この一覧にない `gen_ai.*` の属性は出ませんでした。生成パラメーターの属性のうち付いたのは、リクエストで指定した `gen_ai.request.max_tokens` だけです。イベントとしては `gen_ai.user.message` と `gen_ai.choice` が出ました。新しい規約に揃えたクエリを書くなら、その差はCollectorの側か自分の計装で埋めることになります。
 
 ![GrafanaのトレースでBedrockのConverseのスパンを開いた画面。ライブラリーの版は0.65b0で、属性にgen_ai.system=aws.bedrockがあり、gen_ai.provider.nameはない](/images/20261014-bedrock-botocore-span.png)
 *0.65b0が出したConverseのスパン。`gen_ai.provider.name` はなく、`gen_ai.system` が付いている*
 
-もう1系統は、GenAI関連のパッケージを集約している `opentelemetry-python-genai` リポジトリの `opentelemetry-instrumentation-genai-bedrock` です。こちらは4つのAPIすべてを対象にしていて、本文の取得も `OTEL_INSTRUMENTATION_GENAI_CAPTURE_MESSAGE_CONTENT` で切り替えられます。ただしこの日付の時点でPyPIに公開されておらず、リポジトリの中にあるだけです[^pypi]。リポジトリ内では `opentelemetry-instrumentation-google-genai` や `opentelemetry-instrumentation-genai-anthropic` がすでに 1.1b1 としてリリースされているので、Bedrock版も追って公開される流れに見えます（ここはリポジトリ内のリリース状況からの推論です）が、いまの時点で `pip install` はできません。当面はcontrib側を使い、対応モデルの制限を受け入れる形になります。
+もう1系統は、GenAI関連のパッケージを集約している `opentelemetry-python-genai` リポジトリの `opentelemetry-instrumentation-genai-bedrock` です。こちらは4つのAPIすべてを対象にしていて、本文の取得も `OTEL_INSTRUMENTATION_GENAI_CAPTURE_MESSAGE_CONTENT` で切り替えられます。2026年9月22日の時点ではPyPIに公開されておらず、リポジトリの中にあるだけでしたが[^pypi]、2日後の9月24日に1.2b0として公開されました。配布物のソースでは、プロバイダーの識別に新しい規約の `gen_ai.provider.name` の列挙値（`aws.bedrock`）を使っていて、ガードレールの識別子の属性も扱っています。ただし本記事では、この版を実際に動かしてはいません。新しい規約に揃えたいならこちらが候補になりますが、ベータの版なので、属性の出方は自分の環境で確かめてから採用することになります。
 
-[^pypi]: `https://pypi.org/pypi/opentelemetry-instrumentation-genai-bedrock/json` が404を返します。同リポジトリのリリース一覧には `opentelemetry-instrumentation-google-genai==1.1b1`（2026年8月21日）などが並んでいる一方、Bedrock版のタグはありません。
+[^pypi]: 2026年9月22日の時点では `https://pypi.org/pypi/opentelemetry-instrumentation-genai-bedrock/json` が404を返し、同リポジトリのリリース一覧にも `opentelemetry-instrumentation-google-genai==1.1b1`（2026年8月21日）などが並ぶ一方でBedrock版のタグはありませんでした。2026年10月13日には、同じURLが1.2b0（9月24日公開）を返しています。
 
 契機となる設定は1行です。ただしこの1行はboto3のクライアントにフックを入れるだけで、`TracerProvider` と `MeterProvider` とエクスポーターを設定するわけではありません。これらを初期化しないまま動かすと、スパンもメトリクスも生成されないまま捨てられます。次のコードは、SDKとエクスポーターの初期化が済んだ環境に足す部分の抜粋です。ADOTを使う場合は後述の `opentelemetry-instrument` コマンド経由で起動すると、初期化を環境変数で済ませられます。
 
@@ -69,7 +69,7 @@ response = client.converse(
 
 このモデルIDをそのまま使えるかはリージョンによります。us-east-1ではこのコードのまま動きましたが、us-east-2ではNova MicroをモデルIDで直接呼べず、推論プロファイルの `us.amazon.nova-micro-v1:0` を指定する必要がありました。
 
-手元のマシンからAWS IAM Identity Center（SSO）のプロファイルで試すと、認証情報を取得する `SSO OIDC.CreateToken` と `SSO.GetRoleCredentials` の呼び出しもスパンになり、最初のBedrockの呼び出しのトレースに子として入ります。どちらもboto3のクライアントなので、計装はBedrockの呼び出しと区別しません。属性に秘密情報は載りませんが、トレースが見づらくなるので、`instrument()` の前に `boto3.setup_default_session()` を呼んでから `boto3.DEFAULT_SESSION.get_credentials().get_frozen_credentials()` で認証情報を取得しておくと、これらのスパンは出なくなります。
+手元のマシンからAWS IAM Identity Center（SSO）のプロファイルで試すと、認証情報を取得する `SSO OIDC.CreateToken` と `SSO.GetRoleCredentials` の呼び出しもスパンになり、最初のBedrockの呼び出しのトレースに子として入ります。認証情報の取得もboto3のクライアントで行われるので、計装はBedrockの呼び出しと区別しません。属性に秘密情報は載りませんが、トレースは見づらくなります。`instrument()` の前に `boto3.setup_default_session()` を呼び、`boto3.DEFAULT_SESSION.get_credentials().get_frozen_credentials()` で認証情報を取得しておくと、これらのスパンは出なくなります。
 
 ## SageMakerのエンドポイントでのトレースの切れ目
 
@@ -82,6 +82,9 @@ SageMaker AIのリアルタイムエンドポイントは、Bedrockと違って�
 > （Amazon SageMaker AIは、APIが対応しているものを除いてPOSTヘッダーをすべて取り除きます。Amazon SageMaker AIが追加のヘッダーを足すこともあります。リクエスト構文に列挙されていないヘッダーの挙動に依存すべきではありません。）
 
 W3C Trace Contextの `traceparent` はこの列挙に含まれません。2026年10月13日に、us-east-2のリアルタイムのエンドポイント（ml.t2.medium）で確かめました。botocoreのイベントフックでHTTPヘッダーに `traceparent` を足して呼ぶと、ヘッダーはモデルコンテナに届かず、コンテナの中で作ったスパンは呼び出し側とは別のトレースの根になりました。コンテナが受け取ったヘッダーは `Accept`、`Content-Length`、`Content-Type`、`Host`、`User-Agent`、`X-Amzn-SageMaker-Custom-Attributes`、`X-Amzn-SageMaker-Inference-Id` の7つです。同じboto3をローカルのHTTPサーバーに向けたときには届いていた `Authorization` や `X-Amz-Date` は取り除かれ、boto3が送っていない `Accept` が加わっていました。
+
+![SageMaker AIのコンソールでエンドポイントの概要を開いた画面。種類はReal-timeで、状態はInService](/images/20261014-sagemaker-endpoint-inservice.png)
+*検証に使ったリアルタイムのエンドポイント（ARNは塗りつぶしている）*
 
 用意されている抜け道は `CustomAttributes` です。APIリファレンスは「推論のリクエストに関する追加情報を提供する。この情報は不透明な値としてそのまま転送される。たとえばリクエストを追跡するためのIDを渡す用途に使える」と説明していて、実際に「リクエストの `CustomAttributes` ヘッダーでトレースIDを渡し、レスポンスの `CustomAttributes` ヘッダーで返す」という例をそのまま載せています。リクエスト構文では `X-Amzn-SageMaker-Custom-Attributes` というヘッダーに対応します。制約は、値が1024文字以内の印字可能なUS-ASCIIであること、そしてレスポンスに載せ返すかどうかはモデル側のコードの責任であることです。
 
@@ -129,7 +132,7 @@ with tracer.start_as_current_span(
 
 `gen_ai.provider.name` に独自の値を入れている点は意図的です。規約の列挙には `aws.bedrock` はあっても SageMaker に対応する値がなく、規約自身が「いずれかが該当する場合はその値を使わなければならないが、該当しない場合は独自の値を使ってよい」としています。独自の値を入れたことは記録に残しておく必要があります。あとで規約側に値が追加されたら、揃えに行く対象になります。
 
-コンテナ側では、`X-Amzn-SageMaker-Custom-Attributes` ヘッダーの値を辞書へ戻して `extract` に渡し、取り出したコンテキストをスパンの親にします。前述のエンドポイントでこの2つのコードを動かすと、コンテナ側のスパンは呼び出し側と同じトレースIDになり、呼び出し側のスパンが親になりました。`traceparent` をHTTPヘッダーと `CustomAttributes` の両方で送った場合も、届いたのは `CustomAttributes` のほうだけで、結果は同じです。
+コンテナ側では、`X-Amzn-SageMaker-Custom-Attributes` ヘッダーの値を辞書へ戻して `extract` に渡し、取り出したコンテキストをスパンの親にします。
 
 ```python
 from opentelemetry import trace
@@ -150,16 +153,18 @@ def handle(request):
         return run_inference(request)
 ```
 
+前述のエンドポイントで、呼び出し側とコンテナ側のこの2つのコードを動かすと、コンテナ側のスパンは呼び出し側と同じトレースIDになり、呼び出し側のスパンが親になりました。`traceparent` をHTTPヘッダーと `CustomAttributes` の両方で送った場合も、届いたのは `CustomAttributes` のほうだけで、結果は同じです。
+
 ![CloudWatch Logsでコンテナのログを開いた画面。traceparent_headerはnullで、custom_attributesの値とコンテナ側のスパンのtrace IDと親のスパンIDが一致している](/images/20261014-sagemaker-customattributes-log.png)
 *ヘッダーと `CustomAttributes` の両方で送ったときにコンテナが記録した内容。`traceparent` ヘッダーは届かず（`null`）、`CustomAttributes` の値から親を復元している*
 
 値が空だったり形式が合わなかったりした場合、`extract` は無効なコンテキストを返すので、スパンは親を持たない新しいトレースの根になります。呼び出し側とつながらなかったこと自体は、トレースの根が2つに分かれる形で後から分かります。
 
-複数の項目を渡す必要があるなら、区切り文字で連ねるのではなくJSONへ符号化します。`json.dumps(carrier)` の結果は印字可能なUS-ASCIIに収まるので `CustomAttributes` の文字種の制約を満たしますが、長さは自分で検査する必要があります。バゲッジに業務上のキーを詰めると1024文字を超ええるので、送信前に長さを確かめて、超える場合は渡す項目を削るか別の経路へ回します。受信側は `json.loads` で辞書へ戻してから `extract` に渡します。`CustomAttributes` は不透明な値としてそのまま転送されるだけなので、符号化と復号の取り決めは呼び出し側とコンテナ側で揃えておくものになります。
+複数の項目を渡す必要があるなら、区切り文字で連ねるのではなくJSONへ符号化します。`json.dumps(carrier)` の結果は印字可能なUS-ASCIIに収まるので `CustomAttributes` の文字種の制約を満たしますが、長さは自分で検査する必要があります。バゲッジに業務上のキーを詰めると1024文字を超えうるので、送信前に長さを確かめて、超える場合は渡す項目を削るか別の経路へ回します。受信側は `json.loads` で辞書へ戻してから `extract` に渡します。`CustomAttributes` は不透明な値としてそのまま転送されるだけなので、符号化と復号の取り決めは呼び出し側とコンテナ側で揃えておくものになります。
 
 レスポンスの `CustomAttributes` に載せ返すかどうかは別の判断です。呼び出し側でコンテナ内のスパンIDを知りたい場合だけ必要になります。
 
-モデルのバージョンについては、レスポンスの `InvokedProductionVariant` ヘッダーがどのプロダクションバリアントで処理されたかを返します（バリアントが1つのエンドポイントでは、エンドポイント設定で付けたバリアント名がそのまま返りました）。A/Bテストのために2つのバリアントに重みを付けている場合、この値を属性にしておくとバリアント別にレイテンシーを比べられます。データキャプチャを有効にしているなら `InferenceId`（64文字以内）が記録されたデータに付くので、テレメトリー側の識別子と揃えておくと、あとから両者を照合できます。
+モデルのバージョンについては、レスポンスの `InvokedProductionVariant` ヘッダーがどのプロダクションバリアントで処理されたかを返します。バリアントが1つのエンドポイントでは、エンドポイント設定で付けたバリアント名がそのまま返りました。A/Bテストのために2つのバリアントに重みを付けている場合、この値を属性にしておくとバリアント別にレイテンシーを比べられます。データキャプチャを有効にしているなら `InferenceId`（64文字以内）が記録されたデータに付くので、テレメトリー側の識別子と揃えておくと、あとから両者を照合できます。
 
 ## AgentCoreを使うときのCollectorの位置
 
@@ -178,9 +183,9 @@ boto3
 CMD ["opentelemetry-instrument", "python", "main.py"]
 ```
 
-ここで把握しておく必要があるのが、Collectorの扱いです。ドキュメントには「ADOT Collectorはエージェントの観測性には対応していません。AgentCoreランタイムの外でホストしたエージェントからテレメトリーを送るには、ADOT SDKかAWS Lambda Layer for OpenTelemetryのどちらかを使う必要があります」という注意書きがあります。この記述が定めているのは、AgentCoreのAgent Observabilityへテレメトリーを届ける公式の手順としてADOT Collectorが対象外だということです。CloudWatchのGenAI Observabilityの画面で見る構成を採るなら、Collectorをゲートウェイとして立ててサンプリングや属性の整形を一箇所に集める形は選べず、整形はSDK側のプロセッサーで行うことになります。
+Collectorの扱いには制約があります。ドキュメントには「ADOT Collectorはエージェントの観測性には対応していません。AgentCoreランタイムの外でホストしたエージェントからテレメトリーを送るには、ADOT SDKかAWS Lambda Layer for OpenTelemetryのどちらかを使う必要があります」という注意書きがあります。この記述が定めているのは、AgentCoreのAgent Observabilityへテレメトリーを届ける公式の手順としてADOT Collectorが対象外だということです。CloudWatchのGenAI Observabilityの画面で見る構成を採るなら、Collectorをゲートウェイとして立ててサンプリングや属性の整形を一箇所に集める形は選べず、整形はSDK側のプロセッサーで行うことになります。
 
-この記述から、独自のOTLPの経路が技術的に成り立たないことまでは導けません。同じドキュメントは、ランタイム内で動くエージェントを別の観測性のプラットフォームへつなぐ場合に `DISABLE_ADOT_OBSERVABILITY=true` を設定する手順も示していて、これを設定するとランタイムがデフォルトで入れるADOTの環境変数が外れます。送信先を自分で組む余地はそこにあります。ただしその構成でCollectorを挟んだときに何が届くかは、本記事では検証していません（未確認です）。AgentCoreの組み込みのメトリクスとスパンはCloudWatchへ入る前提の仕組みなので、そちらが使えなくなる可能性も含めて、採用前に自分の環境で確かめる部分になります。
+この記述から、独自のOTLPの経路が技術的に成り立たないことまでは導けません。同じドキュメントは、ランタイム内で動くエージェントを別の観測性のプラットフォームへつなぐ場合に `DISABLE_ADOT_OBSERVABILITY=true` を設定する手順も示していて、これを設定するとランタイムがデフォルトで入れるADOTの環境変数が外れます。送信先を自分で組む余地はそこにあります。ただしその構成でCollectorを挟んだときに何が届くかは、本記事では検証していません。AgentCoreの組み込みのメトリクスとスパンはCloudWatchへ入る前提の仕組みなので、そちらが使えなくなる可能性も含めて、採用前に自分の環境で確かめる部分になります。
 
 ランタイム外のエージェントでは、環境変数でログ先とヘッダーを組み立てます。ドキュメントが挙げている一覧から抜粋します。山括弧の箇所は自分の値に置き換えるプレースホルダーで、`export` を付けるかコンテナの環境変数の設定として与えるかは実行方法によります。
 
@@ -228,7 +233,9 @@ export AWS_GENAI_CONTENT_EXTRACTION_OPT_OUT=true
 
 [^adot]: `aws-opentelemetry-distro` の `exporter/otlp/aws/traces/otlp_aws_span_exporter.py` で確認できます。同じファイルから、トレースの送信先が `https://xray.[AWSRegion].amazonaws.com/v1/traces` でSigV4署名を直接注入する形になっていることも読み取れます。
 
-CloudWatchのOTLPエンドポイントでトレースを受けるには、先にTransaction Searchを有効にしておく必要があります。[OTLPエンドポイントの手引き](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/CloudWatch-OTLPGettingStarted.html)には次の注記があります。
+CloudWatchのOTLPエンドポイントを直接使う場合の送信先は、トレースが `https://xray.{リージョン}.amazonaws.com/v1/traces`、ログが `https://logs.{リージョン}.amazonaws.com/v1/logs`、メトリクスが `https://monitoring.{リージョン}.amazonaws.com/v1/metrics` です。3つともHTTPのみでgRPCに対応せず、Collectorから送る場合は [Sigv4 Authエクステンション](https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/extension/sigv4authextension)が必要です（ログとメトリクスはBearerトークンでも認証できます）。
+
+トレースのエンドポイントを使うには、先にTransaction Searchを有効にしておく必要があります。[OTLPエンドポイントの手引き](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/CloudWatch-OTLPGettingStarted.html)には次の注記があります。
 
 > Make sure Transaction Search is enabled before you use the OTLP Endpoint for traces.
 >
@@ -238,17 +245,17 @@ CloudWatchのOTLPエンドポイントでトレースを受けるには、先に
 
 インデックスの割合が1%のままだと、少数のトレースはX-Rayの画面に出ません。2026年10月13日にus-east-2で2件のトレースを送ったところ、X-Rayのトレース詳細でも `BatchGetTraces` でも見つからず、`aws/spans` を直接検索するTransaction Searchの画面でだけ確認できました。しかも送ってから検索できるようになるまで約10分かかり、その間は送信に失敗した場合と見分けがつきません。Collectorから送るなら、送信の成否はCollectorの内部メトリクス（`otelcol_exporter_sent_spans` と `otelcol_exporter_send_failed_spans`）で先に確かめておくと切り分けられます。
 
-CloudWatchのOTLPエンドポイントを直接使う場合、制限を先に見ておく価値があります。トレースは `https://xray.{リージョン}.amazonaws.com/v1/traces`、ログは `https://logs.{リージョン}.amazonaws.com/v1/logs`、メトリクスは `https://monitoring.{リージョン}.amazonaws.com/v1/metrics` です。3つともHTTPのみでgRPCに対応せず、Collectorから送る場合は [Sigv4 Authエクステンション](https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/extension/sigv4authextension)が必要です（ログとメトリクスはBearerトークンでも認証できます）。プロンプトの本文を属性に載せる方針を採るときに関係してくるのが、次の上限です。
+プロンプトの本文を属性に載せる方針を採るなら、次の上限も先に確かめておく必要があります。
 
 | 上限 | 値 |
 | --- | --- |
-| トレース: 1リクエストの非圧縮サイズ | 5MB |
-| トレース: 1スパンの最大サイズ | 200KB |
-| トレース: 1リクエストのスパン数 | 10,000 |
-| トレース: リソースとスコープ1組の最大サイズ | 16KB |
-| メトリクス: 属性の文字列値の最大長 | 1,024文字 |
-| メトリクス: 1データポイントのラベル数 | 150 |
-| ログ: 1リクエストの非圧縮サイズ | 1MB（一部リージョンで20MB） |
+| トレースの1リクエストあたりの非圧縮サイズ | 5MB |
+| トレースの1スパンの最大サイズ | 200KB |
+| トレースの1リクエストあたりのスパン数 | 10,000 |
+| トレースのリソースとスコープ1組の最大サイズ | 16KB |
+| メトリクスの属性の文字列値の最大長 | 1,024文字 |
+| メトリクスの1データポイントあたりのラベル数 | 150 |
+| ログの1リクエストあたりの非圧縮サイズ | 1MB（一部リージョンで20MB） |
 
 1スパン200KBという制限があるので、長い会話履歴をそのままスパン属性に載せる設計は成り立ちません。本文を残すなら、S3などへ逃してスパンには参照だけを置く形になります。GenAI規約も同じ方針を示していて、外部ストレージへのアップロードをフックで扱うやり方を第3の選択肢として挙げています。
 
@@ -337,7 +344,7 @@ Transformプロセッサーの設定には2つの書き方があります。上�
 
 Redactionプロセッサーの側にも限界があります。止まるのは列挙したキーだけで、規約に Opt-In の属性が追加されれば、その分を足すまで通ります。対象になるのはスパンとログレコードとメトリクスのデータポイントの属性で、スパンのイベントは対象外です。ADOTの設定で本文をログ側へ移している場合、そちらの本文はこのプロセッサーではマスクされません。何も通さないことを保証したいなら、`allow_all_keys` を `false` にして `allowed_keys` に通す属性を列挙する許可リスト方式にしますが、`gen_ai.*` 以外も含めて一覧を保守し続けることになります。
 
-この設定は実際に動かしました。2026年10月13日に、otelcol-contrib v0.161.0をTransaction Searchが有効なus-east-2で動かし、BedrockのConverseとConverseStreamのスパンを送ったところ、X-RayとGrafana Cloudの両方に届き、送信の失敗はありませんでした。上の設定から変えたのは、リージョンと受信アドレスだけです。
+上のCollectorの設定は、実際に動かしました。2026年10月13日に、otelcol-contrib v0.161.0をTransaction Searchが有効なus-east-2で動かし、BedrockのConverseとConverseStreamのスパンを送ったところ、X-RayとGrafana Cloudの両方に届き、送信の失敗はありませんでした。上の設定から変えたのは、リージョンと受信アドレスだけです。
 
 ただし、同じトレースでも送り先によって形が変わります。送ったのは、Bedrockを呼んだクライアントスパンが根になっているトレースです。CloudWatch側では、その親として `InternalOperation` というSERVERのスパン（`aws.local.service` などの属性を持つ）が足されていました。Grafana側には、送ったとおりクライアントスパンが1つだけあり、それが根です。両方へ送る構成では、トレースあたりのスパン数や根のスパンの名前で集計すると、送り先ごとに値が食い違います。
 
@@ -353,7 +360,7 @@ Redactionプロセッサーの側にも限界があります。止まるのは�
 
 自動計装が届く範囲はBedrockのRuntime APIまでで、SageMakerのエンドポイントとアプリケーション側のエージェントループは手で書く領域だということを確認しました。とくにSageMakerは、APIが列挙していないPOSTヘッダーを取り除くと明記していて、実際に `traceparent` のヘッダーはコンテナに届きませんでした。ヘッダーで流す前提の構成は、そのままでは通りません。
 
-GenAIの計装パッケージは `opentelemetry-python-genai` へ集約されつつあり、Bedrock向けのものはリポジトリにある一方でPyPIにはまだ公開されていません。当面はcontrib側のBedrock Runtime拡張を使い、InvokeModel系では対応モデルが限られることと、プロバイダーの識別が旧属性の `gen_ai.system` で出ることを前提に組んでおく、という認識で良さそうです。
+GenAIの計装パッケージは `opentelemetry-python-genai` へ集約されつつあり、Bedrock向けのものも2026年9月24日にベータの版としてPyPIに公開されました。contrib側のBedrock Runtime拡張を使い続けるなら、InvokeModel系では対応モデルが限られることと、プロバイダーの識別が旧属性の `gen_ai.system` で出ることを前提に組みます。新しい規約の属性で揃えたいなら、集約された側の版を自分の環境で確かめてから移ることになります。
 
 ## 出典
 
