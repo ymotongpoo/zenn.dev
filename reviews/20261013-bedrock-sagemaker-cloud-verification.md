@@ -24,8 +24,8 @@ W-01、W-05、W-07（ローカル）とW-08（一次資料）は今回実施し�
 4. **少数のトレースはX-Rayのトレース詳細に出ない。** インデックスが1%のため、検証用の2件はX-Rayの `BatchGetTraces` でもコンソールのトレース詳細でも見えませんでした。CloudWatchのTransaction Searchの画面（`aws/spans` を直接検索する）には出ます。取り込みから検索できるまでに約10分かかりました。
 5. **0.66b1でも `gen_ai.system` のまま。** TL;DRの「現行の0.65b0」は9月22日時点の記述として正しいままです。公開日の時点では0.66b1が最新なので、版を更新するなら「0.66b1でも同じ」と書けます。
 6. **SSOのプロファイルで手元から動かすと、認証情報の取得もトレースに入る。** `BotocoreInstrumentor` は `SSO OIDC.CreateToken` と `SSO.GetRoleCredentials` もスパンにし、最初の呼び出しのトレースに子として入れました。記事の範囲外ですが、手元で試す読者が見かける可能性があります。
-8. **Bedrock版の計装は9月24日にPyPIに公開されていた。** 記事は9月22日の時点で「PyPIに公開されておらず `pip install` はできない」と書いていましたが、`opentelemetry-instrumentation-genai-bedrock` は2026年9月24日に1.2b0として公開されています。配布物のソースでは `gen_ai.provider.name` の列挙値 `aws.bedrock` を使っています。実際の呼び出しは未実施で、記事にもそう書きました（DOCUMENTED）。
 7. **us-east-2のNova Microは推論プロファイル経由になる。** `us.amazon.nova-micro-v1:0` で呼ぶ必要がありました。記事のコード例はus-east-1でモデルIDを直接指定しており、そのままで正しく動きました（W-02）。
+8. **Bedrock版の計装は9月24日にPyPIに公開されていた。** 記事は9月22日の時点で「PyPIに公開されておらず `pip install` はできない」と書いていましたが、`opentelemetry-instrumentation-genai-bedrock` は2026年9月24日に1.2b0として公開されています。配布物のソースでは `gen_ai.provider.name` の列挙値 `aws.bedrock` を使っています。実際の呼び出しは未実施で、記事にもそう書きました（DOCUMENTED）。
 
 ## 画像
 
