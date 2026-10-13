@@ -1,0 +1,22 @@
+articles/20261014-bedrock-sagemaker-otel.md
+  s_458207916fcd98::t_8b91ef836b6636 68
+  s_458207916fcd98::t_8f1894c1f5e20b 31,49,73,285
+  s_458207916fcd98::t_58fad0d3d7d167 2,11,13-14,16,21,23-27,33,37,47,51,53,55-67,71-72,75,77,79,94,96,108,110,112-114,156,180,182,184,192,207,209,211,265,281-283,287,347,362,368,373,376-383,387,389
+  s_458207916fcd98::t_81268ef21880f7 32,48,286
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "d14d8771e7716f0e95e9871759dcaa58caebacd9",
+  "prompts": {},
+  "sessions": {
+    "s_458207916fcd98": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "d4cc45ba-c9a0-4f0e-b22e-b7f8b0c241e4",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Yoshi Yamaguchi <ymotongpoo@gmail.com>"
+    }
+  }
+}
