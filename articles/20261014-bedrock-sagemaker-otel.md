@@ -10,10 +10,10 @@ published_at: 2026-10-14 09:00
 :::message
 一次情報は2026年10月13日の時点のものを確認しました。AWSのサービス側の仕様もOpenTelemetry側の規約も動いている最中なので、採用前に同じページを読み直してください。本文のうち実際に動かして確かめた部分も同じ日に実施したもので、リージョンとバージョンを該当箇所か脚注に書いています。対象にした一次情報と検証環境は次のとおりです。
 
-- GenAI規約のBedrock編。[semantic-conventions-genai](https://github.com/open-telemetry/semantic-conventions-genai) のコミット `5293eff` の `docs/gen-ai/aws-bedrock.md` で、安定度は Development
-- 計装。[`opentelemetry-instrumentation-botocore`](https://pypi.org/project/opentelemetry-instrumentation-botocore/) 0.66b1のBedrock Runtime拡張と、[opentelemetry-python-genai](https://github.com/open-telemetry/opentelemetry-python-genai) の [`opentelemetry-instrumentation-genai-bedrock`](https://pypi.org/project/opentelemetry-instrumentation-genai-bedrock/) 1.2b0
-- AWS側。[AWS Distro for OpenTelemetry](https://aws-otel.github.io/)（ADOT）Python `aws-opentelemetry-distro` 0.18.0以降と、[CloudWatchのOTLPエンドポイント](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/CloudWatch-OTLPEndpoint.html)
-- Collector。[OpenTelemetry Collector Contrib](https://github.com/open-telemetry/opentelemetry-collector-contrib) の `otelcol-contrib` v0.161.0で動作を確認（執筆時点の最新はv0.162.0）
+- GenAI規約のBedrock関連: [semantic-conventions-genai](https://github.com/open-telemetry/semantic-conventions-genai) のコミット `5293eff` の `docs/gen-ai/aws-bedrock.md` で、安定度は Development
+- 計装: [`opentelemetry-instrumentation-botocore`](https://pypi.org/project/opentelemetry-instrumentation-botocore/) 0.66b1のBedrock Runtime拡張と、[opentelemetry-python-genai](https://github.com/open-telemetry/opentelemetry-python-genai) の [`opentelemetry-instrumentation-genai-bedrock`](https://pypi.org/project/opentelemetry-instrumentation-genai-bedrock/) 1.2b0
+- AWS側: [AWS Distro for OpenTelemetry](https://aws-otel.github.io/)（ADOT）Python `aws-opentelemetry-distro` 0.18.0以降と、[CloudWatchのOTLPエンドポイント](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/CloudWatch-OTLPEndpoint.html)
+- Collector: [OpenTelemetry Collector Contrib](https://github.com/open-telemetry/opentelemetry-collector-contrib) の `otelcol-contrib` v0.161.0で動作を確認（執筆時点の最新はv0.162.0）
 :::
 
 ## はじめに
