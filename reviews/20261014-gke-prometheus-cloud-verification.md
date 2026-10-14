@@ -27,6 +27,12 @@
 | G-12 | FAIL | CLOUD | 165行 | 予約ラベル `namespace` を持つ系列は拒否されず、メトリクスのラベル `namespace` として保存された（リソースの `namespace` が空でも設定済みでも同じ）。PromQLのAPIでは `metric_namespace` として見える。INTとDOUBLEの衝突は実際に起き、`exporter.googlemanagedprometheus.intToDouble` で解消した（この部分はPASS） |
 | G-13 | PASS | CLOUD | 38行 | `otlp_http` と `googleclientauth` で Telemetry API（`telemetry.googleapis.com`）へ送った系列が、`prometheus.googleapis.com` の系列として取得できた。ただし `metric_start_time` プロセッサーを入れないと、累積の系列が開始時刻なしとして拒否される |
 
+記事に設定例を載せたあと、ユーザーの指示で G-13b を追加しました（run `1015-telemetry-min`）。
+
+| Case | 判定 | 環境 | 原稿の節 | 実測・確認結果 |
+| --- | --- | --- | --- | --- |
+| G-13b | PASS | CLOUD | Telemetry API の設定例 | 設定例から `gcp.project_id` とリソース検出を外すと動かないことを確かめた。どちらも無し、またはリソース検出だけでは `Resource is missing required attribute "gcp.project_id"`、`gcp.project_id` だけでは `Unrecognized region or location` で、すべての点が拒否された。`gcp.project_id` と手で付けた `cloud.region` の組み合わせなら届き、`location` は `us-central1`、`cluster` は空になった |
+
 G-01、G-04、G-09、G-10は9月22日の結果を引き継ぎ、今回は再実行していません。G-08（一次資料）は下の「一次資料の再確認」で置き換えます。
 
 ## 原稿に関係する発見

@@ -211,6 +211,8 @@ service:
       exporters: [otlp_http/telemetry]
 ```
 
+このうち `gcp.project_id` と、`location` の元になる属性は省けません。実測では、`gcp.project_id` を付けないと `Resource is missing required attribute "gcp.project_id"` で、`gcp.project_id` だけを付けてリソース検出を外すと `Unrecognized region or location` で、どちらもすべての点が拒否されました。リソース検出（`gcp`）が付けるのは `cloud.account.id` で、`gcp.project_id` は付けないので、プロジェクトIDは自分で渡す必要があります。`location` については、Telemetry APIの [metricsのリファレンス](https://docs.cloud.google.com/stackdriver/docs/reference/telemetry/v1.metrics)が、`prometheus_target` の `location` を `cloud.availability_zone` か `cloud.region` から取り、値が無ければその点を拒否すると説明しています。リソース検出を使わずに `cloud.region` を手で付けても届きましたが、その場合 `location` はゾーンではなくリージョンになり、`cluster` のラベルも空になりました。リソース検出はゾーンとクラスター名（`k8s.cluster.name`）も付けるので、GKEでは検出を使うほうが、マネージド収集の系列と同じ粒度のラベルで並びます。
+
 `POD_NAMESPACE` はDownward APIでPodのNamespaceを渡す環境変数です。認証は、`googleclientauth` がノードのサービスアカウントの認証情報を使いました（このクラスターはWorkload Identityを有効にしていません）。Workload Identityを有効にしたクラスターでは、Kubernetesのサービスアカウントに書き込みの権限を付ける必要があります。
 
 GKE上で同じアプリケーションを3つの経路で収集し、GMPで並べたのが次の画像です。`pm` がマネージド収集、`col-gmp` がCollectorとGMPのエクスポーター、`col-otlp` がCollectorとTelemetry APIの経路で、同じメトリクス名と値の系列が同じ場所に入っています。
