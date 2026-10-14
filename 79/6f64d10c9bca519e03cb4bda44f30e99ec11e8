@@ -1,0 +1,21 @@
+articles/20261015-gke-prometheus-to-otlp-metrics.md
+  s_2fcf7f1673f464::t_08a8e87af8d93e 11,21,27,29,34-36,38,40,44,46,48,63,85,95,105,107,109,111,115,118,130,145,147,165,167,169,175,199,203,217,219,221,226,229,237,239,241,243,247,250-251,255,257,267,269
+  s_2fcf7f1673f464::t_a8f033929edc3d 6,33,103,113,122,128,215,245,253,259
+  s_2fcf7f1673f464::t_e10653e8833dcf 25,31,223
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "796f64d10c9bca519e03cb4bda44f30e99ec11e8",
+  "prompts": {},
+  "sessions": {
+    "s_2fcf7f1673f464": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a138bb-f921-7ab2-b63d-4fd48ca97a1a",
+        "model": "gpt-6-astra"
+      },
+      "human_author": "Yoshi Yamaguchi <ymotongpoo@gmail.com>"
+    }
+  }
+}
