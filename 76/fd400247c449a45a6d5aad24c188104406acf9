@@ -1,0 +1,14 @@
+articles/20261014-bedrock-sagemaker-otel.md
+  h_bf0ada3931f770 13-16
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "76fd400247c449a45a6d5aad24c188104406acf9",
+  "prompts": {},
+  "humans": {
+    "h_bf0ada3931f770": {
+      "author": "Yoshi Yamaguchi <ymotongpoo@gmail.com>"
+    }
+  }
+}
