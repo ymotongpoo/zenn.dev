@@ -171,7 +171,7 @@ exporters:
       num_consumers: 5
 ```
 
-GMPを保存先にする場合は [Google Managed Prometheusエクスポーター](https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/exporter/googlemanagedprometheusexporter)を使います。メトリクスについて Beta の安定度で、`prometheus_target` というモニタリング対象リソースへマッピングします。リソースのラベルになる `location`、`cluster`、`namespace`、`job`、`instance`、`project_id` は予約されていて、READMEはこれらをメトリクスのラベルとして持つ系列は `exported_` を前置しないと拒否されると説明しています。ただし実測では、`namespace` ラベルを持つ系列は拒否されず、メトリクスのラベル `namespace` として保存されました。GMPのPromQLのAPIでは、リソースの `namespace` と区別するために `metric_namespace` という名前で見えます。どちらの扱いになっても、既存のダッシュボードが参照するラベル名とはずれるので、アプリケーション側で予約ラベルを使っているなら、移す前にリラベルで名前を変えておきます。また、Collectorの経路では `k8s.namespace.name` のリソース属性を付けないと、リソースの `namespace` が空になります。
+GMPを保存先にする場合は [Google Managed Prometheusエクスポーター](https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/exporter/googlemanagedprometheusexporter)を使います。メトリクスについて Beta の安定度で、`prometheus_target` というモニタリング対象リソースへマッピングします。リソースのラベルになる `location`、`cluster`、`namespace`、`job`、`instance`、`project_id` は予約されていて、READMEはこれらをメトリクスのラベルとして持つ系列は `exported_` を前置しないと拒否されると説明しています。ただし実測では、`namespace` ラベルを持つ系列は拒否されず、メトリクスのラベル `namespace` として保存されました。GMPのPromQLのAPIでは、リソースの `namespace` と区別するために `metric_namespace` という名前で見えます。どちらの扱いになっても、既存のダッシュボードが参照するラベル名とはずれるので、アプリケーション側で予約ラベルを使っているなら、移す前にリラベルで名前を変えておきます。また、Collectorで収集する構成では `k8s.namespace.name` のリソース属性を付けないと、リソースの `namespace` が空になります。
 
 加えて、同じメトリクスをINTとDOUBLEの両方で書き込むとエラーになるので、衝突を避けるためにすべてDOUBLEへ変換するフィーチャーゲート `exporter.googlemanagedprometheus.intToDouble` が用意されています。この衝突は、前に書いた `otel_scope_info` の変更と組み合わさって起きます。エクスポーターはデフォルト（`extra_metrics_config.enable_scope_info: true`）でINTの `otel_scope_info` を自分で生成します。そこへ、スクレイプ先が出したDOUBLEの `otel_scope_info` がレシーバーから素通しで届くと、実測では `inconsistent value types specified for metric` のエラーで書き込みの一部が失敗しました。フィーチャーゲートを有効にすると解消しました。
 
@@ -179,7 +179,7 @@ GMPを保存先にする場合は [Google Managed Prometheusエクスポータ�
 otelcol-contrib --config=config.yaml --feature-gates=exporter.googlemanagedprometheus.intToDouble
 ```
 
-送信先をGMPのエクスポーターではなくTelemetry APIにして、OTLPのまま送ることもできます。この場合は、開始時刻の扱いに注意が要ります。Prometheusレシーバーはv0.142.0から累積の系列の開始時刻を補わなくなり、その役割は [Metric Start Timeプロセッサー](https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/processor/metricstarttimeprocessor)に移りました。Telemetry APIは開始時刻の無い累積の系列を `metric kind CUMULATIVE must specify start time` として拒否するので、実測ではカウンターがすべて届きませんでした。プロセッサーを入れると、最初の1点だけが拒否され、以後の点は届きました。GMPのエクスポーターの経路は、プロセッサーを入れなくても届きました。
+送信先をGMPのエクスポーターではなくTelemetry APIにして、OTLPのまま送ることもできます。この場合は、開始時刻の扱いに注意が要ります。Prometheusレシーバーはv0.142.0から累積の系列の開始時刻を補わなくなり、その役割は [Metric Start Timeプロセッサー](https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/processor/metricstarttimeprocessor)に移りました。Telemetry APIは開始時刻の無い累積の系列を `metric kind CUMULATIVE must specify start time` として拒否するので、実測ではカウンターがすべて届きませんでした。プロセッサーを入れると、最初の1点だけが拒否され、以後の点は届きました。GMPのエクスポーターを使う構成では、プロセッサーを入れなくても届きました。
 
 実測で使った設定のうち、Telemetry APIへ送る部分は次のとおりです。
 
@@ -215,11 +215,11 @@ service:
 
 `POD_NAMESPACE` はDownward APIでPodのNamespaceを渡す環境変数です。認証は、`googleclientauth` がノードのサービスアカウントの認証情報を使いました（このクラスターはWorkload Identityを有効にしていません）。Workload Identityを有効にしたクラスターでは、Kubernetesのサービスアカウントに書き込みの権限を付ける必要があります。
 
-GKE上で同じアプリケーションを3つの経路で収集し、GMPで並べたのが次の画像です。`pm` がマネージド収集、`col-gmp` がCollectorとGMPのエクスポーター、`col-otlp` がCollectorとTelemetry APIの経路で、同じメトリクス名と値の系列が同じ場所に入っています。
+GKE上で同じアプリケーションを3つの方法で収集し、GMPで並べたのが次の画像です。`pm` がマネージド収集、`col-gmp` がCollectorとGMPのエクスポーター、`col-otlp` がCollectorとTelemetry APIを使う構成で、同じメトリクス名と値の系列が同じ場所に入っています。
 
 ![Cloud MonitoringのMetrics Explorerの表で、temperature_celsiusをjobごとに集計した3行が並び、いずれも値が21.5になっている](/images/20261015-gmp-three-paths.png)
 
-ただし3つの経路は、名前もラベルも同じになるわけではありません。実測では、`_total` の付いていないCounterは、マネージド収集では元の名前のまま、GMPのエクスポーターの経路では `_total` 付きの名前になりました。またTelemetry APIの経路では `target_info` のラベル名がドットを含んだまま（`cloud.account.id`）保存されました。経路を替えるときも、段階1と同じように系列を比べて確かめます。
+ただし3つの方法は、名前もラベルも同じになるわけではありません。実測では、`_total` の付いていないCounterは、マネージド収集では元の名前のまま、GMPのエクスポーターを使う構成では `_total` 付きの名前になりました。またTelemetry APIへ送る構成では `target_info` のラベル名がドットを含んだまま（`cloud.account.id`）保存されました。収集方法を替えるときも、段階1と同じように系列を比べて確かめます。
 
 ## OTLPによる送信を並行して導入する
 
