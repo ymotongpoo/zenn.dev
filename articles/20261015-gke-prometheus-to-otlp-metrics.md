@@ -105,6 +105,7 @@ target_info
 ガイドは、`on` と `group_left` を使った結合には以前から問題があると説明しています。結合に使わないラベル（識別用のラベル以外）の値が入れ替わったとき、古い `target_info` が失効として印を付けられない限り、PromQLの参照の遡り時間（デフォルトで5分）のあいだ新旧2つの `target_info` が重なります。この期間、結合クエリは一致する系列が2つあるために失敗します。`info` 関数は常に最新のサンプルを持つ系列を選ぶので、この問題を避けられます。実測でも、同じインスタンスの `deployment.environment.name` を書き換えて送り直すと、`on` と `group_left` を使った結合は `found duplicate series for the match group` のエラーで失敗し、`info` 関数は新しい値を返しました。ラベルの昇格を絞って `target_info` に寄せる設計にするなら、`info` 関数の有効化を前提にしておく必要があります。
 
 ![Grafanaの表で、info関数の結果にtarget_infoから取ったdeployment_environment_nameの列が付き、pod-aとpod-bの2行が並んでいる](/images/20261015-info-target-info.png)
+*ローカルのPrometheus 3.15.0で `info` 関数を使い、昇格させていない `deployment.environment.name` を `target_info` から付けた結果を、Grafanaで確認した画面*
 
 `info` 関数に空文字列と一致しない条件（`=~".+"`）を渡すと、該当する属性を持たないリソースの系列は結果から落ちます。また、サービスによって `service.instance.id` の有無が混ざる構成では、Prometheus 3.14.0までの `info` 関数は一部の `target_info` を取りこぼす不具合があり、3.15.0で修正されました。
 
@@ -218,6 +219,7 @@ service:
 GKE上で同じアプリケーションを3つの方法で収集し、GMPで並べたのが次の画像です。`pm` がマネージド収集、`col-gmp` がCollectorとGMPのエクスポーター、`col-otlp` がCollectorとTelemetry APIを使う構成で、同じメトリクス名と値の系列が同じ場所に入っています。
 
 ![Cloud MonitoringのMetrics Explorerの表で、temperature_celsiusをjobごとに集計した3行が並び、いずれも値が21.5になっている](/images/20261015-gmp-three-paths.png)
+*マネージド収集（`pm`）、CollectorとGMPのエクスポーター（`col-gmp`）、CollectorとTelemetry API（`col-otlp`）の3つの方法で集めた `temperature_celsius` を、Cloud MonitoringのMetrics Explorerで並べた画面*
 
 ただし3つの方法は、名前もラベルも同じになるわけではありません。実測では、`_total` の付いていないCounterは、マネージド収集では元の名前のまま、GMPのエクスポーターを使う構成では `_total` 付きの名前になりました。またTelemetry APIへ送る構成では `target_info` のラベル名がドットを含んだまま（`cloud.account.id`）保存されました。収集方法を替えるときも、段階1と同じように系列を比べて確かめます。
 
@@ -290,6 +292,7 @@ absent_over_time(http_server_request_duration_seconds_count{job="checkout"}[5m])
 この2つは同じものを検知しません。`absent_over_time` は、渡した範囲ベクトルに要素が1つも無いときだけ値 `1` の1要素を返す関数です。`job="checkout"` のPodが10個あって1個だけ止まっても、残りの9個が系列を送っている限り入力は空にならないので、このアラートは発火しません。検知できるのは、そのラベルの組み合わせに一致する系列がサービス全体で絶えた場合だけです。2つのインスタンスからOTLPで送り、1つずつ止めた実測が次の画像です。`pod-b` を11時4分ごろに止めても `absent_over_time` は値を返さず、`pod-a` も11時7分ごろに止めてから約5分後に、初めて値 `1` を返しました。
 
 ![上のパネルでpod-aとpod-bの送信レートが順に0へ落ち、下のパネルのabsent_over_timeはpod-bが止まった時点では空のまま、pod-aが止まった約5分後から値1になっている](/images/20261015-absent-over-time.png)
+*2つのPodの送信を順に止めたときの送信レート（上）と `absent_over_time` の値（下）を、ローカルのGrafanaで確認した画面。pod-bを止めた時点では発火せず、pod-aも止めて約5分後に値が1になる*
 
 さらに、ここで使っているのがリクエスト数のメトリクスである点にも制約があります。`http_server_request_duration_seconds_count` はリクエストが来て初めて作られるので、夜間や初回リクエストの前には系列が存在しません。障害ではないのに発火する一方、この時間帯を評価の対象から外すと、その間に本当に止まった場合を見逃します。死活監視に使うメトリクスは、トラフィックに依存せず一定の間隔で出続けるものを選びます。プロセスの稼働時間のように、リクエストが無くても値が更新されるものが該当します。
 
