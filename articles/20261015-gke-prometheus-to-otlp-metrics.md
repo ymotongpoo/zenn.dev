@@ -37,7 +37,7 @@ GKE上でメトリクスを集める方法は4つあります。移行にあた�
 | アプリがOTLPで送信する | OpenTelemetry SDK | OTLP | Collector、Prometheusの `/api/v1/otlp/v1/metrics`、Mimirの `/otlp/v1/metrics` |
 | Collectorがリモートライトで送信する | [Prometheus Remote Writeエクスポーター](https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/exporter/prometheusremotewriteexporter) | Remote Write 1.0（2.0は開発中） | Mimirの `/api/v1/push`、Managed Service for Prometheus |
 
-Google Cloud Managed Service for Prometheus（以下GMP）は、収集のやり方を4つ提示しています。Kubernetes環境で推奨されているマネージド収集、上流のPrometheusバイナリを差し替える形の自己デプロイ収集、OpenTelemetry Collector、そしてCompute Engine向けのOps Agentです。GMPのドキュメントは自身を「PrometheusとOpenTelemetryのメトリクスのためのフルマネージドな解決策」と位置づけていて、OTLPのメトリクスも受け付けます。OTLPの受け口は [Telemetry API](https://docs.cloud.google.com/stackdriver/docs/otlp/overview)（`telemetry.googleapis.com`）で、届いたメトリクスはCloud MonitoringにPrometheusの時系列として保存され、課金もGMPと同じ「Prometheus Samples Ingested」の単位になります。GKE上でOTLPへ寄せていく場合、収集に使うソフトウェアをPrometheusからCollectorへ替えても、保存先としてGMPを使い続けられます。
+Google Cloud Managed Service for Prometheus（以下GMP）は、収集のやり方を4つ提示しています。Kubernetes環境で推奨されているマネージド収集、上流のPrometheusバイナリを差し替える形の自己デプロイ収集、OpenTelemetry Collector、そしてCompute Engine向けのOps Agentです。GMPのドキュメントは自身を「PrometheusとOpenTelemetryのメトリクスのためのフルマネージドな解決策」と位置づけていて、OTLPのメトリクスも受け付けます。OTLPの受信エンドポイントは [Telemetry API](https://docs.cloud.google.com/stackdriver/docs/otlp/overview)（`telemetry.googleapis.com`）で、届いたメトリクスはCloud MonitoringにPrometheusの時系列として保存され、課金もGMPと同じ「Prometheus Samples Ingested」の単位になります。GKE上でOTLPへ寄せていく場合、収集に使うソフトウェアをPrometheusからCollectorへ替えても、保存先としてGMPを使い続けられます。
 
 Grafana Mimirも両方を受けます。リモートライトが `POST /api/v1/push`、OTLPが `POST /otlp/v1/metrics` で、どちらもテナントを `X-Scope-OrgID` ヘッダーで指定します。移行の期間中に2つの送信方法を併用する場合、テナントを分けておくと後段のダッシュボードを切り替えやすくなります。
 
@@ -225,7 +225,7 @@ GKE上で同じアプリケーションを3つの方法で収集し、GMPで並�
 
 ## OTLPによる送信を並行して導入する
 
-次の段階で、アプリケーションからOTLPで送信する構成を追加します。Prometheusを直接の受け口にするなら、OTLPレシーバーの有効化が必要です。デフォルトでは無効で、Prometheusのガイドは「Prometheusは認証なしでも動作しうるので、明示的に設定しない限り受信トラフィックを受け付けるのは安全ではない」という理由を挙げています。
+次の段階で、アプリケーションからOTLPで送信する構成を追加します。Prometheusへ直接送信するなら、OTLPレシーバーの有効化が必要です。デフォルトでは無効で、Prometheusのガイドは「Prometheusは認証なしでも動作しうるので、明示的に設定しない限り受信トラフィックを受け付けるのは安全ではない」という理由を挙げています。
 
 ```bash
 prometheus --web.enable-otlp-receiver
@@ -310,7 +310,7 @@ absent_over_time(http_server_request_duration_seconds_count{job="checkout"}[5m])
 | --- | --- | --- | --- |
 | 0 | 棚卸し。どのメトリクスがどのダッシュボードとアラートから参照されているかを一覧にする | なし | 該当なし |
 | 1 | スクレイプをCollectorへ移す。送信方法はリモートライトのまま | 変わらないことを確認する | Prometheusのスクレイプ設定を戻す |
-| 2 | OTLPの受け口を並行して立てる。テナントまたはラベルで区別する | なし（既存の構成は不変） | OTLPの受け口を止める |
+| 2 | OTLPレシーバーを並行して立てる。テナントまたはラベルで区別する | なし（既存の構成は不変） | OTLPレシーバーを止める |
 | 3 | サービス単位で計装をOpenTelemetry SDKへ移す。旧名を導出するレコーディングルールを置く | 変わる。ルールで吸収 | 該当サービスの計装を戻す |
 | 4 | 死活監視を書き換える。スクレイプを廃止したサービスだけを対象にする | なし | 古いスクレイプ設定とアラート定義を一組で退避しておく |
 | 5 | 翻訳戦略を決める。`NoTranslation` へ寄せるなら全ダッシュボードの書き換え後 | 変わる | 翻訳戦略をデフォルトへ戻す |
