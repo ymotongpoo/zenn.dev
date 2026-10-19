@@ -1,0 +1,63 @@
+books/otel-for-perl/10-perl-ecosystem.md
+  s_ff65d3f1cc7ef1::t_bc1a7a716f2eb4 23,28-29,40
+books/otel-for-perl/35-psgi-runtime.md
+  s_ff65d3f1cc7ef1::t_6a6f1b0aa19198 185-195,197,199
+  s_ff65d3f1cc7ef1::t_3830e7f74e679b 52
+  s_ff65d3f1cc7ef1::t_d9e962697cec3b 158-169
+  s_ff65d3f1cc7ef1::t_9fc2914c3816e7 25,27,29-46,50,129,131,137,143,147
+  s_ff65d3f1cc7ef1::t_cffcf1e9473306 63,114-117
+  s_ff65d3f1cc7ef1::t_4b49d8fcb86c87 211
+  s_ff65d3f1cc7ef1::t_7866ec78239dd8 205
+  s_ff65d3f1cc7ef1::t_54cc31904f7b0a 170,201
+  s_ff65d3f1cc7ef1::t_e6656434c00481 180-183
+  s_ff65d3f1cc7ef1::t_422c3416985c83 51,184
+books/otel-for-perl/00-introduction.md
+  s_ff65d3f1cc7ef1::t_54cc31904f7b0a 27
+  s_ff65d3f1cc7ef1::t_c08f57c38fdce0 16,20
+books/otel-for-perl/50-contributing.md
+  s_ff65d3f1cc7ef1::t_1dbbb46e380c71 19,26
+  s_ff65d3f1cc7ef1::t_54cc31904f7b0a 30-32
+  s_ff65d3f1cc7ef1::t_e8471a9f460d59 20
+  s_ff65d3f1cc7ef1::t_c995ba9ae55101 12
+books/otel-for-perl/15-sdk-setup.md
+  s_ff65d3f1cc7ef1::t_52beedd3313ced 191
+  s_ff65d3f1cc7ef1::t_6f2983ab2e1979 184-190,192-193
+  s_ff65d3f1cc7ef1::t_057c6623217c67 7,11,67
+  s_ff65d3f1cc7ef1::t_54cc31904f7b0a 144
+  s_ff65d3f1cc7ef1::t_8c19f37703c5e9 47
+  s_ff65d3f1cc7ef1::t_e83c99b3621f8b 74
+  s_ff65d3f1cc7ef1::t_821e487ff1b703 38,45
+  s_ff65d3f1cc7ef1::t_18ccdce8cc621d 150,156
+books/otel-for-perl/30-signal-coverage.md
+  s_ff65d3f1cc7ef1::t_f71fe6e55dcd37 78
+  s_ff65d3f1cc7ef1::t_54cc31904f7b0a 64
+  s_ff65d3f1cc7ef1::t_da14d4d782b7df 48,55-56
+  s_ff65d3f1cc7ef1::t_d108440d570173 11-15,17,25,43
+books/otel-for-perl/20-plack-tracing.md
+  s_ff65d3f1cc7ef1::t_4b49d8fcb86c87 104,106-107,110,116
+books/otel-for-perl/99-references.md
+  s_ff65d3f1cc7ef1::t_659c60114d5321 24-26
+  s_ff65d3f1cc7ef1::t_478ab36cb8e2b3 30
+books/otel-for-perl/25-http-propagation.md
+  s_ff65d3f1cc7ef1::t_ff2134ee372cb0 17
+  s_ff65d3f1cc7ef1::t_4b49d8fcb86c87 93-95,97,102
+books/otel-for-perl/45-sdk-vs-obi.md
+  s_ff65d3f1cc7ef1::t_54cc31904f7b0a 36
+  s_ff65d3f1cc7ef1::t_4c2c6bbfccdea6 20,34
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "ca1befa982884791bae8928f5a6befd67b7ec76b",
+  "prompts": {},
+  "sessions": {
+    "s_ff65d3f1cc7ef1": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "afb5e511-29a5-465f-8c60-b7af60da667d",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Yoshi Yamaguchi <ymotongpoo@gmail.com>"
+    }
+  }
+}
