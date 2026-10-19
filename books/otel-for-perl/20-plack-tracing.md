@@ -101,19 +101,19 @@ FRONTEND_CMD="plackup -E deployment -s HTTP::Server::PSGI -p 5000 app_otel_simpl
 
 ```
 # days=7&currency=USD
-report: 'GET request'   SERVER    53.9ms
+report: 'GET request'   SERVER    47.3ms
   report: 'aggregate'   INTERNAL  21.3ms  report.days=7
-  report: 'GET'         CLIENT    21.8ms
-    rates: 'GET /rates' SERVER    20.4ms
+  report: 'GET'         CLIENT    21.1ms
+    rates: 'GET /rates' SERVER    20.3ms
 
 # days=180&currency=USD
-report: 'GET request'   SERVER   576.7ms
+report: 'GET request'   SERVER   574.8ms
   report: 'aggregate'   INTERNAL 540.4ms  report.days=180
   report: 'GET'         CLIENT    22.8ms
     rates: 'GET /rates' SERVER    20.5ms
 ```
 
-`days=180` のリクエストでは、576.7msのうち540.4msが集計処理の時間です。2章では外から見て「遅い」としか言えなかったリクエストを、Perlのプロセスの中の区間に分けられました。`report.days` の属性からは、遅い処理が入力の日数に比例することも読み取れます。
+`days=180` のリクエストでは、574.8msのうち540.4msが集計処理の時間です。2章では外から見て「遅い」としか言えなかったリクエストを、Perlのプロセスの中の区間に分けられました。`report.days` の属性からは、遅い処理が入力の日数に比例することも読み取れます。
 
 ## サーバースパンの属性とセマンティック規約
 

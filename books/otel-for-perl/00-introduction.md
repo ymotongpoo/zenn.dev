@@ -13,18 +13,18 @@ Perlは、その公式の実装を持たない言語の1つです。公式ドキ
 素材は、筆者が用意した小さな2つのサービスです。集計結果を返すPerlのPSGIアプリケーションが、為替レートを返すGoのサービスを呼ぶ構成です。このPerlのアプリケーションに、CPANの実装を組み込んだ場合と、OBIで外から観測した場合を比べます。届いたテレメトリーは、[OpenTelemetry Collector](https://opentelemetry.io/ja/docs/collector/)で受け取ったまま保存して確かめました。最初に組み込んだとき、CollectorにはGoのサービスのスパンだけが届き、Perlのスパンは1件もありませんでした。本書の後半の多くは、その理由と対処に充てています。
 
 :::message
-本書のコードと測定値は、2026年10月7日に次の環境で確かめたものです。
+本書のコードと測定値は、2026年10月7日と19日に次の環境で確かめたものです。SDKを使う測定は、19日にSDK 0.100で取り直しました。
 
 - ホスト：Linux 7.0.0（Ubuntu、x86_64、4コア）、Docker 29.0.0
 - Perl 5.44.0（Docker公式イメージ `perl:5.44.0`）、Carton 1.0.35
-- CPAN：OpenTelemetry 0.039、OpenTelemetry::SDK 0.028（ログの確認だけ0.029-TRIAL）、OpenTelemetry::Exporter::OTLP 0.021、Plack::Middleware::OpenTelemetry 0.262410、Plack 1.0054、Starman 0.4018、Twiggy 0.1026、IO::Async 0.805
+- CPAN：OpenTelemetry 0.039、OpenTelemetry::SDK 0.100、OpenTelemetry::Exporter::OTLP 0.021、Plack::Middleware::OpenTelemetry 0.262410、Plack 1.0054、Starman 0.4018、Twiggy 0.1026、IO::Async 0.805
 - Go 1.27.1、OpenTelemetry Go v1.47.0、otelhttp v0.72.0
 - OBI v0.14.0（伝搬の確認だけv1.0.0-rc.1も使用）
 - otel/opentelemetry-collector-contrib 0.162.0、grafana/otel-lgtm 0.32.1
 
 コードと実験のスクリプトは[ymotongpoo/otel-for-perl](https://github.com/ymotongpoo/otel-for-perl)にあります。
 
-CPANの実装はいまも活発に開発されています。SDKの0.029-TRIALは、ログの実験的な対応を加えて本書の執筆中にリリースされた試験版です。本書で扱う不具合や未実装の機能は、新しいリリースで変わっている可能性があります。
+CPANの実装はいまも活発に開発されています。SDKの0.100は、ログに対応して本書の執筆中にリリースされた安定版です。本書で扱う不具合や未実装の機能は、新しいリリースで変わっている可能性があります。
 :::
 
 ## 本書の読み方

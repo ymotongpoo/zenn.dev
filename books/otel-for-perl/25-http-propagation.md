@@ -14,7 +14,7 @@ use OpenTelemetry::Instrumentation 'HTTP::Tiny';
 
 `HTTP::Tiny` の計装は、`HTTP::Tiny::request` メソッドの周りに処理を差し込みます。差し込んだ処理は、リクエストのたびに種類がCLIENTのスパンを作り、現在のコンテキストに入れます。続いてリクエストのヘッダーに `traceparent` を書き込み、元のメソッドを呼ぶ流れです。`app_otel.psgi` では計装を有効にする `use` が `use Demo::Report` より前にあるので、`Demo::Report` は計装の後で `HTTP::Tiny` のオブジェクトを作ります。差し込みはメソッドそのものに対して行われるため、計装の前に作ったオブジェクトからの呼び出しでも計装されます。
 
-[^legacy]: 0.026より前は、計装は `OpenTelemetry::Integration` の名前空間にありました。いまのバージョンでも古い名前空間を探しますが、新しいコードでは `OpenTelemetry::Instrumentation` を使います。SDKのPOD（0.028）のSYNOPSISには、古い `OpenTelemetry::Integration` の書き方が残っています。0.029-TRIALでは直っています（[SDKのissue #23](https://github.com/jjatria/perl-opentelemetry-sdk/issues/23)）。
+[^legacy]: 0.026より前は、計装は `OpenTelemetry::Integration` の名前空間にありました。いまのバージョンでも古い名前空間を探しますが、新しいコードでは `OpenTelemetry::Instrumentation` を使います。SDKのPODのSYNOPSISには、0.028まで古い `OpenTelemetry::Integration` の書き方が残っていました。0.100では直っています（[SDKのissue #23](https://github.com/jjatria/perl-opentelemetry-sdk/issues/23)）。
 
 クライアントのスパンには、次の属性が付いていました。
 
@@ -90,13 +90,13 @@ Collectorに届いた `rates` のスパンの親は、すべてPerlのクライ�
 
 | リクエスト | サーバー（Perl） | aggregate | HTTPクライアント | `GET /rates`（Go） |
 | --- | --- | --- | --- | --- |
-| `days=7&currency=USD` | 53.9ms | 21.3ms | 21.8ms | 20.4ms |
-| `days=180&currency=USD` | 576.7ms | 540.4ms | 22.8ms | 20.5ms |
-| `days=7&currency=BRL` | 634.0ms | 21.3ms | 602.7ms | 600.7ms |
+| `days=7&currency=USD` | 47.3ms | 21.3ms | 21.1ms | 20.3ms |
+| `days=180&currency=USD` | 574.8ms | 540.4ms | 22.8ms | 20.5ms |
+| `days=7&currency=BRL` | 632.5ms | 21.3ms | 602.0ms | 600.5ms |
 
-`currency=BRL` のリクエストでは、Perlのクライアントのスパンが602.7msで、その子であるGoのスパンが600.7msです。待ち時間のほとんどは、Goのサービスの中の時間です。HTTPクライアントとGoのスパンの差の2msには、通信のほか、HTTP::Tinyとotelhttpの処理や応答の読み取りにかかった時間が含まれます。2章で同じ0.6秒前後に見えた2つのリクエストは、トレースでは直す場所が別だと分かりました。
+`currency=BRL` のリクエストでは、Perlのクライアントのスパンが602.0msで、その子であるGoのスパンが600.5msです。待ち時間のほとんどは、Goのサービスの中の時間です。HTTPクライアントとGoのスパンの差の1.5msには、通信のほか、HTTP::Tinyとotelhttpの処理や応答の読み取りにかかった時間が含まれます。2章で同じ0.6秒前後に見えた2つのリクエストは、トレースでは直す場所が別だと分かりました。
 
 ![サービスをまたぐトレース](/images/20261128-plack-request-spans.png)
 *図1: 受け取ったトレースの構造。矢印は1つのリクエストの処理の中での呼び出しの向きを表す。ミドルウェアがSERVERのスパンを作ってから `app_otel.psgi` を呼び、その中で `in_span` が集計処理のスパンを、`HTTP::Tiny` の計装がCLIENTのスパンを作る。計装はリクエストに `traceparent` を書き込み、Goの `otelhttp` がそれを読んで自分のスパンの親にする*
 
-表を見直すと、Perlのサーバーのスパンは集計とHTTPクライアントの和より10ms前後長くなっていました。`days=7&currency=USD` なら、21.3msと21.8msの和は43.1msで、サーバーのスパンは53.9msです。この差には、5章と6章で使ったSimpleプロセッサーの同期送信の費用が含まれます。Simpleプロセッサーは子のスパンが終わるたびに、リクエストの処理の途中でCollectorへの送信を済ませるからです。8章で、この差を含めてプロセッサーごとの費用を比べます。
+表を見直すと、Perlのサーバーのスパンは集計とHTTPクライアントの和より5〜12ms長くなっていました。`days=7&currency=USD` なら、21.3msと21.1msの和は42.4msで、サーバーのスパンは47.3msです。この差には、5章と6章で使ったSimpleプロセッサーの同期送信の費用が含まれます。Simpleプロセッサーは子のスパンが終わるたびに、リクエストの処理の途中でCollectorへの送信を済ませるからです。8章で、この差を含めてプロセッサーごとの費用を比べます。

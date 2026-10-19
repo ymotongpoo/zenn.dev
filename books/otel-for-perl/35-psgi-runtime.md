@@ -22,29 +22,34 @@ Goのスパンには親のスパンIDが入っていて、Perlから `traceparen
 >
 > （プロセッサーの作成か最初のスパンの受信から `scheduledDelayMillis` 後。前回の送信のタイマーの終了か送信の完了から、またはその後に最初のスパンがキューに入ってから `scheduledDelayMillis` 後。キューのスパンが `maxExportBatchSize` 件以上のとき。`ForceFlush` が呼ばれたとき）
 
-`scheduledDelayMillis` のデフォルト値は5,000ミリ秒です。仕様どおりの実装なら、リクエストが少なくても5秒ごとに送られます。ところが、SDK 0.028の[Batchプロセッサー](https://github.com/jjatria/perl-opentelemetry-sdk/blob/0.028/lib/OpenTelemetry/SDK/Trace/Span/Processor/Batch.pm)は、環境変数 `OTEL_BSP_SCHEDULE_DELAY` の値を `$schedule_delay` に入れるだけです。その値は、どこでも使われていません。スパンを受け取る `process` メソッドは、キューが512件（`OTEL_BSP_MAX_EXPORT_BATCH_SIZE` のデフォルト値）に満たなければ、何もせずに戻ります。
+`scheduledDelayMillis` のデフォルト値は5,000ミリ秒です。仕様どおりの実装なら、リクエストが少なくても5秒ごとに送られます。ところが、SDK 0.100の[Batchプロセッサー](https://github.com/jjatria/perl-opentelemetry-sdk/blob/0.100/lib/OpenTelemetry/Processor/Batch.pm)は、環境変数 `OTEL_BSP_SCHEDULE_DELAY` の値を `$schedule_delay` に入れるだけです。その値は、どこでも使われていません。スパンを受け取る `process` メソッドは、キューが512件（`OTEL_BSP_MAX_EXPORT_BATCH_SIZE` のデフォルト値）に満たなければ、何もせずに戻ります。
 
-```perl:OpenTelemetry/SDK/Trace/Span/Processor/Batch.pm（0.028、抜粋）
+```perl:OpenTelemetry/Processor/Batch.pm（0.100、抜粋）
     method process ( @items ) {
-        my $batch = $lock->enter(
-            sub {
-                ...
-                push @queue, @items;
-                return [] if @queue < $batch_size;
-                ...
-                [ splice @queue, 0, $batch_size ];
-            }
-        );
-        return unless @$batch;
-        $function->call(
-            args => [ $exporter, $batch, $exporter_timeout ],
-            on_result => sub ( $type, $result ) { ... },
-        );
-        return;
+        try {
+            my $batch = $lock->enter(
+                sub {
+                    ...
+                    push @queue, @items;
+                    return [] if @queue < $batch_size;
+                    ...
+                    [ splice @queue, 0, $batch_size ];
+                }
+            );
+            return unless @$batch;
+            $function->call(
+                args => [ $exporter, $batch, $exporter_timeout ],
+                on_result => sub ( $type, $result ) { ... },
+            );
+            return;
+        }
+        ...
     }
 ```
 
-200回のリクエストを送ると、Perlのスパンは1回につき3件で計600件になります。そのうち届いたのは、ちょうど512件でした。残りの88件は、次に512件たまるまでキューに残ります。2026年10月3日の0.029-TRIALでは、Batchプロセッサーの本体がトレースとログに共通の `OpenTelemetry::Processor::Batch` に移りました。ただし、`$schedule_delay` を使わない作りは同じです。
+200回のリクエストを送ると、Perlのスパンは1回につき3件で計600件になります。そのうち届いたのは、ちょうど512件でした。残りの88件は、次に512件たまるまでキューに残ります。0.100のBatchプロセッサーは、トレースとログに共通の実装です。ログも、同じ条件がそろうまで送られません[^bsp-0028]。
+
+[^bsp-0028]: 0.028までは、トレース専用の `OpenTelemetry::SDK::Trace::Span::Processor::Batch` が同じ処理を持っていました。試験版の0.029-TRIALで共通の実装に移り、`$schedule_delay` を使わない作りもそのまま引き継がれています。
 
 ## ワーカーの上限と送信の停止
 
@@ -55,7 +60,7 @@ Goのスパンには親のスパンIDが入っていて、Perlから `traceparen
 ![Batchプロセッサーとワーカープロセス](/images/20261128-batch-processor-fork.png)
 *図1: Batchプロセッサーの送信の流れ。実線はスパンの流れ、ピンクの破線はPSGIサーバーでは完了しない結果の受け取りを表す。アプリケーションのプロセスは、キューが512件に達するとIO::Async::Functionのワーカーに送信を依頼する。ワーカーは送信を終えると結果をパイプで返すが、アプリケーションのプロセスがIO::Asyncのループを回さない限り、その結果は読まれず、ワーカーは次の依頼を受けない*
 
-2,000回のリクエスト（Perlのスパン6,000件）を送ると、届いたのは4,096件、つまり512件の8回分でした。本書の構成ではそこで送信が止まり、コンテナの中にはワーカープロセスが8つ残っていました。8回という回数は、この構成で観測した値です。ワーカーの上限の設定や、結果が受け取られるかどうかの事情によって変わる可能性があります。
+2,000回のリクエスト（Perlのスパン6,000件）を送ると、届いたのは3,584件、つまり512件の7回分でした。本書の構成ではそこで送信が止まり、コンテナの中にはトレースのワーカープロセスが8つ残っていました。ワーカーが8つあるのに7回分しか届かなかった理由は、確かめていません。止まるまでの回数は一定ではなく、0.028では8回分（4,096件）、0.100でログのエクスポーターを `none` にした構成では6回分（3,072件）でした。
 
 同じ現象は、APIのリポジトリの[issue #23](https://github.com/jjatria/perl-opentelemetry/issues/23)「Telemetry output stops being sent」で2025年9月に報告されています。報告者が突き止めた原因は、IO::Asyncを使わないプロセスでは誰もループを回さないことです。報告には、ループを回すコードも添えられていました。2026年4月に、作者のjjatriaが[次のように返しています](https://github.com/jjatria/perl-opentelemetry/issues/23#issuecomment-4199416444)。
 
@@ -106,10 +111,10 @@ HTTP::Server::PSGIで、4つの構成に同じ2,000回のリクエストを順�
 
 | 構成 | 届いたPerlのスパン（6,000件中） | 平均応答時間 |
 | --- | --- | --- |
-| デフォルトのBatch | 4,096 | 26.9ms |
-| Batch＋ループを進めるだけ | 5,632 | 26.8ms |
-| Batch＋ループ＋5秒ごとの `force_flush` | 5,703 | 27.1ms |
-| Simple（4章の構成） | 6,000 | 32.2ms |
+| デフォルトのBatch | 3,584 | 26.7ms |
+| Batch＋ループを進めるだけ | 5,632 | 26.7ms |
+| Batch＋ループ＋5秒ごとの `force_flush` | 5,709 | 27.2ms |
+| Simple（4章の構成） | 6,000 | 32.4ms |
 
 ループを進めるだけで、送信は止まらなくなりました。5,632件は512件の11回分で、残りはキューの中です。5秒ごとの `force_flush` を足しても、最後のflushの後に終わったリクエストのスパンは残ります。このflushはリクエストを契機に動くので、リクエストが来ない間はキューが送られないままです。Simpleプロセッサーだけが6,000件すべてを届けましたが、平均の応答時間はBatchより5ms余り長くなりました。
 
@@ -121,26 +126,25 @@ HTTP::Server::PSGIで、4つの構成に同じ2,000回のリクエストを順�
 
 2つ目は、`shutdown` を呼んでもキューが送られないことで、こちらは仕様の要求を満たしていません。Batchプロセッサーの `shutdown` は、終了済みを表すフラグを立ててから `force_flush` を呼びます。ところが `force_flush` の先頭は、そのフラグが立っていれば何もせずに成功を返す作りです。
 
-```perl:OpenTelemetry/SDK/Trace/Span/Processor/Batch.pm（0.028、抜粋）
+```perl:OpenTelemetry/Processor/Batch.pm（0.100、抜粋）
     async method shutdown ( $timeout = undef ) {
-        return TRACE_EXPORT_SUCCESS if $done;
+        return EXPORT_RESULT_SUCCESS if $done;
 
         $done = 1;
         ...
         await $self->force_flush( maybe_timeout $timeout, $start );
 
-        $self->$report_dropped_spans( terminating => scalar @queue )
-            if @queue;
+        $self->report_dropped( 'terminating', scalar @queue ) if @queue;
         @queue = ();
         ...
     }
 
     async method force_flush ( $timeout = undef ) {
-        return TRACE_EXPORT_SUCCESS if $done;
+        return EXPORT_RESULT_SUCCESS if $done;
         ...
 ```
 
-結果として、`shutdown` はキューを送らずに「終了時に捨てた」と数えて空にします。4章で見た、`force_flush` の行を消すと3件とも届かない現象は、これが原因です。0.029-TRIALの `OpenTelemetry::Processor::Batch` も同じ順序で書かれていました。
+結果として、`shutdown` はキューを送らずに「終了時に捨てた」と数えて空にします。4章で見た、`force_flush` の行を消すと3件とも届かない現象は、これが原因です。0.028までのトレース専用のBatchプロセッサーも、同じ順序で書かれていました。
 
 PSGIのサーバーで終了時にキューを送る処理は、アプリケーションの側に書きます。SIGTERMを受けたら通常の終了処理を通し、`END` ブロックで `force_flush` を呼びます。
 
@@ -151,7 +155,19 @@ if ( $ENV{SHUTDOWN_HOOK} ) {
 }
 ```
 
-`END` で `shutdown(3)` を呼ぶ版も試しましたが、HTTP::Server::PSGIでは3秒のタイムアウトを過ぎても戻りませんでした。プロセスは、10秒後にDockerがSIGKILLで止めるまで終わりませんでした。`force_flush(3)` だけにすると0.4秒で終了し、最後のリクエストのスパンも届きました。`shutdown` が戻らない原因は特定できていません[^init]。
+HTTP::Server::PSGIに3回のリクエストを送ってからコンテナを止め、終了時に呼ぶものを変えて比べました。Perlのスパンは、起動を確かめる1回のリクエストを含めて12件です。
+
+| 終了時に呼ぶもの | ログのエクスポーター | 届いたPerlのスパン（12件中） | 停止にかかった時間 |
+| --- | --- | --- | --- |
+| トレースの `force_flush` | デフォルト（`otlp`） | 12 | 10.5秒 |
+| トレースの `force_flush` | `none` | 12 | 0.4秒 |
+| トレースの `shutdown` | デフォルト（`otlp`） | 6 | 10.5秒 |
+| トレースの `shutdown` | `none` | 6 | 10.6秒 |
+| トレースの `force_flush` とログの `shutdown` | デフォルト（`otlp`） | 12 | 10.6秒 |
+
+トレースの `force_flush` を呼べば、12件すべてが届きます。ただ、0.100ではそれだけだと、停止に10.5秒かかりました。DockerがSIGTERMから10秒待ってSIGKILLで止めた時間です。`END` の `force_flush` はすぐに終わっていて、止まっていたのはその後のプロセスの終了の途中でした。4章で見た現象で、ログのエクスポーターを `none` にすると0.4秒で終了しました。ログのBatchプロセッサーが無い0.028では、`force_flush` だけで0.4秒でした。
+
+`shutdown` を呼ぶ版は、ログのエクスポーターの設定によらず、3秒のタイムアウトを過ぎても戻りませんでした。0.028でも同じです。届いたのは止める前に送られていた6件で、最後のリクエストのスパンは失われました。4章のスクリプトでは有効だった、ログのプロバイダーの `shutdown` を足す方法も、PSGIサーバーの終了処理の中では戻りませんでした。`shutdown` が戻らない原因は特定できていません[^init]。いまのSDKでPSGIサーバーを速く止めながらキューを送り切れたのは、ログのエクスポーターを `none` にして、終了時にトレースの `force_flush` だけを呼ぶ構成です。
 
 [^init]: この確認では、Composeで `init: true` を指定しました。TERMのハンドラーを登録していない `app_otel.psgi` を `init: true` なしで動かすと、plackupがコンテナのPID 1になり、`docker compose stop` の10秒後にSIGKILLされるまで終了しませんでした。PID名前空間のinitは、ハンドラーを登録していないシグナルではデフォルトの動作（終了）を取らないからです（[pid_namespaces(7)](https://man7.org/linux/man-pages/man7/pid_namespaces.7.html)）。上のように `$SIG{TERM}` を登録した場合は、PID 1でもハンドラーが呼ばれます。
 
@@ -161,25 +177,38 @@ if ( $ENV{SHUTDOWN_HOOK} ) {
 
 | 構成 | 届いたPerlのスパン（6,000件中） | 親子がそろったトレース（2,000本中） | 平均応答時間 | 停止にかかった時間 |
 | --- | --- | --- | --- | --- |
-| 未計装（`app.psgi`） | － | － | 37.5ms | 0.7秒 |
-| デフォルトのBatch | 1,536 | 510 | 42.6ms | 0.7秒 |
-| Batch＋ループ＋5秒ごとの `force_flush`＋終了時の `force_flush` | 3,955 | 1,316 | 42.9ms | 10.7秒 |
-| Simple | 6,000 | 2,000 | 51.7ms | 0.7秒 |
+| 未計装（`app.psgi`） | － | － | 37.3ms | 0.8秒 |
+| デフォルトのBatch | 1,536 | 510 | 42.5ms | 10.8秒 |
+| Batch＋ループ＋5秒ごとの `force_flush`＋終了時の `force_flush` | 3,955 | 1,316 | 42.9ms | 11.0秒 |
+| Simple | 6,000 | 2,000 | 51.8ms | 0.6秒 |
 
-デフォルトのBatchでは、6,000件のうち1,536件しか届きませんでした。Starmanのワーカーは、それぞれが自分のキューとIO::Asyncのワーカーを持ちます。キューは512件ずつしか送られず、残りは停止とともに消えます。ただ、1ワーカーあたり約1,500件のスパンが作られた計算なので、512件ずつでもこれより多く届くはずです。1,536件にとどまった理由は確かめられていません。
+デフォルトのBatchでは、6,000件のうち1,536件しか届きませんでした。Starmanのワーカーは、マスタープロセスで作られたBatchプロセッサーをforkで受け継ぎ、それぞれが自分のキューを持ちます。キューは512件ずつしか送られず、残りは停止とともに消えます。ただ、1ワーカーあたり約1,500件のスパンが作られた計算なので、512件ずつでもこれより多く届くはずです。1,536件にとどまった理由は確かめられていません。
 
-ループを進める回避策を入れても、停止に10.7秒かかり、届いたのは3,955件でした。ワーカーの終了処理が完了せずSIGKILLで止められたものと見ていますが、原因は特定できていません。
+ループを進める回避策を入れると、届いたスパンは3,955件に増えました。
 
-Starmanの `--preload-app` は、アプリケーションをマスタープロセスで読み込んでからワーカーをforkするオプションです。SDKを読み込んだ後にforkすると、ワーカーとIO::Asyncの状態が不整合になるのではないかと考えました。そこで、このオプションを付けた場合も測りました。送信が止まることはなく、届いたスパンはデフォルトのBatchで1,024件、回避策で4,376件、Simpleで6,000件でした[^preload]。付けない場合と比べると、デフォルトのBatchは1,536件から減り、回避策は3,955件から増えています。この差の原因は確かめていません。
+停止には、デフォルトのBatchでも回避策でも11秒前後かかりました。0.028では、デフォルトのBatchの停止は0.7秒でした。停止の途中のコンテナの中を見ると、Starmanの4つのワーカーはどれもプロセスの終了の途中で待っていて、ログのBatchプロセッサーのワーカーはすでに終了していました。4章で見た現象と同じ形です。ログのエクスポーターを `none` にすると、停止は1秒以内に収まりました[^stm-nologs]。
+
+| 構成 | 停止（ログのエクスポーターがデフォルト） | 停止（ログのエクスポーターが `none`） |
+| --- | --- | --- |
+| デフォルトのBatch | 10.8秒 | 0.7秒 |
+| Batch＋ループ＋5秒ごとの `force_flush`＋終了時の `force_flush` | 11.0秒 | 0.9秒 |
+| Simple | 0.6秒 | 0.6秒 |
+
+[^stm-nologs]: ログのエクスポーターを `none` にした構成で届いたPerlのスパンは、デフォルトのBatchで2,048件、回避策で3,646件、Simpleで6,000件でした。0.028では、回避策の構成の停止に10.7秒かかり、原因を特定できていませんでした。
+
+Starmanには、アプリケーションをマスタープロセスで読み込んでからワーカーをforkする `--preload-app` のオプションがあります。SDKを読み込んだ後にforkすると、ワーカーとIO::Asyncの状態が不整合になるのではないかと考え、このオプションを付けた場合も測りました。届いたスパンはデフォルトのBatchで1,536件、回避策で4,467件[^preload-err]、Simpleで6,000件で、停止にかかった時間も付けない場合と同じ傾向でした[^preload]。
+
+ところが、plackupで起動したStarmanは、このオプションを付けなくてもマスタープロセスでアプリケーションを読み込みます。[Plack::Handler::Starman](https://metacpan.org/pod/Plack::Handler::Starman)のPODによれば、`plackup -s Starman` は `starman --preload-app` と同じです。上の表の測定も、forkの前にSDKを読み込んで行ったことになります。停止の途中に見たSDKのワーカーのプロセスも、Starmanのワーカーではなくマスタープロセスの子でした。forkの後にSDKを読み込む構成は、本書では測っていません。
 
 [^latency]: 応答時間は、`curl` の `time_total` を2,000回分平均した値です。分布やCPU使用率は測っていません。
 [^preload]: plackupに `--preload-app app_otel.psgi` の順で渡すと、`app_otel.psgi` が `--preload-app` の値として扱われ、PSGIファイルの指定が消えます。plackupは、自分が知らないオプションの次の引数をそのオプションの値とみなすからです。このとき起動するのは、カレントディレクトリのデフォルトのファイル `app.psgi` です。`--preload-app=1` と書くと正しく渡せます。
+[^preload-err]: この測定では、2,000回のうち1回のリクエストがエラーになりました。
 
 ## Simpleプロセッサーの費用
 
 ここまでの測定で、どのサーバーでもすべてのスパンを届けたのはSimpleプロセッサーだけでした。その代わり、Simpleプロセッサーはスパンが終わるたびにその場でCollectorへHTTPのリクエストを送ります。題材のアプリケーションでは、1回のリクエストで3回送ることになります。
 
-費用は応答時間に表れました。HTTP::Server::PSGIへの直列のリクエストでは、平均の応答時間がデフォルトのBatchより5ms余り長くなりました[^latency]。Starmanで8並列にした場合は、未計装の37.5msに対して51.7msと、14ms余り長い値でした。6章では、サーバーのスパンと子のスパンの和との間に約10msの差がありました。この差にも、Simpleプロセッサーがリクエストの処理の途中で送信する費用が含まれます。ループを進める回避策で同じ3種類のリクエストを測ったときは、この差は3ms前後（2.7〜3.9ms）でした。
+費用は応答時間に表れました。HTTP::Server::PSGIへの直列のリクエストでは、平均の応答時間がデフォルトのBatchより5ms余り長くなりました[^latency]。Starmanで8並列にした場合は、未計装の37.3msに対して51.8msと、14ms余り長い値でした。6章では、サーバーのスパンと子のスパンの和との間に5〜12msの差がありました。この差にも、Simpleプロセッサーがリクエストの処理の途中で送信する費用が含まれます。ループを進める回避策で同じ3種類のリクエストを測ったときは、この差は2ms前後（1.8〜2.3ms）でした。
 
 Simpleプロセッサーで計装したサーバーのスパンは、送信にかかった時間の分だけ長く記録されます。トレースで遅い区間を探すために計装したのに、区間の長さに計装の費用が含まれてしまいます。確実に届くこととアプリケーションの応答時間を乱さないことは、いまのCPANのSDKでは同時に満たせない条件です。
 

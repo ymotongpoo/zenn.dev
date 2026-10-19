@@ -20,13 +20,13 @@ Perlの要望は、communityリポジトリの[issue #828](https://github.com/op
 
 ## CPANにある配布物
 
-CPANの実装の中心は、API、SDK、OTLPエクスポーターの3つの配布物です。いずれもJosé Joaquín Atria[^jjatria]が書いています。その周りに、フレームワークやライブラリごとの計装を提供する配布物があります。2026年10月7日にMetaCPANで確認した最新版は次のとおりです。
+CPANの実装の中心は、API、SDK、OTLPエクスポーターの3つの配布物です。いずれもJosé Joaquín Atria[^jjatria]が書いています。その周りに、フレームワークやライブラリごとの計装を提供する配布物があります。2026年10月19日にMetaCPANで確認した最新版は次のとおりです。
 
 | 配布物 | 作者のID | 最新版（リリース日） | 役割 |
 | --- | --- | --- | --- |
 | [OpenTelemetry](https://metacpan.org/release/JJATRIA/OpenTelemetry-0.039) | JJATRIA | 0.039（2026-10-03） | API。トレースとログのAPI、トレースコンテキストのプロパゲーター、`HTTP::Tiny`、`LWP::UserAgent`、`DBI`の計装、`Log::Any`のアダプターを含む |
-| [OpenTelemetry::SDK](https://metacpan.org/release/JJATRIA/OpenTelemetry-SDK-0.028) | JJATRIA | 0.028（2025-08-22） | SDK。トレースの処理と送信。試験版の[0.029-TRIAL](https://metacpan.org/release/JJATRIA/OpenTelemetry-SDK-0.029-TRIAL)（2026-10-03）でログに実験的に対応 |
-| [OpenTelemetry::Exporter::OTLP](https://metacpan.org/release/JJATRIA/OpenTelemetry-Exporter-OTLP-0.021) | JJATRIA | 0.021（2025-05-08） | OTLPエクスポーター。トレースとログをHTTPで送る |
+| [OpenTelemetry::SDK](https://metacpan.org/release/JJATRIA/OpenTelemetry-SDK-0.100) | JJATRIA | 0.100（2026-10-11） | SDK。トレースとログの処理と送信。ログに対応した最初の安定版 |
+| [OpenTelemetry::Exporter::OTLP](https://metacpan.org/release/JJATRIA/OpenTelemetry-Exporter-OTLP-0.022) | JJATRIA | 0.022（2026-10-15） | OTLPエクスポーター。トレースとログをHTTPで送る[^otlp-0022] |
 | [Plack::Middleware::OpenTelemetry](https://metacpan.org/release/ABH/Plack-Middleware-OpenTelemetry-0.262410) | ABH | 0.262410（2026-08-29） | PSGIのリクエストごとにスパンを作るミドルウェア |
 | [Mojolicious::Plugin::OpenTelemetry](https://metacpan.org/dist/Mojolicious-Plugin-OpenTelemetry) | JJATRIA | 0.006（2026-03-11） | Mojoliciousのプラグイン |
 | [Dancer2::Plugin::OpenTelemetry](https://metacpan.org/dist/Dancer2-Plugin-OpenTelemetry) | JJATRIA | 0.003（2024-05-09） | Dancer2のプラグイン |
@@ -37,6 +37,7 @@ OTLPは、OpenTelemetryが定めるテレメトリーの送信プロトコルで
 
 [^jjatria]: [José Joaquín Atria](https://github.com/jjatria)は、CPANのOpenTelemetry、OpenTelemetry::SDK、OpenTelemetry::Exporter::OTLPの作者です。CPANのIDはJJATRIAです。
 [^otlp]: 仕様は[OTLP Specification](https://opentelemetry.io/ja/docs/specs/otlp/)にあります。
+[^otlp-0022]: 本書の測定には0.021を使いました。0.022の変更は、未定義の値をエンコードするときに警告を出さなくなったことなどで、本書で扱う動作は変わりません。
 
 ## APIとSDKを分ける理由
 

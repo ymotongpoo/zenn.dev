@@ -21,13 +21,13 @@ title: "参考文献"
 ## CPANの実装
 
 - [OpenTelemetry 0.039](https://metacpan.org/release/JJATRIA/OpenTelemetry-0.039)と[リポジトリ](https://github.com/jjatria/perl-opentelemetry)（タグ `0.039`）：API、計装、`Log::Any` のアダプター、Guides
-- [OpenTelemetry::SDK 0.028](https://metacpan.org/release/JJATRIA/OpenTelemetry-SDK-0.028)と[0.029-TRIAL](https://metacpan.org/release/JJATRIA/OpenTelemetry-SDK-0.029-TRIAL)、[リポジトリ](https://github.com/jjatria/perl-opentelemetry-sdk)（タグ `0.028`、`0.029`）：SDK
-- [0.028のBatchプロセッサー](https://github.com/jjatria/perl-opentelemetry-sdk/blob/0.028/lib/OpenTelemetry/SDK/Trace/Span/Processor/Batch.pm)と[0.029の共通のBatchプロセッサー](https://github.com/jjatria/perl-opentelemetry-sdk/blob/0.029/lib/OpenTelemetry/Processor/Batch.pm)
-- [OpenTelemetry::Exporter::OTLP 0.021](https://metacpan.org/release/JJATRIA/OpenTelemetry-Exporter-OTLP-0.021)と[リポジトリ](https://github.com/jjatria/perl-opentelemetry-exporter-otlp)：OTLPエクスポーター
+- [OpenTelemetry::SDK 0.100](https://metacpan.org/release/JJATRIA/OpenTelemetry-SDK-0.100)と[リポジトリ](https://github.com/jjatria/perl-opentelemetry-sdk)（タグ `0.100`）：SDK
+- [0.100のBatchプロセッサー](https://github.com/jjatria/perl-opentelemetry-sdk/blob/0.100/lib/OpenTelemetry/Processor/Batch.pm)：トレースとログに共通の実装
+- [OpenTelemetry::Exporter::OTLP 0.021](https://metacpan.org/release/JJATRIA/OpenTelemetry-Exporter-OTLP-0.021)と[リポジトリ](https://github.com/jjatria/perl-opentelemetry-exporter-otlp)（タグ `0.021`）：OTLPエクスポーター
 - [Plack::Middleware::OpenTelemetry 0.262410](https://metacpan.org/release/ABH/Plack-Middleware-OpenTelemetry-0.262410)と[リポジトリ](https://github.com/abh/Plack-Middleware-OpenTelemetry)（タグ `v0.262410`）：PSGIのミドルウェア
 - [jjatria/perl-opentelemetry#23](https://github.com/jjatria/perl-opentelemetry/issues/23)：IO::Asyncのループを回さないプロセスで送信が止まる報告と、作者の返答
 - [jjatria/perl-opentelemetry-sdk#7](https://github.com/jjatria/perl-opentelemetry-sdk/pull/7)：送信をプロセスの中で行うための提案
-- [jjatria/perl-opentelemetry-sdk#24](https://github.com/jjatria/perl-opentelemetry-sdk/issues/24)：SDKを使うプログラムが終了しない報告と、0.029-TRIALでの再現手順の[コメント](https://github.com/jjatria/perl-opentelemetry-sdk/issues/24#issuecomment-6048489586)
+- [jjatria/perl-opentelemetry-sdk#24](https://github.com/jjatria/perl-opentelemetry-sdk/issues/24)：SDKを使うプログラムが終了しない報告と、0.029-TRIALでの再現手順の[コメント](https://github.com/jjatria/perl-opentelemetry-sdk/issues/24#issuecomment-6048489586)、0.100での再現の[コメント](https://github.com/jjatria/perl-opentelemetry-sdk/issues/24#issuecomment-6260524108)
 - [IO::Async::Function](https://metacpan.org/pod/IO::Async::Function)：SDKが送信に使うワーカープロセスの仕組み
 - [OpenTelemetry::Guides::Exporters](https://metacpan.org/pod/OpenTelemetry::Guides::Exporters)と[IO::Async::Loop::Mojo](https://metacpan.org/pod/IO::Async::Loop::Mojo)：MojoliciousのイベントループでSDKの送信を動かす方法
 
