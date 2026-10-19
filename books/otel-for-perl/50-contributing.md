@@ -8,8 +8,9 @@ title: "Perl実装にいま必要なもの"
 
 | 課題 | 種類 | 確かめた章 | 修正先 |
 | --- | --- | --- | --- |
-| Batchプロセッサーが `OTEL_BSP_SCHEDULE_DELAY` の間隔で送らず、キューが512件に達するまで送らない | SDKの未実装 | 8章 | [perl-opentelemetry-sdk](https://github.com/jjatria/perl-opentelemetry-sdk)（[#27に報告済み](https://github.com/jjatria/perl-opentelemetry-sdk/issues/27)） |
-| IO::Asyncのループを回さないアプリケーションでは、送信が止まる（本書の構成では512件の6〜8回分）。Mojoliciousでの方法はGuidesにあるが、PSGIサーバーでの回避策は無い | SDKの設計と文書 | 8章 | perl-opentelemetryのGuides（[#23にコメント済み](https://github.com/jjatria/perl-opentelemetry/issues/23#issuecomment-6049916551)） |
+| Batchプロセッサーが `OTEL_BSP_SCHEDULE_DELAY` の間隔で送らず、キューが512件に達するまで送らない | SDKの未実装 | 8章 | [perl-opentelemetry-sdk](https://github.com/jjatria/perl-opentelemetry-sdk)（[#27に報告済み](https://github.com/jjatria/perl-opentelemetry-sdk/issues/27)、実装の設計を[提案](https://github.com/jjatria/perl-opentelemetry-sdk/issues/27#issuecomment-6260523597)） |
+| IO::Asyncのループを回さないアプリケーションでは、送信が止まる（本書の構成では512件の6〜8回分）。Batchプロセッサーにはループが必要という原則が、Guidesに書かれていない | SDKの設計と文書 | 8章 | perl-opentelemetryのGuides（[#23で節の追加を提案](https://github.com/jjatria/perl-opentelemetry/issues/23#issuecomment-6260523869)） |
+| ループを回さないアプリケーションに向くSimpleプロセッサーを、環境変数で選べない | SDKの設定 | 4章、8章 | perl-opentelemetry-sdk |
 | `shutdown` がキューを送らずに捨てる | SDKの不具合 | 4章、8章 | perl-opentelemetry-sdk（[#25](https://github.com/jjatria/perl-opentelemetry-sdk/issues/25)に報告、修正は[PR #26](https://github.com/jjatria/perl-opentelemetry-sdk/pull/26)） |
 | SIGTERMで終了するとき、`shutdown` がタイムアウトを過ぎても戻らない | SDKの不具合の可能性（原因は未特定） | 8章 | perl-opentelemetry-sdk |
 | プロセスの終了時に、SDKが `shutdown` も `force_flush` も呼ばない | ライフサイクルの改善提案（仕様の要求ではない） | 8章 | perl-opentelemetry-sdk |
@@ -31,9 +32,11 @@ READMEの古さは、たとえば次のような記述です。APIのREADMEに�
 
 0.100で終了しなくなった不具合も、直す場所の見当は付いています。Batchプロセッサーは、破棄されるときにワーカーの停止を `get` で待つ作りです。この待ちを、プロセスの終了の途中でPerlがオブジェクトを破棄しているとき（`${^GLOBAL_PHASE}` が `DESTRUCT` のとき）だけ省くと、4章の再現手順を5回試して、5回ともプロセスが終了しました。この変更でほかの終了処理に影響が出ないかは、まだ確かめていません。issue #24で作者と相談しながら進める作業です。
 
-IO::Asyncのループの問題については、作者がissue #23で文書化の必要を認めています。PSGIサーバーでの測定結果と回避策は、同じissueに[コメント](https://github.com/jjatria/perl-opentelemetry/issues/23#issuecomment-6049916551)しました。最初の作業は、Guidesに説明を足すことです。GuidesにはMojoliciousでの方法がすでにあるので、足すのはPSGIのアプリケーションの場合です。ミドルウェアでループを進めればよいことと、終了時に `force_flush` を呼ぶ必要があることを書きます。Guidesにこの2点があれば、利用者は8章の回避策を探し当てずに済みます。
+IO::Asyncのループの問題については、作者がissue #23で文書化の必要を認めています。PSGIサーバーでの測定結果と回避策は、同じissueに[コメント](https://github.com/jjatria/perl-opentelemetry/issues/23#issuecomment-6049916551)しました。作者の[返答](https://github.com/jjatria/perl-opentelemetry/issues/23#issuecomment-6150108237)は、フレームワークごとの手順よりも、「an event loop is needed if you are using the batch processor」（Batchプロセッサーを使うならイベントループが必要）という原則を説明したい、というものでした。そこで筆者は、GuidesのExportersの章に原則の節を足すことを[提案](https://github.com/jjatria/perl-opentelemetry/issues/23#issuecomment-6260523869)しています。Batchプロセッサーには回っているIO::Asyncのループが必要なことと、ループが無いアプリケーションではSimpleプロセッサーを使うことを書く内容です。別のイベントループで動くならIO::Async::Loopのサブクラスを探すことや、それでもBatchを使うなら8章の `loop_once` と終了時の `force_flush` が要ることにも触れます。Simpleプロセッサーの設定例も添えるつもりです。環境変数ではSimpleプロセッサーを選べないので、例が無いと利用者は4章の構成にたどり着けません。
 
-`OTEL_BSP_SCHEDULE_DELAY` で送る機能を作るのは、それより大きな作業です。IO::Asyncのループを回さないプロセスで、5秒ごとに何かを動かす仕組みそのものが無いからです。定期的に送られないこと自体は、[issue #27](https://github.com/jjatria/perl-opentelemetry-sdk/issues/27)として報告しました。アプリケーションのプロセスの中で送信できるようにする変更は、2023年11月にSDKの[pull request #7](https://github.com/jjatria/perl-opentelemetry-sdk/pull/7)として出され、デバッグ用の提案としてdraftのまま残っています。作者の返答は、この形でマージするものではないとしつつ「it must not block the main process」というものでした。メインのプロセスを止めずに定期的に送る仕組みをどう作るかは、作者と相談しながら決めることになります。
+`OTEL_BSP_SCHEDULE_DELAY` で送る機能は、当初はそれより大きな作業だと考えていました。IO::Asyncのループを回さないプロセスには、5秒ごとに何かを動かす仕組みそのものが無いからです。定期的に送られないことを[issue #27](https://github.com/jjatria/perl-opentelemetry-sdk/issues/27)として報告すると、作者はこの機能を実装するpull requestを歓迎し、IO::Asyncのタイマーを使う方法を望むと返しました[^pr7]。8章で引用したとおり、ループを回さないアプリケーションはそもそもBatchプロセッサーを使わない前提です。タイマーは、IO::Asyncのループの中で動けば十分です。筆者は、`IO::Async::Timer::Countdown` で実装する設計を2026年10月19日に[返信](https://github.com/jjatria/perl-opentelemetry-sdk/issues/27#issuecomment-6260523597)し、pull request #26の上に積む形を提案しました。
+
+[^pr7]: アプリケーションのプロセスの中で送信できるようにする変更は、2023年11月にSDKの[pull request #7](https://github.com/jjatria/perl-opentelemetry-sdk/pull/7)として出され、デバッグ用の提案としてdraftのまま残っています。作者の返答は、この形でマージするものではないとしつつ「it must not block the main process」というものでした。
 
 Plackのミドルウェアは、APIとSDKとは別の作者のリポジトリです。スパン名については、スパン名の付け方を話し合っていた既存のissue #10に規約の該当箇所を[コメント](https://github.com/abh/Plack-Middleware-OpenTelemetry/issues/10#issuecomment-6049918698)し、`server.address` とSDKへの依存は[issue #11](https://github.com/abh/Plack-Middleware-OpenTelemetry/issues/11)で提案しました。スパン名を `{method}` にする修正と、`server.address` と `server.port` を分けて入れる修正は、セマンティック規約の該当箇所を根拠に説明できる内容です。SDKへの依存を外すには、`resource_attributes` のオプションをどう扱うかを決める必要があります。
 

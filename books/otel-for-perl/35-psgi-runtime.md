@@ -70,6 +70,14 @@ Goのスパンには親のスパンIDが入っていて、Perlから `traceparen
 
 PerlのWebアプリケーションの多くは、IO::Async以外の仕組みで動いています。PlackのサーバーやMojoliciousがその例です。Mojoliciousについては、APIのGuidesのExportersの章に方法が載っています。[IO::Async::Loop::Mojo](https://metacpan.org/pod/IO::Async::Loop::Mojo)を入れて環境変数 `IO_ASYNC_LOOP` を `Mojo` にすれば、IO::AsyncのループがMojoliciousのイベントループの上で回ります（本書では未検証）。PlackのPSGIサーバーについての同じような説明は、Guidesにありません。
 
+作者の考えは、2026年10月にSDKの[issue #27](https://github.com/jjatria/perl-opentelemetry-sdk/issues/27)への[返答](https://github.com/jjatria/perl-opentelemetry-sdk/issues/27#issuecomment-6150204783)で、さらにはっきりしました。筆者が `OTEL_BSP_SCHEDULE_DELAY` を使わない作りを報告したのに対し、作者はIO::Asyncのタイマーを使う実装を歓迎したうえで、次のように書いています。
+
+> An application that does not run an IO::Async loop should not be using the batch processor, and this configuration option only makes sense for the batch processor ...
+>
+> （IO::Asyncのループを回さないアプリケーションは、Batchプロセッサーを使うべきではありません。この設定も、Batchプロセッサーでしか意味を持ちません）
+
+この方針に従えば、HTTP::Server::PSGIやStarmanで動くアプリケーションはSimpleプロセッサーを使うことになります。ところがSDKは、エクスポーターを `otlp` にすると必ずBatchプロセッサーを組み、Simpleを選ぶ環境変数もありません（4章）。何も設定しなければ、PSGIのアプリケーションは作者が使うべきでないとする構成で動きます。次の節の回避策は、それでもBatchプロセッサーを使う場合の方法です。
+
 ## PSGIのミドルウェアで回避する
 
 次のミドルウェアは、issue #23の方法をPSGIに当てはめて書いたものです。リクエストごとにIO::Asyncのループを1回だけ進めてワーカーの結果を受け取り、送信が止まらないようにします。それだけでは5秒ごとの送信にはならないので、指定した秒数が経っていれば `force_flush` でキューを送り出す処理も加えました。
