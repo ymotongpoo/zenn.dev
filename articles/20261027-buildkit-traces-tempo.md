@@ -46,7 +46,7 @@ docker buildx history trace --builder gf-demo --addr 127.0.0.1:16686
 
 この画面では、全体の20.27秒のうち19.24秒を`[build 4/4] RUN go mod download && go build`の手順が占めていることがわかります。ビルドが遅いと感じたときに、どの手順を疑えばよいかは、この画面だけで判断できます。
 
-## Tempoへ送る
+## Tempoへ送信
 
 同じトレースをGrafana Tempoへ送るには、buildxのbuilderを作るときに環境変数を2つ渡すだけです。送り先には[grafana/otel-lgtm](https://github.com/grafana/docker-otel-lgtm)を使いました。[Grafana](https://grafana.com/oss/grafana/)とTempoに加えてPrometheusとOpenTelemetry Collectorも1つにまとめたコンテナで、そのOTLPのポートへ送ります。
 
@@ -70,7 +70,7 @@ docker buildx build --builder gf-demo --load .
 ![GrafanaのExploreでTempoのトレースを開いた画面。buildx: build .の全体が20.87秒で、[build 4/4] RUN go mod download && go build -o /out/hello .のスパンが19.36秒になっている](/images/20261027-tempo-build-regressed.png)
 *同じ種類のビルドのトレースをGrafanaのExploreで開いた画面。上部はトレースの概要で、下はDockerfileの手順のスパンのあたりを切り出した*
 
-## ビルドを溜めると見えるもの
+## ビルドを遅くしてみる
 
 ここまでなら、Dockerの画面で十分です。Tempoへ送る価値が出てくるのは、ビルドが1回ではなく、CI/CDのように継続的に多数行われるときです。
 
@@ -132,7 +132,7 @@ OTEL_RESOURCE_ATTRIBUTES="vcs.ref.head.revision=$(git rev-parse --short HEAD)" \
 
 手順のスパン名には、`RUN`のコマンドがそのまま入ります。Dockerfileを変えるとスパン名も変わるので、変更の前後を1本の系列で比べるなら、ルートのスパンの所要時間を使ってください。
 
-## エージェントに直させる
+## エージェントに修正させる
 
 Tempoに溜めたトレースは、人だけでなくプログラムからも問い合わせられます。[mcp-grafana](https://github.com/grafana/mcp-grafana)は、GrafanaをMCPのサーバーとして公開するツールです。Tempo向けには次のようなツールを持っています。
 
@@ -174,7 +174,7 @@ docker buildx create --name gf-cloud --driver docker-container \
 
 トレース専用の変数（名前に`TRACES`が入るもの）だけを渡しているのは、BuildKitが`OTEL_EXPORTER_OTLP_ENDPOINT`を見るとメトリクスの送信も始めるためです[^detect]。このbuilderで手元と同じ20回のビルドを流すと、21本（動作確認の1回を含む）のトレースが全部Grafana CloudのTempoに届きました[^cloud-search]。トークンはbuilderのコンテナの環境変数とbuildxの設定ファイルに残るので、使い終わったら`docker buildx rm gf-cloud`でbuilderを消してください。
 
-### Grafana Assistantに調べさせる
+### Grafana Assistantに調査させる
 
 SaaSの側には、溜めたトレースを調べる機能も最初から用意されています。その例が、Grafana Cloudに組み込まれたAIアシスタントの[Grafana Assistant](https://grafana.com/docs/grafana-cloud/machine-learning/assistant/)です。[ドキュメント](https://grafana.com/docs/grafana-cloud/platform/grafana-assistant/guides/querying/)によると、AssistantはTempoを含むデータソースに問い合わせ、TraceQLのクエリを書いて実行できます。トレースのIDを渡せば1本のトレースをウォーターフォールで表示でき、実験的な機能として、あるトレースと比べる候補のトレースを探すこともできます。
 
