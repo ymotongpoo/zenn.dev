@@ -96,7 +96,7 @@ COPY --from=build /out/hello /hello
 ENTRYPOINT ["/hello"]
 ```
 
-途中で、Dockerfileを「整理した」コミットを入れて、キャッシュマウントをわざと外しました。あわせて`COPY . .`も依存のダウンロードより前に移した状態です。この順序だと、ソースを1行変えるたびに依存のダウンロードと全パッケージのコンパイルがやり直しになります。変わったのはビルドのステージだけなので、示すのもその部分だけです。
+途中で、Dockerfileを「整理した」コミットを入れて、キャッシュマウントをわざと外しました。あわせて`COPY . .`も依存のダウンロードより前に移した状態です。この順序だと、ソースを1行変えるたびに依存のダウンロードと全パッケージのコンパイルがやり直しになります。`build`のステージは以下のように変わっています。
 
 ```dockerfile
 FROM golang:1.26-alpine AS build
@@ -158,11 +158,9 @@ Tempoに溜めたトレースは、人だけでなくプログラムからも問
 
 ## オブザーバビリティのSaaSに送る利点
 
-ここまでは、手元のotel-lgtmにトレースを送ってきました。otel-lgtmは、イメージの説明にあるとおり開発、デモ、テストのための環境で、コンテナを消せばトレースも消えます。ビルドをまたいで問いを立てるには、トレースを長く残せて、CIのrunnerからも送れる場所が必要です。[Grafana Cloud](https://grafana.com/products/cloud/)のようなオブザーバビリティのSaaSに送ると、その場所を自分で運用せずに済みます。
+ここまでは、手元のotel-lgtmにトレースを送ってきました。otel-lgtmは、イメージの説明にあるとおり開発、デモ、テストのための環境で、コンテナを消せばトレースも消えます。ビルドをまたいで問いを立てるには、トレースを長く残せて、CIのrunnerからも送れる場所が必要です。[Grafana Cloud](https://grafana.com/products/cloud/)のようなオブザーバビリティのSaaSに送ると、その場所を自分で運用せずに済みます。たとえばGrafana Cloudでも、BuildKitで保持する量よりも圧倒的に多くのトレースを保持できます[^retention]。
 
-保持期間は、[Grafana Cloudの料金のページ](https://grafana.com/pricing/)によるとTracesではFreeプランで14日、Proプランで30日です。BuildKitの履歴の48時間か50回分より長く、手元の開発機のビルドとCIのビルドを同じTempoに入れて、同じクエリで比べられます。
-
-Grafana Cloudへ送るときも、builderに渡す環境変数を変えるだけです。Grafana Cloudの[ドキュメント](https://grafana.com/docs/grafana-cloud/send-data/otlp/send-data-otlp/)が示すOTLPの送り方はHTTPなので、BuildKitのデフォルトのgRPCから`http/protobuf`に切り替えました。エンドポイントと認証のヘッダーは、Grafana CloudのポータルのOpenTelemetryのタイルで生成した値をそのまま使いました。
+Grafana Cloudへ送るときも、builderに渡す環境変数を変えるだけです。Grafana Cloudの[OTLPのゲートウェイ](https://grafana.com/docs/grafana-cloud/send-data/otlp/send-data-otlp/)はHTTP/2の接続を受け付けないので、BuildKitのデフォルトのgRPCは使えず、`http/protobuf`を指定します[^grpc]。エンドポイントと認証のヘッダーは、Grafana CloudのポータルのOpenTelemetryのタイルで生成した値をそのまま使いました。
 
 ```sh
 docker buildx create --name gf-cloud --driver docker-container \
@@ -213,3 +211,5 @@ Dockerは、ビルドのトレースを出す仕組みも、それを確認す�
 [^detect]: BuildKit v0.33.1の[`util/tracing/detect/otlp.go`](https://github.com/moby/buildkit/blob/v0.33.1/util/tracing/detect/otlp.go)は、OTLPのクライアントをオプションなしで作っています。OpenTelemetryのGoのexporterは、送り先、プロトコル、ヘッダーを環境変数から読みます。
 [^assistant-self]: [Grafana Assistantの紹介のページ](https://grafana.com/docs/grafana-cloud/machine-learning/assistant/introduction/)によると、自前で運用しているGrafanaから使う場合も、チャット、ダッシュボードの作成、クエリ、ナビゲーションは使えます。
 [^cloud-search]: Grafana CloudのTempoでビルドのトレースを検索するときは、`name = "build ."`で絞ると確実に見つかります。
+[^retention]: [Grafana Cloudの料金のページ](https://grafana.com/pricing/)によると、Tracesの保持期間はFreeプランで14日、Proプランで30日です。BuildKitの履歴の48時間か50回分より長く、手元の開発機のビルドとCIのビルドを同じTempoに入れて、同じクエリで比べられます。
+[^grpc]: gRPCはHTTP/2の上で動きますが、Grafana CloudのOTLPのゲートウェイは、TLSの接続時にHTTP/2（ALPNの`h2`）を選びません。`OTEL_EXPORTER_OTLP_TRACES_PROTOCOL=grpc`を指定すると、BuildKitのログに`missing selected ALPN property`という接続のエラーが出て、トレースは届きません。2026年10月20日に、ap-northeast-0のゲートウェイで確認しました。
