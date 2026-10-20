@@ -9,7 +9,8 @@ published: false
 :::message
 2026年10月20日に確認した内容です。動作確認には次の版を使いました。
 
-- Docker Engine 29.0.0、buildx v0.29.1、BuildKit v0.33.1（Ubuntu 26.04.1）
+- Docker Engine 29.0.0、buildx v0.29.1（Ubuntu 26.04.1）
+- BuildKit v0.33.1（builderのイメージを`moby/buildkit:v0.33.1`に固定）
 - [grafana/otel-lgtm](https://github.com/grafana/docker-otel-lgtm) 0.37.0（Grafana 13.2.3、Tempo 3.1.0を含む）
 - [mcp-grafana](https://github.com/grafana/mcp-grafana) 2.0.2
 - [Claude Code](https://code.claude.com/docs/en/overview) 2.1.303
@@ -31,12 +32,12 @@ Dockerのビルドを実行する[BuildKit](https://docs.docker.com/build/buildk
 
 `docker build`の実体は、[buildx](https://docs.docker.com/reference/cli/docker/buildx/)というCLIのプラグインと、ビルドを実行するデーモンのBuildKitです。BuildKitは[OpenTelemetry](https://opentelemetry.io/ja/)[^otel]でトレース[^trace]を出す機能を持っていて、Dockerfileの手順ひとつひとつがスパンになります。計装を足す必要はありません。
 
-Dockerの[公式ドキュメント](https://docs.docker.com/build/debug/opentelemetry/)が示しているのは、環境変数`JAEGER_TRACE`でJaegerへ送る方法だけです。一方、[BuildKitのREADME](https://github.com/moby/buildkit/blob/master/README.md)には、OTLP[^otlp]で送る方法が載っています。環境変数`OTEL_TRACES_EXPORTER=otlp`と`OTEL_EXPORTER_OTLP_TRACES_ENDPOINT`を使う方法で、後でTempoへ送るときにもこちらを使います。
+Dockerの[公式ドキュメント](https://docs.docker.com/build/debug/opentelemetry/)が示しているのは、環境変数`JAEGER_TRACE`でJaegerへ送る方法だけです。一方、[BuildKitのREADME](https://github.com/moby/buildkit/blob/v0.33.1/README.md)には、OTLP[^otlp]で送る方法が載っています。環境変数`OTEL_TRACES_EXPORTER=otlp`と`OTEL_EXPORTER_OTLP_TRACES_ENDPOINT`を使う方法で、後でTempoへ送るときにもこちらを使います。
 
 トレースをどこにも送っていなくても、BuildKitはビルドの履歴にトレースを残しています。[`docker buildx history trace`](https://docs.docker.com/reference/cli/docker/buildx/history/trace/)は、その履歴からトレースを取り出し、一時的に立ち上げたJaeger UIで開くコマンドです[^history-trace-tty]。
 
 ```sh
-docker buildx history trace --addr 127.0.0.1:16686
+docker buildx history trace --builder gf-demo --addr 127.0.0.1:16686
 ```
 
 ![Jaeger UIでbuildx: build .のトレースを開いた画面。全体は20.27秒で、buildkitdの[build 4/4] RUN go mod download && go buildのスパンが19.24秒を占めている](/images/20261027-jaeger-build-steps.png)
@@ -52,12 +53,13 @@ docker buildx history trace --addr 127.0.0.1:16686
 docker run -d --name lgtm -p 3000:3000 -p 4317:4317 -p 4318:4318 grafana/otel-lgtm:0.37.0
 
 docker buildx create --name gf-demo --driver docker-container \
+  --driver-opt image=moby/buildkit:v0.33.1 \
   --driver-opt network=host \
   --driver-opt env.OTEL_TRACES_EXPORTER=otlp \
   --driver-opt env.OTEL_EXPORTER_OTLP_TRACES_ENDPOINT=http://127.0.0.1:4317 \
   --bootstrap
 
-docker buildx build --builder gf-demo .
+docker buildx build --builder gf-demo --load .
 ```
 
 `docker-container`ドライバーのbuilderでは、BuildKitはコンテナの中で動きます。`network=host`を付けたのは、そのBuildKitからホストのループバックアドレスに公開したOTLPのポートへ届かせるためです[^docker-desktop]。
@@ -73,7 +75,9 @@ docker buildx build --builder gf-demo .
 
 ここまでなら、Dockerの画面で十分です。Tempoへ送る理由になるのは、ビルドが1回ではなく、たくさんあるときです。
 
-[BuildKitの設定](https://github.com/moby/buildkit/blob/master/docs/buildkitd.toml.md)では、ビルドの履歴はデフォルトで`maxAge = 172800`（48時間）、`maxEntries = 50`です。`docker buildx history trace`で開けるのは、この履歴に残っているビルドだけです。使い捨てのCIのrunnerでは、ジョブが終わればbuilderごと履歴も消えます。DockerはGitHub Actions向けに、[ビルドの記録をZIPのアーティファクトとして残す](https://docs.docker.com/build/ci/github-actions/build-summary/)機能を持っています。ただ、それをDocker Desktopに取り込んで見るのはビルド1回分ずつです。「どのコミットからビルドが遅くなったのか」は、1本のトレースを見ても答えられません。
+[BuildKitの設定](https://github.com/moby/buildkit/blob/v0.33.1/docs/buildkitd.toml.md)では、ビルドの履歴はデフォルトで`maxAge = 172800`（48時間）、`maxEntries = 50`です。`docker buildx history trace`で開けるのは、この履歴に残っているビルドだけで、`--compare`で2回分を並べて比べる場合も同じ制約がかかります。
+
+使い捨てのCIのrunnerでは、ジョブが終わればbuilderごと履歴も消えます。DockerはGitHub Actions向けに、[ビルドの記録をZIPのアーティファクトとして残す](https://docs.docker.com/build/ci/github-actions/build-summary/)機能を持っています。ただ、それをDocker Desktopに取り込んで見るのは、CIの実行1回分ずつです。「どのコミットからビルドが遅くなったのか」を答えるには、何十回分ものビルドを並べなければなりません。
 
 そこで、コミットを重ねながら20回ビルドし、全部のトレースをTempoに溜めました。題材は、Prometheusのクライアントライブラリに依存する小さなGoのHTTPサーバーです。前半の10回は、依存のダウンロードとビルドのキャッシュをキャッシュマウントで再利用するDockerfileでビルドしました。
 
@@ -93,7 +97,7 @@ COPY --from=build /out/hello /hello
 ENTRYPOINT ["/hello"]
 ```
 
-11回目に、Dockerfileを「整理した」コミットを入れました。このコミットはキャッシュマウントを外し、`COPY . .`を依存のダウンロードより前に移すものです。この順序だと、ソースを1行変えるたびに依存のダウンロードと全パッケージのコンパイルがやり直しになります。
+11回目に、Dockerfileを「整理した」コミットを入れました。このコミットはキャッシュマウントを外し、`COPY . .`を依存のダウンロードより前に移すものです。この順序だと、ソースを1行変えるたびに依存のダウンロードと全パッケージのコンパイルがやり直しになります。変わったのはビルドのステージだけなので、そこだけを示します。
 
 ```dockerfile
 FROM golang:1.26-alpine AS build
@@ -111,14 +115,14 @@ OTEL_RESOURCE_ATTRIBUTES="vcs.ref.head.revision=$(git rev-parse --short HEAD)" \
   docker buildx build --builder gf-demo .
 ```
 
-20回分のビルドの所要時間を、[TraceQL](https://grafana.com/docs/tempo/latest/traceql/)[^traceql]のメトリクスのクエリでグラフにしました。ルートのスパンだけを選んで、30秒ごとの最大値を取っています[^quantile]。
+2〜20回目のビルド（19回分）の所要時間を、[TraceQL](https://grafana.com/docs/tempo/latest/traceql/)[^traceql]のメトリクスのクエリでグラフにしました。ルートのスパンだけを選んで、30秒ごとの最大値を取っています[^quantile]。
 
 ```traceql
-{ resource.service.name = "buildx" && nestedSetParent < 0 } | max_over_time(duration)
+{ resource.service.name = "buildx" && span:parentID = "" } | max_over_time(duration)
 ```
 
 ![GrafanaのExploreでTraceQLのメトリクスのクエリを実行した折れ線グラフ。05:23:00までは約2秒で推移し、05:23:30の点から約20秒に上がったまま戻らない](/images/20261027-tempo-build-duration.png)
-*20回分のビルドの所要時間をTraceQLのmax_over_timeでGrafanaに描いた画面。点の時刻は30秒の区間の終わりを表す*
+*2〜20回目のビルドの所要時間をTraceQLのmax_over_timeでGrafanaに描いた画面。点の時刻は30秒の区間の終わりを表す*
 
 トレースで見ると、前半のビルドは1.9〜2.5秒で終わり、11回目から20.3〜21.7秒に延びて戻りません[^cold]。跳ねた直後のトレースを開けば、`vcs.ref.head.revision`からコミットがわかります。このデモでは「整理した」コミットでした。遅くなる前後のトレースを並べると、どの手順が延びたのかもわかります。
 
@@ -154,7 +158,7 @@ mcp-grafanaはコンテナで起動し、`--disable-write`で書き込み系の�
 }
 ```
 
-Claude Codeに許可したのは、このMCPのツールと、`git log`と`git show`と`git diff`と`docker buildx build`だけです。頼んだ内容は次のとおりです。
+Claude Codeは`--permission-mode acceptEdits`で起動しました。このモードでは、作業ディレクトリの中でのファイルの編集と一般的なファイル操作のコマンドが確認なしで通ります。そのほかに許可したのは、このMCPのツールと、`git log`、`git show`、`git diff`、`docker buildx build`、`sleep`のコマンドです。頼んだ内容は次のとおりです。
 
 ```text
 Our container build got slow recently. Builds are traced: every build sends
@@ -170,13 +174,13 @@ and confirm in Tempo that the new build is fast again. New traces can take
 about 30 seconds to become searchable.
 ```
 
-エージェントは`search_tempo_traces`でコミットごとの所要時間を並べ、約2秒から約21秒に跳ねたのが「整理した」コミットだと特定しました。そのコミットの差分を`git show`で読み、キャッシュマウントと`COPY`の順序を元に戻しています。後から足されたラベルは残したままでした。再ビルドしたあと、新しいトレースが検索できるようになるまで待ち、2.98秒と0.79秒で終わったことをTempoで確かめています。ここまでで18ターン、52.6秒でした[^cost]。
+エージェントは、まず`git log`でコミットの一覧を読み、`search_tempo_traces`でコミットごとの所要時間を並べました。そこから出した結論は、約2秒から約21秒に跳ねたのは「整理した」コミットだというものです。そのコミットの差分を`git show`で読んだうえで、キャッシュマウントと`COPY`の順序を元に戻しています。後から足されたラベルは残したままです。再ビルドしたあとは新しいトレースが検索できるようになるまで待ち、2.98秒と0.79秒で終わったことをTempoで確かめました。ここまでの所要時間は18ターン、52.6秒です[^cost]。
 
-最初に試したときは、劣化させたコミットのメッセージを「Simplify the Dockerfile」にしていました。エージェントはトレースを見る前に`git log`を読み、そのメッセージで原因の見当をつけてしまいました。ラベルを足すだけのコミットを前後に混ぜたのは、この試行の後です。実際のリポジトリでは、遅くした変更がわかりやすいメッセージで入っているとは限りません。トレースがあれば、そうした場合でもコミットを特定できます。
+最初に試したときは、劣化させたコミットのメッセージを「Simplify the Dockerfile」にしていました。エージェントはトレースを見る前に`git log`を読み、そのメッセージで原因の見当をつけてしまいました。ラベルを足すだけのコミットを前後に混ぜたのは、この試行の後です。実際のリポジトリでは、遅くした変更がわかりやすいメッセージで入っているとは限りません。2回目の試行では、メッセージからは判断できないコミットの中から、エージェントがトレースを使って正しいコミットを選びました。試したのはこの1回だけです。
 
 ## エージェントの操作も同じトレースに入る
 
-最初の試行では、エージェントが再ビルドしたトレースをTempoで見つけられませんでした。手元のClaude Codeは、[テレメトリーの設定](https://code.claude.com/docs/en/monitoring-usage)で自分のトレースを別の場所へ送っていました[^enhanced]。同じドキュメントにあるとおり、トレースを有効にしたClaude Codeは、Bashで実行するコマンドに`TRACEPARENT`を渡します。中身は、実行中のツールのスパンのトレースコンテキストです。そのため、ビルドのトレースはClaude Codeのトレースの子になり、親のスパンはデモのTempoに届いていなかったのです。
+最初の試行では、エージェントが再ビルドしたトレースをTempoで見つけられませんでした。手元のClaude Codeは、[テレメトリーの設定](https://code.claude.com/docs/en/monitoring-usage)で自分のトレースを別の場所へ送っていました[^enhanced]。同じドキュメントにあるとおり、トレースを有効にしたClaude Codeは、Bashで実行するコマンドに`TRACEPARENT`を渡します[^propagate]。中身は、実行中のツールのスパンのトレースコンテキストです。そのため、ビルドのトレースはClaude Codeのトレースの子になり、親のスパンはデモのTempoに届いていなかったのです。
 
 そこで、Claude Code自身のトレースもデモのTempoへ送るようにしました。Claude Codeの`--settings`に次の値を渡しています。
 
@@ -204,7 +208,9 @@ about 30 seconds to become searchable.
 
 ## 残っている課題
 
-CIで使う方法は試していません。CIのジョブが`TRACEPARENT`を渡せば、ビルドのスパンをジョブのスパンの下に入れられるはずです。ただ、確認したのはbuildxのコードと手元の動作だけです。Grafana Cloudへ直接送る場合については、BuildKitが認証のヘッダーを`OTEL_EXPORTER_OTLP_HEADERS`から読むかも確かめていません。読まない場合は、BuildKitとGrafana Cloudの間にCollectorを置くことになります。
+CIで使う方法は試していません。CIのジョブが`TRACEPARENT`を渡せば、ビルドのスパンをジョブのスパンの下に入れられるはずです。ただ、確認したのはbuildxのコードと手元の動作だけで、CIのジョブのスパンを作る側の仕組みも別に必要になります。
+
+Grafana Cloudへ直接送る方法も試していません。BuildKit v0.33.1はOTLPのクライアントをオプションなしで作っており（[`util/tracing/detect/otlp.go`](https://github.com/moby/buildkit/blob/v0.33.1/util/tracing/detect/otlp.go)）、OpenTelemetryのGoのexporterは送り先とヘッダーを環境変数から読みます。そのため、`OTEL_EXPORTER_OTLP_HEADERS`で認証のヘッダーを渡せるはずです。うまくいかない場合は、BuildKitとGrafana Cloudの間にCollectorを置くことになります。
 
 ## おわりに
 
@@ -217,11 +223,12 @@ Dockerは、ビルドのトレースを出す仕組みも、それを見る画�
 [^otlp]: OpenTelemetry Protocolの略で、OpenTelemetryのデータを送るためのプロトコルです。[gRPC](https://grpc.io/)（ポート4317）とHTTP（ポート4318）で送れます。
 [^history-trace-tty]: 標準出力が端末でないときは、Jaeger UIを起動せずに、トレースをJaegerの形式のJSONとして標準出力に書き出しました。
 [^docker-desktop]: 確認したのはLinuxのDocker Engineだけです。Docker Desktopでは`network=host`の意味が変わるので、この設定のままでは届かない可能性があります。
-[^client-env]: クライアント側に`OTEL_EXPORTER_OTLP_ENDPOINT`を渡したビルドと渡さないビルドの両方で、`buildx`のスパンがTempoに届きました。builder側の設定だけで届く理由は調べていません。また、docker-containerドライバーでは`buildctl dial-stdio`というトレースがビルドとは別に毎回届くので、検索するときは`resource.service.name = "buildx"`で絞ると見やすくなります。
+[^client-env]: buildx v0.29.1は、BuildKitに接続するときに`client.WithTracerDelegate`を指定しています（[`driver/manager.go`](https://github.com/docker/buildx/blob/v0.29.1/driver/manager.go)）。buildxは自分のスパンをBuildKitに渡し、BuildKitがまとめて送ります。BuildKitのREADMEにも、`buildctl`はスパンを`buildkitd`に転送するので、exporterはデーモン側だけに設定すればよいとあります。また、docker-containerドライバーでは`buildctl dial-stdio`というトレースがビルドとは別に毎回届くので、検索するときは`resource.service.name = "buildx"`で絞ると見やすくなります。
 [^traceql]: Grafana Tempoのクエリ言語です。スパンの属性や所要時間でトレースを選び、`| max_over_time(duration)`のように続けると、選んだスパンから時系列のメトリクスを計算できます。
-[^quantile]: 最初は`quantile_over_time(duration, .5)`で中央値を取りましたが、劣化後の約20秒のビルドが24秒前後の値になりました。`quantile_over_time`はヒストグラムのバケットから近似値を求めるためです。`max_over_time`と`avg_over_time`は、トレースの所要時間と同じ値を返しました。
-[^cold]: グラフの範囲から外した1回目のビルドは、キャッシュが空だったので38.2秒かかりました。
-[^childprocess]: buildxは`cmd/buildx/tracing.go`でBuildKitの[`util/tracing/childprocess`](https://github.com/moby/buildkit/blob/master/util/tracing/childprocess/traceenv.go)を読み込んでいます。このパッケージが環境変数`TRACEPARENT`と`TRACESTATE`を読みます。
+[^quantile]: 最初は`quantile_over_time(duration, .5)`で中央値を取りましたが、劣化後の約20秒のビルドが、区間を60秒にすると24.3秒、30秒にすると34.4秒になりました。`quantile_over_time`は所要時間を2のべき乗の幅のバケットに入れて近似するので、値がバケットの境目に寄ります。`max_over_time`は、区間に入ったトレースの所要時間の最大値をそのまま返しました。
+[^cold]: グラフの範囲から外した1回目のビルドは、キャッシュが空だったので38.1秒かかりました。
+[^childprocess]: buildx v0.29.1は、[`cmd/buildx/tracing.go`](https://github.com/docker/buildx/blob/v0.29.1/cmd/buildx/tracing.go)でBuildKit v0.25.0の[`util/tracing/env`](https://github.com/moby/buildkit/blob/v0.25.0/util/tracing/env/traceenv.go)を読み込んでいます。このパッケージが環境変数`TRACEPARENT`と`TRACESTATE`を読みます。buildxのもっと新しい版では、同じ役割のパッケージが`util/tracing/childprocess`に変わっています。
 [^mcp]: [Model Context Protocol](https://modelcontextprotocol.io/)の略で、AIエージェントが外部のツールやデータにアクセスするためのプロトコルです。
 [^cost]: このときのClaude Codeの表示では、費用は0.28ドルでした。1回目の試行は15ターン、40秒、0.36ドルです。
+[^propagate]: ドキュメントによると、`ANTHROPIC_BASE_URL`で独自のプロキシを指定している場合は、`CLAUDE_CODE_PROPAGATE_TRACEPARENT=1`を設定しない限り`TRACEPARENT`を渡しません。
 [^enhanced]: トレースを出すには`CLAUDE_CODE_ENABLE_TELEMETRY`に加えて`CLAUDE_CODE_ENHANCED_TELEMETRY_BETA`を有効にする必要があり、2026年10月20日の時点ではbetaの機能です。
