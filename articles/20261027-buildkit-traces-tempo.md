@@ -14,6 +14,7 @@ published: false
 - [grafana/otel-lgtm](https://github.com/grafana/docker-otel-lgtm) 0.37.0（Grafana 13.2.3、Tempo 3.1.0を含む）
 - [mcp-grafana](https://github.com/grafana/mcp-grafana) 2.0.2
 - [Claude Code](https://code.claude.com/docs/en/overview) 2.1.303
+- [gcx](https://grafana.com/docs/grafana/latest/as-code/observability-as-code/grafana-cli/gcx/) 0.3.0
 
 記事中のコマンドは、手元で使ったポート番号をotel-lgtmのデフォルトに戻して書いています。
 :::
@@ -210,7 +211,21 @@ about 30 seconds to become searchable.
 
 ここまでは、手元のotel-lgtmにトレースを送ってきました。otel-lgtmは、イメージの説明にあるとおり開発、デモ、テストのための環境で、コンテナを消せばトレースも消えます。ビルドをまたいで問いを立てるには、トレースを長く残せて、CIのrunnerからも送れる場所が必要です。[Grafana Cloud](https://grafana.com/products/cloud/)のようなオブザーバビリティのSaaSに送ると、その場所を自分で運用せずに済みます。
 
-保持期間は、Grafana CloudのTracesではFreeプランで14日、Proプランで30日です[^pricing]。BuildKitの履歴の48時間か50回分より長く、手元の開発機のビルドとCIのビルドを同じTempoに入れて、同じクエリで比べられます。使い捨てのrunnerから送る場合も、OTLPのエンドポイントと認証のヘッダーを環境変数で渡すだけです（試していない点は「残っている課題」に書きました）。
+保持期間は、Grafana CloudのTracesではFreeプランで14日、Proプランで30日です[^pricing]。BuildKitの履歴の48時間か50回分より長く、手元の開発機のビルドとCIのビルドを同じTempoに入れて、同じクエリで比べられます。
+
+Grafana Cloudへ送るときも、builderに渡す環境変数を変えるだけです。Grafana Cloudの[ドキュメント](https://grafana.com/docs/grafana-cloud/send-data/otlp/send-data-otlp/)が示すOTLPの送り方はHTTPなので、BuildKitのデフォルトのgRPCから`http/protobuf`に切り替えました。エンドポイントと認証のヘッダーは、Grafana CloudのポータルのOpenTelemetryのタイルで生成した値をそのまま使いました。
+
+```sh
+docker buildx create --name gf-cloud --driver docker-container \
+  --driver-opt image=moby/buildkit:v0.33.1 \
+  --driver-opt env.OTEL_TRACES_EXPORTER=otlp \
+  --driver-opt env.OTEL_EXPORTER_OTLP_TRACES_PROTOCOL=http/protobuf \
+  --driver-opt "env.OTEL_EXPORTER_OTLP_TRACES_ENDPOINT=${OTEL_EXPORTER_OTLP_ENDPOINT}/v1/traces" \
+  --driver-opt "env.OTEL_EXPORTER_OTLP_TRACES_HEADERS=${OTEL_EXPORTER_OTLP_HEADERS}" \
+  --bootstrap
+```
+
+トレース専用の変数（名前に`TRACES`が入るもの）だけを渡しているのは、BuildKitが`OTEL_EXPORTER_OTLP_ENDPOINT`を見るとメトリクスの送信も始めるためです[^detect]。このbuilderで手元と同じ20回のビルドを流すと、21本（動作確認の1回を含む）のトレースが全部Grafana CloudのTempoに届きました。トークンはbuilderのコンテナの環境変数とbuildxの設定ファイルに残るので、使い終わったら`docker buildx rm gf-cloud`でbuilderを消してください。
 
 ### Grafana Assistantに調べさせる
 
@@ -218,13 +233,25 @@ SaaSの側には、溜めたトレースを調べる機能も最初から用意�
 
 前の節でエージェントに調べさせたときは、mcp-grafanaをコンテナで起動し、Claude Codeに設定を渡す準備が必要でした。Assistantは最初からスタックのデータソースにつながっているので、この準備は要らないのが利点です。ビルドが遅くなったことに気づいた人が、Grafanaの画面からそのまま「ビルドの所要時間はいつから延びたか」と聞けば済みます。原因の調査まではAssistantに任せ、Dockerfileを直して再ビルドするところはリポジトリを編集できるコーディングエージェントに任せる、という分担です。
 
-Assistantは、自前で運用しているGrafanaからGrafana CloudのAssistantにつないで使うこともできます。ただし、複数のデータソースを調べてレポートにまとめるInvestigationsと、Grafana CloudのMCPへの接続は、Grafana Cloudに限られた機能です[^assistant-self]。なお、この記事を書いた時点では、ビルドのトレースをGrafana Cloudに送ってAssistantに聞くところまでは試していません。
+実際に、Grafana Cloudへ送った20回分のビルドについてAssistantに聞きました。AssistantはGrafanaの画面のほか、Grafanaのコマンドラインツールの`gcx`からも呼べるので、今回は`gcx`を使いました。伝えたのは、Claude Codeに渡したのと同じ前提だけです。
+
+```sh
+gcx assistant prompt 'コンテナのビルドが最近遅くなりました。ビルドのトレースはTempo（データソース grafanacloud-shophub-traces）に送っています。各ビルドにはサービス buildx の "build ." という名前のスパンがあり、そのスパンのリソース属性 vcs.ref.head.revision にビルドしたコミットが入っています。過去1時間のトレースから、ビルドの所要時間がいつから延びたのか、どのコミットからなのか、ビルドのどの手順が遅くなったのかを調べてください。'
+```
+
+Assistantはデータソースへの問い合わせを17回行い、132秒で答えを返しました。答えの冒頭は次のとおりです。
+
+> **結論:** ビルド時間は、およそ 07:09 UTC に約2秒から約20秒へ延びました。最初に遅くなったコミットは `9eac8b9` です。遅くなった手順は Dockerfile の `RUN go mod download && go build -o /out/hello .` です。
+
+`9eac8b9`は「整理した」コミットで、答えは正しいものでした。手順についても、速いビルドの6ステップと遅いビルドの4ステップを比べた結果、遅いほうでは`RUN go mod download && go build`の1つの手順が約19.4秒、全体の約95%を占めるという答えです。依存の取得のキャッシュが効かなくなったことを原因として推測しつつ、「このデータにはコミットの親子順がありません」と書き、時間の順で最初に遅くなったコミットだという限定も付けていました。動作確認のために送った30.2秒のビルドも、コミットの属性がないことに気づいて、ほかのビルドとは別に扱っていました。
+
+Assistantは、自前で運用しているGrafanaからGrafana CloudのAssistantにつないで使うこともできます。ただし、複数のデータソースを調べてレポートにまとめるInvestigationsと、Grafana CloudのMCPへの接続は、Grafana Cloudに限られた機能です[^assistant-self]。
 
 ## 残っている課題
 
 CIで使う方法は試していません。CIのジョブが`TRACEPARENT`を渡せば、ビルドのスパンをジョブのスパンの下に入れられるはずです。ただ、確認したのはbuildxのコードと手元の動作だけで、CIのジョブのスパンを作る側の仕組みも別に必要になります。
 
-Grafana Cloudへ直接送る方法も試していません。BuildKit v0.33.1はOTLPのクライアントをオプションなしで作っており（[`util/tracing/detect/otlp.go`](https://github.com/moby/buildkit/blob/v0.33.1/util/tracing/detect/otlp.go)）、OpenTelemetryのGoのexporterは送り先とヘッダーを環境変数から読みます。そのため、`OTEL_EXPORTER_OTLP_HEADERS`で認証のヘッダーを渡せるはずです。うまくいかない場合は、BuildKitとGrafana Cloudの間にCollectorを置くことになります。
+もう1つ、Grafana CloudのTempoでトレースを検索したとき、ルートのスパンを選ぶ`span:parentID = ""`の条件では1件も見つかりませんでした。同じ条件でもメトリクスのクエリでは手元と同じ値が返り、手元のTempo 3.1.0では検索でも20件が見つかっています。原因は調べていないので、検索では`name = "build ."`で絞るほうが確実です。
 
 ## おわりに
 
@@ -242,6 +269,7 @@ Dockerは、ビルドのトレースを出す仕組みも、それを見る画�
 [^quantile]: 最初は`quantile_over_time(duration, .5)`で中央値を取りましたが、劣化後の約20秒のビルドが、区間を60秒にすると24.3秒、30秒にすると34.4秒になりました。`quantile_over_time`は所要時間を2のべき乗の幅のバケットに入れて近似するので、値がバケットの境目に寄ります。`max_over_time`は、区間に入ったトレースの所要時間の最大値をそのまま返しました。
 [^cold]: グラフの範囲から外した1回目のビルドは、キャッシュが空だったので38.1秒かかりました。
 [^childprocess]: buildx v0.29.1は、[`cmd/buildx/tracing.go`](https://github.com/docker/buildx/blob/v0.29.1/cmd/buildx/tracing.go)でBuildKit v0.25.0の[`util/tracing/env`](https://github.com/moby/buildkit/blob/v0.25.0/util/tracing/env/traceenv.go)を読み込んでいます。このパッケージが環境変数`TRACEPARENT`と`TRACESTATE`を読みます。buildxのもっと新しい版では、同じ役割のパッケージが`util/tracing/childprocess`に変わっています。
+[^detect]: BuildKit v0.33.1の[`util/tracing/detect/otlp.go`](https://github.com/moby/buildkit/blob/v0.33.1/util/tracing/detect/otlp.go)は、OTLPのクライアントをオプションなしで作っています。OpenTelemetryのGoのexporterは、送り先、プロトコル、ヘッダーを環境変数から読みます。
 [^mcp]: [Model Context Protocol](https://modelcontextprotocol.io/)の略で、AIエージェントが外部のツールやデータにアクセスするためのプロトコルです。
 [^cost]: このときのClaude Codeの表示では、費用は0.28ドルでした。1回目の試行は15ターン、40秒、0.36ドルです。
 [^propagate]: ドキュメントによると、`ANTHROPIC_BASE_URL`で独自のプロキシを指定している場合は、`CLAUDE_CODE_PROPAGATE_TRACEPARENT=1`を設定しない限り`TRACEPARENT`を渡しません。
