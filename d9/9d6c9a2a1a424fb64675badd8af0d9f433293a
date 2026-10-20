@@ -1,0 +1,33 @@
+books/otel-for-perl/15-sdk-setup.md
+  s_ff65d3f1cc7ef1::t_48845ceff85c96 187,193
+books/otel-for-perl/50-contributing.md
+  s_ff65d3f1cc7ef1::t_9aa9a7a9c96e39 35
+  s_ff65d3f1cc7ef1::t_bc15c51204f002 33
+  s_ff65d3f1cc7ef1::t_da86086e55c400 12,14,31,37
+books/otel-for-perl/35-psgi-runtime.md
+  s_ff65d3f1cc7ef1::t_3dacf09630b637 224
+  s_ff65d3f1cc7ef1::t_f548de83cc4bfd 228,238
+  s_ff65d3f1cc7ef1::t_17e86a460de75e 157,182
+  s_ff65d3f1cc7ef1::t_2982472ab0d63e 234
+  s_ff65d3f1cc7ef1::t_bc15c51204f002 81,226,236
+  s_ff65d3f1cc7ef1::t_5ce1fddef930ca 79,225,227,229-233,235,237,240,242-243
+  s_ff65d3f1cc7ef1::t_f54b8979d14f56 80,239
+books/otel-for-perl/45-sdk-vs-obi.md
+  s_ff65d3f1cc7ef1::t_9aa9a7a9c96e39 17,36
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "d99d6c9a2a1a424fb64675badd8af0d9f433293a",
+  "prompts": {},
+  "sessions": {
+    "s_ff65d3f1cc7ef1": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "afb5e511-29a5-465f-8c60-b7af60da667d",
+        "model": "unknown"
+      },
+      "human_author": "Yoshi Yamaguchi <ymotongpoo@gmail.com>"
+    }
+  }
+}
