@@ -3,7 +3,8 @@ title: "Dockerのビルドを遅くしたコミットをGrafana Tempoのトレ�
 emoji: "🐳"
 type: "tech"
 topics: ["Docker", "OpenTelemetry", "grafana", "Tempo", "BuildKit"]
-published: false
+published: true
+published_at: 2026-10-27 09:00
 ---
 
 :::message
