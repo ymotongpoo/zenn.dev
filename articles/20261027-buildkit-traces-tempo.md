@@ -31,9 +31,9 @@ Dockerのビルドを実行する[BuildKit](https://docs.docker.com/build/buildk
 
 ## BuildKitが出すトレース
 
-`docker build`の実体は、[buildx](https://docs.docker.com/reference/cli/docker/buildx/)というCLIのプラグインと、ビルドを実行するデーモンのBuildKitです。BuildKitは[OpenTelemetry](https://opentelemetry.io/ja/)[^otel]でトレース[^trace]を出す機能を持っていて、Dockerfileの手順ひとつひとつがスパンになります。計装を足す必要はありません。
+`docker build`の実体は、[buildx](https://docs.docker.com/reference/cli/docker/buildx/)というCLIのプラグインと、ビルドを実行するデーモンのBuildKitです。BuildKitは[OpenTelemetry](https://opentelemetry.io/ja/)でトレースを出す機能を持っていて、Dockerfileの手順ひとつひとつがスパンになります。計装を足す必要はありません。
 
-Dockerの[公式ドキュメント](https://docs.docker.com/build/debug/opentelemetry/)が示しているのは、環境変数`JAEGER_TRACE`でJaegerへ送る方法だけです。一方、[BuildKitのREADME](https://github.com/moby/buildkit/blob/v0.33.1/README.md)には、OTLP[^otlp]で送る方法が載っています。環境変数`OTEL_TRACES_EXPORTER=otlp`と`OTEL_EXPORTER_OTLP_TRACES_ENDPOINT`を使う方法で、後でTempoへ送るときにもこちらを使います。
+Dockerの[公式ドキュメント](https://docs.docker.com/build/debug/opentelemetry/)が示しているのは、環境変数`JAEGER_TRACE`でJaegerへ送る方法だけです。一方、[BuildKitのREADME](https://github.com/moby/buildkit/blob/v0.33.1/README.md)には、OTLPで送る方法が載っています。環境変数`OTEL_TRACES_EXPORTER=otlp`と`OTEL_EXPORTER_OTLP_TRACES_ENDPOINT`を使う方法で、後でTempoへ送るときにもこちらを使います。
 
 トレースをどこにも送っていなくても、BuildKitはビルドの履歴にトレースを残しています。[`docker buildx history trace`](https://docs.docker.com/reference/cli/docker/buildx/history/trace/)は、その履歴からトレースを取り出し、一時的に立ち上げたJaeger UIで開くコマンドです[^history-trace-tty]。
 
@@ -114,7 +114,7 @@ OTEL_RESOURCE_ATTRIBUTES="vcs.ref.head.revision=$(git rev-parse --short HEAD)" \
   docker buildx build --builder gf-demo .
 ```
 
-ここまでの各ビルドの所要時間を、[TraceQL](https://grafana.com/docs/tempo/latest/traceql/)[^traceql]のメトリクスのクエリでグラフにしました。ルートのスパンだけを選んで、30秒ごとの最大値を取っています[^quantile]。
+ここまでの各ビルドの所要時間を、[TraceQL](https://grafana.com/docs/tempo/latest/traceql/)のメトリクスのクエリでグラフにしました。ルートのスパンだけを選んで、30秒ごとの最大値を取っています[^quantile]。
 
 ```traceql
 { resource.service.name = "buildx" && span:parentID = "" } | max_over_time(duration)
@@ -134,7 +134,7 @@ OTEL_RESOURCE_ATTRIBUTES="vcs.ref.head.revision=$(git rev-parse --short HEAD)" \
 
 ## エージェントに直させる
 
-Tempoに溜めたトレースは、人だけでなくプログラムからも問い合わせられます。[mcp-grafana](https://github.com/grafana/mcp-grafana)は、GrafanaをMCP[^mcp]のサーバーとして公開するツールです。Tempo向けには次のようなツールを持っています。
+Tempoに溜めたトレースは、人だけでなくプログラムからも問い合わせられます。[mcp-grafana](https://github.com/grafana/mcp-grafana)は、GrafanaをMCPのサーバーとして公開するツールです。Tempo向けには次のようなツールを持っています。
 
 - `search_tempo_traces`：TraceQLでトレースを検索する
 - `query_tempo_metrics`：TraceQLのメトリクスを計算する
@@ -154,13 +154,13 @@ Tempoに溜めたトレースは、人だけでなくプログラムからも問
 
 エージェントは、まずGitの履歴を読み、`search_tempo_traces`でコミットごとの所要時間を並べました。そこから導いた結論は、所要時間が約2秒から約21秒に跳ねたのは「整理した」コミットだというものです。遅くなる前と後のトレースを`diff_tempo_traces`で比べ、`RUN go mod download && go build`の手順に約19.9秒かかるようになったことと、以前は依存のダウンロードがキャッシュから読まれていたことも確かめました。
 
-修正では、`go.mod`と`go.sum`を先にコピーする順序とキャッシュマウントを元に戻し、後から足されたラベルは残しました。再ビルドのあとは新しいトレースが検索できるようになるのを待ち、所要時間が2.31秒に戻ったことをTempoで確かめています。全体で約3分かかり、そのうち約1分半は新しいトレースを待つ時間でした[^cost]。
+修正では、`go.mod`と`go.sum`を先にコピーする順序とキャッシュマウントを元に戻し、後から足されたラベルは残しました。再ビルドのあとは新しいトレースが検索できるようになるのを待ち、所要時間が2.31秒に戻ったことをTempoで確かめています。全体で約3分かかり、そのうち約1分半は新しいトレースを待つ時間でした。
 
 ## オブザーバビリティのSaaSに送る利点
 
 ここまでは、手元のotel-lgtmにトレースを送ってきました。otel-lgtmは、イメージの説明にあるとおり開発、デモ、テストのための環境で、コンテナを消せばトレースも消えます。ビルドをまたいで問いを立てるには、トレースを長く残せて、CIのrunnerからも送れる場所が必要です。[Grafana Cloud](https://grafana.com/products/cloud/)のようなオブザーバビリティのSaaSに送ると、その場所を自分で運用せずに済みます。
 
-保持期間は、Grafana CloudのTracesではFreeプランで14日、Proプランで30日です[^pricing]。BuildKitの履歴の48時間か50回分より長く、手元の開発機のビルドとCIのビルドを同じTempoに入れて、同じクエリで比べられます。
+保持期間は、[Grafana Cloudの料金のページ](https://grafana.com/pricing/)によるとTracesではFreeプランで14日、Proプランで30日です。BuildKitの履歴の48時間か50回分より長く、手元の開発機のビルドとCIのビルドを同じTempoに入れて、同じクエリで比べられます。
 
 Grafana Cloudへ送るときも、builderに渡す環境変数を変えるだけです。Grafana Cloudの[ドキュメント](https://grafana.com/docs/grafana-cloud/send-data/otlp/send-data-otlp/)が示すOTLPの送り方はHTTPなので、BuildKitのデフォルトのgRPCから`http/protobuf`に切り替えました。エンドポイントと認証のヘッダーは、Grafana CloudのポータルのOpenTelemetryのタイルで生成した値をそのまま使いました。
 
@@ -196,29 +196,20 @@ Assistantはデータソースへの問い合わせを17回行い、132秒で答
 
 Assistantは、自前で運用しているGrafanaからGrafana CloudのAssistantにつないで使うこともできます。ただし、複数のデータソースを調べてレポートにまとめるInvestigationsと、Grafana CloudのMCPへの接続は、Grafana Cloudに限られた機能です[^assistant-self]。
 
-## 次に書きたいこと
-
-この記事では、長くなるので、ビルドのトレースをGrafanaに送り、溜めたトレースをAIに調べさせるところまでにしました。次は、これを踏まえてCIの設定も含めて書きたいと考えています。CIのジョブが`TRACEPARENT`を渡せば、ビルドのスパンをジョブのスパンの下に入れて、パイプライン全体の中でビルドを見られるはずです。
-
 ## おわりに
 
 Dockerは、ビルドのトレースを出す仕組みも、それを確認する画面も持っています。ビルドを1回調べるならDockerの画面で十分で、Tempoに送る意味が出てくるのはビルドをまたいだ問いを立てるときだと確認しました。
 
+この記事では、長くなるので、ビルドのトレースをGrafanaに送り、溜めたトレースをAIに調べさせるところまでにしました。次は、これを踏まえてCIの設定も含めて書きたいと考えています。CIのジョブが`TRACEPARENT`を渡せば、ビルドのスパンをジョブのスパンの下に入れて、パイプライン全体の中でビルドを見られるはずです。
+
 ビルドが遅くなったと感じたことがあるなら、まず手元のbuilderに環境変数を2つ足して、トレースを溜めるところから始めてみてください。コンテナビルドでもオブザーバビリティを高めていきましょう。
 
-[^otel]: アプリケーションやインフラからトレース、メトリクス、ログを集めるための、ベンダーに依存しない仕様とSDKの集まりです。CNCFのプロジェクトです。
-[^trace]: 1つの処理の流れを、処理の単位であるスパンの木として記録したものです。スパンには開始時刻、所要時間、親のスパン、属性が付きます。
-[^otlp]: OpenTelemetry Protocolの略で、OpenTelemetryのデータを送るためのプロトコルです。[gRPC](https://grpc.io/)（ポート4317）とHTTP（ポート4318）で送れます。
 [^history-trace-tty]: 標準出力が端末でないときは、Jaeger UIを起動せずに、トレースをJaegerの形式のJSONとして標準出力に書き出しました。
 [^docker-desktop]: 確認したのはLinuxのDocker Engineだけです。Docker Desktopでは`network=host`の意味が変わるので、この設定のままでは届かない可能性があります。
 [^client-env]: buildx v0.29.1は、BuildKitに接続するときに`client.WithTracerDelegate`を指定しています（[`driver/manager.go`](https://github.com/docker/buildx/blob/v0.29.1/driver/manager.go)）。buildxは自分のスパンをBuildKitに渡し、BuildKitがまとめて送ります。BuildKitのREADMEにも、`buildctl`はスパンを`buildkitd`に転送するので、exporterはデーモン側だけに設定すればよいとあります。また、docker-containerドライバーでは`buildctl dial-stdio`というトレースがビルドとは別に毎回届くので、検索するときは`resource.service.name = "buildx"`で絞ると見やすくなります。
-[^traceql]: Grafana Tempoのクエリ言語です。スパンの属性や所要時間でトレースを選び、`| max_over_time(duration)`のように続けると、選んだスパンから時系列のメトリクスを計算できます。
 [^quantile]: `quantile_over_time(duration, .5)`で中央値を取ると、約20秒のビルドが、区間を60秒にすると24.3秒、30秒にすると34.4秒になります。`quantile_over_time`は所要時間を2のべき乗の幅のバケットに入れて近似するので、値がバケットの境目に寄ります。`max_over_time`は、区間に入ったトレースの所要時間の最大値をそのまま返します。
 [^cold]: グラフの範囲から外した最初のビルドは、キャッシュが空だったので38.1秒かかりました。
 [^traceparent]: buildxは、環境変数`TRACEPARENT`があると、それを親のトレースコンテキストとして扱います。この変数が設定されたシェルからビルドすると、ビルドがその親のトレースに入り、`build .`がルートになりません。ビルドを1回ずつ別のトレースにしたいなら、`TRACEPARENT`を外してから実行してください。buildx v0.29.1は、[`cmd/buildx/tracing.go`](https://github.com/docker/buildx/blob/v0.29.1/cmd/buildx/tracing.go)でBuildKit v0.25.0の[`util/tracing/env`](https://github.com/moby/buildkit/blob/v0.25.0/util/tracing/env/traceenv.go)を読み込んでいます。このパッケージが`TRACEPARENT`と`TRACESTATE`を読みます。buildxのもっと新しいバージョンでは、同じ役割のパッケージが`util/tracing/childprocess`に変わっています。
 [^detect]: BuildKit v0.33.1の[`util/tracing/detect/otlp.go`](https://github.com/moby/buildkit/blob/v0.33.1/util/tracing/detect/otlp.go)は、OTLPのクライアントをオプションなしで作っています。OpenTelemetryのGoのexporterは、送り先、プロトコル、ヘッダーを環境変数から読みます。
-[^mcp]: [Model Context Protocol](https://modelcontextprotocol.io/)の略で、AIエージェントが外部のツールやデータにアクセスするためのプロトコルです。
-[^cost]: Claude Codeの表示では18ターンで、費用は0.33ドルでした。
-[^pricing]: 2026年10月20日に[Grafana Cloudの料金のページ](https://grafana.com/pricing/)で確認した値です。同じページによると、Grafana AssistantはFreeプランでも使え、1か月あたり3人のアクティブなAIユーザーまで（1人あたり月4,000万トークン）が含まれます。
 [^assistant-self]: [Grafana Assistantの紹介のページ](https://grafana.com/docs/grafana-cloud/machine-learning/assistant/introduction/)によると、自前で運用しているGrafanaから使う場合も、チャット、ダッシュボードの作成、クエリ、ナビゲーションは使えます。
 [^cloud-search]: Grafana CloudのTempoでビルドのトレースを検索するときは、`name = "build ."`で絞ると確実に見つかります。
