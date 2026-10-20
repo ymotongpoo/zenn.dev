@@ -192,7 +192,7 @@ Assistantはデータソースへの問い合わせを17回行い、132秒で答
 
 `9eac8b9`は「整理した」コミットで、答えは正しいものでした。手順についても、速いビルドの6ステップと遅いビルドの4ステップを比べた結果、遅いほうでは`RUN go mod download && go build`の1つの手順が約19.4秒、全体の約95%を占めるという答えです。依存の取得のキャッシュが効かなくなったことを原因として推測しつつ、「このデータにはコミットの親子順がありません」と書き、時間の順で最初に遅くなったコミットだという限定も付けていました。動作確認のために送った30.2秒のビルドも、コミットの属性がないことに気づいて、ほかのビルドとは別に扱っていました。
 
-Assistantは、自前で運用しているGrafanaからGrafana CloudのAssistantにつないで使うこともできます。ただし、複数のデータソースを調べてレポートにまとめるInvestigationsと、Grafana CloudのMCPへの接続は、Grafana Cloudに限られた機能です[^assistant-self]。
+Assistantは、自前で運用しているGrafanaからGrafana CloudのAssistantにつないで使うこともできます[^assistant-self]。
 
 ## おわりに
 
@@ -209,6 +209,6 @@ Dockerは、ビルドのトレースを出す仕組みも、それを確認す�
 [^cold]: グラフの範囲から外した最初のビルドは、キャッシュが空だったので38.1秒かかりました。
 [^traceparent]: buildxは、環境変数`TRACEPARENT`があると、それを親のトレースコンテキストとして扱います。この変数が設定されたシェルからビルドすると、ビルドがその親のトレースに入り、`build .`がルートになりません。ビルドを1回ずつ別のトレースにしたいなら、`TRACEPARENT`を外してから実行してください。buildx v0.29.1は、[`cmd/buildx/tracing.go`](https://github.com/docker/buildx/blob/v0.29.1/cmd/buildx/tracing.go)でBuildKit v0.25.0の[`util/tracing/env`](https://github.com/moby/buildkit/blob/v0.25.0/util/tracing/env/traceenv.go)を読み込んでいます。このパッケージが`TRACEPARENT`と`TRACESTATE`を読みます。buildxのもっと新しいバージョンでは、同じ役割のパッケージが`util/tracing/childprocess`に変わっています。
 [^detect]: BuildKit v0.33.1の[`util/tracing/detect/otlp.go`](https://github.com/moby/buildkit/blob/v0.33.1/util/tracing/detect/otlp.go)は、OTLPのクライアントをオプションなしで作っています。OpenTelemetryのGoのexporterは、送り先、プロトコル、ヘッダーを環境変数から読みます。
-[^assistant-self]: [Grafana Assistantの紹介のページ](https://grafana.com/docs/grafana-cloud/machine-learning/assistant/introduction/)によると、自前で運用しているGrafanaから使う場合も、チャット、ダッシュボードの作成、クエリ、ナビゲーションは使えます。
+[^assistant-self]: [Grafana Assistantの紹介のページ](https://grafana.com/docs/grafana-cloud/machine-learning/assistant/introduction/)によると、自前で運用しているGrafanaから使う場合も、チャット、ダッシュボードの作成、クエリ、ナビゲーションは使えます。ただし、複数のデータソースを調べてレポートにまとめるInvestigationsと、Grafana CloudのMCPへの接続は、Grafana Cloudに限られた機能です。
 [^cloud-search]: Grafana CloudのTempoでビルドのトレースを検索するときは、`name = "build ."`で絞ると確実に見つかります。
 [^retention]: [Grafana Cloudの料金のページ](https://grafana.com/pricing/)によると、Tracesの保持期間はFreeプランで14日、Proプランで30日です。BuildKitの履歴の48時間か50回分より長く、手元の開発機のビルドとCIのビルドを同じTempoに入れて、同じクエリで比べられます。
