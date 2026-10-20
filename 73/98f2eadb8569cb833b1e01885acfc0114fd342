@@ -1,0 +1,20 @@
+articles/20261027-buildkit-traces-tempo.md
+  s_e4fa66530811a2::t_bdcc9c76b94b30 1-218
+  s_e4fa66530811a2::t_7b248c10fe9a15 219-227
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "7398f2eadb8569cb833b1e01885acfc0114fd342",
+  "prompts": {},
+  "sessions": {
+    "s_e4fa66530811a2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "64f5fe81-0139-4903-849e-798e2e760e4f",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Yoshi Yamaguchi <ymotongpoo@gmail.com>"
+    }
+  }
+}
