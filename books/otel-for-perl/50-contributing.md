@@ -8,7 +8,7 @@ title: "Perl実装にいま必要なもの"
 
 | 課題 | 種類 | 確かめた章 | 修正先 |
 | --- | --- | --- | --- |
-| Batchプロセッサーが `OTEL_BSP_SCHEDULE_DELAY` の間隔で送らず、キューが512件に達するまで送らない | SDKの未実装 | 8章 | [perl-opentelemetry-sdk](https://github.com/jjatria/perl-opentelemetry-sdk)（[#27に報告済み](https://github.com/jjatria/perl-opentelemetry-sdk/issues/27)、実装の設計を[提案](https://github.com/jjatria/perl-opentelemetry-sdk/issues/27#issuecomment-6260523597)） |
+| Batchプロセッサーが `OTEL_BSP_SCHEDULE_DELAY` の間隔で送らず、キューが512件に達するまで送らない | SDKの未実装 | 8章 | [perl-opentelemetry-sdk](https://github.com/jjatria/perl-opentelemetry-sdk)（[#27に報告済み](https://github.com/jjatria/perl-opentelemetry-sdk/issues/27)、実装を[PR #30](https://github.com/jjatria/perl-opentelemetry-sdk/pull/30)で提案） |
 | IO::Asyncのループを回さないアプリケーションでは、送信が止まる（本書の構成では512件の6〜8回分）。Batchプロセッサーにはループが必要という原則が、Guidesに書かれていない | SDKの設計と文書 | 8章 | perl-opentelemetryのGuides（[#23](https://github.com/jjatria/perl-opentelemetry/issues/23)で相談。作者はFAQの形の文書を検討中） |
 | ループを回さないアプリケーションに向くSimpleプロセッサーを、環境変数で選べない | SDKの設定 | 4章、8章 | perl-opentelemetry-sdk |
 | `shutdown` がキューを送らずに捨てる | SDKの不具合 | 4章、8章 | perl-opentelemetry-sdk（[#25](https://github.com/jjatria/perl-opentelemetry-sdk/issues/25)に報告。作者が[49f3453](https://github.com/jjatria/perl-opentelemetry-sdk/commit/49f3453adddf1b8661cc565a6371bc4f2287decb)で修正、未リリース） |
@@ -34,7 +34,7 @@ READMEの古さは、たとえば次のような記述です。APIのREADMEに�
 
 IO::Asyncのループの問題については、作者がissue #23で文書化の必要を認めています。PSGIサーバーでの測定結果と回避策は、同じissueに[コメント](https://github.com/jjatria/perl-opentelemetry/issues/23#issuecomment-6049916551)しました。作者の[返答](https://github.com/jjatria/perl-opentelemetry/issues/23#issuecomment-6150108237)は、フレームワークごとの手順よりも、「an event loop is needed if you are using the batch processor」（Batchプロセッサーを使うならイベントループが必要）という原則を説明したい、というものでした。筆者が、ループの無いアプリケーションにはSimpleプロセッサーを勧める節を足す案を示すと、作者は8章で紹介したとおり、回すループを見つけるほうを勧めるべきだと返しました。8章で測ったNet::Async::HTTP::Serverは、その具体例です。作者は#24で、FAQの形の文書を検討しているとも書いています。筆者は文書の形を作者に任せ、作者が勧めたサーバーで測った結果を伝えることにしました。
 
-`OTEL_BSP_SCHEDULE_DELAY` で送る機能は、当初はそれより大きな作業だと考えていました。IO::Asyncのループを回さないプロセスには、5秒ごとに何かを動かす仕組みそのものが無いからです。定期的に送られないことを[issue #27](https://github.com/jjatria/perl-opentelemetry-sdk/issues/27)として報告すると、作者はこの機能を実装するpull requestを歓迎し、IO::Asyncのタイマーを使う方法を望むと返しました[^pr7]。8章で引用したとおり、ループを回さないアプリケーションはそもそもBatchプロセッサーを使わない前提です。タイマーは、IO::Asyncのループの中で動けば十分です。筆者が `IO::Async::Timer::Countdown` で実装する設計を[返信](https://github.com/jjatria/perl-opentelemetry-sdk/issues/27#issuecomment-6260523597)すると、作者は設計を妥当とし、送信の最中にタイマーが次の送信を始める競合に気を付けるよう求めました。筆者は、どの経路の送信でも、送信中はタイマーで送らない形で実装しています。8章のNet::Async::HTTP::Serverの測定で、すべてのスパンが届いた版です。
+`OTEL_BSP_SCHEDULE_DELAY` で送る機能は、当初はそれより大きな作業だと考えていました。IO::Asyncのループを回さないプロセスには、5秒ごとに何かを動かす仕組みそのものが無いからです。定期的に送られないことを[issue #27](https://github.com/jjatria/perl-opentelemetry-sdk/issues/27)として報告すると、作者はこの機能を実装するpull requestを歓迎し、IO::Asyncのタイマーを使う方法を望むと返しました[^pr7]。8章で引用したとおり、ループを回さないアプリケーションはそもそもBatchプロセッサーを使わない前提です。タイマーは、IO::Asyncのループの中で動けば十分です。筆者が `IO::Async::Timer::Countdown` で実装する設計を[返信](https://github.com/jjatria/perl-opentelemetry-sdk/issues/27#issuecomment-6260523597)すると、作者は設計を妥当とし、送信の最中にタイマーが次の送信を始める競合に気を付けるよう求めました。筆者は、どの経路の送信でも、送信中はタイマーで送らない形で実装し、2026年10月20日に[pull request #30](https://github.com/jjatria/perl-opentelemetry-sdk/pull/30)として送りました。8章のNet::Async::HTTP::Serverの測定で、すべてのスパンが届いた版です。
 
 [^pr7]: アプリケーションのプロセスの中で送信できるようにする変更は、2023年11月にSDKの[pull request #7](https://github.com/jjatria/perl-opentelemetry-sdk/pull/7)として出され、デバッグ用の提案としてdraftのまま残っています。作者の返答は、この形でマージするものではないとしつつ「it must not block the main process」というものでした。
 
