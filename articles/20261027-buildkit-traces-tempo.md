@@ -206,6 +206,20 @@ about 30 seconds to become searchable.
 
 ルートは`claude_code.interaction`です。その下に、LLMへの問い合わせの`claude_code.llm_request`と、ツールの呼び出しの`claude_code.tool`が並びます。`docker buildx build`を実行したツールの呼び出しの下には`build .`があり、さらにその下にBuildKitの手順のスパンが続く構造です。エージェントが何を調べ、何を実行し、その結果ビルドの中で何が起きたのかを、1本のトレースで追えます。
 
+## オブザーバビリティのSaaSに送る利点
+
+ここまでは、手元のotel-lgtmにトレースを送ってきました。otel-lgtmは、イメージの説明にあるとおり開発、デモ、テストのための環境で、コンテナを消せばトレースも消えます。ビルドをまたいで問いを立てるには、トレースを長く残せて、CIのrunnerからも送れる場所が必要です。[Grafana Cloud](https://grafana.com/products/cloud/)のようなオブザーバビリティのSaaSに送ると、その場所を自分で運用せずに済みます。
+
+保持期間は、Grafana CloudのTracesではFreeプランで14日、Proプランで30日です[^pricing]。BuildKitの履歴の48時間か50回分より長く、手元の開発機のビルドとCIのビルドを同じTempoに入れて、同じクエリで比べられます。使い捨てのrunnerから送る場合も、OTLPのエンドポイントと認証のヘッダーを環境変数で渡すだけです（試していない点は「残っている課題」に書きました）。
+
+### Grafana Assistantに調べさせる
+
+SaaSの側には、溜めたトレースを調べる機能も最初から用意されています。その例が、Grafana Cloudに組み込まれたAIアシスタントの[Grafana Assistant](https://grafana.com/docs/grafana-cloud/machine-learning/assistant/)です。[ドキュメント](https://grafana.com/docs/grafana-cloud/platform/grafana-assistant/guides/querying/)によると、AssistantはTempoを含むデータソースに問い合わせ、TraceQLのクエリを書いて実行できます。トレースのIDを渡せば1本のトレースをウォーターフォールで表示でき、実験的な機能として、あるトレースと比べる候補のトレースを探すこともできます。
+
+前の節でエージェントに調べさせたときは、mcp-grafanaをコンテナで起動し、Claude Codeに設定を渡す準備が必要でした。Assistantは最初からスタックのデータソースにつながっているので、この準備は要らないのが利点です。ビルドが遅くなったことに気づいた人が、Grafanaの画面からそのまま「ビルドの所要時間はいつから延びたか」と聞けば済みます。原因の調査まではAssistantに任せ、Dockerfileを直して再ビルドするところはリポジトリを編集できるコーディングエージェントに任せる、という分担です。
+
+Assistantは、自前で運用しているGrafanaからGrafana CloudのAssistantにつないで使うこともできます。ただし、複数のデータソースを調べてレポートにまとめるInvestigationsと、Grafana CloudのMCPへの接続は、Grafana Cloudに限られた機能です[^assistant-self]。なお、この記事を書いた時点では、ビルドのトレースをGrafana Cloudに送ってAssistantに聞くところまでは試していません。
+
 ## 残っている課題
 
 CIで使う方法は試していません。CIのジョブが`TRACEPARENT`を渡せば、ビルドのスパンをジョブのスパンの下に入れられるはずです。ただ、確認したのはbuildxのコードと手元の動作だけで、CIのジョブのスパンを作る側の仕組みも別に必要になります。
@@ -232,3 +246,5 @@ Dockerは、ビルドのトレースを出す仕組みも、それを見る画�
 [^cost]: このときのClaude Codeの表示では、費用は0.28ドルでした。1回目の試行は15ターン、40秒、0.36ドルです。
 [^propagate]: ドキュメントによると、`ANTHROPIC_BASE_URL`で独自のプロキシを指定している場合は、`CLAUDE_CODE_PROPAGATE_TRACEPARENT=1`を設定しない限り`TRACEPARENT`を渡しません。
 [^enhanced]: トレースを出すには`CLAUDE_CODE_ENABLE_TELEMETRY`に加えて`CLAUDE_CODE_ENHANCED_TELEMETRY_BETA`を有効にする必要があり、2026年10月20日の時点ではbetaの機能です。
+[^pricing]: 2026年10月20日に[Grafana Cloudの料金のページ](https://grafana.com/pricing/)で確認した値です。同じページによると、Grafana AssistantはFreeプランでも使え、1か月あたり3人のアクティブなAIユーザーまで（1人あたり月4,000万トークン）が含まれます。
+[^assistant-self]: [Grafana Assistantの紹介のページ](https://grafana.com/docs/grafana-cloud/machine-learning/assistant/introduction/)によると、自前で運用しているGrafanaから使う場合も、チャット、ダッシュボードの作成、クエリ、ナビゲーションは使えます。
