@@ -1,0 +1,19 @@
+articles/20261027-buildkit-traces-tempo.md
+  s_059bf482b8a148::t_eb32cb50858de7 6-7
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "ec7fba8d07c727bf5325ef8caadf452cea14f454",
+  "prompts": {},
+  "sessions": {
+    "s_059bf482b8a148": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "s_059bf482b8a148",
+        "model": "unknown"
+      },
+      "human_author": "Yoshi Yamaguchi <ymotongpoo@gmail.com>"
+    }
+  }
+}
