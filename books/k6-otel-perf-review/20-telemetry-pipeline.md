@@ -2,15 +2,15 @@
 title: "試験とアプリのテレメトリーを集める"
 ---
 
-ここまでの数字はすべて[k6](https://grafana.com/docs/k6/v2.3.x/)の側から見たものでした。k6が測るのは、リクエストを送ってから応答を受け取るまでの時間です。その時間のうち、`catalog-api`の中でどれだけ使い、`inventory`でどれだけ使ったのかは、k6には見えません。修正前の版が毎秒100件で2.6秒かかった理由も、修正後の版が毎秒150件で502を返した理由も、ここまでは2章で決めた構成の数字から逆算したにすぎません。
+ここまでの数字はすべて[k6](https://grafana.com/docs/k6/v2.3.x/)の側から見たものでした。k6が測るのは、リクエストを送ってから応答を受け取るまでの時間です。その時間のうち、`catalog-api`の中でどれだけ使い、`inventory`でどれだけ使ったのかは、k6には見えません。修正前のバージョンが毎秒100件で2.6秒かかった理由も、修正後のバージョンが毎秒150件で502を返した理由も、ここまでは2章で決めた構成の数字から逆算したにすぎません。
 
-アプリケーションの中で起きたことを確かめるには、アプリケーション自身が出すテレメトリーが必要です。この章では、`catalog-api`と`inventory`のテレメトリーと、k6の試験のメトリクスを1か所に集める構成を組みます。
+アプリケーションの中で起きたことを確かめるには、アプリケーション自身が出すテレメトリーが必要です。`catalog-api`と`inventory`のテレメトリーと、k6の試験のメトリクスを1か所に集めてみましょう。
 
 ## アプリケーションの計装
 
 OpenTelemetryではテレメトリーをトレース、メトリクス、ログの3種類の**シグナル**に分けます。**トレース**は、1件のリクエストの処理を、区間を表す**スパン**の木で表したものです。スパンは名前と開始と終了の時刻を持ち、親のスパンの中に子のスパンが入ります。`catalog-api`のスパンの子として`inventory`のスパンを記録するには、HTTPのヘッダーでトレースの識別子を受け渡します。この受け渡しを**伝搬**（propagation）と呼び、ヘッダーの形式は[W3C Trace Context](https://www.w3.org/TR/trace-context/)の`traceparent`です。
 
-題材の2つのサービスは、同じ初期化のコードでSDKを設定しています。送信のプロトコルは3つのシグナルともOTLP/HTTPです。送り先とサービス名は、標準の環境変数`OTEL_EXPORTER_OTLP_ENDPOINT`と`OTEL_SERVICE_NAME`で渡します。
+サンプルの2つのサービスは、同じ初期化のコードでSDKを設定しています。送信のプロトコルは3つのシグナルともOTLP/HTTPです。送り先とサービス名は、標準の環境変数`OTEL_EXPORTER_OTLP_ENDPOINT`と`OTEL_SERVICE_NAME`で渡します。
 
 ```go
 tp := sdktrace.NewTracerProvider(sdktrace.WithResource(res), sdktrace.WithBatcher(te))
@@ -27,7 +27,7 @@ otel.SetLoggerProvider(lp)
 logger := slog.New(otelslog.NewHandler(scope, otelslog.WithLoggerProvider(lp)))
 ```
 
-最後の`logger`は抜粋のために簡略化しており、題材のコードでは同じログを標準出力にも書いています。
+最後の`logger`は抜粋のために簡略化しており、サンプルのコードでは同じログを標準出力にも書いています。
 
 HTTPの計装には[otelhttp](https://pkg.go.dev/go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp@v0.72.0)を使います。サーバー側はハンドラーを`otelhttp.NewHandler`で包み、クライアント側は`http.Client`のトランスポートを`otelhttp.NewTransport`で包む形です。`traceparent`は、クライアント側の計装がリクエストに付けます。
 
@@ -61,7 +61,7 @@ environment:
 
 この出力が送るのはメトリクスだけです。k6の試験のあとで、Tempoに記録されたサービスは`catalog-api`と`inventory`の2つだけで、`service.name`が`k6`のトレースは0件でした。Lokiのログにも同じ2つのサービスのものしかありません。k6の出力を有効にしても、アプリケーションの分散トレースが生成されるわけではありません。トレースは、アプリケーション側の計装と伝搬で作るものです。
 
-Mimirに届いたk6のメトリクスは、`http_req_duration_milliseconds`のヒストグラムや`http_reqs_total`、`dropped_iterations_total`のような名前です。k6のタグはOpenTelemetryの属性に変換され、Mimirではラベルになります。題材の試験では、試験ごとに`testid`タグを付けているので、試験を`testid`のラベルで選べます。
+Mimirに届いたk6のメトリクスは、`http_req_duration_milliseconds`のヒストグラムや`http_reqs_total`、`dropped_iterations_total`のような名前です。k6のタグはOpenTelemetryの属性に変換され、Mimirではラベルになります。サンプルの試験では、試験ごとに`testid`タグを付けているので、試験を`testid`のラベルで選べます。
 
 ```javascript
 const label = __ENV.LABEL || model;
@@ -75,20 +75,9 @@ export const options = {
 
 ## 収集と保存
 
-3つのサービスのテレメトリーは、いったん[Grafana Alloy](https://grafana.com/docs/alloy/v1.20/)に集めます。AlloyはGrafana Labsが開発するテレメトリーのコレクターで、OpenTelemetry Collectorの部品を組み合わせて設定を書けます。題材の設定は、OTLPを受けてシグナルごとに保存先へ振り分けるだけです。
+3つのサービスのテレメトリーは、いったん[Grafana Alloy](https://grafana.com/docs/alloy/v1.20/)に集めます。AlloyはGrafana Labsが開発するテレメトリーのコレクターで、OpenTelemetry Collectorのコンポーネントを組み合わせて設定を書けます。サンプルの設定は、OTLPを受けてシグナルごとに保存先へ振り分けるだけです[^alloy]。中心は、バッチ処理のあとの振り分けの部分です。
 
 ```alloy
-otelcol.receiver.otlp "default" {
-  grpc { endpoint = "0.0.0.0:4317" }
-  http { endpoint = "0.0.0.0:4318" }
-
-  output {
-    metrics = [otelcol.processor.batch.default.input]
-    traces  = [otelcol.processor.batch.default.input]
-    logs    = [otelcol.processor.batch.default.input]
-  }
-}
-
 otelcol.processor.batch "default" {
   output {
     metrics = [otelcol.exporter.otlphttp.mimir.input]
@@ -96,24 +85,11 @@ otelcol.processor.batch "default" {
     logs    = [otelcol.exporter.otlphttp.loki.input]
   }
 }
-
-otelcol.exporter.otlphttp "mimir" {
-  client { endpoint = "http://mimir:9009/otlp" }
-}
-
-otelcol.exporter.otlp "tempo" {
-  client {
-    endpoint = "tempo:4317"
-    tls { insecure = true }
-  }
-}
-
-otelcol.exporter.otlphttp "loki" {
-  client { endpoint = "http://loki:3100/otlp" }
-}
 ```
 
-保存先は3つです。メトリクスは[Grafana Mimir](https://grafana.com/docs/mimir/v3.2.x/)、トレースは[Grafana Tempo](https://grafana.com/docs/tempo/v3.1.x/)、ログは[Grafana Loki](https://grafana.com/docs/loki/v3.7.x/)に入れ、[Grafana](https://grafana.com/docs/grafana/v13.2/)から3つを横断して調べます。いずれもOTLPを直接受け付けるので、Alloyの側での形式の変換は不要です。題材ではどれも単一のプロセスで動かし、データはローカルのファイルシステムに置いています。
+[^alloy]: 設定の全体は、サンプルのリポジトリの[`config/config.alloy`](https://github.com/ymotongpoo/k6-otel-perf-review/blob/f86b6ed88a1dbb34050897a984f9997e67f78d4a/config/config.alloy)にあります。OTLPの受け口（gRPCの4317番とHTTPの4318番）、バッチ処理、3つの保存先への送信からなります。
+
+保存先は3つです。メトリクスは[Grafana Mimir](https://grafana.com/docs/mimir/v3.2.x/)、トレースは[Grafana Tempo](https://grafana.com/docs/tempo/v3.1.x/)、ログは[Grafana Loki](https://grafana.com/docs/loki/v3.7.x/)に入れ、[Grafana](https://grafana.com/docs/grafana/v13.2/)から3つを横断して調べます。いずれもOTLPを直接受け付けるので、Alloyの側での形式の変換は不要です。サンプルではどれも単一のプロセスで動かし、データはローカルのファイルシステムに置いています。
 
 保存先によって、OpenTelemetryのリソース属性の扱いが違います。Mimirでは、`service.name`が`job`ラベルになります。選ぶ条件は、`catalog-api`のメトリクスなら`job="catalog-api"`、k6のメトリクスなら`job="k6"`です。Lokiでは、`service.name`が`service_name`というラベルになり、ログに付いたトレースIDとスパンIDは構造化メタデータの`trace_id`と`span_id`に入ります。
 
@@ -134,6 +110,9 @@ Grafanaでは、Tempoのデータソースにトレースからログへ移る�
       query: '{service_name="$${__span.tags["service.name"]}"} | trace_id="$${__span.traceId}"'
 ```
 
-`inventory`があふれて503を返した回のトレースを1件選び、このクエリと同じ条件でLokiを検索すると、`catalog-api`が書いた「backend returned error」のログが1件返りました。トレースとログは、トレースIDで1件ずつ対応しています。
+これでk6のメトリクス、アプリケーションのメトリクス、トレース、ログの4種類が同じGrafanaから引けるようになりました。サンプルのリポジトリには、k6とアプリケーションのメトリクスを並べたダッシュボードも入れてあります。3章の修正前のバージョンに毎秒100件をかけた試験を選んだ画面が、図1です。
 
-これでk6のメトリクス、アプリケーションのメトリクス、トレース、ログの4種類が同じGrafanaから引けるようになりました。ただし、4種類のつながり方は同じではありません。トレースとログはトレースIDでつながり、k6のメトリクスとアプリケーションのメトリクスをつなぐものは時刻だけです。
+![k6の完了したリクエストの頻度は毎秒77件前後、k6から見たp(95)は約4.8秒、VUの数は200で頭打ち、catalog-apiのサーバー側のp(95)は約4.9秒、inventoryは0秒近くのまま](/images/20261118-grafana-dashboard-open-l4-r100.png)
+*図1: 修正前のバージョンに毎秒100件をかけた試験を、サンプルのダッシュボードでGrafanaに表示した画面。上の2段がk6のメトリクス、下の段がアプリケーションのメトリクス*
+
+同じ画面に並んでいても、4種類のつながり方は同じではありません。トレースとログはトレースIDでつながり、k6のメトリクスとアプリケーションのメトリクスをつなぐものは時刻だけです。図1の上の2段は`testid`で試験を選べますが、下の段は同じ時間範囲を表示しているにすぎません。

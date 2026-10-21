@@ -2,14 +2,14 @@
 title: "参考文献"
 ---
 
-本書で参照した一次情報の一覧です。いずれも2026年10月8日に確認しました。ドキュメントは版を固定したURLを優先しています。
+本書で参照した一次情報の一覧です。いずれも2026年10月21日に確認しました。ドキュメントはバージョンを固定したURLを優先しています。
 
 ## 検証環境
 
-| 対象 | 版 | 入手先 |
+| 対象 | バージョン | 入手先 |
 | --- | --- | --- |
 | k6 | v2.3.0（`grafana/k6:2.3.0@sha256:9c2dee7f8ed74d317e4027c06a10f169b625638189de8d4555d0b3486a5aeb34`） | [grafana/k6](https://github.com/grafana/k6/releases/tag/v2.3.0) |
-| Go | 1.26.0（`golang:1.26.0`） | [go.dev](https://go.dev/dl/) |
+| Go | 1.27.3（`golang:1.27.3`） | [go.dev](https://go.dev/dl/) |
 | OpenTelemetry Go | v1.47.0 | [open-telemetry/opentelemetry-go](https://github.com/open-telemetry/opentelemetry-go/releases/tag/v1.47.0) |
 | otelhttp | v0.72.0 | [opentelemetry-go-contrib](https://github.com/open-telemetry/opentelemetry-go-contrib/releases/tag/v1.47.0) |
 | otelslog | v0.21.0 | 同上 |
@@ -19,7 +19,7 @@ title: "参考文献"
 | Grafana Loki | 3.7.8 | [grafana/loki](https://github.com/grafana/loki/releases/tag/v3.7.8) |
 | Grafana | 13.2.3 | [grafana/grafana](https://github.com/grafana/grafana/releases/tag/v13.2.3) |
 
-題材のコードと実験のスクリプトは[ymotongpoo/k6-otel-perf-review](https://github.com/ymotongpoo/k6-otel-perf-review)にあります。コンテナイメージのダイジェストは、このリポジトリの`compose.yaml`と`Dockerfile`に固定してあります。
+サンプルのコードと実験のスクリプトは[ymotongpoo/k6-otel-perf-review](https://github.com/ymotongpoo/k6-otel-perf-review)にあります。コンテナイメージのダイジェストは、このリポジトリの`compose.yaml`と`Dockerfile`に固定してあります。
 
 ## k6
 
