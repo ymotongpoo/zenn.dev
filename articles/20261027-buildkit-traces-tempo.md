@@ -28,7 +28,7 @@ published_at: 2026-10-27 09:00
 
 ## TL;DR
 
-Dockerのビルドを実行する[BuildKit](https://docs.docker.com/build/buildkit/)は、ビルドごとにOpenTelemetryのトレースを出しています。そのトレースは`docker buildx history trace`でJaeger UIに開けるので、ビルドを1回調べるならその画面で十分です。ただし、BuildKitが残す履歴はデフォルトで48時間か50回分までです。同じトレースをGrafana Tempoに送ってコミットのIDを付けておけば、どのコミットからビルドが遅くなったのかをグラフで特定できます。コーディングエージェントやGrafana Assistantにトレースを読ませれば、遅くしたコミットと手順を見つけるところまで任せられます。
+Dockerのビルドを実行する[BuildKit](https://docs.docker.com/build/buildkit/)は、ビルドごとにOpenTelemetryのトレースを出しています。そのトレースは`docker buildx history trace`でJaeger UIに開けるので、ビルドを1回調べるならその画面で十分です。BuildKitの履歴は、デフォルトでは最新50件を残し、それ以外で48時間を超えたものが削除されます。同じトレースをGrafana Tempoに送ってコミットのIDを付けておけば、どのコミットからビルドが遅くなったのかをグラフで特定できます。コーディングエージェントやGrafana Assistantにトレースを読ませれば、遅くしたコミットと手順を見つけるところまで任せられます。
 
 ## BuildKitが出すトレース
 
@@ -75,7 +75,7 @@ docker buildx build --builder gf-demo --load .
 
 ここまでなら、Dockerの画面で十分です。Tempoへ送る価値が出てくるのは、ビルドが1回ではなく、CI/CDのように継続的に多数行われるときです。
 
-[BuildKitの設定](https://github.com/moby/buildkit/blob/v0.33.1/docs/buildkitd.toml.md)では、ビルドの履歴はデフォルトで`maxAge = 172800`（48時間）、`maxEntries = 50`です。`docker buildx history trace`で開けるのは、この履歴に残っているビルドだけで、`--compare`で2回分を並べて比べる場合も同じ制約がかかります。
+[BuildKitの設定](https://github.com/moby/buildkit/blob/v0.33.1/docs/buildkitd.toml.md)では、ビルドの履歴はデフォルトで`maxAge = 172800`（48時間）、`maxEntries = 50`です。これはどちらかを超えたら削除する上限ではありません。最新50件を残し、それ以外で48時間を超えた履歴を削除します[^history-gc]。`docker buildx history trace`で開けるのは、この履歴に残っているビルドだけで、`--compare`で2回分を並べて比べる場合も同じ制約がかかります。
 
 使い捨てのCIのrunnerでは、ジョブが終わればbuilderごと履歴も消えます。DockerはGitHub Actions向けに、[ビルドの記録をZIPのアーティファクトとして残す](https://docs.docker.com/build/ci/github-actions/build-summary/)機能を持っています。ただ、それをDocker Desktopに取り込んで見るのは、CIの実行1回分ずつです。「どのコミットからビルドが遅くなったのか」を答えるには、何十回分ものビルドを取得して比較しなければなりません。
 
@@ -159,7 +159,7 @@ Tempoに溜めたトレースは、人だけでなくプログラムからも問
 
 ## オブザーバビリティのSaaSに送る利点
 
-ここまでは、手元のotel-lgtmにトレースを送ってきました。otel-lgtmは、イメージの説明にあるとおり開発、デモ、テストのための環境で、コンテナを消せばトレースも消えます。ビルドをまたいで問いを立てるには、トレースを長く残せて、CIのrunnerからも送れる場所が必要です。[Grafana Cloud](https://grafana.com/products/cloud/)のようなオブザーバビリティのSaaSに送ると、その場所を自分で運用せずに済みます。たとえばGrafana Cloudでも、BuildKitで保持する量よりも圧倒的に多くのトレースを保持できます[^retention]。
+ここまでは、手元のotel-lgtmにトレースを送ってきました。otel-lgtmは、イメージの説明にあるとおり開発、デモ、テストのための環境で、コンテナを消せばトレースも消えます。ビルドをまたいで問いを立てるには、トレースを長く残せて、CIのrunnerからも送れる場所が必要です。[Grafana Cloud](https://grafana.com/products/cloud/)のようなオブザーバビリティのSaaSに送ると、その場所を自分で運用せずに済みます。Grafana Cloudでは、プランに応じた期間、トレースを保持できます[^retention]。
 
 Grafana Cloudへ送るときも、builderに渡す環境変数を変えるだけです。Grafana Cloudの[OTLPのゲートウェイ](https://grafana.com/docs/grafana-cloud/send-data/otlp/send-data-otlp/)にはOTLP/HTTPで送るので、BuildKitのデフォルトのgRPCから`http/protobuf`に切り替えます。エンドポイントと認証のヘッダーは、Grafana CloudのポータルのOpenTelemetryのタイルで生成した値をそのまま使いました。
 
@@ -204,6 +204,7 @@ Dockerは、ビルドのトレースを出す仕組みも、それを確認す�
 ビルドが遅くなったと感じたことがあるなら、まず手元のbuilderに環境変数を2つ足して、トレースを溜めるところから始めてみてください。コンテナビルドでもオブザーバビリティを高めていきましょう。
 
 [^history-trace-tty]: 標準出力が端末でないときは、Jaeger UIを起動せずに、トレースをJaegerの形式のJSONとして標準出力に書き出しました。
+[^history-gc]: BuildKit v0.33.1の[`Queue.gc`](https://github.com/moby/buildkit/blob/v0.33.1/solver/llbsolver/history/buildhistory.go#L208-L252)は、pinされた履歴を対象から外し、残りを新しい順に並べます。そのうち最新50件を除き、完了から48時間を超えた履歴を削除します。pinされた履歴はこのGCでは削除されません。保持条件は設定で変更できます。
 [^docker-desktop]: 確認したのはLinuxのDocker Engineだけです。Docker Desktopでは`network=host`の意味が変わるので、この設定のままでは届かない可能性があります。
 [^client-env]: buildx v0.29.1は、BuildKitに接続するときに`client.WithTracerDelegate`を指定しています（[`driver/manager.go`](https://github.com/docker/buildx/blob/v0.29.1/driver/manager.go)）。buildxは自分のスパンをBuildKitに渡し、BuildKitがまとめて送ります。BuildKitのREADMEにも、`buildctl`はスパンを`buildkitd`に転送するので、exporterはデーモン側だけに設定すればよいとあります。また、docker-containerドライバーでは`buildctl dial-stdio`というトレースがビルドとは別に毎回届くので、検索するときは`resource.service.name = "buildx"`で絞ると見やすくなります。
 [^quantile]: `quantile_over_time(duration, .5)`で中央値を取ると、約20秒のビルドが、区間を60秒にすると24.3秒、30秒にすると34.4秒になります。`quantile_over_time`は所要時間を2のべき乗の幅のバケットに入れて近似するので、値がバケットの境目に寄ります。`max_over_time`は、区間に入ったトレースの所要時間の最大値をそのまま返します。
@@ -212,4 +213,4 @@ Dockerは、ビルドのトレースを出す仕組みも、それを確認す�
 [^detect]: BuildKit v0.33.1の[`util/tracing/detect/otlp.go`](https://github.com/moby/buildkit/blob/v0.33.1/util/tracing/detect/otlp.go)は、OTLPのクライアントをオプションなしで作っています。OpenTelemetryのGoのexporterは、送り先、プロトコル、ヘッダーを環境変数から読みます。
 [^assistant-self]: [Grafana Assistantの紹介のページ](https://grafana.com/docs/grafana-cloud/machine-learning/assistant/introduction/)によると、自前で運用しているGrafanaから使う場合も、チャット、ダッシュボードの作成、クエリ、ナビゲーションは使えます。ただし、複数のデータソースを調べてレポートにまとめるInvestigationsと、Grafana CloudのMCPへの接続は、Grafana Cloudに限られた機能です。
 [^cloud-search]: Grafana CloudのTempoでビルドのトレースを検索するときは、`name = "build ."`で絞ると確実に見つかります。
-[^retention]: [Grafana Cloudの料金のページ](https://grafana.com/pricing/)によると、Tracesの保持期間はFreeプランで14日、Proプランで30日です。BuildKitの履歴の48時間か50回分より長く、手元の開発機のビルドとCIのビルドを同じTempoに入れて、同じクエリで比べられます。
+[^retention]: [Grafana Cloudの料金のページ](https://grafana.com/pricing/)によると、Tracesの保持期間はFreeプランで14日、Proプランで30日です。手元の開発機のビルドとCIのビルドを同じTempoに入れて、同じクエリで比べられます。
