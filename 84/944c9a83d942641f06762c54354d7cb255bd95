@@ -1,0 +1,19 @@
+articles/20261027-buildkit-traces-tempo.md
+  s_e5d7daba3536a0::t_9bf148dd0b240c 31,78,162,207,216
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "84944c9a83d942641f06762c54354d7cb255bd95",
+  "prompts": {},
+  "sessions": {
+    "s_e5d7daba3536a0": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a15baf-3c6c-7eb3-89ab-c308d5ab4b41",
+        "model": "gpt-6-astra"
+      },
+      "human_author": "Yoshi Yamaguchi <ymotongpoo@gmail.com>"
+    }
+  }
+}
