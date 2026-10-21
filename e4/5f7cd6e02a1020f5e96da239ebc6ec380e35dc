@@ -1,0 +1,39 @@
+books/k6-otel-perf-review/00-introduction.md
+  s_9cbfbcbfb549ab::t_8c3a67a8ed1e70 5,7,9,11,14,18,28
+books/k6-otel-perf-review/05-two-verdicts.md
+  s_9cbfbcbfb549ab::t_24b84a36b34f72 5,7,9,11-12,18,22,30-31,34,36-37,43,45,47-48,56,60,63-64,67
+books/k6-otel-perf-review/10-load-models.md
+  s_9cbfbcbfb549ab::t_c9233e5c17543b 5,11,22,26-30,32,36,44,46,48-51,53,55,61,63
+books/k6-otel-perf-review/15-load-validity.md
+  s_9cbfbcbfb549ab::t_dc07fb64b5d1bb 5,9,15,17-19,23,29-31,33,35-40,42,63,67-70,74,82-83,85,87-89,93,97-105
+books/k6-otel-perf-review/20-telemetry-pipeline.md
+  s_9cbfbcbfb549ab::t_b3efcfc7353ceb 5,7,13,30,64,78,90-92,113-116,118
+books/k6-otel-perf-review/25-narrowing-down.md
+  s_9cbfbcbfb549ab::t_7ce19699017249 5,9,25,29-30,36-38,40,42-45,51,55,61,63,67-70,72,76,84-87,91
+books/k6-otel-perf-review/30-wait-span.md
+  s_9cbfbcbfb549ab::t_7c6b86053d47b2 5,38,46,50-53,55,57,59-60,62,64,70
+books/k6-otel-perf-review/35-retest.md
+  s_9cbfbcbfb549ab::t_2c30799cc98dc3 5,9,13-16,18,22,26,28-29,31,33-43,49,51-56,58,60,64,66,68
+books/k6-otel-perf-review/40-handoff.md
+  s_9cbfbcbfb549ab::t_bbcb68e4f54112 5,9,15-16,27-28,44,46-47,49-50,54,58,70,74,80-81,83,85,94
+books/k6-otel-perf-review/45-applicability.md
+  s_9cbfbcbfb549ab::t_23cb3b140cbf17 9,15,25,29-31,33,35,37
+books/k6-otel-perf-review/99-references.md
+  s_9cbfbcbfb549ab::t_31ab8058cbf6a3 5,9,12,22
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "e45f7cd6e02a1020f5e96da239ebc6ec380e35dc",
+  "prompts": {},
+  "sessions": {
+    "s_9cbfbcbfb549ab": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f65ddf87-97e8-4c2f-9803-5e752cea6020",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Yoshi Yamaguchi <ymotongpoo@gmail.com>"
+    }
+  }
+}
