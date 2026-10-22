@@ -1,0 +1,73 @@
+books/k6-otel-perf-review/config.yaml
+  s_8691f959bd8a42::t_f86ff7db121f65 2
+books/k6-otel-perf-review/20-telemetry-pipeline.md
+  s_8691f959bd8a42::t_88798a0add1977 2,5,7,13-15,44,50,62-64,66,76,80,92,94,115,118
+  s_8691f959bd8a42::t_6b69df51eeac18 120
+books/k6-otel-perf-review/45-applicability.md
+  s_8691f959bd8a42::t_0421be40d9ff95 5,7,11,13,15,21,25,37,41,43,45
+  s_8691f959bd8a42::t_fc42a633e99152 35
+books/k6-otel-perf-review/05-two-verdicts.md
+  s_8691f959bd8a42::t_9a9219f5162f7b 5,14,20,22,24,26,28,30-32,36-37,45,47,56,58,60,62,68
+  s_8691f959bd8a42::t_7f9050cebe8486 69,71
+books/k6-otel-perf-review/30-wait-span.md
+  s_8691f959bd8a42::t_e0c571267257fa 5,7,9,11,18,38,40,42
+  s_8691f959bd8a42::t_84342b011cb024 57,60,64,70
+books/k6-otel-perf-review/10-load-models.md
+  s_8691f959bd8a42::t_c40c72f900acc0 42
+  s_8691f959bd8a42::t_dc70093ce02a83 5,9,17,32,34,36,44-46,57,67
+  s_8691f959bd8a42::t_1f54ce0df79bff 43
+books/k6-otel-perf-review/25-narrowing-down.md
+  s_8691f959bd8a42::t_01d15f3ef871bb 85
+  s_8691f959bd8a42::t_9996df9b689dfc 2,9,25,40,42-43,55,61,63-65,74,79-83,94,98
+  s_98a02006b04161::t_f8d50f49acccd9 36,51,78,84
+books/k6-otel-perf-review/35-retest.md
+  s_8691f959bd8a42::t_de3daeaf04f5a6 5,18,22-24,33,35,38,41,45,49,60,68,70
+books/k6-otel-perf-review/40-handoff.md
+  s_8691f959bd8a42::t_c0c4e249f80f20 5,9,11,13,15,18,20,22,54,60-63,66,70,72,74,78,80,83,85,89,92,94,96-99,101,103,109,115-118
+  s_8691f959bd8a42::t_b7a17d514d1b8c 100,102,104-108,110-114,119
+books/k6-otel-perf-review/99-references.md
+  s_8691f959bd8a42::t_d61d2e2c7a14f7 34
+  s_8691f959bd8a42::t_7faa290d12209a 29-30
+  s_8691f959bd8a42::t_293f725df61f25 43
+  s_8691f959bd8a42::t_f78c889e9e72cd 48
+books/k6-otel-perf-review/00-introduction.md
+  s_8691f959bd8a42::t_0dafd171f33a34 7,9,11,18,26,28,30,32
+books/k6-otel-perf-review/15-load-validity.md
+  s_8691f959bd8a42::t_ff9099f8be4681 5,9,11-13,19,21,25,29,33-34,46,48-53,55-61,74
+  s_8691f959bd8a42::t_977cf308899d28 54
+  s_8691f959bd8a42::t_4976a5995a6840 87,91,95,97,99,107
+diagrams/k6-otel-perf-review/20261118-retest-flow.dot
+  s_9cbfbcbfb549ab::t_009217cdbb5755 2,22,25
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "7f616cc5786079a59d28977c0c37ad8a8c2d0a79",
+  "prompts": {},
+  "sessions": {
+    "s_8691f959bd8a42": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "2a434595-cc44-4ffc-9f79-fa591f5e1a0a",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Yoshi Yamaguchi <ymotongpoo@gmail.com>"
+    },
+    "s_98a02006b04161": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a16267-3fd7-77b3-b3b8-e9732d3e95e8",
+        "model": "gpt-6.1-sol"
+      },
+      "human_author": "Yoshi Yamaguchi <ymotongpoo@gmail.com>"
+    },
+    "s_9cbfbcbfb549ab": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f65ddf87-97e8-4c2f-9803-5e752cea6020",
+        "model": "unknown"
+      },
+      "human_author": "Yoshi Yamaguchi <ymotongpoo@gmail.com>"
+    }
+  }
+}
