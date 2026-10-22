@@ -26,10 +26,12 @@ title: "参考文献"
 - [Open and closed models](https://grafana.com/docs/k6/v2.3.x/using-k6/scenarios/concepts/open-vs-closed/)：閉じたモデルと開いたモデルの定義、coordinated omission（3章）
 - [Dropped iterations](https://grafana.com/docs/k6/v2.3.x/using-k6/scenarios/concepts/dropped-iterations/)：始められなかった反復と閾値での扱い（4章）
 - [Constant arrival rate](https://grafana.com/docs/k6/v2.3.x/using-k6/scenarios/executors/constant-arrival-rate/)：`preAllocatedVUs`と`maxVUs`（3章、4章）
+- [Arrival-rate VU allocation](https://grafana.com/docs/k6/v2.3.x/using-k6/scenarios/concepts/arrival-rate-vu-allocation/)：VUを前もって用意する理由（3章、4章）
+- [Test lifecycle](https://grafana.com/docs/k6/v2.3.x/using-k6/test-lifecycle/)：VUと反復の定義、VUごとの初期化（2章、4章）
 - [Thresholds](https://grafana.com/docs/k6/v2.3.x/using-k6/thresholds/)：合否の条件と終了コード（4章）
 - [Built-in metrics](https://grafana.com/docs/k6/v2.3.x/using-k6/metrics/reference/)：`http_req_duration`、`http_req_failed`、`dropped_iterations`の定義（2章、4章）
 - [OpenTelemetry output](https://grafana.com/docs/k6/v2.3.x/results-output/real-time/opentelemetry/)：OTLPでのメトリクスの出力（5章）
-- k6 v2.3.0のソース：[`errext/exitcodes/codes.go`](https://github.com/grafana/k6/blob/v2.3.0/errext/exitcodes/codes.go)（終了コード99）、[`lib/netext/httpext/tracer.go`](https://github.com/grafana/k6/blob/v2.3.0/lib/netext/httpext/tracer.go)（サンプルの時刻）、[`lib/executor/constant_arrival_rate.go`](https://github.com/grafana/k6/blob/v2.3.0/lib/executor/constant_arrival_rate.go)（反復を捨てる条件とVUの追加）（4章）
+- k6 v2.3.0のソース：[`errext/exitcodes/codes.go`](https://github.com/grafana/k6/blob/v2.3.0/errext/exitcodes/codes.go)（終了コード99）、[`lib/netext/httpext/tracer.go`](https://github.com/grafana/k6/blob/v2.3.0/lib/netext/httpext/tracer.go)（サンプルの時刻）、[`lib/executor/constant_arrival_rate.go`](https://github.com/grafana/k6/blob/v2.3.0/lib/executor/constant_arrival_rate.go)（反復を捨てる条件とVUの追加）（4章）、[`internal/output/opentelemetry/output.go`](https://github.com/grafana/k6/blob/v2.3.0/internal/output/opentelemetry/output.go)（メトリクスの単位）（5章）
 
 ## OpenTelemetry
 
@@ -38,11 +40,12 @@ title: "参考文献"
 - [otelslog v0.21.0](https://pkg.go.dev/go.opentelemetry.io/contrib/bridges/otelslog@v0.21.0)（5章）
 - [Tracing API（v1.61.0）](https://github.com/open-telemetry/opentelemetry-specification/blob/v1.61.0/specification/trace/api.md#spankind)：スパンの種別（7章）
 - [W3C Trace Context](https://www.w3.org/TR/trace-context/)（5章）
+- [Deprecating Span Events API](https://opentelemetry.io/blog/2026/deprecating-span-events/)：スパンイベントとログ（6章）
 
 ## Grafanaのスタック
 
 - [Grafana Alloy v1.20](https://grafana.com/docs/alloy/v1.20/)（5章）
-- [Grafana Mimir v3.2.x](https://grafana.com/docs/mimir/v3.2.x/)（5章）
+- [Grafana Mimir v3.2.x](https://grafana.com/docs/mimir/v3.2.x/)と[設定のリファレンス](https://grafana.com/docs/mimir/v3.2.x/configure/configuration-parameters/)：OTLPのメトリクス名の変換（5章）
 - [Grafana Tempo v3.1.x](https://grafana.com/docs/tempo/v3.1.x/)と[TraceQL](https://grafana.com/docs/tempo/v3.1.x/traceql/)（5章、6章）
 - [Grafana Loki v3.7.x](https://grafana.com/docs/loki/v3.7.x/)（5章）
 
