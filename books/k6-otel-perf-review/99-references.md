@@ -31,7 +31,10 @@ title: "参考文献"
 - [Thresholds](https://grafana.com/docs/k6/v2.3.x/using-k6/thresholds/)：合否の条件と終了コード（4章）
 - [Built-in metrics](https://grafana.com/docs/k6/v2.3.x/using-k6/metrics/reference/)：`http_req_duration`、`http_req_failed`、`dropped_iterations`の定義（2章、4章）
 - [OpenTelemetry output](https://grafana.com/docs/k6/v2.3.x/results-output/real-time/opentelemetry/)：OTLPでのメトリクスの出力（5章）
-- k6 v2.3.0のソース：[`errext/exitcodes/codes.go`](https://github.com/grafana/k6/blob/v2.3.0/errext/exitcodes/codes.go)（終了コード99）、[`lib/netext/httpext/tracer.go`](https://github.com/grafana/k6/blob/v2.3.0/lib/netext/httpext/tracer.go)（サンプルの時刻）、[`lib/executor/constant_arrival_rate.go`](https://github.com/grafana/k6/blob/v2.3.0/lib/executor/constant_arrival_rate.go)（反復を捨てる条件とVUの追加）（4章）、[`internal/output/opentelemetry/output.go`](https://github.com/grafana/k6/blob/v2.3.0/internal/output/opentelemetry/output.go)（メトリクスの単位）（5章）
+- k6 v2.3.0の[`errext/exitcodes/codes.go`](https://github.com/grafana/k6/blob/v2.3.0/errext/exitcodes/codes.go)：終了コード99（4章）
+- k6 v2.3.0の[`lib/netext/httpext/tracer.go`](https://github.com/grafana/k6/blob/v2.3.0/lib/netext/httpext/tracer.go)：サンプルの時刻（4章）
+- k6 v2.3.0の[`lib/executor/constant_arrival_rate.go`](https://github.com/grafana/k6/blob/v2.3.0/lib/executor/constant_arrival_rate.go)：反復を捨てる条件とVUの追加（4章）
+- k6 v2.3.0の[`internal/output/opentelemetry/output.go`](https://github.com/grafana/k6/blob/v2.3.0/internal/output/opentelemetry/output.go)：メトリクスの単位（5章）
 
 ## OpenTelemetry
 

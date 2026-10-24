@@ -1,5 +1,5 @@
 title: "その修正で本当に速くなったのか？k6とOpenTelemetryで確かめる性能改善"
-summary: "開発側が「速くなった」と報告した修正を、運用側のテストは「まだ遅い」と評価しました。同時実行数を制限したGoのHTTP APIを題材に、k6の負荷モデルの違い、想定した負荷を実際にかけられたかの確認、OpenTelemetryとGrafanaのLGTMスタックによる原因の絞り込み、変更前後の再テストまでを、実際に動かした結果で追います。CloudNative Days Winter 2026の登壇の解説資料です。"
+summary: "開発側が「速くなった」と報告した修正を、運用側のテストは「まだ遅い」と評価しました。同時実行数を制限したGoのHTTP APIを題材に、k6で負荷モデルの違いと、想定した負荷がかかったかを確かめます。OpenTelemetryとGrafanaスタックを使った原因の絞り込みから変更前後の再テストまでを、実測結果で説明します。CloudNative Days Winter 2026の登壇の解説資料です。"
 topics: ["k6", "opentelemetry", "grafana", "loadtesting", "observability"]
 published: false
 price: 0

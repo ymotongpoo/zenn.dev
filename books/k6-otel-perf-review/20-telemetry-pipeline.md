@@ -10,7 +10,9 @@ title: "テストとアプリのテレメトリーを集める"
 
 OpenTelemetryではテレメトリーをトレース、メトリクス、ログの3種類の**シグナル**に分けます。**トレース**は、1件のリクエストの処理を、区間を表す**スパン**の木で表したものです。スパンは名前と開始と終了の時刻を持ち、親のスパンの中に子のスパンが入ります。`catalog-api`のスパンの子として`inventory`のスパンを記録するには、HTTPのヘッダーでトレースの識別子を受け渡します。この受け渡しを**伝搬**（propagation）と呼び、ヘッダーの形式は[W3C Trace Context](https://www.w3.org/TR/trace-context/)の`traceparent`です。
 
-サンプルの2つのサービスは、同じ初期化のコードでSDKを設定しています。送信のプロトコルは3つのシグナルともOTLP/HTTPです。送り先とサービス名は、標準の環境変数`OTEL_EXPORTER_OTLP_ENDPOINT`と`OTEL_SERVICE_NAME`で渡します[^logger]。
+サンプルの2つのサービスは、同じ初期化のコードでSDKを設定しています。送信のプロトコルは3つのシグナルともOTLP/HTTPです[^otlp]。送り先とサービス名は、標準の環境変数`OTEL_EXPORTER_OTLP_ENDPOINT`と`OTEL_SERVICE_NAME`で渡します[^logger]。
+
+[^otlp]: OTLP（OpenTelemetry Protocol）は、テレメトリーを送受信するためのプロトコルです。OTLP/HTTPは、HTTPを使ってテレメトリーを送信します（[OTLP仕様](https://opentelemetry.io/docs/specs/otlp/)）。
 
 [^logger]: 抜粋の最後の`logger`は簡略化したもので、サンプルのコードでは同じログを標準出力にも書いています。
 
@@ -59,7 +61,9 @@ environment:
   K6_OTEL_SERVICE_NAME: k6
 ```
 
-この出力が送るのはメトリクスだけです。k6のテストのあと、Tempoに記録されたサービスは`catalog-api`と`inventory`の2つだけで、`service.name`が`k6`のトレースは0件でした。Lokiに入ったログも、同じ2つのサービスのものしかありません。トレースは、k6の出力ではなく、アプリケーション側の計装と伝搬で作られます。
+この出力が送るのはメトリクスだけです[^output-check]。トレースは、k6の出力ではなく、アプリケーション側の計装と伝搬で作られます。
+
+[^output-check]: k6のテストのあと、Tempoに記録されたサービスは`catalog-api`と`inventory`の2つだけで、`service.name`が`k6`のトレースは0件でした。Lokiに入ったログも、同じ2つのサービスのものしかありません。
 
 Mimirに届いたk6のメトリクスは、`http_req_duration_milliseconds`のヒストグラムや`http_reqs_total`、`dropped_iterations_total`のような名前です[^naming]。k6のタグはOpenTelemetryの属性に変換され、Mimirではラベルになります。サンプルではテストごとに`testid`タグを付けているので、Mimirでも`testid`のラベルでテストを選べます。
 
@@ -73,7 +77,7 @@ export const options = {
 };
 ```
 
-一方、アプリケーションのメトリクスには`testid`のラベルがありません。`catalog-api`は、どのテストから届いたリクエストなのかを知らないからです。k6のメトリクスとアプリケーションのメトリクスは、同じ時間範囲を選ぶことでしか比べられません。
+一方、アプリケーションのメトリクスには`testid`のラベルがありません。`catalog-api`は、どのテストから届いたリクエストなのかを知らないからです。
 
 ## 収集と保存
 
@@ -91,9 +95,11 @@ otelcol.processor.batch "default" {
 
 [^alloy]: AlloyはGrafana Labsが開発するテレメトリーのコレクターで、OpenTelemetry Collectorのコンポーネントを組み合わせて設定を書けます。サンプルの設定は、OTLPを受けてシグナルごとに保存先へ振り分けるだけです。設定の全体は、サンプルのリポジトリの[`config/config.alloy`](https://github.com/ymotongpoo/k6-otel-perf-review/blob/f86b6ed88a1dbb34050897a984f9997e67f78d4a/config/config.alloy)にあります。OTLPのレシーバー（gRPCの4317番とHTTPの4318番）、バッチ処理、3つの保存先への送信からなります。
 
-メトリクスは[Grafana Mimir](https://grafana.com/docs/mimir/v3.2.x/)、トレースは[Grafana Tempo](https://grafana.com/docs/tempo/v3.1.x/)、ログは[Grafana Loki](https://grafana.com/docs/loki/v3.7.x/)に入れ、[Grafana](https://grafana.com/docs/grafana/v13.2/)から3つを横断して調べます。いずれもOTLPを直接受け付けるので、Alloyの側での形式の変換は不要です。サンプルではどれも単一のプロセスで動かし、データはローカルのファイルシステムに置いています。
+メトリクスは[Grafana Mimir](https://grafana.com/docs/mimir/v3.2.x/)、トレースは[Grafana Tempo](https://grafana.com/docs/tempo/v3.1.x/)、ログは[Grafana Loki](https://grafana.com/docs/loki/v3.7.x/)に入れ、[Grafana](https://grafana.com/docs/grafana/v13.2/)から3つを横断して調べます[^storage-layout]。いずれもOTLPを直接受け付けるので、Alloyの側での形式の変換は不要です。
 
-保存先によって、OpenTelemetryのリソース属性の扱いが違います。Mimirでは、`service.name`が`job`ラベルになります。選ぶ条件は、`catalog-api`のメトリクスなら`job="catalog-api"`、k6のメトリクスなら`job="k6"`です。Lokiでは、`service.name`が`service_name`というラベルになり、ログに付いたトレースIDとスパンIDは構造化メタデータの`trace_id`と`span_id`に入ります。
+[^storage-layout]: サンプルでは、各保存先を単一のプロセスで動かし、データはローカルのファイルシステムに置いています。
+
+テレメトリーの発生元を表す[リソース属性](https://opentelemetry.io/docs/concepts/resources/)は、保存先によって扱いが違います。Mimirでは、`service.name`が`job`ラベルになります。選ぶ条件は、`catalog-api`のメトリクスなら`job="catalog-api"`、k6のメトリクスなら`job="k6"`です。Lokiでは、`service.name`が`service_name`というラベルになり、ログに付いたトレースIDとスパンIDは構造化メタデータの`trace_id`と`span_id`に入ります。
 
 Grafanaでは、Tempoのデータソースにトレースからログへ移る設定を入れました。トレースの画面でスパンを選ぶと、そのスパンのサービス名とトレースIDでLokiを検索します。
 

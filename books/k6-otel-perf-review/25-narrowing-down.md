@@ -6,7 +6,9 @@ title: "テスト結果から調べる処理を絞る"
 
 ## 同じ時間範囲のメトリクス
 
-最初に見るのは、テストと同じ時間範囲のメトリクスです。k6のメトリクスは`testid`でテストを選び、アプリケーションのメトリクスはテストの開始と終了の時刻で範囲を選びます。サンプルでは、テストの終了の10秒前を基準に、直前40秒の値を[PromQL](https://prometheus.io/docs/prometheus/latest/querying/basics/)で求めました。
+最初に見るのは、テストと同じ時間範囲のメトリクスです。k6のメトリクスは`testid`でテストを選び、アプリケーションのメトリクスはテストの開始と終了の時刻で範囲を選びます。次の[PromQL](https://prometheus.io/docs/prometheus/latest/querying/basics/)で、同じ時間範囲のp(95)を求めます[^metric-window]。
+
+[^metric-window]: テストの終了の10秒前を基準に、直前40秒の値を集計しました。
 
 ```promql
 # k6から見た応答時間のp(95)（ミリ秒）
@@ -33,9 +35,9 @@ histogram_quantile(0.95,
 | `inventory`が503を返した頻度 | 0件/秒 | 31.9件/秒 |
 | `inventory`の待ち行列の最大 | 0件 | 8件 |
 
-最初に目につくのは、k6から見たp(95)の4,844msです。3章で示したk6の要約では、同じテストのp(95)は2,612msでした。値が違う理由は、[Mimir](https://grafana.com/docs/mimir/v3.2.x/)に入ったヒストグラムが決まった境界のバケットで件数を数えていることにあります。この時間範囲では応答の約8割が2,500msから5,000msのバケットに入り、p(95)もこのバケットの中です[^buckets]。`histogram_quantile`はバケットの中の値を両端の間に一様に散らばっているとみなして補間するので、p(95)の推定値はこの2,500msの幅の中で決まってしまいます。
+最初に目につくのは、k6から見たp(95)の4,844msです。3章で示したk6の要約では、同じテストのp(95)は2,612msでした。値が違う理由は、[Mimir](https://grafana.com/docs/mimir/v3.2.x/)に入ったヒストグラムが決まった境界のバケットで件数を数えていることにあります。バケットが粗いため、補間したp(95)が要約の値から大きく離れました[^buckets]。
 
-[^buckets]: k6の出力も[otelhttp](https://pkg.go.dev/go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp@v0.72.0)も、バケットの境界は5、10、25、50、75、100、250、500、750、1,000、2,500、5,000ms…の並びでした。境界は計装の側で細かくできます。OpenTelemetryには境界を自動で決める指数ヒストグラムもありますが、サンプルでは扱っていません。
+[^buckets]: この時間範囲では応答の約8割が2,500msから5,000msのバケットに入り、p(95)もこのバケットの中です。`histogram_quantile`はバケット内の値を一様に分布するとみなして補間するので、p(95)の推定値はこの2,500msの幅の中で決まります（[Prometheusの関数リファレンス](https://prometheus.io/docs/prometheus/latest/querying/functions/#histogram_quantile)）。k6の出力も[otelhttp](https://pkg.go.dev/go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp@v0.72.0)も、バケットの境界は5、10、25、50、75、100、250、500、750、1,000、2,500、5,000ms…の並びでした。境界は計装の側で細かくできます。OpenTelemetryには境界を自動で決める指数ヒストグラムもありますが、サンプルでは扱っていません。
 
 それでも、同じ境界で数えた値どうしなら比べられます。修正前のバージョンでは、`catalog-api`のサーバー側の時間が4.9秒前後なのに、`catalog-api`が`inventory`を呼んだ時間と`inventory`自身の時間は73msでした。`inventory`は普段どおりに応答しています。時間を使っているのは`catalog-api`の中で、`inventory`を呼んでいる時間の外です。修正後のバージョンに毎秒150件をかけたときは、`catalog-api`と`inventory`の時間がほぼ同じで、時間は`inventory`の中で使われています。`inventory`は待ち行列の上限の8件まで詰まり、毎秒32件を断っています。
 
@@ -75,7 +77,7 @@ histogram_quantile(0.95,
 
 ## トレースからログへ
 
-修正後のバージョンに毎秒150件をかけたテストでは、21.2%のリクエストが502でした。エラーになったトレースを1件選び、5章で設定した「トレースからログへ」の移動を使ってみましょう。サンプルのログはスパンイベントではなくOpenTelemetryのログとしてLokiに入っているので、トレースの画面からLokiへ移って探します[^events]。図2の右は、`inventory`のスパンの詳細で「Logs for this trace」を押し、`inventory`のサービス名とこのトレースのトレースIDで検索したLokiの画面です。
+修正後のバージョンに毎秒150件をかけたテストでは、21.2%のリクエストが502でした。エラーになったトレースを1件選び、5章で設定した「トレースからログへ」の移動を使ってみましょう[^events]。図2の右は、`inventory`のスパンの詳細で「Logs for this trace」を押し、`inventory`のサービス名とこのトレースのトレースIDで検索したLokiの画面です。
 
 ![左のTempoの画面でcatalog-apiのGET /items/{id}が502を返したトレースを開き、inventoryのGET /stock/{id}のスパンの詳細にLogs for this traceのボタンがある。右のLokiの画面には、inventoryのサービス名とトレースIDで検索した結果として、WARNのqueue fullが1行表示されている](/images/20261118-grafana-trace-to-logs.png)
 *図2: `inventory`が503で断ったリクエストのトレースをGrafanaのExploreで開き、`inventory`のスパンの「Logs for this trace」からLokiのログを右に表示した画面*

@@ -22,15 +22,15 @@ title: "想定した負荷をかけられたか"
 
 ## 合格と判定される不足
 
-VUが足りなくなるのは、アプリケーションが遅いときだけではありません。アプリケーションが速くても、VUが少なすぎれば指定した頻度は出ません。次に試すのは、修正後のバージョンに毎秒100件を指定し、`preAllocatedVUs`を2、`maxVUs`を4に絞った設定です。`maxVUs`を`preAllocatedVUs`より小さくするとk6は設定の誤りとしてテストを始めないので、2つの値を一緒に変えています[^vusconfig]。
+VUが足りなくなるのは、アプリケーションが遅いときだけではありません。アプリケーションが速くても、VUが少なすぎれば指定した頻度は出ません。試したのは、修正後のバージョンに毎秒100件を指定し、`preAllocatedVUs`を2、`maxVUs`を4に絞った設定です[^vusconfig]。
 
-[^vusconfig]: k6 v2.3.0の[`lib/executor/constant_arrival_rate.go`](https://github.com/grafana/k6/blob/v2.3.0/lib/executor/constant_arrival_rate.go)の設定の検証が、`maxVUs can't be less than preAllocatedVUs`というエラーを返します。
+[^vusconfig]: `maxVUs`を`preAllocatedVUs`より小さくするとk6は設定の誤りとしてテストを始めないので、2つの値を一緒に変えています。k6 v2.3.0の[`lib/executor/constant_arrival_rate.go`](https://github.com/grafana/k6/blob/v2.3.0/lib/executor/constant_arrival_rate.go)の設定の検証が、`maxVUs can't be less than preAllocatedVUs`というエラーを返します。
 
-応答時間とエラー率の閾値だけでは、反復を始められなかったことは合否に表れません。そこで使うのが、k6のドキュメントも紹介している`dropped_iterations`の閾値です[^threshold]。`dropped_iterations`に`count==0`の閾値を足すと、始められなかった反復が1回でもあればテストは不合格になり、k6はソースで`ThresholdsHaveFailed`として定義された終了コード99で終わります[^exit]。サンプルのテストスクリプトは、環境変数`CHECK_DROPPED`を`true`にすると、この閾値を加える作りです。
+応答時間とエラー率の閾値だけでは、反復を始められなかったことは合否に表れません。`dropped_iterations`に`count==0`の閾値を足すと[^threshold]、始められなかった反復が1回でもあればテストは不合格になり、k6は終了コード99で終わります[^exit]。サンプルのテストスクリプトは、環境変数`CHECK_DROPPED`を`true`にすると、この閾値を加える作りです。
 
 [^threshold]: [Dropped iterations](https://grafana.com/docs/k6/v2.3.x/using-k6/scenarios/concepts/dropped-iterations/)の "To assert that the SUT responds within this error budget, you can use the dropped_iterations metric in a Threshold." による。
 
-[^exit]: k6 v2.3.0の[`errext/exitcodes/codes.go`](https://github.com/grafana/k6/blob/v2.3.0/errext/exitcodes/codes.go)。ドキュメントの[Thresholds](https://grafana.com/docs/k6/v2.3.x/using-k6/thresholds/)は "non-zero exit code" とだけ書いています。
+[^exit]: 終了コード99は、ソースでは`ThresholdsHaveFailed`として定義されています。k6 v2.3.0の[`errext/exitcodes/codes.go`](https://github.com/grafana/k6/blob/v2.3.0/errext/exitcodes/codes.go)。ドキュメントの[Thresholds](https://grafana.com/docs/k6/v2.3.x/using-k6/thresholds/)は "non-zero exit code" とだけ書いています。
 
 ```javascript
 const thresholds = {
@@ -75,7 +75,9 @@ k6は不足に気づいていて、警告も出しますが、ターミナルで
 
 それなのに、エラーは実際に`inventory`で起きていました。k6が数えた502は0.2コアで70件、0.1コアで463件で、いずれも`inventory`の待ち行列があふれた503を`catalog-api`が変換したものです。k6側のタイムアウトは0件でした。
 
-原因を探るため、リクエストが届いた時刻を`catalog-api`の側で数えました。k6が記録するリクエストの時刻は応答を受け取った時刻なので[^endtime]、送った時刻の偏りは見えません。集計の対象は、同じ条件で20秒間流したときに[Tempo](https://grafana.com/docs/tempo/v3.1.x/)に残った`catalog-api`のサーバースパン2,001件の開始時刻です。
+原因を探るため、リクエストが届いた時刻を`catalog-api`の側で集計しました[^arrival-sample]。k6が記録するリクエストの時刻は応答を受け取った時刻なので[^endtime]、送った時刻の偏りは見えません。
+
+[^arrival-sample]: 同じ条件で20秒間流したときに[Tempo](https://grafana.com/docs/tempo/v3.1.x/)に残った、`catalog-api`のサーバースパン2,001件の開始時刻を集計しました。サーバースパンは、受け取ったリクエストの処理区間を表す記録です（[OpenTelemetryの説明](https://opentelemetry.io/docs/concepts/signals/traces/#server)）。
 
 [^endtime]: k6 v2.3.0の[`lib/netext/httpext/tracer.go`](https://github.com/grafana/k6/blob/v2.3.0/lib/netext/httpext/tracer.go)で、`http_reqs`などのサンプルの時刻に`tr.EndTime`を使っています。
 
@@ -94,9 +96,11 @@ k6は不足に気づいていて、警告も出しますが、ターミナルで
 
 ここまでのテストでは、合否の基準をp(95)が200ms未満、エラー率が1%未満としてきました。この値はサンプルのために決めたもので、根拠は「利用者が商品の一覧を開いたときに待たされたと感じない程度」という想定だけです。
 
-基準の数値は、組織のSLOをそのまま負荷テストの閾値に写さず、テストが確かめる利用条件から決めます。SLOは本番の利用が混在する状態と長い集計期間を前提にした目標で、60秒の合成された負荷とは前提が違うからです。テストの閾値とSLOを関連づけたいなら、どの利用条件を再現したテストなのかを閾値と一緒に記録します。
+基準の数値は、組織のSLO[^slo]をそのまま負荷テストの閾値に写さず、テストが確かめる利用条件から決めます。SLOは本番の利用が混在する状態と長い集計期間を前提にした目標で、60秒の合成された負荷とは前提が違うからです。テストの閾値とSLOを関連づけたいなら、どの利用条件を再現したテストなのかを閾値と一緒に記録します。
 
-基準と並んで、テストのたびに記録するものもここで決まりました。
+[^slo]: SLO（service level objective、サービスレベル目標）は、応答時間やエラー率などで測るサービス水準に対して定める目標値や範囲です（[Google SRE Bookの説明](https://sre.google/sre-book/service-level-objectives/)）。
+
+テストごとに、次の項目を記録します。
 
 - 指定した頻度と完了の頻度
 - 始まった反復の回数と`dropped_iterations`
