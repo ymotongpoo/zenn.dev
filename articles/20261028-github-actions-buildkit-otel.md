@@ -3,7 +3,8 @@ title: "GitHub ActionsとDockerのビルドを1本のトレースにしてGrafan
 emoji: "🐳"
 type: "tech"
 topics: ["githubactions", "Docker", "OpenTelemetry", "grafana", "BuildKit"]
-published: false
+published: true
+published_at: 2026-10-28 09:30
 ---
 
 :::message
