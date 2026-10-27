@@ -1,0 +1,54 @@
+// 実証した送信構成を示す独自の図。ソースは以下の2ファイル。
+// https://github.com/ymotongpoo/buildkit-github-actions-otel-spike-20261027/blob/8937d28af8ddcdb5fddace81c0a4815e5a31f51a/scripts/setup-builder.sh
+// https://github.com/ymotongpoo/buildkit-github-actions-otel-spike-20261027/blob/8937d28af8ddcdb5fddace81c0a4815e5a31f51a/scripts/export-workflow.py
+// 矢印はデータの移動だけを表す。親IDの受け渡しもデータとして示し、起動関係は混ぜない。
+// レビューT02により、APIレコードのイベント再構成を独立したノードにした。
+// 左列の時刻は観測した検索可能時刻を示すものではない（C02）。
+digraph ci_buildkit_export {
+  graph [
+    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=13,
+    rankdir=TB, compound=true, splines=ortho,
+    nodesep=0.45, ranksep=0.55, pad=0.22,
+    bgcolor="white", newrank=true
+  ];
+  node [
+    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=12,
+    shape=box, style="rounded,filled", penwidth=1.6,
+    fillcolor="#D9E7F4", color="#38638F", margin="0.2,0.14"
+  ];
+  edge [
+    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=11,
+    color="#334155", penwidth=1.4, arrowsize=0.9, fontcolor="#1E293B"
+  ];
+
+  subgraph cluster_build {
+    label=<<b>ビルド側の処理と送信</b>>;
+    style="rounded"; labeljust="l"; penwidth=1.6; margin=14;
+    color="#38638F"; bgcolor="#EFF5FB"; fontcolor="#2E4D6E";
+    parent [label="ci-parent.py\nTRACEPARENTを計算"];
+    buildx [label="Buildx\n計算した値を親に設定"];
+    buildkit [label="BuildKit\nbuildx + buildkitd のスパン"];
+    parent -> buildx;
+    buildx -> buildkit;
+  }
+
+  subgraph cluster_ci {
+    label=<<b>完了後の別ワークフロー</b>>;
+    style="rounded"; labeljust="l"; penwidth=1.6; margin=14;
+    color="#75589C"; bgcolor="#F5F1F9"; fontcolor="#5B4370";
+    api [fillcolor="#E9DFF2", color="#75589C", label="GitHub API\n完了したrunとjobの情報"];
+    transform [fillcolor="#E9DFF2", color="#75589C", label="export-workflow.py\nイベントの形式へ変換"];
+    receiver [fillcolor="#E9DFF2", color="#75589C", label="GitHub receiver\nイベントからCIスパンを生成"];
+    api -> transform;
+    transform -> receiver;
+  }
+
+  gateway [label="Grafana Cloud\nOTLPエンドポイント"];
+  tempo [fillcolor="#F3E8CE", color="#96742E", label="Tempo\n共通のトレースIDで保存"];
+  { rank=same; parent; api; }
+  { rank=same; buildx; transform; }
+  { rank=same; buildkit; receiver; }
+  buildkit -> gateway;
+  receiver -> gateway;
+  gateway -> tempo;
+}
