@@ -6,18 +6,18 @@
 // 左列の時刻は観測した検索可能時刻を示すものではない（C02）。
 digraph ci_buildkit_export {
   graph [
-    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=13,
+    fontname="IBM Plex Sans JP", fontsize=13,
     rankdir=TB, compound=true, splines=ortho,
     nodesep=0.45, ranksep=0.55, pad=0.22,
     bgcolor="white", newrank=true
   ];
   node [
-    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=12,
+    fontname="IBM Plex Sans JP", fontsize=12,
     shape=box, style="rounded,filled", penwidth=1.6,
     fillcolor="#D9E7F4", color="#38638F", margin="0.2,0.14"
   ];
   edge [
-    fontname="Harano Aji Gothic,Noto Sans CJK JP,IPAGothic", fontsize=11,
+    fontname="IBM Plex Sans JP", fontsize=11,
     color="#334155", penwidth=1.4, arrowsize=0.9, fontcolor="#1E293B"
   ];
 
@@ -38,7 +38,7 @@ digraph ci_buildkit_export {
     color="#75589C"; bgcolor="#F5F1F9"; fontcolor="#5B4370";
     api [fillcolor="#E9DFF2", color="#75589C", label="GitHub API\n完了したrunとjobの情報"];
     transform [fillcolor="#E9DFF2", color="#75589C", label="export-workflow.py\nイベントの形式へ変換"];
-    receiver [fillcolor="#E9DFF2", color="#75589C", label="GitHub receiver\nイベントからCIスパンを生成"];
+    receiver [fillcolor="#E9DFF2", color="#75589C", label="OpenTelemetry Collector\nイベントからCIスパンを生成"];
     api -> transform;
     transform -> receiver;
   }
