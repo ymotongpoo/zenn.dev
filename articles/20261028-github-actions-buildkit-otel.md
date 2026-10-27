@@ -8,7 +8,12 @@ published_at: 2026-10-28 09:30
 ---
 
 :::message
-2026年10月27日に、GitHubホストランナーのUbuntu 24.04で確認した内容です。Docker Engine 28.0.4、Buildx v0.29.1、BuildKit v0.33.1、OpenTelemetry Collector contrib v0.164.0を使いました。送信するシグナルはトレースだけです。
+2026年10月27日に、GitHubホストランナーのUbuntu 24.04で次のバージョンを使って確認した内容です。送信するシグナルはトレースだけです。
+
+- Docker Engine 28.0.4
+- Buildx v0.29.1
+- BuildKit v0.33.1
+- OpenTelemetry Collector contrib v0.164.0
 
 GitHubレシーバーのトレース機能は、このバージョンではalphaです。後述する親スパンのID計算もレシーバーの実装に依存します。
 :::
@@ -27,9 +32,9 @@ GitHubレシーバーのトレース機能は、このバージョンではalpha
 
 ビルド側の送信元は、OpenTelemetryでトレースを送る機能を持つBuildKitです。Dockerfileの各手順のスパンに加えて、クライアントであるBuildxのスパンも、[BuildKitへ転送してまとめて送ります](https://github.com/docker/buildx/blob/v0.29.1/util/tracing/trace.go#L15-L24)。
 
-GitHub Actions側のスパンを作るのは、OpenTelemetry Collectorの[GitHubレシーバー](https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/v0.164.0/receiver/githubreceiver/README.md)です。GitHubレシーバーは、GitHubから届く`workflow_run`と`workflow_job`のWebhookのイベントを受け取り、ワークフロー、ジョブ、ステップのスパンに変換します。Collectorは、そのスパンをエクスポーターでGrafana Cloudへ送ります。
+一方、GitHub Actions側には、BuildKitのようにトレースを送る送信元がありません。ワークフローの実行の記録はWebhookのイベントやREST APIで取得できますが、トレースの形式にはなっていないためです。この記録をスパンに変換するのが、OpenTelemetry Collectorの[GitHubレシーバー](https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/v0.164.0/receiver/githubreceiver/README.md)です。GitHubレシーバーは、GitHubから届く`workflow_run`と`workflow_job`のWebhookのイベントを受け取り、ワークフロー、ジョブ、ステップのスパンを作ります。レシーバーはCollectorに組み込んで動かすコンポーネントなので、GitHub Actions側のスパンはCollectorを通し、エクスポーターでGrafana Cloudへ送ります。
 
-今回は、CI側のイベントの取得から送信までをActionsの中で実行する構成を選びました。ワークフローの完了後に別のワークフローを起動し、そのランナーで一時的にCollectorを動かします。補助スクリプトが完了した実行の情報をGitHub APIで取得し、Webhookと同じ形式のイベントに組み立てて、ランナー内のGitHubレシーバーへ渡す構成です。BuildKitからの送信だけを試す段階では、このCollectorは使いません。
+今回は、CI側のイベントの取得から送信までをActionsの中で実行する構成を選びました[^always-on]。ワークフローの完了後に別のワークフローを起動し、そのランナーで一時的にCollectorを動かします。補助スクリプトが完了した実行の情報をGitHub APIで取得し、Webhookと同じ形式のイベントに組み立てて、ランナー内のGitHubレシーバーへ渡す構成です。BuildKitからの送信だけを試す段階では、このCollectorは使いません。
 
 ![左列は親IDを計算してBuildxへ渡し、BuildKit経由で送信する。右列は完了したCI情報を補助スクリプトでイベントへ変換してOpenTelemetry Collectorへ渡す。両方がGrafana Cloudの同じOTLPエンドポイントへ届く構成図](/images/20261028-github-actions-buildkit-otel-flow.png)
 *図1: 矢印はデータの移動を表します。左側では計算したTRACEPARENTをBuildxへ渡します。右側は完了後の別ワークフローで、補助スクリプトがGitHub APIの情報をイベント形式へ変換し、OpenTelemetry Collectorへ渡します。Collector内のGitHubレシーバーでCIスパンを生成して送信します。*
@@ -66,7 +71,7 @@ docker buildx create --name ci-otel --driver docker-container \
 このbuilderを選んで`docker buildx build --builder ci-otel --load …`を実行すると、BuildxとBuildKitの両方のスパンがGrafana Cloudへ届きました。[ベースラインの実行](https://github.com/ymotongpoo/buildkit-github-actions-otel-spike-20261027/actions/runs/40436429094)から取得したのは、`build .`をルートにした87スパンのトレースです。イメージのビルドと実行テストも成功しました。
 
 ![Grafana CloudのExploreで表示したベースラインのトレース。ルートはbuild .で、サービス数は2、スパン数は87、所要時間は約1.35秒](/images/20261028-github-actions-buildkit-otel-baseline.png)
-*図2: Grafana Cloudで取得したベースラインのトレース。BuildxとBuildKitの87スパンを確認できます。[^registry-auth]*
+*図2: Grafana Cloudで取得したベースラインのトレース。BuildxとBuildKitの87スパンを確認できます[^registry-auth]。*
 
 ## Actionsのステップを親にする
 
@@ -74,7 +79,7 @@ docker buildx create --name ci-otel --driver docker-container \
 
 ただし、ビルドの時点では親になるステップのスパンはまだありません。CI側のスパンは、ワークフローの完了後に作るからです。それでも親のIDを指定できるのは、GitHubレシーバーがトレースIDとスパンIDを乱数ではなく実行IDやジョブIDから決まった規則で計算するためです。ビルドの前に同じ規則で計算すれば、あとで届くステップのスパンと同じIDが得られます。
 
-補助スクリプト[`scripts/ci-parent.py`](https://github.com/ymotongpoo/buildkit-github-actions-otel-spike-20261027/blob/8937d28af8ddcdb5fddace81c0a4815e5a31f51a/scripts/ci-parent.py)は、今回の実行ID、再実行回数、ジョブIDから、レシーバーの[ID生成の実装](https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/v0.164.0/receiver/githubreceiver/trace_event_handling.go)と同じ規則でIDを計算します。計算部分を抜粋すると次のとおりです。[^job-lookup]
+補助スクリプト[`scripts/ci-parent.py`](https://github.com/ymotongpoo/buildkit-github-actions-otel-spike-20261027/blob/8937d28af8ddcdb5fddace81c0a4815e5a31f51a/scripts/ci-parent.py)は、今回の実行ID、再実行回数、ジョブIDから、レシーバーの[ID生成の実装](https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/v0.164.0/receiver/githubreceiver/trace_event_handling.go)と同じ規則でIDを計算します[^job-lookup]。計算部分を抜粋すると次のとおりです。
 
 ```python
 trace_id = hashlib.sha256(f"{run}{attempt}t".encode()).hexdigest()[:32]
@@ -116,7 +121,7 @@ traceparent = f"00-{trace_id}-{step_id}-01"
 
 再実行回数を指定するのは、取得した時点で最新の再実行ではなく、通知された回のジョブを読むためです。補助スクリプトは、その回のジョブとステップの情報をGitHub APIで取得し、Webhookと同じ形式のイベントに組み立ててランナー内のCollectorへPOSTします。変換の処理は[`scripts/export-workflow.py`](https://github.com/ymotongpoo/buildkit-github-actions-otel-spike-20261027/blob/174eacdf9765bbc516b38de8a09eedc709cef8eb/scripts/export-workflow.py)で確認できます。
 
-[`collector.yaml`](https://github.com/ymotongpoo/buildkit-github-actions-otel-spike-20261027/blob/174eacdf9765bbc516b38de8a09eedc709cef8eb/collector.yaml)の内容は次のとおりです。[^scrapers]
+[`collector.yaml`](https://github.com/ymotongpoo/buildkit-github-actions-otel-spike-20261027/blob/174eacdf9765bbc516b38de8a09eedc709cef8eb/collector.yaml)の内容は次のとおりです[^scrapers]。
 
 ```yaml
 receivers:
@@ -155,7 +160,7 @@ service:
 
 エクスポーターの`endpoint`はベースURLのままです。`otlp_http`のエクスポーターが`/v1/traces`を付けるので、BuildKitにトレース専用のURLを渡したのとは指定方法が違います。認証ヘッダーには、BuildKitと同じシークレットから`Authorization=`の後ろの値を取り出して渡します。
 
-このCollectorは送信のたびに起動して停止する実証用の設定で、送信キューと再試行を無効にしています。[^export-check]
+このCollectorは送信のたびに起動して停止する実証用の設定で、送信キューと再試行を無効にしています[^export-check]。
 
 自分の環境で試すには、2つのシークレットを登録し、ビルド用と送信用のワークフローをデフォルトブランチに置きます。そのうえで`BuildKit linked trace`を手動で実行し、ビルドと`Export completed workflow trace`の両方の完了を待ちます。APIの呼び出しに使うのは`contents: read`と`actions: read`の権限を付けた`GITHUB_TOKEN`で、GitHub AppやPATは不要です。
 
@@ -188,7 +193,7 @@ BuildKit linked trace
     └── Verify source fixture
 ```
 
-`build .`の親IDは`Build Docker image`のスパンIDと一致し、取得した108スパンはすべて同じワークフローのルートへつながっていました。[^verification]
+`build .`の親IDは`Build Docker image`のスパンIDと一致し、取得した108スパンはすべて同じワークフローのルートへつながっていました[^verification]。
 
 GrafanaのExploreでTempoのデータソースを選び、実行した時間帯に絞って、次の[TraceQL](https://grafana.com/docs/tempo/latest/traceql/)で検索します。`ci.run.id`は、`OTEL_RESOURCE_ATTRIBUTES`でBuildxのスパンに付けた属性です。
 
@@ -198,7 +203,7 @@ GrafanaのExploreでTempoのデータソースを選び、実行した時間帯�
 
 前回の記事では、ルートのスパンだけを選ぶ条件（`span:parentID = ""`）でビルドの所要時間を集計しました。今回のビルドは`build .`にActionsの親があるので、この条件では選べません。手元のビルドとCIのビルドをまとめて選ぶ条件は、`{ resource.service.name = "buildx" && name = "build ." }`です。ベースラインとCIの両方のトレースが、この条件の検索結果に入ることを確認しました。
 
-CI側のスパンは、送信用のワークフローが完了してから届きます。トレースを開くのは、両方のワークフローが完了してからにしてください。[^search-delay]
+CI側のスパンは、送信用のワークフローが完了してから届きます。トレースを開くのは、両方のワークフローが完了してからにしてください[^search-delay]。
 
 ## 今回確認した範囲
 
@@ -206,13 +211,15 @@ BuildKitからGrafana Cloudへの送信と、2ジョブのワークフローへ�
 
 CI側の時刻はGitHub APIが秒単位で記録した値です。そのため、親子の接続が正しくても、BuildKitのスパンが親の時間範囲からわずかにはみ出すことがあります。今回の実行では、`build .`の終了が親の`Build Docker image`の終了を約0.84秒超えていました。
 
-今回は信頼できるリポジトリでの手動実行だけで、matrix、reusable workflow、forkからのPR、実際の再実行、実行間でのキャッシュ再利用は検証していません。[^workflow-security]
+今回は信頼できるリポジトリでの手動実行だけで、matrix、reusable workflow、forkからのPR、実際の再実行、実行間でのキャッシュ再利用は検証していません[^workflow-security]。
 
 ## おわりに
 
 GitHub Actionsのワークフローとステップから、Dockerfileのどの手順やレジストリへの通信に時間を使ったかまで、1本のトレースでたどれるようになりました。自分のCIへ取り込むときには、まずBuildKitの送信だけを確認し、必要に応じてCIの親スパンを追加する順で試せます。
 
 [^registry-auth]: 図の上部に赤く表示されている`HEAD HTTP HEAD`のエラーは、[Docker Registryのトークン認証](https://docs.docker.com/reference/api/registry/auth/)で最初に返る401の認証要求です。今回の実行では、トークン取得後の再試行が200となり、ビルドも成功しています。
+
+[^always-on]: GitHubレシーバーは、常時稼働するCollectorでGitHubからのWebhookを受け取る使い方を想定しています。組織のCIを継続して記録するなら、その構成のほうが向いています。常時稼働のCollectorなら、送信キューと再試行を有効にして、Grafana Cloudへの送信に失敗したスパンを再送することもできます。ただし、GitHubからWebhookを受けるために、インターネットから届くエンドポイントを用意して運用する必要があります。今回はその準備をせずに試すため、Actionsの中で完結させました。
 
 [^job-lookup]: ジョブの数値IDは、GitHub APIで今回の実行のジョブの一覧を取得し、名前が`GITHUB_JOB`と一致するジョブから取り出します。ジョブの表示名を変えたりmatrixを使ったりする場合は、別の方法でジョブを特定する必要があります。
 
