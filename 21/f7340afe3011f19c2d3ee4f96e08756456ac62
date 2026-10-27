@@ -1,0 +1,25 @@
+articles/20261028-github-actions-buildkit-otel.md
+  s_e5d7daba3536a0::t_213eb37ce9f332 1-13,15-35,37-62,64-106,108-133,135-181,183-187,189-224,226,228-234,236,238-256,258,260-263
+  s_e5d7daba3536a0::t_9b5796ba58ad71 14,134,188,227
+  s_e5d7daba3536a0::t_32bf8641c42af8 36
+  s_e5d7daba3536a0::t_64684faf5cc115 237
+  s_e5d7daba3536a0::t_d4dee014a9fd34 63,107,182,225,235,257,259
+diagrams/20261028-github-actions-buildkit-otel/20261028-github-actions-buildkit-otel-flow.dot
+  s_e5d7daba3536a0::t_4adb036f591da9 1-54
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "21f7340afe3011f19c2d3ee4f96e08756456ac62",
+  "prompts": {},
+  "sessions": {
+    "s_e5d7daba3536a0": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a15baf-3c6c-7eb3-89ab-c308d5ab4b41",
+        "model": "gpt-6.1-sol"
+      },
+      "human_author": "Yoshi Yamaguchi <ymotongpoo@gmail.com>"
+    }
+  }
+}
