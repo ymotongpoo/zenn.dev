@@ -50,6 +50,7 @@ Goのスパンには親のスパンIDが入っていて、Perlから `traceparen
 200回のリクエストを送ると、Perlのスパンは1回につき3件で計600件になります。そのうち届いたのは、ちょうど512件でした。残りの88件は、次に512件たまるまでキューに残ります。0.100のBatchプロセッサーは、トレースとログに共通の実装です。ログも、同じ条件がそろうまで送られません[^bsp-0028]。
 
 [^bsp-0028]: 0.028までは、トレース専用の `OpenTelemetry::SDK::Trace::Span::Processor::Batch` が同じ処理を持っていました。試験版の0.029-TRIALで共通の実装に移り、`$schedule_delay` を使わない作りもそのまま引き継がれています。
+[^concurrency]: 2026年10月28日、SDK 0.100のタグのコード、IO::Async 0.805、OpenTelemetry::Exporter::OTLP 0.022、HTTP::Tiny 0.096、Perl 5.44.0で確認。送信に0.3秒かかるテスト用のエクスポーターで、バッチの大きさを1にして `process` を続けて12回呼び、3回とも同じ結果でした。`OTEL_PERL_BSP_MAX_WORKERS` を1にすると、送信は1つずつになります。接続の数は、受けた接続を数えるHTTPサーバーにOTLP/JSONで送って数えました。仕様の該当箇所は、[トレース](https://github.com/open-telemetry/opentelemetry-specification/blob/v1.61.0/specification/trace/sdk.md#batching-processor)と[ログ](https://github.com/open-telemetry/opentelemetry-specification/blob/v1.61.0/specification/logs/sdk.md#batching-processor)のBatching processorです。
 
 ## ワーカーの上限と送信の停止
 
@@ -61,6 +62,17 @@ Goのスパンには親のスパンIDが入っていて、Perlから `traceparen
 *図1: Batchプロセッサーの送信の流れ。実線はスパンの流れ、ピンクの破線はPSGIサーバーでは完了しない結果の受け取りを表す。アプリケーションのプロセスは、キューが512件に達するとIO::Async::Functionのワーカーに送信を依頼する。ワーカーは送信を終えると結果をパイプで返すが、アプリケーションのプロセスがIO::Asyncのループを回さない限り、その結果は読まれず、ワーカーは次の依頼を受けない*
 
 2,000回のリクエスト（Perlのスパン6,000件）を送ると、届いたのは3,584件、つまり512件の7回分でした。本書の構成ではそこで送信が止まり、コンテナの中にはトレースのワーカープロセスが8つ残っていました。ワーカーが8つあるのに7回分しか届かなかった理由は、確かめていません。止まるまでの回数は一定ではなく、0.028では8回分（4,096件）、0.100でログのエクスポーターを `none` にした構成では6回分（3,072件）でした。
+
+ワーカーが8つあるということは、送信が同時に8つまで走るということでもあります。仕様のBatching processorは、この点についても要求を置いています。
+
+> The processor MUST synchronize calls to `Span Exporter`'s `Export`
+> to make sure that they are not invoked concurrently.
+>
+> （プロセッサーは、Span Exporterの `Export` の呼び出しを同期して、同時に呼び出されないようにしなければなりません）
+
+0.100のBatchプロセッサーは、この同期をしていません。空いたワーカーが無いときは、IO::Async::Functionが新しいワーカーを作り、次の送信をそこで始める作りです。1件で満杯になるバッチを続けて12個渡すと、8つのワーカーで8件の送信が同時に走りました[^concurrency]。ログの仕様にも、LogRecordExporterについて同じ一文があります。
+
+送信のたびに、Collectorへの接続も作り直されます。SDKは、ワーカーに送信を頼むたびにエクスポーターのオブジェクトを引数として渡し、ワーカーはそのコピーを受け取ります。コピーの中のHTTP::Tinyのオブジェクトも毎回新しく、前の送信の接続を引き継ぐ手段が無いということです。OTLPのエクスポーターで6回送ると、ワーカーが1つでも6本の接続ができました。HTTPSで送るなら、送信のたびにTLSの接続を確立し直すことになります。
 
 同じ現象は、APIのリポジトリの[issue #23](https://github.com/jjatria/perl-opentelemetry/issues/23)「Telemetry output stops being sent」で2025年9月に報告されています。報告者が突き止めた原因は、IO::Asyncを使わないプロセスでは誰もループを回さないことです。報告には、ループを回すコードも添えられていました。2026年4月に、作者のjjatriaが[次のように返しています](https://github.com/jjatria/perl-opentelemetry/issues/23#issuecomment-4199416444)。
 
@@ -179,7 +191,7 @@ HTTP::Server::PSGIに3回のリクエストを送ってからコンテナを止�
 
 `shutdown` を呼ぶ版は、ログのエクスポーターの設定によらず、3秒のタイムアウトを過ぎても戻りませんでした。0.028でも同じです。届いたのは止める前に送られていた6件で、最後のリクエストのスパンは失われました。4章のスクリプトでは有効だった、ログのプロバイダーの `shutdown` を足す方法も、PSGIサーバーの終了処理の中では戻りませんでした。`shutdown` が戻らない原因は特定できていません[^init]。いまのSDKでPSGIサーバーを速く止めながらキューを送り切れたのは、ログのエクスポーターを `none` にして、終了時にトレースの `force_flush` だけを呼ぶ構成です。
 
-[^shutdown-fix]: 作者は2026年10月19日に、終了済みの印を立てる時点を `force_flush` の後に遅らせる変更（[49f3453](https://github.com/jjatria/perl-opentelemetry-sdk/commit/49f3453adddf1b8661cc565a6371bc4f2287decb)）をSDKのmainに入れました。筆者の再現手順でも、`shutdown` だけで3件届くようになりました。執筆時点では、この変更を含むリリースはありません。
+[^shutdown-fix]: 作者は2026年10月19日に、終了済みの印を立てる時点を `force_flush` の後に遅らせる変更（[49f3453](https://github.com/jjatria/perl-opentelemetry-sdk/commit/49f3453adddf1b8661cc565a6371bc4f2287decb)）をSDKのmainに入れました。筆者の再現手順でも、`shutdown` だけで3件届くようになりました。2026年10月28日の時点で、この変更を含むリリースはありません。
 [^init]: この確認では、Composeで `init: true` を指定しました。TERMのハンドラーを登録していない `app_otel.psgi` を `init: true` なしで動かすと、plackupがコンテナのPID 1になり、`docker compose stop` の10秒後にSIGKILLされるまで終了しませんでした。PID名前空間のinitは、ハンドラーを登録していないシグナルではデフォルトの動作（終了）を取らないからです（[pid_namespaces(7)](https://man7.org/linux/man-pages/man7/pid_namespaces.7.html)）。上のように `$SIG{TERM}` を登録した場合は、PID 1でもハンドラーが呼ばれます。
 
 ## Starmanのprefork
@@ -240,4 +252,4 @@ Simpleプロセッサーで計装したサーバーのスパンは、送信に�
 最後に、本書で試していない実行方式があります。TwiggyやMojoliciousのようなイベントループのサーバーでは、別の問題が加わります。コールバックをまたいでSDKのコンテキストが引き継がれるかどうかです。上の測定の題材のアプリケーションは、リクエストを1つずつ同期的に処理するので、コールバックをまたぐ処理を含みません。
 
 [^nahs]: Net-Async-HTTP-Server 0.15をデモの `cpanfile` に加えて測りました。ログのエクスポーターを `none` にしても、件数と停止の時間は変わりませんでした。このサーバーにはSIGTERMのハンドラーが無く、シグナルでそのまま終了するので、4章で見たプロセスの終了処理を通りません。
-[^branch]: 筆者が[pull request #30](https://github.com/jjatria/perl-opentelemetry-sdk/pull/30)として送った変更の途中の版を、デモのイメージに重ねて読み込ませて測りました。最終の版との違いは `force_flush` の扱いだけで、この測定は `force_flush` を呼びません。2026年10月20日の時点で、この変更はSDKにマージされていません。
+[^branch]: 筆者が[pull request #30](https://github.com/jjatria/perl-opentelemetry-sdk/pull/30)として送った変更を、デモのイメージに重ねて読み込ませて測りました。10月20日の版でも、レビューを受けて書き直した10月23日の版（`851b6d8`）と同じコードでも、届いたのは12件と6,012件でした。2026年10月28日の時点で、この変更はSDKにマージされていません。

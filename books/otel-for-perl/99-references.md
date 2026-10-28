@@ -29,6 +29,9 @@ title: "参考文献"
 - [jjatria/perl-opentelemetry-sdk#7](https://github.com/jjatria/perl-opentelemetry-sdk/pull/7)：送信をプロセスの中で行うための提案
 - [jjatria/perl-opentelemetry-sdk#24](https://github.com/jjatria/perl-opentelemetry-sdk/issues/24)：SDKを使うプログラムが終了しない報告と、0.029-TRIALでの再現手順の[コメント](https://github.com/jjatria/perl-opentelemetry-sdk/issues/24#issuecomment-6048489586)、0.100での再現の[コメント](https://github.com/jjatria/perl-opentelemetry-sdk/issues/24#issuecomment-6260524108)
 - [IO::Async::Function](https://metacpan.org/pod/IO::Async::Function)：SDKが送信に使うワーカープロセスの仕組み
+- [jjatria/perl-opentelemetry-sdk#30](https://github.com/jjatria/perl-opentelemetry-sdk/pull/30)：`OTEL_BSP_SCHEDULE_DELAY` で送る変更の提案と、レビュー、送り方の設計の議論
+- [jjatria/perl-opentelemetry-sdk#31](https://github.com/jjatria/perl-opentelemetry-sdk/issues/31)：`shutdown` や `force_flush` を取り消すとperlが落ちる報告
+- [jjatria/perl-opentelemetry-sdk#32](https://github.com/jjatria/perl-opentelemetry-sdk/pull/32)：破棄のときにワーカーを待つ処理を、グローバルデストラクションとforkした子のときだけ省く提案
 - [OpenTelemetry::Guides::Exporters](https://metacpan.org/pod/OpenTelemetry::Guides::Exporters)と[IO::Async::Loop::Mojo](https://metacpan.org/pod/IO::Async::Loop::Mojo)：MojoliciousのイベントループでSDKの送信を動かす方法
 
 ## OBI
