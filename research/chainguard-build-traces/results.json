@@ -1,0 +1,718 @@
+{
+  "verified_at": "2026-10-27T12:26:59.821235+00:00",
+  "method": "Real GNU Hello builds; spans retrieved from Tempo HTTP API, without browser verification.",
+  "versions": {
+    "melange": "v0.63.2",
+    "apko": "v1.4.13",
+    "otel_go": "v1.47.0",
+    "go": "go1.27.0",
+    "otel_lgtm": "0.37.0",
+    "tempo": "3.1.0"
+  },
+  "native_melange": {
+    "span_count": 546,
+    "scopes": {
+      "melange": 10,
+      "go-apk": 527,
+      "apko": 9
+    },
+    "span_names": [
+      "BuildCmd",
+      "BuildImage",
+      "BuildPackage",
+      "DiscoverKeys",
+      "EmitPackage",
+      "ExpandApk",
+      "FixateWorld",
+      "GenerateIndex",
+      "GetPackagesWithDependencies",
+      "GetRepositoryIndexes",
+      "ImageLayoutToLayer",
+      "InitDB",
+      "InitKeyring",
+      "New",
+      "NewPkgResolver",
+      "Request(\"https://packages.wolfi.dev/os/apk-configuration\")",
+      "Request(\"https://packages.wolfi.dev/os/x86_64/apk-tools-2.14.10-r17.apk\")",
+      "Request(\"https://packages.wolfi.dev/os/x86_64/autoconf-2.73-r1.apk\")",
+      "Request(\"https://packages.wolfi.dev/os/x86_64/automake-1.19-r2.apk\")",
+      "Request(\"https://packages.wolfi.dev/os/x86_64/binutils-2.47-r2.apk\")",
+      "Request(\"https://packages.wolfi.dev/os/x86_64/build-base-1-r10.apk\")",
+      "Request(\"https://packages.wolfi.dev/os/x86_64/busybox-1.38.0-r3.apk\")",
+      "Request(\"https://packages.wolfi.dev/os/x86_64/ca-certificates-bundle-20261020-r0.apk\")",
+      "Request(\"https://packages.wolfi.dev/os/x86_64/gcc-16.2.0-r2.apk\")",
+      "Request(\"https://packages.wolfi.dev/os/x86_64/glibc-2.44-2.44-r10.apk\")",
+      "Request(\"https://packages.wolfi.dev/os/x86_64/glibc-2.44-dev-2.44-r10.apk\")",
+      "Request(\"https://packages.wolfi.dev/os/x86_64/glibc-2.44-locale-posix-2.44-r10.apk\")",
+      "Request(\"https://packages.wolfi.dev/os/x86_64/gmp-6.3.0-r12.apk\")",
+      "Request(\"https://packages.wolfi.dev/os/x86_64/isl-0.28-r6.apk\")",
+      "Request(\"https://packages.wolfi.dev/os/x86_64/ld-linux-2.44-2.44-r10.apk\")",
+      "Request(\"https://packages.wolfi.dev/os/x86_64/libatomic-16.2.0-r2.apk\")",
+      "Request(\"https://packages.wolfi.dev/os/x86_64/libbrotlicommon1-1.2.1-r2.apk\")",
+      "Request(\"https://packages.wolfi.dev/os/x86_64/libbrotlidec1-1.2.1-r2.apk\")",
+      "Request(\"https://packages.wolfi.dev/os/x86_64/libbrotlienc1-1.2.1-r2.apk\")",
+      "Request(\"https://packages.wolfi.dev/os/x86_64/libbz2-1-1.0.8-r28.apk\")",
+      "Request(\"https://packages.wolfi.dev/os/x86_64/libcrypt1-2.44-2.44-r10.apk\")",
+      "Request(\"https://packages.wolfi.dev/os/x86_64/libgcc-16.2.0-r2.apk\")",
+      "Request(\"https://packages.wolfi.dev/os/x86_64/libgomp-16.2.0-r2.apk\")",
+      "Request(\"https://packages.wolfi.dev/os/x86_64/libltdl-2.5.4-r5.apk\")",
+      "Request(\"https://packages.wolfi.dev/os/x86_64/libquadmath-16.2.0-r2.apk\")",
+      "Request(\"https://packages.wolfi.dev/os/x86_64/libstdc++-16.2.0-r2.apk\")",
+      "Request(\"https://packages.wolfi.dev/os/x86_64/libstdc++-dev-16.2.0-r2.apk\")",
+      "Request(\"https://packages.wolfi.dev/os/x86_64/libtool-2.5.4-r5.apk\")",
+      "Request(\"https://packages.wolfi.dev/os/x86_64/libxcrypt-4.5.2-r6.apk\")",
+      "Request(\"https://packages.wolfi.dev/os/x86_64/libxcrypt-dev-4.5.2-r6.apk\")",
+      "Request(\"https://packages.wolfi.dev/os/x86_64/libzstd1-1.5.7-r12.apk\")",
+      "Request(\"https://packages.wolfi.dev/os/x86_64/linux-headers-7.3-r0.apk\")",
+      "Request(\"https://packages.wolfi.dev/os/x86_64/m4-1.4.21-r10.apk\")",
+      "Request(\"https://packages.wolfi.dev/os/x86_64/make-4.4.1-r15.apk\")",
+      "Request(\"https://packages.wolfi.dev/os/x86_64/mpc-1.4.1-r3.apk\")",
+      "Request(\"https://packages.wolfi.dev/os/x86_64/mpfr-4.2.2-r5.apk\")",
+      "Request(\"https://packages.wolfi.dev/os/x86_64/openssf-compiler-options-20250904-r11.apk\")",
+      "Request(\"https://packages.wolfi.dev/os/x86_64/openssl-4.0-libcrypto-4.0.3-r8.apk\")",
+      "Request(\"https://packages.wolfi.dev/os/x86_64/openssl-4.0-libssl-4.0.3-r8.apk\")",
+      "Request(\"https://packages.wolfi.dev/os/x86_64/openssl-provider-legacy-allowed-4.1.0-r0.apk\")",
+      "Request(\"https://packages.wolfi.dev/os/x86_64/perl-5.44.0-r3.apk\")",
+      "Request(\"https://packages.wolfi.dev/os/x86_64/pkgconf-3.0.10-r2.apk\")",
+      "Request(\"https://packages.wolfi.dev/os/x86_64/posix-cc-wrappers-2-r10.apk\")",
+      "Request(\"https://packages.wolfi.dev/os/x86_64/scanelf-1.3.11-r3.apk\")",
+      "Request(\"https://packages.wolfi.dev/os/x86_64/wget-1.25.0-r20.apk\")",
+      "Request(\"https://packages.wolfi.dev/os/x86_64/wolfi-base-1-r7.apk\")",
+      "Request(\"https://packages.wolfi.dev/os/x86_64/wolfi-baselayout-20230201-r30.apk\")",
+      "Request(\"https://packages.wolfi.dev/os/x86_64/wolfi-keys-1-r14.apk\")",
+      "Request(\"https://packages.wolfi.dev/os/x86_64/zlib-1.3.2.1_rc20260921-r1.apk\")",
+      "ResolveWorld",
+      "SetRepositories",
+      "WriteTar",
+      "WriteTargz",
+      "bubblewrap.LoadImage",
+      "bubblewrap.StartPod",
+      "build",
+      "buildGuest",
+      "cachePackage",
+      "cacheTransport.RoundTrip",
+      "cacheTransport.retrieveAndSaveFile",
+      "cachedPackage",
+      "callback",
+      "checkSums",
+      "fetchChainguardKeys",
+      "fetchPackage",
+      "getPackageImpl",
+      "indexCache.get(\"https://packages.wolfi.dev/os/x86_64/APKINDEX.tar.gz\")",
+      "initializeApk",
+      "installCertificates",
+      "installPackage",
+      "installRuntimeKeyring",
+      "lazilyInstallAPKFiles",
+      "parseRepositoryIndex",
+      "populateWorkspace",
+      "resolveApkDB",
+      "retrieveWorkspace",
+      "writeCABundleChecksums",
+      "writeTar"
+    ]
+  },
+  "cases": [
+    {
+      "case": "melange-first",
+      "exit_code": 0,
+      "trace_id": "df03ef6dd9ba8b240e6bde81b107fef1",
+      "span_count": 546,
+      "scopes": {
+        "chainguard-build-traces/experiment": 1,
+        "melange": 9,
+        "go-apk": 527,
+        "apko": 9
+      },
+      "major_spans": [
+        {
+          "name": "melange build",
+          "scope": "chainguard-build-traces/experiment",
+          "duration_ms": 41818.795,
+          "status": {}
+        },
+        {
+          "name": "BuildCmd",
+          "scope": "melange",
+          "duration_ms": 41818.118,
+          "status": {}
+        },
+        {
+          "name": "BuildPackage",
+          "scope": "melange",
+          "duration_ms": 41672.489,
+          "status": {}
+        },
+        {
+          "name": "buildGuest",
+          "scope": "melange",
+          "duration_ms": 23217.459,
+          "status": {}
+        },
+        {
+          "name": "BuildImage",
+          "scope": "apko",
+          "duration_ms": 15350.079,
+          "status": {}
+        },
+        {
+          "name": "ImageLayoutToLayer",
+          "scope": "apko",
+          "duration_ms": 4122.367,
+          "status": {}
+        },
+        {
+          "name": "bubblewrap.LoadImage",
+          "scope": "melange",
+          "duration_ms": 769.339,
+          "status": {}
+        },
+        {
+          "name": "New",
+          "scope": "apko",
+          "duration_ms": 344.101,
+          "status": {}
+        },
+        {
+          "name": "initializeApk",
+          "scope": "apko",
+          "duration_ms": 344.086,
+          "status": {}
+        },
+        {
+          "name": "EmitPackage",
+          "scope": "melange",
+          "duration_ms": 61.224,
+          "status": {}
+        },
+        {
+          "name": "bubblewrap.StartPod",
+          "scope": "melange",
+          "duration_ms": 23.138,
+          "status": {}
+        },
+        {
+          "name": "writeCABundleChecksums",
+          "scope": "apko",
+          "duration_ms": 14.755,
+          "status": {}
+        },
+        {
+          "name": "GenerateIndex",
+          "scope": "melange",
+          "duration_ms": 13.531,
+          "status": {}
+        },
+        {
+          "name": "populateWorkspace",
+          "scope": "melange",
+          "duration_ms": 5.526,
+          "status": {}
+        },
+        {
+          "name": "New",
+          "scope": "apko",
+          "duration_ms": 0.237,
+          "status": {}
+        },
+        {
+          "name": "initializeApk",
+          "scope": "apko",
+          "duration_ms": 0.22,
+          "status": {}
+        },
+        {
+          "name": "installCertificates",
+          "scope": "apko",
+          "duration_ms": 0.009,
+          "status": {}
+        },
+        {
+          "name": "retrieveWorkspace",
+          "scope": "melange",
+          "duration_ms": 0.005,
+          "status": {}
+        },
+        {
+          "name": "installRuntimeKeyring",
+          "scope": "apko",
+          "duration_ms": 0.002,
+          "status": {}
+        }
+      ],
+      "missing_parent_names": [],
+      "negative_duration_names": [],
+      "resource_attributes": [
+        {
+          "experiment.case": "melange-first",
+          "service.name": "melange",
+          "service.version": "0.63.2",
+          "telemetry.sdk.language": "go",
+          "telemetry.sdk.name": "opentelemetry",
+          "telemetry.sdk.version": "1.47.0"
+        }
+      ]
+    },
+    {
+      "case": "melange-repeat",
+      "exit_code": 0,
+      "trace_id": "3f0cb763357f5bd41d289078afe07df3",
+      "span_count": 254,
+      "scopes": {
+        "chainguard-build-traces/experiment": 1,
+        "melange": 9,
+        "apko": 9,
+        "go-apk": 235
+      },
+      "major_spans": [
+        {
+          "name": "melange build",
+          "scope": "chainguard-build-traces/experiment",
+          "duration_ms": 26070.942,
+          "status": {}
+        },
+        {
+          "name": "BuildCmd",
+          "scope": "melange",
+          "duration_ms": 26069.916,
+          "status": {}
+        },
+        {
+          "name": "BuildPackage",
+          "scope": "melange",
+          "duration_ms": 25921.002,
+          "status": {}
+        },
+        {
+          "name": "buildGuest",
+          "scope": "melange",
+          "duration_ms": 9254.154,
+          "status": {}
+        },
+        {
+          "name": "BuildImage",
+          "scope": "apko",
+          "duration_ms": 3563.969,
+          "status": {}
+        },
+        {
+          "name": "ImageLayoutToLayer",
+          "scope": "apko",
+          "duration_ms": 2923.757,
+          "status": {}
+        },
+        {
+          "name": "bubblewrap.LoadImage",
+          "scope": "melange",
+          "duration_ms": 1182.647,
+          "status": {}
+        },
+        {
+          "name": "New",
+          "scope": "apko",
+          "duration_ms": 355.978,
+          "status": {}
+        },
+        {
+          "name": "initializeApk",
+          "scope": "apko",
+          "duration_ms": 355.964,
+          "status": {}
+        },
+        {
+          "name": "EmitPackage",
+          "scope": "melange",
+          "duration_ms": 53.904,
+          "status": {}
+        },
+        {
+          "name": "bubblewrap.StartPod",
+          "scope": "melange",
+          "duration_ms": 23.556,
+          "status": {}
+        },
+        {
+          "name": "GenerateIndex",
+          "scope": "melange",
+          "duration_ms": 11.968,
+          "status": {}
+        },
+        {
+          "name": "writeCABundleChecksums",
+          "scope": "apko",
+          "duration_ms": 6.054,
+          "status": {}
+        },
+        {
+          "name": "populateWorkspace",
+          "scope": "melange",
+          "duration_ms": 5.229,
+          "status": {}
+        },
+        {
+          "name": "New",
+          "scope": "apko",
+          "duration_ms": 0.281,
+          "status": {}
+        },
+        {
+          "name": "initializeApk",
+          "scope": "apko",
+          "duration_ms": 0.259,
+          "status": {}
+        },
+        {
+          "name": "retrieveWorkspace",
+          "scope": "melange",
+          "duration_ms": 0.007,
+          "status": {}
+        },
+        {
+          "name": "installCertificates",
+          "scope": "apko",
+          "duration_ms": 0.002,
+          "status": {}
+        },
+        {
+          "name": "installRuntimeKeyring",
+          "scope": "apko",
+          "duration_ms": 0.002,
+          "status": {}
+        }
+      ],
+      "missing_parent_names": [],
+      "negative_duration_names": [],
+      "resource_attributes": [
+        {
+          "experiment.case": "melange-repeat",
+          "service.name": "melange",
+          "service.version": "0.63.2",
+          "telemetry.sdk.language": "go",
+          "telemetry.sdk.name": "opentelemetry",
+          "telemetry.sdk.version": "1.47.0"
+        }
+      ]
+    },
+    {
+      "case": "apko-first",
+      "exit_code": 0,
+      "trace_id": "7ab9f824e88c4740e8960781bb448322",
+      "span_count": 130,
+      "scopes": {
+        "go-apk": 114,
+        "apko": 15,
+        "chainguard-build-traces/experiment": 1
+      },
+      "major_spans": [
+        {
+          "name": "apko build",
+          "scope": "chainguard-build-traces/experiment",
+          "duration_ms": 3806.645,
+          "status": {}
+        },
+        {
+          "name": "buildImageComponents",
+          "scope": "apko",
+          "duration_ms": 3802.8,
+          "status": {}
+        },
+        {
+          "name": "BuildLayers",
+          "scope": "apko",
+          "duration_ms": 499.29,
+          "status": {}
+        },
+        {
+          "name": "BuildLayer",
+          "scope": "apko",
+          "duration_ms": 499.288,
+          "status": {}
+        },
+        {
+          "name": "BuildImage",
+          "scope": "apko",
+          "duration_ms": 459.4,
+          "status": {}
+        },
+        {
+          "name": "New",
+          "scope": "apko",
+          "duration_ms": 386.937,
+          "status": {}
+        },
+        {
+          "name": "initializeApk",
+          "scope": "apko",
+          "duration_ms": 386.644,
+          "status": {}
+        },
+        {
+          "name": "ImageLayoutToLayer",
+          "scope": "apko",
+          "duration_ms": 39.847,
+          "status": {}
+        },
+        {
+          "name": "GenerateImageSBOM",
+          "scope": "apko",
+          "duration_ms": 1.679,
+          "status": {}
+        },
+        {
+          "name": "writeCABundleChecksums",
+          "scope": "apko",
+          "duration_ms": 1.384,
+          "status": {}
+        },
+        {
+          "name": "New",
+          "scope": "apko",
+          "duration_ms": 0.546,
+          "status": {}
+        },
+        {
+          "name": "GenerateIndexSBOM",
+          "scope": "apko",
+          "duration_ms": 0.347,
+          "status": {}
+        },
+        {
+          "name": "initializeApk",
+          "scope": "apko",
+          "duration_ms": 0.332,
+          "status": {}
+        },
+        {
+          "name": "GenerateIndex",
+          "scope": "apko",
+          "duration_ms": 0.146,
+          "status": {}
+        },
+        {
+          "name": "installRuntimeKeyring",
+          "scope": "apko",
+          "duration_ms": 0.002,
+          "status": {}
+        },
+        {
+          "name": "installCertificates",
+          "scope": "apko",
+          "duration_ms": 0.001,
+          "status": {}
+        }
+      ],
+      "missing_parent_names": [],
+      "negative_duration_names": [],
+      "resource_attributes": [
+        {
+          "experiment.case": "apko-first",
+          "service.name": "apko",
+          "service.version": "1.4.13",
+          "telemetry.sdk.language": "go",
+          "telemetry.sdk.name": "opentelemetry",
+          "telemetry.sdk.version": "1.47.0"
+        }
+      ]
+    },
+    {
+      "case": "apko-repeat",
+      "exit_code": 0,
+      "trace_id": "cd4464f6be5f7906ec60dff2f2da30e5",
+      "span_count": 86,
+      "scopes": {
+        "go-apk": 70,
+        "apko": 15,
+        "chainguard-build-traces/experiment": 1
+      },
+      "major_spans": [
+        {
+          "name": "apko build",
+          "scope": "chainguard-build-traces/experiment",
+          "duration_ms": 1731.185,
+          "status": {}
+        },
+        {
+          "name": "buildImageComponents",
+          "scope": "apko",
+          "duration_ms": 1727.267,
+          "status": {}
+        },
+        {
+          "name": "New",
+          "scope": "apko",
+          "duration_ms": 292.718,
+          "status": {}
+        },
+        {
+          "name": "initializeApk",
+          "scope": "apko",
+          "duration_ms": 292.608,
+          "status": {}
+        },
+        {
+          "name": "BuildLayers",
+          "scope": "apko",
+          "duration_ms": 91.15,
+          "status": {}
+        },
+        {
+          "name": "BuildLayer",
+          "scope": "apko",
+          "duration_ms": 91.147,
+          "status": {}
+        },
+        {
+          "name": "BuildImage",
+          "scope": "apko",
+          "duration_ms": 61.398,
+          "status": {}
+        },
+        {
+          "name": "ImageLayoutToLayer",
+          "scope": "apko",
+          "duration_ms": 29.731,
+          "status": {}
+        },
+        {
+          "name": "GenerateImageSBOM",
+          "scope": "apko",
+          "duration_ms": 1.799,
+          "status": {}
+        },
+        {
+          "name": "writeCABundleChecksums",
+          "scope": "apko",
+          "duration_ms": 1.033,
+          "status": {}
+        },
+        {
+          "name": "New",
+          "scope": "apko",
+          "duration_ms": 0.552,
+          "status": {}
+        },
+        {
+          "name": "GenerateIndexSBOM",
+          "scope": "apko",
+          "duration_ms": 0.344,
+          "status": {}
+        },
+        {
+          "name": "initializeApk",
+          "scope": "apko",
+          "duration_ms": 0.303,
+          "status": {}
+        },
+        {
+          "name": "GenerateIndex",
+          "scope": "apko",
+          "duration_ms": 0.177,
+          "status": {}
+        },
+        {
+          "name": "installCertificates",
+          "scope": "apko",
+          "duration_ms": 0.001,
+          "status": {}
+        },
+        {
+          "name": "installRuntimeKeyring",
+          "scope": "apko",
+          "duration_ms": 0.001,
+          "status": {}
+        }
+      ],
+      "missing_parent_names": [],
+      "negative_duration_names": [],
+      "resource_attributes": [
+        {
+          "experiment.case": "apko-repeat",
+          "service.name": "apko",
+          "service.version": "1.4.13",
+          "telemetry.sdk.language": "go",
+          "telemetry.sdk.name": "opentelemetry",
+          "telemetry.sdk.version": "1.47.0"
+        }
+      ]
+    },
+    {
+      "case": "melange-failure",
+      "exit_code": 1,
+      "trace_id": "3689d4f01519bee7a92b227d7ecb2a1c",
+      "span_count": 2,
+      "scopes": {
+        "melange": 1,
+        "chainguard-build-traces/experiment": 1
+      },
+      "major_spans": [
+        {
+          "name": "melange build",
+          "scope": "chainguard-build-traces/experiment",
+          "duration_ms": 1.401,
+          "status": {
+            "message": "failed to load configuration: open nonexistent.yaml: no such file or directory",
+            "code": "STATUS_CODE_ERROR"
+          }
+        },
+        {
+          "name": "BuildCmd",
+          "scope": "melange",
+          "duration_ms": 0.091,
+          "status": {}
+        }
+      ],
+      "missing_parent_names": [],
+      "negative_duration_names": [],
+      "resource_attributes": [
+        {
+          "experiment.case": "melange-failure",
+          "service.name": "melange",
+          "service.version": "0.63.2",
+          "telemetry.sdk.language": "go",
+          "telemetry.sdk.name": "opentelemetry",
+          "telemetry.sdk.version": "1.47.0"
+        }
+      ]
+    },
+    {
+      "case": "apko-failure",
+      "exit_code": 1,
+      "trace_id": "d5458d788041d7ac4293b9d42fe77b49",
+      "span_count": 2,
+      "scopes": {
+        "apko": 1,
+        "chainguard-build-traces/experiment": 1
+      },
+      "major_spans": [
+        {
+          "name": "apko build",
+          "scope": "chainguard-build-traces/experiment",
+          "duration_ms": 0.217,
+          "status": {
+            "message": "failed to load image configuration: file does not exist",
+            "code": "STATUS_CODE_ERROR"
+          }
+        },
+        {
+          "name": "buildImageComponents",
+          "scope": "apko",
+          "duration_ms": 0.011,
+          "status": {}
+        }
+      ],
+      "missing_parent_names": [],
+      "negative_duration_names": [],
+      "resource_attributes": [
+        {
+          "experiment.case": "apko-failure",
+          "service.name": "apko",
+          "service.version": "1.4.13",
+          "telemetry.sdk.language": "go",
+          "telemetry.sdk.name": "opentelemetry",
+          "telemetry.sdk.version": "1.47.0"
+        }
+      ]
+    }
+  ],
+  "container_stdout": "Hello, world!\n"
+}

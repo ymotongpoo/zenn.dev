@@ -1,0 +1,28 @@
+package:
+  name: hello
+  version: 2.12
+  epoch: 0
+  description: "the GNU hello world program"
+  copyright:
+    - license: GPL-3.0-or-later
+
+environment:
+  contents:
+    keyring:
+      - https://packages.wolfi.dev/os/wolfi-signing.rsa.pub
+    repositories:
+      - https://packages.wolfi.dev/os
+    packages:
+      - wolfi-base
+      - build-base
+      - ca-certificates-bundle
+
+pipeline:
+  - uses: fetch
+    with:
+      uri: https://ftp.gnu.org/gnu/hello/hello-${{package.version}}.tar.gz
+      expected-sha256: cf04af86dc085268c5f4470fbae49b18afbc221b78096aab842d934a76bad0ab
+  - uses: autoconf/configure
+  - uses: autoconf/make
+  - uses: autoconf/make-install
+  - uses: strip
