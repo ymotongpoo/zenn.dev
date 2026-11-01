@@ -1,0 +1,29 @@
+books/tinygo-otel-esp32/35-clock.md
+  s_8d3131bec2452b::t_836abee21e056b 38-40
+books/tinygo-otel-esp32/99-references.md
+  s_8d3131bec2452b::t_836abee21e056b 84-85,89-91
+books/tinygo-otel-esp32/05-constraints.md
+  s_8d3131bec2452b::t_836abee21e056b 43,45-48
+books/tinygo-otel-esp32/45-three-signals.md
+  s_8d3131bec2452b::t_836abee21e056b 33-35
+books/tinygo-otel-esp32/00-introduction.md
+  s_8d3131bec2452b::t_836abee21e056b 13-15
+books/tinygo-otel-esp32/55-conclusion.md
+  s_8d3131bec2452b::t_836abee21e056b 9-11
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "6890b1b2103771864f9b5b823f3a5fd3bd6cb4f2",
+  "prompts": {},
+  "sessions": {
+    "s_8d3131bec2452b": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a18143-b12d-73f0-a68f-f7c4cbe424a8",
+        "model": "gpt-6.1-sol"
+      },
+      "human_author": "Yoshi Yamaguchi <ymotongpoo@gmail.com>"
+    }
+  }
+}
