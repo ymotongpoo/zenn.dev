@@ -40,9 +40,12 @@ title: "前提と制約"
 
 Wi-Fiの接続には[espradio](https://github.com/tinygo-org/espradio)を使います。espradioはTinyGoのプロジェクトが開発しているESP32向けの無線通信パッケージです。TCP/IPの処理には、Goだけで書かれたネットワークスタック[lneto](https://github.com/soypat/lneto)を使っています。OSの無いマイコンの上でDHCP、DNS、TCP、UDPがGoのコードとして動き、Goの`net`パッケージも使えます。
 
-困ったのは、ライブラリが機能を持っていても、外から呼べるAPIになっていないものがあったことです。lnetoはNTPを実装しています。ところがespradio v0.3.0の標準の接続手順ではNTPサーバーが設定されず、NTPを実行する関数にも外から届きません。OTLPのデータには時刻が必要なので、時刻の同期は自分で書きました（8章）。
+困ったのは、ライブラリが機能を持っていても、外から呼べるAPIになっていないものがあったことです。lnetoはNTPを実装しています。ところがespradio v0.3.0の標準の接続手順ではNTPサーバーが設定されず、NTPを実行する関数にも外から届きません。OTLPのデータには時刻が必要なので、時刻の同期は自分で書きました（8章）[^ntp-api]。
 
-接続中のアクセスポイントの電波強度（RSSI）を返すGoの関数もありませんでした。10章では、Wi-Fiドライバのバイナリにある関数を直接呼んでいます。
+接続中のアクセスポイントの電波強度（RSSI）を返すGoの関数もありませんでした。10章では、Wi-Fiドライバのバイナリにある関数を直接呼んでいます[^rssi-api]。
+
+[^ntp-api]: 2026年10月28日追記。10月15日にマージされた[PR #96](https://github.com/tinygo-org/espradio/pull/96)で`Esplink.NTP()`が追加され、10月17日公開の[espradio v0.4.0](https://github.com/tinygo-org/espradio/releases/tag/v0.4.0)に入りました。NTPの問い合わせは公開APIで行い、返された時計の差分を呼び出し側で反映できます。
+[^rssi-api]: 2026年10月28日追記。10月15日にマージされた[PR #97](https://github.com/tinygo-org/espradio/pull/97)で`espradio.RSSI()`が追加され、[espradio v0.4.0](https://github.com/tinygo-org/espradio/releases/tag/v0.4.0)に入りました。接続中のAPの電波強度を取得する独自のcgoラッパーは不要です。
 
 ## TLSを載せないという前提
 

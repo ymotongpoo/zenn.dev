@@ -30,7 +30,9 @@ arenaCap.Set(float64(capacity))
 
 **RSSI**（Received Signal Strength Indicator）は受信した電波の強さで、単位はdBmです。送信の失敗が続いたとき、電波が弱いのかCollectorが落ちているのかを切り分けるために送っています。
 
-espradio v0.3.0には、接続中のアクセスポイント（AP）のRSSIを返すGoの関数がありません。`espradio.Scan()` が列挙するのは周辺のAPで、接続中のリンクの値の代わりにはなりません。一方、Espressifが提供するWi-Fiのバイナリライブラリ（以下ブロブ）には[`esp_wifi_sta_get_rssi`](https://docs.espressif.com/projects/esp-idf/en/latest/esp32s3/api-reference/network/esp_wifi.html)があり、espradioはこのブロブをリンクしています。シンボルはすでにバイナリの中にあるので、cgoのプリアンブルでプロトタイプを宣言すれば呼び出しは成立します。
+espradio v0.3.0には、接続中のアクセスポイント（AP）のRSSIを返すGoの関数がありません[^rssi-api]。`espradio.Scan()` が列挙するのは周辺のAPで、接続中のリンクの値の代わりにはなりません。一方、Espressifが提供するWi-Fiのバイナリライブラリ（以下ブロブ）には[`esp_wifi_sta_get_rssi`](https://docs.espressif.com/projects/esp-idf/en/latest/esp32s3/api-reference/network/esp_wifi.html)があり、espradioはこのブロブをリンクしています。シンボルはすでにバイナリの中にあるので、cgoのプリアンブルでプロトタイプを宣言すれば呼び出しは成立します。
+
+[^rssi-api]: 2026年10月28日追記。10月15日マージの[PR #97](https://github.com/tinygo-org/espradio/pull/97)により、10月17日公開の[espradio v0.4.0](https://github.com/tinygo-org/espradio/releases/tag/v0.4.0)には`espradio.RSSI() (int, error)`があります。値の単位はdBmで、未接続時は`espradio.ErrNotConnected`を返します。サンプルコードはこの公開APIに切り替え、以下のcgoラッパーを削除しました。以下はv0.3.0で使った実装です。
 
 ```go
 /*

@@ -81,8 +81,11 @@ title: "参考文献"
 
 本書の調査で見つけた制約のうち、次の5件を2026年10月7日に各プロジェクトへ報告しました。
 
-- [tinygo-org/espradio#75](https://github.com/tinygo-org/espradio/issues/75)：`netlink`で接続したプログラムから時刻を合わせる手段がないことの報告（8章）
-- [tinygo-org/espradio#76](https://github.com/tinygo-org/espradio/issues/76)：接続中のアクセスポイントのRSSIを返す関数の提案（10章）
+- [tinygo-org/espradio#75](https://github.com/tinygo-org/espradio/issues/75)：`netlink`で接続したプログラムから時刻を合わせる手段がないことの報告（8章）[^ntp-fixed]
+- [tinygo-org/espradio#76](https://github.com/tinygo-org/espradio/issues/76)：接続中のアクセスポイントのRSSIを返す関数の提案（10章）[^rssi-fixed]
 - [tinygo-org/tinygo#5839](https://github.com/tinygo-org/tinygo/issues/5839)：ESP32-S3でgoroutineのスタックがあふれても`goroutine stack overflow`と報告されず、無言で止まるか別のエラーで落ちることの報告（9章）
 - [tinygo-org/tinygo#5204へのコメント](https://github.com/tinygo-org/tinygo/issues/5204#issuecomment-6036833704)：`tls.X509KeyPair`が無いために`otlpmetrichttp`がビルドできない事例（4章）
 - [tinygo-org/tinygo#3862へのコメント](https://github.com/tinygo-org/tinygo/issues/3862#issuecomment-6036834071)：`(reflect.Type).MethodByName`が未実装のために、protobuf-goの`proto.Marshal`がpanicする事例（5章）
+
+[^ntp-fixed]: 2026年10月28日追記。10月15日に[PR #96](https://github.com/tinygo-org/espradio/pull/96)がマージされ、issueは解決済みです。追加された`Esplink.NTP()`は[espradio v0.4.0](https://github.com/tinygo-org/espradio/releases/tag/v0.4.0)に含まれます。
+[^rssi-fixed]: 2026年10月28日追記。10月15日に[PR #97](https://github.com/tinygo-org/espradio/pull/97)がマージされ、issueは解決済みです。追加された`espradio.RSSI()`は[espradio v0.4.0](https://github.com/tinygo-org/espradio/releases/tag/v0.4.0)に含まれます。

@@ -35,7 +35,9 @@ warning: clock never synchronised; timestamps will be wrong
 clock ready: 1970-01-01 00:00:33.0411515 +0000 UTC
 ```
 
-時刻を合わせる実装はライブラリの中にあっても、外から呼べないわけです。そこで、espradioには手を入れず、時刻を問い合わせるプロトコルを自分で実装することにしました。
+時刻を合わせる実装はライブラリの中にあっても、外から呼べないわけです。そこで、espradioには手を入れず、時刻を問い合わせるプロトコルを自分で実装することにしました[^ntp-api]。
+
+[^ntp-api]: 2026年10月28日追記。10月15日マージの[PR #96](https://github.com/tinygo-org/espradio/pull/96)により、10月17日公開の[espradio v0.4.0](https://github.com/tinygo-org/espradio/releases/tag/v0.4.0)には`Esplink.NTP(host, timeout, retries)`があります。サンプルコードは`l.NTP("pool.ntp.org", 5*time.Second, 3)`で時計の差分を取得し、成功時に`runtime.AdjustTimeOffset(int64(offset))`で反映する形に更新しました。Wi-Fi接続だけでは自動同期されません。以下のSNTP実装と実機出力はv0.3.0での記録です。なお、当時の[lneto v0.3.2](https://github.com/soypat/lneto/tree/v0.3.2/x/xnet)にも`NTPServer`を読む処理はなく、アドレスを設定するだけでは同期は始まりません。`DoNTP`や`StartNTP`の明示的な呼び出しが必要でした。
 
 ## SNTPのパケット
 
