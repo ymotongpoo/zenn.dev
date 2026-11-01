@@ -205,6 +205,12 @@ GrafanaのExploreでTempoのデータソースを選び、実行した時間帯�
 
 CI側のスパンは、送信用のワークフローが完了してから届きます。トレースを開くのは、両方のワークフローが完了してからにしてください[^search-delay]。
 
+## Grafanaの共有アクションでの例
+
+GrafanaのCIでは、Dockerイメージのビルドとpushを共通のアクションにまとめています。Grafana Labsのリポジトリで使うワークフローとアクションは[grafana/shared-workflows](https://github.com/grafana/shared-workflows)で公開されており、その1つが[`docker-build-push-image`](https://github.com/grafana/shared-workflows/tree/2f6fc769c66a2aa8d849650ed270e88088d85e8b/actions/docker-build-push-image)です。このアクションは、GrafanaのレジストリであるGoogle Artifact RegistryとDocker Hubへの認証を済ませてから、[docker/build-push-action](https://github.com/docker/build-push-action)でイメージをビルドしてpushします。
+
+`docker-build-push-image`には、使うbuilderの名前を指定する[`builder`入力](https://github.com/grafana/shared-workflows/blob/2f6fc769c66a2aa8d849650ed270e88088d85e8b/actions/docker-build-push-image/action.yaml#L17-L20)があります。指定しなければアクションが新しいbuilderを作り、指定すればそのbuilderでビルドする仕組みです。BuildKitのトレースの送信先はbuilderの設定で決まるので、`setup-builder.sh`で作った`ci-otel`をこの入力に渡せば、共通のアクションを使ったままビルドのトレースをGrafana Cloudへ送る設定にできます。Actionsのステップへつなぐには、これに加えて、アクションを呼ぶステップへの`TRACEPARENT`の受け渡しが必要です。この組み合わせはまだ試していないので、次は共通のアクションを使うワークフローでも1本のトレースになるかを確かめてみたいと思います。
+
 ## 今回確認した範囲
 
 BuildKitからGrafana Cloudへの送信と、2ジョブのワークフローへのビルド内部の接続までを確認しました。ただし、IDの生成規則はOpenTelemetryの共通の仕様ではなく、GitHubレシーバー v0.164.0の実装です。Collectorのバージョンやレシーバーのfeature gateを変えるときは、取得したトレースで`build .`が親のステップにつながっているかを確かめ直してください。
