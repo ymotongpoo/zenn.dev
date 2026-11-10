@@ -1,0 +1,87 @@
+books/k6-otel-perf-review/45-applicability.md
+  s_8d8cc7e7724a9d::t_c9143f47542bc2 33,50-51
+  s_d8c08f475ac77b::t_bd4ed6c6efa10c 43,45,47
+  s_8d8cc7e7724a9d::t_a62a44b6062ab3 13,25
+  s_8d8cc7e7724a9d::t_24ddac349902de 11,37
+  s_8d8cc7e7724a9d::t_3bf90d4aa1dc9e 41
+books/k6-otel-perf-review/25-narrowing-down.md
+  s_8d8cc7e7724a9d::t_a62a44b6062ab3 27,38,42,47,53
+  s_8d8cc7e7724a9d::t_a39ded64528873 63
+  s_8d8cc7e7724a9d::t_3bf90d4aa1dc9e 76,79,104
+  s_8d8cc7e7724a9d::t_8b01cadde6f1bc 9,78,80
+  s_8d8cc7e7724a9d::t_c9143f47542bc2 11,13-16,18-20,22-25
+  s_8d8cc7e7724a9d::t_9f94900dfa55ab 77
+books/k6-otel-perf-review/05-two-verdicts.md
+  s_8d8cc7e7724a9d::t_c9143f47542bc2 7,72-73
+  s_8d8cc7e7724a9d::t_96b18e754c9e02 16,22,30,47,54,62
+  s_d8c08f475ac77b::t_bd4ed6c6efa10c 2,5,11,58
+books/k6-otel-perf-review/10-load-models.md
+  s_d8c08f475ac77b::t_bd4ed6c6efa10c 2,61
+  s_8d8cc7e7724a9d::t_96b18e754c9e02 9,13,55
+  s_8d8cc7e7724a9d::t_c9143f47542bc2 11,42
+  s_d8c08f475ac77b::t_51d8cefbf7b2c6 18,20
+  s_d8c08f475ac77b::t_4faf63b7e74f0d 32
+  s_d8c08f475ac77b::t_2eaabb44a737f9 33
+books/k6-otel-perf-review/00-introduction.md
+  s_8d8cc7e7724a9d::t_c9143f47542bc2 24,26-31
+  s_d8c08f475ac77b::t_bd4ed6c6efa10c 5,11,13,25
+  s_8d8cc7e7724a9d::t_3bf90d4aa1dc9e 9
+books/k6-otel-perf-review/40-handoff.md
+  s_8d8cc7e7724a9d::t_24ddac349902de 107
+  s_8d8cc7e7724a9d::t_a62a44b6062ab3 113
+  s_d8c08f475ac77b::t_51d8cefbf7b2c6 22,33,68-69,83,94,103,123,128
+  s_d8c08f475ac77b::t_b974ea97435bf6 18-21,23-25
+  s_d8c08f475ac77b::t_bd4ed6c6efa10c 9
+  s_d8c08f475ac77b::t_8036f166fcd955 26-27
+  s_8d8cc7e7724a9d::t_c9143f47542bc2 31-32,34-63,79,85,87,96,98
+  s_d8c08f475ac77b::t_cb56306f89d3f7 84
+books/k6-otel-perf-review/35-retest.md
+  s_d8c08f475ac77b::t_bd4ed6c6efa10c 20
+  s_8d8cc7e7724a9d::t_c9143f47542bc2 68,71-74
+  s_8d8cc7e7724a9d::t_24ddac349902de 18,70
+  s_8d8cc7e7724a9d::t_a62a44b6062ab3 22,33,38,43,66
+books/k6-otel-perf-review/15-load-validity.md
+  s_8d8cc7e7724a9d::t_24ddac349902de 56,89
+  s_d8c08f475ac77b::t_51d8cefbf7b2c6 106,109,111-112,120-121
+  s_8d8cc7e7724a9d::t_96b18e754c9e02 17
+  s_d8c08f475ac77b::t_bd4ed6c6efa10c 2,23,99
+  s_8d8cc7e7724a9d::t_c9143f47542bc2 9,13,76,78,82,93,113,116-119,122-123
+  s_8d8cc7e7724a9d::t_3bf90d4aa1dc9e 114-115
+books/k6-otel-perf-review/20-telemetry-pipeline.md
+  s_8d8cc7e7724a9d::t_eb4b98f472e2b7 91,94,106-107
+  s_d8c08f475ac77b::t_b3ad5687a09ea4 21,23-24,46,68,74,77,81
+  s_8d8cc7e7724a9d::t_96b18e754c9e02 5,19,79-80
+  s_8d8cc7e7724a9d::t_a39ded64528873 34
+  s_8d8cc7e7724a9d::t_c9143f47542bc2 11,13,15,17,26,28,30,42,44,52,56-64,66,70,72,82-90,92-93,95-105,108-140,142-155
+  s_d8c08f475ac77b::t_3a7e5c03d74404 48
+  s_d8c08f475ac77b::t_5461b5fd5b044f 78
+books/k6-otel-perf-review/30-wait-span.md
+  s_8d8cc7e7724a9d::t_a62a44b6062ab3 5,57,72
+  s_d8c08f475ac77b::t_bd4ed6c6efa10c 44
+  s_8d8cc7e7724a9d::t_a39ded64528873 66
+  s_8d8cc7e7724a9d::t_c9143f47542bc2 18,38,40,42,64,73-78
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "cf29d5cde6debe3548104ee99c2cbfeb8d1de157",
+  "prompts": {},
+  "sessions": {
+    "s_8d8cc7e7724a9d": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a1c0ca-4846-7890-90e4-95b589a80317",
+        "model": "gpt-6-astra"
+      },
+      "human_author": "Yoshi Yamaguchi <ymotongpoo@gmail.com>"
+    },
+    "s_d8c08f475ac77b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "93bab47c-87ca-4658-bcba-e54f9bef4631",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Yoshi Yamaguchi <ymotongpoo@gmail.com>"
+    }
+  }
+}
