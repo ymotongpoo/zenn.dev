@@ -2,7 +2,7 @@
 title: "テストとアプリのテレメトリーを集める"
 ---
 
-ここまで合否の判定に使った応答時間とエラー率は、[k6](https://grafana.com/docs/k6/v2.3.x/)の側から見たものでした。k6が測るのは、リクエストを送ってから応答を受け取るまでの時間です。その時間のうち、`catalog-api`や`inventory`での処理時間は、k6には見えません。4章ではリクエストの到着時刻をサービス側でも調べましたが、修正前のバージョンで約2.6秒かかった処理の内訳はまだ調べていません。2章の構成から疑った同時実行数の制限が、実際にどれだけ待ち時間を生んでいたかを確かめます。
+ここまで合否の判定に使った応答時間とエラー率は、[k6](https://grafana.com/docs/k6/v2.3.x/)の側から見たものでした。k6が測るのは、リクエストを送ってから応答を受け取るまでの時間です。その時間のうち、`catalog-api`や`inventory`での処理時間は、k6には見えません。修正前のバージョンで約2.6秒かかった処理の内訳は、まだ調べていません。2章の構成から疑った同時実行数の制限が、実際にどれだけ待ち時間を生んでいたかを確かめます。
 
 アプリケーション内部での動作を確かめるには、アプリケーション自身が出すテレメトリーが必要です。`catalog-api`と`inventory`のテレメトリーと、k6のテストのメトリクスを1か所に集めてみましょう。
 
@@ -12,7 +12,7 @@ OpenTelemetryではテレメトリーをトレース、メトリクス、ログ�
 
 サンプルの2つのサービスは、SDKで3つのシグナルを記録し、テレメトリーを送受信するプロトコル**OTLP**で外部へ送ります[^otlp]。送り先とサービス名は、環境変数で指定します[^sdk-init]。
 
-[^otlp]: OTLPはOpenTelemetry Protocolの略です。サンプルでは、3つのシグナルともHTTPで送るOTLP/HTTPを使います（[OTLP仕様](https://opentelemetry.io/docs/specs/otlp/)）。
+[^otlp]: OTLPはOpenTelemetry Protocolの略です。サンプルでは、3つのシグナルともHTTPで送るOTLP/HTTPを使います（[OTLP仕様](https://opentelemetry.io/ja/docs/specs/otlp/)）。
 
 HTTPの計装には、GoのHTTPサーバーとクライアントにスパンやメトリクスの記録を組み込むライブラリ[otelhttp](https://pkg.go.dev/go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp@v0.72.0)を使います。サーバー側には受信したリクエストを処理する区間、クライアント側には`inventory`を呼び出す区間の計装を組み込みます[^http-instrumentation]。
 
@@ -41,7 +41,7 @@ k6のOpenTelemetry出力は、テストのメトリクスをOTLPで送る機能�
 
 k6のメトリクスには、テストごとに`testid`タグを付けます[^testid]。このタグはメトリクスの保存先であるMimirではラベルになり、テストを指定して検索できます。メトリクス名は保存先の形式に変わりますが、応答時間やリクエスト数を引き続き調べられます[^naming]。
 
-[^naming]: Mimirに届いたk6のメトリクス名は、`http_req_duration_milliseconds`、`http_reqs_total`、`dropped_iterations_total`などです。k6 v2.3.0のOpenTelemetry出力は、k6自身のメトリクス名（`http_req_duration`のようにアンダースコアで区切る）をそのまま送り、時間のメトリクスには単位`ms`を付けます（[`internal/output/opentelemetry/output.go`](https://github.com/grafana/k6/blob/v2.3.0/internal/output/opentelemetry/output.go)の`normalizeUnit`）。アプリケーションのメトリクスは、OpenTelemetryのセマンティック規約（メトリクスや属性の名前と単位を定めた規約）の名前で、`http.server.request.duration`のようにドットで区切り、単位は`s`です。MimirはOTLPで受けたメトリクス名をPrometheusの形式に変換して保存します。今回の構成では、ドットをアンダースコアに置き換え、単位（`_seconds`、`_milliseconds`）とカウンターの`_total`を末尾に付けました。変換の方式はMimirの`-distributor.otel-translation-strategy`で決まります（[Mimir 3.2の設定のリファレンス](https://grafana.com/docs/mimir/v3.2.x/configure/configuration-parameters/)）。その結果、Mimirの中では`http_req_duration_milliseconds`と`http_server_request_duration_seconds`のように、どちらもアンダースコアで区切った名前になります。
+[^naming]: Mimirに届いたk6のメトリクス名は、`http_req_duration_milliseconds`、`http_reqs_total`、`dropped_iterations_total`などです。k6 v2.3.0のOpenTelemetry出力は、k6自身のメトリクス名（`http_req_duration`のようにアンダースコアで区切る）をそのまま送り、時間のメトリクスには単位`ms`を付けます（[`internal/output/opentelemetry/output.go`](https://github.com/grafana/k6/blob/v2.3.0/internal/output/opentelemetry/output.go)の`normalizeUnit`）。アプリケーションのメトリクスは、OpenTelemetryのセマンティック規約（メトリクスや属性の名前と単位を定めた規約）の名前で、`http.server.request.duration`のようにドットで区切り、単位は`s`です。MimirはOTLPで受けたメトリクス名をPrometheusの形式に変換して保存します。今回の構成では`otel_metric_suffixes_enabled: true`（`-distributor.otel-metric-suffixes-enabled`）を設定し、ドットをアンダースコアに置き換えたうえで、単位（`_seconds`、`_milliseconds`）とカウンターの`_total`を末尾に付けました。変換の方式そのものを変える場合は`-distributor.otel-translation-strategy`で指定します（[Mimir 3.2の設定のリファレンス](https://grafana.com/docs/mimir/v3.2.x/configure/configuration-parameters/)）。その結果、Mimirの中では`http_req_duration_milliseconds`と`http_server_request_duration_seconds`のように、どちらもアンダースコアで区切った名前になります。
 
 一方、アプリケーションのメトリクスには`testid`のラベルがありません。`catalog-api`は、どのテストから届いたリクエストなのかを知らないからです[^app-testid]。
 
@@ -65,7 +65,7 @@ k6のメトリクスには、テストごとに`testid`タグを付けます[^te
 
 メトリクスは[Grafana Mimir](https://grafana.com/docs/mimir/v3.2.x/)、トレースは[Grafana Tempo](https://grafana.com/docs/tempo/v3.1.x/)、ログは[Grafana Loki](https://grafana.com/docs/loki/v3.7.x/)に入れ、[Grafana](https://grafana.com/docs/grafana/v13.2/)を可視化と検索の画面として使います[^storage-layout]。
 
-[^storage-layout]: 3つの保存先はいずれもOTLPを直接受け付けるので、Alloyの側での形式の変換は不要です。サンプルでは、Alloy、Mimir、Tempo、Loki、Grafanaを、それぞれのコンテナイメージから別々のコンテナとして起動しています（[`compose.yaml`](https://github.com/ymotongpoo/k6-otel-perf-review/blob/f86b6ed88a1dbb34050897a984f9997e67f78d4a/compose.yaml)）。各保存先は単一のプロセスで動かし、データはローカルのファイルシステムに置いています。これらを1つのコンテナにまとめた[grafana/otel-lgtm](https://github.com/grafana/docker-otel-lgtm)は使っていません。otel-lgtm v0.37.0は、コレクターにOpenTelemetry Collector、メトリクスの保存先にPrometheusを使います。
+[^storage-layout]: 3つの保存先はいずれもOTLPを直接受け付けるので、Alloyの側での形式の変換は不要です。サンプルでは、Alloy、Mimir、Tempo、Loki、Grafanaを、それぞれのコンテナイメージから別々のコンテナとして起動しています（[`compose.yaml`](https://github.com/ymotongpoo/k6-otel-perf-review/blob/f86b6ed88a1dbb34050897a984f9997e67f78d4a/compose.yaml)）。各保存先は単一のプロセスで動かし、データはローカルのファイルシステムに置いています。これらを1つのコンテナにまとめた[grafana/otel-lgtm](https://github.com/grafana/docker-otel-lgtm/tree/v0.37.0)は使っていません。otel-lgtm v0.37.0は、コレクターにOpenTelemetry Collector、メトリクスの保存先にPrometheusを使います。
 
 保存したデータは、サービス名を指定して検索できます。ログはトレースIDでも絞り込めるので、特定のリクエストに対応する記録を探せます[^resource-labels]。
 
@@ -135,7 +135,7 @@ Grafanaでは、Tempoのデータソースにトレースからログへ移る�
     };
     ```
 
-[^resource-labels]: テレメトリーの発生元を表す[リソース属性](https://opentelemetry.io/docs/concepts/resources/)は、保存先によって扱いが違います。Mimirでは、`service.name`が`job`ラベルになります。選ぶ条件は、`catalog-api`のメトリクスなら`job="catalog-api"`、k6のメトリクスなら`job="k6"`です。Lokiでは、`service.name`が`service_name`というラベルになり、ログに付いたトレースIDとスパンIDは構造化メタデータの`trace_id`と`span_id`に入ります。
+[^resource-labels]: テレメトリーの発生元を表す[リソース属性](https://opentelemetry.io/ja/docs/concepts/resources/)は、保存先によって扱いが違います。Mimirでは、`service.name`が`job`ラベルになります。選ぶ条件は、`catalog-api`のメトリクスなら`job="catalog-api"`、k6のメトリクスなら`job="k6"`です。Lokiでは、`service.name`が`service_name`というラベルになり、ログに付いたトレースIDとスパンIDは構造化メタデータの`trace_id`と`span_id`に入ります。
 
 [^trace-to-logs]: Tempoのデータソースに設定した、トレースからログへ移るための設定です。
 

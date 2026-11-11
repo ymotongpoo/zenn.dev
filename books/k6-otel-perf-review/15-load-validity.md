@@ -10,7 +10,7 @@ title: "実際にかかった負荷の確認"
 
 [^unplanned]: k6 v2.3.0の[`lib/executor/constant_arrival_rate.go`](https://github.com/grafana/k6/blob/v2.3.0/lib/executor/constant_arrival_rate.go)。空いているVUがなければ`dropped_iterations`に記録し、`maxVUs`に余裕があれば追加のVUの初期化を1つ要求します。ドキュメントの[Constant arrival rate](https://grafana.com/docs/k6/v2.3.x/using-k6/scenarios/executors/constant-arrival-rate/)は、`preAllocatedVUs`が少なすぎると指定した頻度でテストできる時間が短くなると注意しています。
 
-    VUはそれぞれ独立したJavaScriptの実行環境で、k6はVUを1つ足すたびに、モジュールの読み込みやオプションの評価といったスクリプトの初期化を実行します。[Test lifecycle](https://grafana.com/docs/k6/v2.3.x/using-k6/test-lifecycle/)の "code in the init context runs once per VU" と、[Arrival-rate VU allocation](https://grafana.com/docs/k6/v2.3.x/using-k6/scenarios/concepts/arrival-rate-vu-allocation/)の "Allocating VUs has CPU and memory costs" による。
+    VUはそれぞれ独立したJavaScriptの実行環境で、k6はVUを1つ足すたびに、モジュールの読み込みやオプションの評価といったスクリプトの初期化を実行します。[Test lifecycle](https://grafana.com/docs/k6/v2.3.x/using-k6/test-lifecycle/)の "code in the init context runs once per VU" と、[Arrival-rate VU allocation](https://grafana.com/docs/k6/v2.3.x/using-k6/scenarios/concepts/arrival-rate-vu-allocation/)の "Allocating VUs has CPU and memory costs" によります。
 
 [^dropped]: [Dropped iterations](https://grafana.com/docs/k6/v2.3.x/using-k6/scenarios/concepts/dropped-iterations/)。メトリクスの定義は[Built-in metrics](https://grafana.com/docs/k6/v2.3.x/using-k6/metrics/reference/)にあります。
 
@@ -28,7 +28,7 @@ VUが足りなくなるのは、アプリケーションが遅いときだけで
 
 応答時間とエラー率の閾値だけでは、反復を始められなかったことは合否に表れません。`dropped_iterations`に`count==0`の閾値を足すと[^threshold]、始められなかった反復が1回でもあればテストは不合格になり、k6は終了コード99で終わります[^exit]。サンプルのテストスクリプトは、環境変数`CHECK_DROPPED`を`true`にすると、この閾値を加える作りです。
 
-[^threshold]: [Dropped iterations](https://grafana.com/docs/k6/v2.3.x/using-k6/scenarios/concepts/dropped-iterations/)の "To assert that the SUT responds within this error budget, you can use the dropped_iterations metric in a Threshold." による。
+[^threshold]: [Dropped iterations](https://grafana.com/docs/k6/v2.3.x/using-k6/scenarios/concepts/dropped-iterations/)の "To assert that the SUT responds within this error budget, you can use the dropped_iterations metric in a Threshold." によります。
 
 [^exit]: 終了コード99は、ソースでは`ThresholdsHaveFailed`として定義されています。k6 v2.3.0の[`errext/exitcodes/codes.go`](https://github.com/grafana/k6/blob/v2.3.0/errext/exitcodes/codes.go)。ドキュメントの[Thresholds](https://grafana.com/docs/k6/v2.3.x/using-k6/thresholds/)は "non-zero exit code" とだけ書いています。
 
@@ -51,9 +51,9 @@ VUを絞った設定で、この閾値を足さない場合と足した場合を
 | 2 | 4 | `count==0` | 60.7件/秒 | 67.2ms | 2,354 | 99 |
 | 50 | 200 | `count==0` | 99.9件/秒 | 67.2ms | 0 | 0 |
 
-VUを4に絞ると、始まった反復は3,672回で、完了の頻度は指定の6割に落ちました。それでも、閾値がなければ応答時間とエラー率の基準だけで判定されるので、このテストは合格で、終了コードも0です。閾値を足すと、同じ設定のテストは不合格になりました。不足のないテストでは、`dropped_iterations`は0として要約に表れ、閾値も満たされました。
+VUを4に絞ると、完了の頻度は指定の6割に落ちました。それでも、閾値がなければ応答時間とエラー率の基準だけで判定されるので、このテストは合格で、終了コードも0です。閾値を足すと、同じ設定のテストは不合格になりました。不足のないテストでは、`dropped_iterations`は0として要約に表れ、閾値も満たされました。
 
-k6は不足に気づいていて、警告も出しますが、ターミナルで見ると見落としてしまうかもしれません。`preAllocatedVUs`を2、`maxVUs`を4にした設定で、テスト時間を20秒に短縮すると、ターミナルには次のように表示されました。
+k6は不足に気づいていて、警告も出しますが、ターミナルで見ると見落としてしまうかもしれません。VUを4に絞った設定でテスト時間を20秒に短縮すると、ターミナルには次のように表示されました。
 
 ![k6のバナーとシナリオの設定の下に、Insufficient VUsの警告が1行あり、最後の進行表示は0/4 VUs、20s、100.00 iters/sで、1220 complete](/images/20261118-k6-insufficient-vus.png)
 *図1: `preAllocatedVUs`を2、`maxVUs`を4にしたk6をターミナルで実行し、終了した時点の画面*
@@ -77,7 +77,7 @@ k6は不足に気づいていて、警告も出しますが、ターミナルで
 
 原因を探るため、リクエストが届いた時刻を`catalog-api`の側で集計しました[^arrival-sample]。応答が完了した時刻ではなく、サービスがリクエストを受けた時刻から到着間隔を調べます[^endtime]。
 
-[^arrival-sample]: 同じ条件で20秒間流したときに[Tempo](https://grafana.com/docs/tempo/v3.1.x/)に残った、`catalog-api`のサーバースパン2,001件の開始時刻を集計しました。サーバースパンは、受け取ったリクエストの処理区間を表す記録です（[OpenTelemetryの説明](https://opentelemetry.io/docs/concepts/signals/traces/#server)）。
+[^arrival-sample]: 同じ条件で20秒間流したときに[Tempo](https://grafana.com/docs/tempo/v3.1.x/)に残った、`catalog-api`のサーバースパン2,001件の開始時刻を集計しました。サーバースパンは、受け取ったリクエストの処理区間を表す記録です（[OpenTelemetryの説明](https://opentelemetry.io/ja/docs/concepts/signals/traces/#server)）。
 
 [^endtime]: k6の`http_reqs`などのメトリクスに付く時刻は、応答を受け取った時刻です。k6 v2.3.0の[`lib/netext/httpext/tracer.go`](https://github.com/grafana/k6/blob/v2.3.0/lib/netext/httpext/tracer.go)で、`http_reqs`などのサンプルの時刻に`tr.EndTime`を使っています。
 
@@ -96,7 +96,7 @@ k6は不足に気づいていて、警告も出しますが、ターミナルで
 
 ここまでのテストでは、合否の基準をp(95)が200ms未満、エラー率が1%未満としてきました。この値はサンプルのために決めたもので、根拠は「利用者が商品の一覧を開いたときに待たされたと感じない程度」という想定だけです。
 
-基準の数値は、応答時間やエラー率などについて定める**SLO**（サービスレベル目標）[^slo]をそのまま負荷テストの閾値とせずに、テストが確かめる利用条件から決めます。SLOは本番の利用が混在する状態と長い集計期間を前提にした目標で、60秒の合成された負荷とは前提が違うからです。テストの閾値とSLOを関連づけたいなら、どの利用条件を再現したテストなのかを閾値と一緒に記録します。
+基準の数値は、**SLO**（サービスレベル目標）[^slo]をそのまま負荷テストの閾値とせずに、テストが確かめる利用条件から決めます。SLOは本番の利用が混在する状態と長い集計期間を前提にした目標で、60秒の合成された負荷とは前提が違うからです。テストの閾値とSLOを関連づけたいなら、どの利用条件を再現したテストなのかを閾値と一緒に記録します。
 
 [^slo]: SLO（service level objective、サービスレベル目標）は、応答時間やエラー率などで測るサービス水準に対して定める目標値や範囲です（[Google SRE Bookの説明](https://sre.google/sre-book/service-level-objectives/)）。
 
@@ -104,15 +104,11 @@ k6は不足に気づいていて、警告も出しますが、ターミナルで
 
 - 指定した頻度と完了の頻度
 - 開始できた反復と開始できなかった反復（`dropped_iterations`）の回数
-- VUの数
+- 初期化したVUの数（`vus_max`）と反復を実行中のVUの数（`vus`）[^vus-observed]
 - k6の終了コードと標準エラーの警告
-- k6のCPU使用率の平均と最大
+- k6に割り当てたCPUと、テスト中のCPU使用率の平均と最大[^cpu-sampling]
 
-k6のCPU使用率はテスト中に変わるので、テストの間に繰り返し測った値から平均と最大を求め、割り当てたCPUと並べて記録します。平均だけでは、テストの一部の時間だけ割り当ての上限に達していたことが分かりません[^cpu-sampling]。
-
-VUの数は2つを分けて記録します。`vus_max`は初期化したVUの数で、用意しただけで反復を実行していないVUも数えます。反復を実行中のVUの数は`vus`です[^vus-observed]。
-
-記録した値から、反復を始められたか、指定に近い頻度で完了したか、負荷生成側の資源に余裕があったかを確認して、指定した負荷での結果として扱えるかを判断します。
+CPU使用率は、平均だけでは一部の時間だけ上限に達していたことを見落とすので、繰り返し測った値の最大も残します。`vus_max`には用意しただけで反復を実行していないVUも含まれるため、実際に動いていた`vus`とは別の項目にしました。これらから、反復を始められたか、指定に近い頻度で完了したか、負荷生成側の資源に余裕があったかを確かめます。
 
 [^cpu-errors]: k6が数えた502は、0.2コアで70件、0.1コアで463件でした。k6側のタイムアウトは0件です。
 

@@ -25,15 +25,13 @@ title: "負荷モデルによる結果の違い"
 | 8 | 77.1件/秒 | 103.4ms | 117.0ms |
 | 16 | 77.3件/秒 | 206.2ms | 224.7ms |
 
-VUが4までは、VUを倍にすると頻度も倍になり、応答時間は約58msのまま変わりません。VUが4を超えると、頻度は毎秒77件で止まります。2章で計算した、修正前のバージョンがさばける上限です。そこから先は、VUを増やしても頻度は増えず、応答時間だけが伸びます[^little]。
+VUが4までは、VUを倍にすると頻度も倍になり、応答時間は約58msのまま変わりません。VUが4を超えると、頻度は毎秒77件で止まります。2章で計算した、修正前のバージョンがさばける上限です。そこから先は、VUを増やしても頻度は増えず、応答時間だけが伸びます[^little]。2章の開発担当のテスト（10VU）も、この8VUと16VUの間で頭打ちになっていました。
 
 [^little]: 待ち行列の理論で知られる[リトルの法則](https://en.wikipedia.org/wiki/Little%27s_law)（系にいる平均の件数＝到着率×平均の滞在時間）の形です。16VUのテストでは、反復の平均所要時間が206.3msで、16件÷毎秒77.3件の207msとほぼ一致します。応答時間の中央値も206.2msでした。閉じたモデルでは系にいる件数がVUの数で固定されるので、頻度が頭打ちになると、増やしたVUの分だけ平均の滞在時間が伸びます。ここでの滞在時間は反復の所要時間なので、反復の中で`sleep`などの待ちを入れるテストでは、HTTPの応答時間より長くなります。
 
-2章の開発担当のテストは、同じ修正前のバージョンに10VUで負荷をかけていたので、この表の8VUと16VUの間にあたります。完了の頻度は毎秒77.1件で頭打ちになり、応答時間の中央値は129.1msでした。10件÷毎秒77.1件の約130msとほぼ一致します。
-
 つまり、閉じたモデルのテストでは、アプリケーションが遅いほどリクエストが減ります。このため、修正前後の応答時間の差は修正の効果だけを表しません。開発担当のテストは、修正前のバージョンには毎秒77件、修正後のバージョンには毎秒118件しかかけていませんでした。p(95)の152msと103msは、それぞれ別の量の負荷に対する結果です。どちらのバージョンにも、運用側が見込む毎秒120件の負荷はかかっていません[^co]。
 
-[^co]: k6のドキュメントは、この問題がテストの文献で「coordinated omission」と呼ばれていると紹介しています。[Open and closed models](https://grafana.com/docs/k6/v2.3.x/using-k6/scenarios/concepts/open-vs-closed/)のページの "In some testing literature, this problem is known as coordinated omission." による。
+[^co]: k6のドキュメントは、この問題がテストの文献で「coordinated omission」と呼ばれていると紹介しています。[Open and closed models](https://grafana.com/docs/k6/v2.3.x/using-k6/scenarios/concepts/open-vs-closed/)のページの "In some testing literature, this problem is known as coordinated omission." によります。
 
 ## 開いたモデル
 
@@ -41,7 +39,7 @@ VUが4までは、VUを倍にすると頻度も倍になり、応答時間は約
 
 テスト中にVUを追加すると、その初期化にCPUとメモリを使い、負荷を生成する側が過負荷になって結果がゆがむおそれがあります。そのため、必要な数のVUは前もって用意します[^allocation]。`preAllocatedVUs`で想定する負荷に見合う数を用意し、`maxVUs`は想定を超えたときの余裕にします。
 
-[^allocation]: [Arrival-rate VU allocation](https://grafana.com/docs/k6/v2.3.x/using-k6/scenarios/concepts/arrival-rate-vu-allocation/)の "Allocating VUs has CPU and memory costs, and allocating VUs as the test runs can overload the load generator and skew results." と "In almost all cases, the best thing to do is to pre-allocate the number of VUs you need beforehand." による。[Constant arrival rate](https://grafana.com/docs/k6/v2.3.x/using-k6/scenarios/executors/constant-arrival-rate/)の設定の表も、`preAllocatedVUs`を "Number of VUs to pre-allocate before test start to preserve runtime resources." と説明しています。
+[^allocation]: [Arrival-rate VU allocation](https://grafana.com/docs/k6/v2.3.x/using-k6/scenarios/concepts/arrival-rate-vu-allocation/)の "Allocating VUs has CPU and memory costs, and allocating VUs as the test runs can overload the load generator and skew results." と "In almost all cases, the best thing to do is to pre-allocate the number of VUs you need beforehand." によります。[Constant arrival rate](https://grafana.com/docs/k6/v2.3.x/using-k6/scenarios/executors/constant-arrival-rate/)の設定の表も、`preAllocatedVUs`を "Number of VUs to pre-allocate before test start to preserve runtime resources." と説明しています。
 
 同じ2つのバージョンに、毎秒100件と150件を60秒ずつかけました。`preAllocatedVUs`は50、`maxVUs`は200です。
 

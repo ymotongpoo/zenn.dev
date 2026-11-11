@@ -23,35 +23,45 @@ title: "参考文献"
 
 ## k6
 
+- [Test lifecycle](https://grafana.com/docs/k6/v2.3.x/using-k6/test-lifecycle/)：VUと反復の定義、VUごとの初期化（2章、4章）
+- [Scenarios](https://grafana.com/docs/k6/v2.3.x/using-k6/scenarios/)：シナリオとエグゼキューター（2章）
+- [Thresholds](https://grafana.com/docs/k6/v2.3.x/using-k6/thresholds/)：パーセンタイル表記、合否の条件、終了コード（2章、4章）
+- [Built-in metrics](https://grafana.com/docs/k6/v2.3.x/using-k6/metrics/reference/)：`http_req_duration`、`http_req_failed`、`dropped_iterations`の定義（2章、4章）
 - [Open and closed models](https://grafana.com/docs/k6/v2.3.x/using-k6/scenarios/concepts/open-vs-closed/)：閉じたモデルと開いたモデルの定義、coordinated omission（3章）
-- [Dropped iterations](https://grafana.com/docs/k6/v2.3.x/using-k6/scenarios/concepts/dropped-iterations/)：始められなかった反復と閾値での扱い（4章）
 - [Constant arrival rate](https://grafana.com/docs/k6/v2.3.x/using-k6/scenarios/executors/constant-arrival-rate/)：`preAllocatedVUs`と`maxVUs`（3章、4章）
 - [Arrival-rate VU allocation](https://grafana.com/docs/k6/v2.3.x/using-k6/scenarios/concepts/arrival-rate-vu-allocation/)：VUを前もって用意する理由（3章、4章）
-- [Test lifecycle](https://grafana.com/docs/k6/v2.3.x/using-k6/test-lifecycle/)：VUと反復の定義、VUごとの初期化（2章、4章）
-- [Thresholds](https://grafana.com/docs/k6/v2.3.x/using-k6/thresholds/)：合否の条件と終了コード（4章）
-- [Built-in metrics](https://grafana.com/docs/k6/v2.3.x/using-k6/metrics/reference/)：`http_req_duration`、`http_req_failed`、`dropped_iterations`の定義（2章、4章）
-- [OpenTelemetry output](https://grafana.com/docs/k6/v2.3.x/results-output/real-time/opentelemetry/)：OTLPでのメトリクスの出力（5章）
+- [Dropped iterations](https://grafana.com/docs/k6/v2.3.x/using-k6/scenarios/concepts/dropped-iterations/)：始められなかった反復と閾値での扱い（4章）
 - k6 v2.3.0の[`errext/exitcodes/codes.go`](https://github.com/grafana/k6/blob/v2.3.0/errext/exitcodes/codes.go)：終了コード99（4章）
 - k6 v2.3.0の[`lib/netext/httpext/tracer.go`](https://github.com/grafana/k6/blob/v2.3.0/lib/netext/httpext/tracer.go)：サンプルの時刻（4章）
 - k6 v2.3.0の[`lib/executor/constant_arrival_rate.go`](https://github.com/grafana/k6/blob/v2.3.0/lib/executor/constant_arrival_rate.go)：反復を捨てる条件とVUの追加（4章）
+- [OpenTelemetry output](https://grafana.com/docs/k6/v2.3.x/results-output/real-time/opentelemetry/)：OTLPでのメトリクスの出力（5章）
 - k6 v2.3.0の[`internal/output/opentelemetry/output.go`](https://github.com/grafana/k6/blob/v2.3.0/internal/output/opentelemetry/output.go)：メトリクスの単位（5章）
 
 ## OpenTelemetry
 
 - [OpenTelemetry Go](https://opentelemetry.io/ja/docs/languages/go/)（2章、5章）
-- [otelhttp v0.72.0](https://pkg.go.dev/go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp@v0.72.0)（5章）
-- [otelslog v0.21.0](https://pkg.go.dev/go.opentelemetry.io/contrib/bridges/otelslog@v0.21.0)（5章）
-- [Tracing API（v1.61.0）](https://github.com/open-telemetry/opentelemetry-specification/blob/v1.61.0/specification/trace/api.md#spankind)：スパンの種別（7章）
+- [トレース（サーバースパン）](https://opentelemetry.io/ja/docs/concepts/signals/traces/#server)（4章）
+- [OTLP仕様](https://opentelemetry.io/ja/docs/specs/otlp/)（5章）
+- [リソース](https://opentelemetry.io/ja/docs/concepts/resources/)（5章）
 - [W3C Trace Context](https://www.w3.org/TR/trace-context/)（5章）
+- [W3C Baggage](https://www.w3.org/TR/baggage/)（5章）
+- [otelhttp v0.72.0](https://pkg.go.dev/go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp@v0.72.0)（5章、6章）
+- [otelslog v0.21.0](https://pkg.go.dev/go.opentelemetry.io/contrib/bridges/otelslog@v0.21.0)（5章）
 - [Deprecating Span Events API](https://opentelemetry.io/blog/2026/deprecating-span-events/)：スパンイベントとログ（6章）
+- [Tracing API（v1.61.0）](https://github.com/open-telemetry/opentelemetry-specification/blob/v1.61.0/specification/trace/api.md#spankind)：スパンの種別（7章）
 
 ## Grafanaのスタック
 
 - [Grafana Alloy v1.20](https://grafana.com/docs/alloy/v1.20/)（5章）
-- [Grafana Mimir v3.2.x](https://grafana.com/docs/mimir/v3.2.x/)と[設定のリファレンス](https://grafana.com/docs/mimir/v3.2.x/configure/configuration-parameters/)：OTLPのメトリクス名の変換（5章）
-- [Grafana Tempo v3.1.x](https://grafana.com/docs/tempo/v3.1.x/)と[TraceQL](https://grafana.com/docs/tempo/v3.1.x/traceql/)（5章、6章）
-- [Grafana Loki v3.7.x](https://grafana.com/docs/loki/v3.7.x/)（5章）
+- [Grafana Mimir v3.2.x](https://grafana.com/docs/mimir/v3.2.x/)と[設定のリファレンス](https://grafana.com/docs/mimir/v3.2.x/configure/configuration-parameters/)：OTLPのメトリクス名の変換（5章、6章）
+- [Grafana Tempo v3.1.x](https://grafana.com/docs/tempo/v3.1.x/)と[TraceQL](https://grafana.com/docs/tempo/v3.1.x/traceql/)（4章、5章、6章、7章、9章）
+- [Grafana Loki v3.7.x](https://grafana.com/docs/loki/v3.7.x/)（5章、9章）
+- [Grafana v13.2](https://grafana.com/docs/grafana/v13.2/)（5章）
+- [grafana/otel-lgtm v0.37.0](https://github.com/grafana/docker-otel-lgtm/tree/v0.37.0)（5章）
 
 ## その他
 
 - [Little's law](https://en.wikipedia.org/wiki/Little%27s_law)（3章）
+- [Service Level Objectives（Google SRE Book）](https://sre.google/sre-book/service-level-objectives/)（4章）
+- [Querying Prometheus](https://prometheus.io/docs/prometheus/latest/querying/basics/)と[histogram_quantile](https://prometheus.io/docs/prometheus/latest/querying/functions/#histogram_quantile)（6章、9章）
+- [git-submodule](https://git-scm.com/docs/git-submodule)（9章）

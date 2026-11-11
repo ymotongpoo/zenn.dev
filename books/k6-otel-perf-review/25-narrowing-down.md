@@ -22,9 +22,15 @@ title: "テスト結果から調べる処理を絞る"
     # catalog-apiがinventoryを呼んだ時間のp(95)（秒）
     histogram_quantile(0.95,
       sum by (le, job)(rate(http_client_request_duration_seconds_bucket[40s])))
+
+    # inventoryが1秒あたりに503を返した件数
+    sum(rate(inventory_queue_rejected_total[40s]))
+
+    # inventoryの待ち行列の最大
+    max(max_over_time(inventory_queue_waiting[40s]))
     ```
 
-次の表では、修正前のバージョンに毎秒100件、修正後のバージョンに毎秒150件を指定したテストを並べています。負荷の条件が異なるのは、それぞれのテストで遅くなった場所を調べるためです。修正の効果は8章で同じ負荷を指定して比べます。
+次の表では、3章で問題が出た2つのテスト（修正前の毎秒100件と、修正後の毎秒150件）について、遅くなった場所を比べます。
 
 | 値 | 修正前、毎秒100件 | 修正後、毎秒150件 |
 | --- | --- | --- |
@@ -37,12 +43,12 @@ title: "テスト結果から調べる処理を絞る"
 
 最初に目につくのは、k6から見たp(95)の4,844msです。3章で示したk6の要約では、同じテストのp(95)は2,612msでした。値が違う理由は、[Mimir](https://grafana.com/docs/mimir/v3.2.x/)に入ったヒストグラムが、決まった範囲ごとの件数しか持たないことにあります。この範囲を**バケット**と呼びます。バケットの中のどこに値が集まっているかは分からないので、一様に分布すると仮定してp(95)を推定します。今回はバケットの幅が広いため、その推定値が要約の値から大きく離れました[^buckets]。
 
-[^buckets]: この時間範囲では応答の約8割が2,500msから5,000msのバケットに入り、p(95)もこのバケットの中です。`histogram_quantile`はバケット内の値を一様に分布するとみなして補間するので、p(95)の推定値はこの2,500msの幅の中で決まります（[Prometheusの関数リファレンス](https://prometheus.io/docs/prometheus/latest/querying/functions/#histogram_quantile)）。k6の出力も[otelhttp](https://pkg.go.dev/go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp@v0.72.0)も、バケットの境界は5、10、25、50、75、100、250、500、750、1,000、2,500、5,000ms…の並びでした。境界は計装の側で細かくできます。OpenTelemetryには境界を自動で決める指数ヒストグラムもありますが、サンプルでは扱っていません。
+[^buckets]: この時間範囲では応答の約8割が2,500msから5,000msのバケットに入り、p(95)もこのバケットの中です。`histogram_quantile`はバケット内の値を一様に分布するとみなして補間するので、p(95)の推定値はこの2,500msの幅の中で決まります（[Prometheusの関数リファレンス](https://prometheus.io/docs/prometheus/latest/querying/functions/#histogram_quantile)）。k6の出力も[otelhttp](https://pkg.go.dev/go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp@v0.72.0)も、バケットの境界は5、10、25、50、75、100、250、500、750、1,000、2,500、5,000ms…の並びでした。アプリケーション側のメトリクスはSDKの設定（View）で境界を細かくできます（k6 v2.3.0のOpenTelemetry出力には境界を変える設定がありません）。OpenTelemetryには境界を自動で決める指数ヒストグラムもありますが、サンプルでは扱っていません。
 
 この推定値から細かな時間差は読み取れませんが、今回のように数秒と数十msの差があれば、調べるサービスを絞れます。修正前のバージョンでは、`catalog-api`のサーバー側の時間が4.9秒前後なのに、`catalog-api`が`inventory`を呼んだ時間と`inventory`自身の時間は73msでした。`inventory`は普段どおりに応答しています。この差から、`catalog-api`の中で、`inventory`を呼んでいる時間の外に長い処理や待ちがあると考えられます。修正後のバージョンに毎秒150件をかけたときは、`catalog-api`と`inventory`の時間がほぼ同じで、調べる候補は`inventory`の中の処理や待ちに絞られます。`inventory`は待ち行列の上限の8件まで詰まり、毎秒32件を断っています。
 
 ![catalog-apiのサーバー側のp(95)は、修正前のバージョンに開いたモデルで負荷をかけた2つのテストの間だけ約4.9秒に上がり、inventoryは0秒近くのまま。右端の修正後のバージョンに毎秒150件をかけた時間帯では、2つのサービスがともに約240msに並ぶ](/images/20261118-grafana-server-p95.png)
-*図1: 3章のテストを続けて流した時間帯の、サービスごとのサーバー側の処理時間のp(95)をGrafanaで表示した画面。左の山が修正前のバージョンに毎秒100件と150件をかけた時間帯、右端が修正後のバージョンに毎秒150件をかけた時間帯*
+*図1: 2章と3章のテストを続けて流した時間帯の、サービスごとのサーバー側の処理時間のp(95)をGrafanaで表示した画面。左の山が修正前のバージョンに毎秒100件と150件をかけた時間帯、右端が修正後のバージョンに毎秒150件をかけた時間帯*
 
 図1でも、修正前のテストでは2つのサービスの線が離れ、修正後の毎秒150件のテストでは重なっています。この違いを手掛かりに、次は同じリクエストの中でどの区間に時間がかかったかを確かめます。
 
@@ -73,7 +79,7 @@ title: "テスト結果から調べる処理を絞る"
 | `inventory`のサーバースパン | 50.6ms | 59.9ms | 112.0ms | 127.1ms |
 | `inventory`の`lookup stock` | 50.5ms | 59.7ms | 50.8ms | 60.4ms |
 
-トレースから求めた値はヒストグラムの補間の影響を受けず、今回の集計ではk6の要約に近い値になりました。k6の要約とは集計対象が異なるので、値が一致するとは限りません。
+トレースから求めた値はヒストグラムの補間の影響を受けず、集計対象はk6の要約と異なるものの、今回は近い値になりました。
 
 修正前のバージョンでは、サーバースパンの中央値が2,570msなのに対し、クライアントスパンは51.5msだけです。クライアントスパンは、サーバースパンが始まってから中央値で約2,519ms後に始まり、サーバースパンとほぼ同時に終わっていました。この約2,519msは、`catalog-api`が`inventory`を呼ぶ前に使った時間です。
 
@@ -86,7 +92,7 @@ title: "テスト結果から調べる処理を絞る"
 ![左のTempoの画面でcatalog-apiのGET /items/{id}が502を返したトレースを開き、inventoryのGET /stock/{id}のスパンの詳細にLogs for this traceのボタンがある。右のLokiの画面には、inventoryのサービス名とトレースIDで検索した結果として、WARNのqueue fullが1行表示されている](/images/20261118-grafana-trace-to-logs.png)
 *図2: `inventory`が503で断ったリクエストのトレースをGrafanaのExploreで開き、`inventory`のスパンの「Logs for this trace」からLokiのログを右に表示した画面*
 
-[^events]: スパンイベントは、スパンの中のある時点に名前と属性を付けて記録する出来事です。トレースの画面にスパンイベントが表示されるのは、アプリケーションがスパンにイベントを記録したとき（Goなら`span.AddEvent`）だけです。サンプルはログをOpenTelemetryのログとして送っているので、ログはスパンイベントになりません。OpenTelemetryはスパンイベントを記録するAPIを非推奨にし、新しいコードではイベントを現在のスパンと関連づけたログとして書くよう求めています。[Deprecating Span Events API](https://opentelemetry.io/blog/2026/deprecating-span-events/)の "New code should write events as logs that are correlated with the current span." による。
+[^events]: スパンイベントは、スパンの中のある時点に名前と属性を付けて記録する出来事です。トレースの画面にスパンイベントが表示されるのは、アプリケーションがスパンにイベントを記録したとき（Goなら`span.AddEvent`）だけです。サンプルはログをOpenTelemetryのログとして送っているので、ログはスパンイベントになりません。OpenTelemetryはスパンイベントを記録するAPIを非推奨にし、新しいコードではイベントを現在のスパンと関連づけたログとして書くよう求めています。[Deprecating Span Events API](https://opentelemetry.io/blog/2026/deprecating-span-events/)の "New code should write events as logs that are correlated with the current span." によります。
 
 検索の条件にはスパンのサービス名も入るので、`inventory`のスパンから開くと、見つかるのは`inventory`の「queue full」の1行だけです。2つのサービスのログを1つの一覧で見たいときは、検索の条件を次のように広げます。
 

@@ -22,7 +22,7 @@ digraph request_path {
   subgraph cluster_api {
     graph [label=<<b>サーバースパン<font face="JetBrains Mono"> GET /items/{id}</font></b>>, labeljust="l",
            style="rounded,filled", fillcolor="#FFF5ED", color="#AB5A13", fontcolor="#783F0E", penwidth=1.6, margin=14];
-    local [label=<<b>api内の処理</b><br/>約5ms、スパンなし>, fillcolor="#E4E4E4", color="#4A4A4A"];
+    local [label=<<b><font face="JetBrains Mono">catalog-api</font>内の処理</b><br/>約5ms、スパンなし>, fillcolor="#E4E4E4", color="#4A4A4A"];
     wait [label=<<b>空きを待つ</b><br/><font face="JetBrains Mono">wait for backend slot</font>>, fillcolor="#F7DDFC", color="#9430A9"];
     subgraph cluster_client {
       graph [label=<<b>クライアントスパン<font face="JetBrains Mono"> HTTP GET</font></b>>, labeljust="l", labelloc="b",
