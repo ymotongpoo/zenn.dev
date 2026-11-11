@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 976 190" width="976" height="190">
+  <style>
+    text { font-feature-settings: 'palt' 1; }
+    .mono { font-variant-ligatures: none; font-feature-settings: 'liga' 0, 'calt' 0; }
+  </style>
+  <rect data-bg="canvas" x="0" y="0" width="976" height="190" fill="#171717" />
+  <g transform="translate(28, 26)">
+    <rect data-role="node" x="0" y="8" width="162" height="80" rx="10" stroke="#AFAFAF" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="#3A3A3A" />
+    <rect data-role="band" x="9" y="22" width="7" height="52" rx="3.5" stroke="#FFED23" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" fill="#FFED23" />
+    <text text-anchor="start" dominant-baseline="central" data-box="22,8,136,80"><tspan x="26" y="36.5"><tspan font-family="Poppins, 'IBM Plex Sans JP', sans-serif" font-size="16.5" font-weight="700" fill="#FFFFFF">仮説を立てる</tspan></tspan><tspan x="26" y="61.5"><tspan font-family="Inter, 'IBM Plex Sans JP', sans-serif" font-size="14.5" font-weight="500" fill="#AFAFAF">測る区間を決める</tspan></tspan></text>
+    <line x1="166" y1="48" x2="176.8" y2="48" stroke="#AFAFAF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+    <polygon points="184,48 175.9,51.91 175.9,44.09" stroke="#AFAFAF" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" fill="#AFAFAF" />
+    <rect data-role="node" x="188" y="8" width="151" height="80" rx="10" stroke="#AFAFAF" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="#3A3A3A" />
+    <rect data-role="band" x="197" y="22" width="7" height="52" rx="3.5" stroke="#2970FF" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" fill="#2970FF" />
+    <text text-anchor="start" dominant-baseline="central" data-box="210,8,125,80"><tspan x="214" y="36.5"><tspan font-family="Poppins, 'IBM Plex Sans JP', sans-serif" font-size="16.5" font-weight="700" fill="#FFFFFF">計装を足す</tspan></tspan><tspan x="214" y="61.5"><tspan font-family="Inter, 'IBM Plex Sans JP', sans-serif" font-size="14.5" font-weight="500" fill="#AFAFAF">その区間だけ</tspan></tspan></text>
+    <line x1="343" y1="48" x2="353.8" y2="48" stroke="#AFAFAF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+    <polygon points="361,48 352.9,51.91 352.9,44.09" stroke="#AFAFAF" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" fill="#AFAFAF" />
+    <rect data-role="node" x="365" y="8" width="139" height="80" rx="10" stroke="#AFAFAF" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="#3A3A3A" />
+    <rect data-role="band" x="374" y="22" width="7" height="52" rx="3.5" stroke="#D444F1" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" fill="#D444F1" />
+    <text text-anchor="start" dominant-baseline="central" data-box="387,8,113,80"><tspan x="391" y="36.5"><tspan font-family="Poppins, 'IBM Plex Sans JP', sans-serif" font-size="16.5" font-weight="700" fill="#FFFFFF">変更する</tspan></tspan><tspan x="391" y="61.5"><tspan font-family="Inter, 'IBM Plex Sans JP', sans-serif" font-size="14.5" font-weight="500" fill="#AFAFAF">1つずつ</tspan></tspan></text>
+    <line x1="508" y1="48" x2="518.8" y2="48" stroke="#AFAFAF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+    <polygon points="526,48 517.9,51.91 517.9,44.09" stroke="#AFAFAF" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" fill="#AFAFAF" />
+    <rect data-role="node" x="530" y="8" width="163" height="80" rx="10" stroke="#AFAFAF" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="#3A3A3A" />
+    <rect data-role="band" x="539" y="22" width="7" height="52" rx="3.5" stroke="#D444F1" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" fill="#D444F1" />
+    <text text-anchor="start" dominant-baseline="central" data-box="552,8,137,80"><tspan x="556" y="36.5"><tspan font-family="Poppins, 'IBM Plex Sans JP', sans-serif" font-size="16.5" font-weight="700" fill="#FFFFFF">再テストする</tspan></tspan><tspan x="556" y="61.5"><tspan font-family="Inter, 'IBM Plex Sans JP', sans-serif" font-size="14.5" font-weight="500" fill="#AFAFAF">同じ負荷と条件で</tspan></tspan></text>
+    <line x1="697" y1="48" x2="707.8" y2="48" stroke="#AFAFAF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+    <polygon points="715,48 706.9,51.91 706.9,44.09" stroke="#AFAFAF" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" fill="#AFAFAF" />
+    <rect data-role="node" x="719" y="8" width="196" height="80" rx="10" stroke="#AFAFAF" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="#3A3A3A" />
+    <rect data-role="band" x="728" y="22" width="7" height="52" rx="3.5" stroke="#04BC4C" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" fill="#04BC4C" />
+    <text text-anchor="start" dominant-baseline="central" data-box="741,8,170,80"><tspan x="745" y="36.5"><tspan font-family="Poppins, 'IBM Plex Sans JP', sans-serif" font-size="16.5" font-weight="700" fill="#FFFFFF">記録を残す</tspan></tspan><tspan x="745" y="61.5"><tspan font-family="Inter, 'IBM Plex Sans JP', sans-serif" font-size="14.5" font-weight="500" fill="#AFAFAF">改善しなかった結果も</tspan></tspan></text>
+    <rect data-role="frame" x="714" y="3" width="206" height="90" rx="13" stroke="#FF671D" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+    <polyline points="817,95 817,128 81,128 81,101" stroke="#FF671D" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+    <polygon points="81,93 85.35,102 76.65,102" stroke="#FF671D" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" fill="#FF671D" />
+  </g>
+</svg>
