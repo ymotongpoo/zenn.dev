@@ -1,0 +1,59 @@
+books/k6-otel-perf-review/15-load-validity.md
+  s_72951186184a52::t_4882f9895b3b3c 99,107,109
+  s_72951186184a52::t_15f2f29b18473e 54,56
+  s_72951186184a52::t_91b6f346974a70 13
+  s_72951186184a52::t_7c4c1911e7fd52 31
+  s_72951186184a52::t_ec9a1dbcf5fff7 80
+  s_72951186184a52::t_e4d77a9b386295 111
+diagrams/k6-otel-perf-review/20261118-request-path.dot
+  s_72951186184a52::t_9059f9b0e9038e 25
+books/k6-otel-perf-review/10-load-models.md
+  s_72951186184a52::t_70b8ec12ac1b1b 28,34,42
+books/k6-otel-perf-review/30-wait-span.md
+  s_72951186184a52::t_9aadfe9922d5ca 57,70,75-76
+  s_72951186184a52::t_3a4eaa1001500f 13
+books/k6-otel-perf-review/35-retest.md
+  s_72951186184a52::t_894bfe4b95f50a 70,74
+  s_72951186184a52::t_462aa54d903a67 5
+books/k6-otel-perf-review/00-introduction.md
+  s_72951186184a52::t_5ce01a441d0b12 17
+  s_72951186184a52::t_763c33dee38b88 11,19
+books/k6-otel-perf-review/25-narrowing-down.md
+  s_72951186184a52::t_73e7b5c66dc283 26
+  s_72951186184a52::t_00e7a41c193f4a 25,27-30,33
+  s_72951186184a52::t_1accc06be0349f 82
+  s_72951186184a52::t_9f6e6fa0787ed3 46,51
+  s_72951186184a52::t_e7a4bde4b8c338 95
+books/k6-otel-perf-review/05-two-verdicts.md
+  s_72951186184a52::t_45f05903d61561 54,58
+  s_72951186184a52::t_b5e72b20cfd2aa 5,7
+books/k6-otel-perf-review/40-handoff.md
+  s_72951186184a52::t_ef52431243fc34 18,23,25,29,31,43-44,48-49,56-58,61-62,66
+  s_72951186184a52::t_b10430afcaadfd 68
+books/k6-otel-perf-review/45-applicability.md
+  s_72951186184a52::t_c07e35fe511a50 11,13,17
+books/k6-otel-perf-review/99-references.md
+  s_72951186184a52::t_594881a1e41f0a 26-29,33,37,43-45,47-49,51,56-60,65-67
+books/k6-otel-perf-review/20-telemetry-pipeline.md
+  s_72951186184a52::t_7f1b87cc2772d3 15
+  s_72951186184a52::t_790d99642f6ce4 68
+  s_72951186184a52::t_6234df397a82e7 138
+  s_72951186184a52::t_b073575ff5bee3 5
+  s_72951186184a52::t_fdb139ea0b76f1 44
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "59302e3fe155fca776ae94b097d467f49fd17862",
+  "prompts": {},
+  "sessions": {
+    "s_72951186184a52": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "agent-bb938b7b-5847-4a52-a192-17bb25b721cd",
+        "model": "unknown"
+      },
+      "human_author": "Yoshi Yamaguchi <ymotongpoo@gmail.com>"
+    }
+  }
+}
