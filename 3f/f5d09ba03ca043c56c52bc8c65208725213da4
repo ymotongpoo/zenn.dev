@@ -1,0 +1,27 @@
+books/k6-otel-perf-review/05-two-verdicts.md
+  s_0e4514a62c362a::t_79240068816c54 73
+books/k6-otel-perf-review/15-load-validity.md
+  s_0e4514a62c362a::t_ee8453a99e4e48 29,37,40-41
+books/k6-otel-perf-review/20-telemetry-pipeline.md
+  s_0e4514a62c362a::t_2031933d2d2338 54,68
+books/k6-otel-perf-review/25-narrowing-down.md
+  s_0e4514a62c362a::t_0a002300e9b509 71
+books/k6-otel-perf-review/40-handoff.md
+  s_0e4514a62c362a::t_14695545f50f75 78
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "3ff5d09ba03ca043c56c52bc8c65208725213da4",
+  "prompts": {},
+  "sessions": {
+    "s_0e4514a62c362a": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "53698d8b-f3e8-4bf1-a144-3d611b90ac98",
+        "model": "unknown"
+      },
+      "human_author": "Yoshi Yamaguchi <ymotongpoo@gmail.com>"
+    }
+  }
+}
