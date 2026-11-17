@@ -70,4 +70,4 @@ title: "開発側と運用側の評価の食い違い"
 
 サンプルでは、入力と環境は2つのテストでそろっていました。違ったのは負荷の与え方です。
 
-[^run]: 手元で同じ構成を動かす手順は、サンプルのリポジトリの[README](https://github.com/ymotongpoo/k6-otel-perf-review/tree/f86b6ed88a1dbb34050897a984f9997e67f78d4a#動かし方)にあります。この本の表のテストは、READMEの`run.sh`に負荷モデルと頻度を渡して流したものです。
+[^run]: 手元で同じ構成を動かす手順は、サンプルのリポジトリの[README](https://github.com/ymotongpoo/k6-otel-perf-review/tree/01064e12b1f1d4f0cb21ef97b4bd1d143c0de5ed#動かし方)にあります。この本の表のテストは、READMEの`run.sh`に負荷モデルと頻度を渡して流したものです。

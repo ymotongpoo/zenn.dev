@@ -26,7 +26,7 @@ VUが足りなくなるのは、アプリケーションが遅いときだけで
 
 [^vusconfig]: `maxVUs`を`preAllocatedVUs`より小さくするとk6は設定の誤りとしてテストを始めないので、2つの値を一緒に変えています。k6 v2.3.0の[`lib/executor/constant_arrival_rate.go`](https://github.com/grafana/k6/blob/v2.3.0/lib/executor/constant_arrival_rate.go)の設定の検証が、`maxVUs can't be less than preAllocatedVUs`というエラーを返します。
 
-応答時間とエラー率の閾値だけでは、反復を始められなかったことは合否に表れません。`dropped_iterations`に`count==0`の閾値を足すと[^threshold]、始められなかった反復が1回でもあればテストは不合格になり、k6は終了コード99で終わります[^exit]。サンプルのテストスクリプトは、環境変数`CHECK_DROPPED`を`true`にすると、この閾値を加える作りです。
+応答時間とエラー率の閾値だけでは、反復を始められなかったことは合否に表れません。`dropped_iterations`に`count==0`の閾値を足すと[^threshold]、始められなかった反復が1回でもあればテストは不合格になり、k6は終了コード99で終わります[^exit]。サンプルのテストスクリプトでこの閾値を環境変数`CHECK_DROPPED`で切り替えるのは、閾値のほかは同じ条件で、閾値がない場合とある場合の判定を比べるためです。自分のテストでは、はじめから閾値に入れておいてください。
 
 [^threshold]: [Dropped iterations](https://grafana.com/docs/k6/v2.3.x/using-k6/scenarios/concepts/dropped-iterations/)の "To assert that the SUT responds within this error budget, you can use the dropped_iterations metric in a Threshold." によります。
 
@@ -34,10 +34,11 @@ VUが足りなくなるのは、アプリケーションが遅いときだけで
 
 ```javascript
 const thresholds = {
-  http_req_duration: [`p(95)<${__ENV.P95_MS || 200}`],
+  http_req_duration: ['p(95)<200'],
   http_req_failed: ['rate<0.01'],
 };
-// CHECK_DROPPED=true fails the test when any iteration could not start.
+// The threshold is opt-in so that the same script can reproduce the run that
+// passes on response time and errors alone. Keep it on in your own tests.
 if (__ENV.CHECK_DROPPED === 'true') {
   thresholds.dropped_iterations = ['count==0'];
 }

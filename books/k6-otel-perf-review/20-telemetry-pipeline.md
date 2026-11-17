@@ -51,7 +51,7 @@ k6のメトリクスには、テストごとに`testid`タグを付けます[^te
 
 `catalog-api`と`inventory`のテレメトリー、およびk6のメトリクスは、いったんコレクターの[Grafana Alloy](https://grafana.com/docs/alloy/v1.20/)に集めます。Alloyはテレメトリーを受信し、シグナルごとに保存先へ転送します[^alloy]。
 
-[^alloy]: AlloyはGrafana Labsが開発するテレメトリーのコレクターで、OpenTelemetry Collectorのコンポーネントを組み合わせて設定を書けます。サンプルの設定は、OTLPを受けてシグナルごとに保存先へ振り分けるだけです。設定の全体は、サンプルのリポジトリの[`config/config.alloy`](https://github.com/ymotongpoo/k6-otel-perf-review/blob/f86b6ed88a1dbb34050897a984f9997e67f78d4a/config/config.alloy)にあります。OTLPのレシーバー（gRPCの4317番とHTTPの4318番）、バッチ処理、3つの保存先への送信からなります。
+[^alloy]: AlloyはGrafana Labsが開発するテレメトリーのコレクターで、OpenTelemetry Collectorのコンポーネントを組み合わせて設定を書けます。サンプルの設定は、OTLPを受けてシグナルごとに保存先へ振り分けるだけです。設定の全体は、サンプルのリポジトリの[`config/config.alloy`](https://github.com/ymotongpoo/k6-otel-perf-review/blob/01064e12b1f1d4f0cb21ef97b4bd1d143c0de5ed/config/config.alloy)にあります。OTLPのレシーバー（gRPCの4317番とHTTPの4318番）、バッチ処理、3つの保存先への送信からなります。
 
     ```alloy
     otelcol.processor.batch "default" {
@@ -65,7 +65,7 @@ k6のメトリクスには、テストごとに`testid`タグを付けます[^te
 
 メトリクスは[Grafana Mimir](https://grafana.com/docs/mimir/v3.2.x/)、トレースは[Grafana Tempo](https://grafana.com/docs/tempo/v3.1.x/)、ログは[Grafana Loki](https://grafana.com/docs/loki/v3.7.x/)に入れ、[Grafana](https://grafana.com/docs/grafana/v13.2/)を可視化と検索の画面として使います[^storage-layout]。
 
-[^storage-layout]: 3つの保存先はいずれもOTLPを直接受け付けるので、Alloyの側での形式の変換は不要です。サンプルでは、Alloy、Mimir、Tempo、Loki、Grafanaを、それぞれのコンテナイメージから別々のコンテナとして起動しています（[`compose.yaml`](https://github.com/ymotongpoo/k6-otel-perf-review/blob/f86b6ed88a1dbb34050897a984f9997e67f78d4a/compose.yaml)）。各保存先は単一のプロセスで動かし、データはローカルのファイルシステムに置いています。これらを1つのコンテナにまとめた[grafana/otel-lgtm](https://github.com/grafana/docker-otel-lgtm/tree/v0.37.0)は使っていません。otel-lgtm v0.37.0は、コレクターにOpenTelemetry Collector、メトリクスの保存先にPrometheusを使います。
+[^storage-layout]: 3つの保存先はいずれもOTLPを直接受け付けるので、Alloyの側での形式の変換は不要です。サンプルでは、Alloy、Mimir、Tempo、Loki、Grafanaを、それぞれのコンテナイメージから別々のコンテナとして起動しています（[`compose.yaml`](https://github.com/ymotongpoo/k6-otel-perf-review/blob/01064e12b1f1d4f0cb21ef97b4bd1d143c0de5ed/compose.yaml)）。各保存先は単一のプロセスで動かし、データはローカルのファイルシステムに置いています。これらを1つのコンテナにまとめた[grafana/otel-lgtm](https://github.com/grafana/docker-otel-lgtm/tree/v0.37.0)は使っていません。otel-lgtm v0.37.0は、コレクターにOpenTelemetry Collector、メトリクスの保存先にPrometheusを使います。
 
 保存したデータは、サービス名を指定して検索できます。ログはトレースIDでも絞り込めるので、特定のリクエストに対応する記録を探せます[^resource-labels]。
 
