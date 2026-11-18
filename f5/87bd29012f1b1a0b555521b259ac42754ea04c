@@ -1,0 +1,20 @@
+books/k6-otel-perf-review/config.yaml
+  s_d8c08f475ac77b::t_b1e4a74c7cd4d8 4
+  s_d8c08f475ac77b::t_a67d0c265f0979 2
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "f587bd29012f1b1a0b555521b259ac42754ea04c",
+  "prompts": {},
+  "sessions": {
+    "s_d8c08f475ac77b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "93bab47c-87ca-4658-bcba-e54f9bef4631",
+        "model": "unknown"
+      },
+      "human_author": "Yoshi Yamaguchi <ymotongpoo@gmail.com>"
+    }
+  }
+}
