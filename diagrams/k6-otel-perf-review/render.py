@@ -90,48 +90,32 @@ def build_demo_topology() -> Scene:
 
 
 # ---------------------------------------------------------------------------
-# 2. 20261118-closed-vs-open (3章: 次のリクエストを送る契機の違い)
+# 2. 20261118-closed-vs-open (3章: 次のリクエストをいつ送るかの違い)
 # ---------------------------------------------------------------------------
 def build_closed_vs_open() -> Scene:
-    s = Scene(920, 356)
-
-    # 閉じたモデル (yellow)
-    s.text(0, 12, "閉じたモデル", font="heading", size=18, weight=700, color="yellow")
-    s.text(132, 12, "constant-vus", font="mono", size=15, weight=500, color="n2")
-
-    s.box(0, 36, 212, 56, "前の応答が返る", fill="n4", stroke="yellow", width=2, font="body", size=17, weight=600, color="n1")
-    s.arrow(218, 64, 274, 64, stroke="n2", width=2, head=11)
-    s.box(280, 36, 248, 56, "次のリクエストを送る", fill="n4", stroke="yellow", width=2, font="body", size=17, weight=600, color="n1")
-
-    s.route([[404, 96], [404, 120], [106, 120], [106, 97]], stroke="yellow", width=1.8, head=10)
-    s.text(556, 64, "前の応答が返ってから次を送る", font="body", size=15.5, weight=700, color="yellow")
-
-    # 区切り線
-    s.line(0, 148, 920, 148, stroke="n4", width=1.5)
-
-    # 開いたモデル (lightblue) + dropped_iterations (pink 破線)
-    s.text(0, 178, "開いたモデル", font="heading", size=18, weight=700, color="lightblue")
-    s.text(132, 178, "constant-arrival-rate", font="mono", size=15, weight=500, color="n2")
-
-    s.box(0, 202, 212, 56, "決めた間隔が経つ", fill="n4", stroke="lightblue", width=2, font="body", size=17, weight=600, color="n1")
-    s.arrow(218, 230, 274, 230, stroke="n2", width=2, head=11)
-    s.box(280, 202, 236, 56, "空いているVUに渡す", fill="n4", stroke="lightblue", width=2, font="body", size=17, weight=600, color="n1")
-    s.arrow(522, 230, 578, 230, stroke="n2", width=2, head=11)
-    s.box(584, 202, 216, 56, "リクエストを送る", fill="n4", stroke="lightblue", width=2, font="body", size=17, weight=600, color="n1")
-
-    # 一定間隔の目盛り
-    for i in range(6):
-        s.line(24 + i * 33, 276, 24 + i * 33, 290, stroke="lightblue", width=2)
-    s.line(12, 283, 201, 283, stroke="lightblue", width=1.5)
-    s.text(0, 309, "応答と関係なく、決めた頻度で送る", font="body", size=14.5, weight=700, color="orange")
-
-    # ピンクの破線: 反復を始められない経路
-    s.arrow(398, 262, 398, 293, stroke="pink", width=2, dash=[6, 5], head=10)
-    s.text(412, 277, "空いているVUがない", font="body", size=14.5, weight=600, color="pink")
-    s.box(280, 298, 236, 58, [
-        {"text": "dropped_iterations", "font": "mono", "size": 15.5, "weight": 600, "color": "pink"},
-        {"text": "に数える", "font": "body", "size": 14.5, "weight": 500, "color": "n1"},
-    ], fill="n4", stroke="pink", width=2, row_gap=22)
+    s=Scene(920,360)
+    s.text(0,12,'閉じたモデル',size=18,weight=700,color='yellow')
+    s.text(150,12,'constant-vus',font='mono',size=15,color='n2')
+    for x,label in [(0,'リクエストを送る'),(330,'応答が返る')]:
+        s.box(x,40,250,56,label,stroke='yellow',size=17)
+    s.arrow(256,68,324,68)
+    s.route([[455,101],[455,133],[125,133],[125,101]],stroke='yellow',head=10)
+    s.text(620,63,'VUごとに応答を待つ',size=16,weight=600,color='yellow')
+    s.text(620,88,'遅くなると、送る頻度も下がる',size=14.5,color='n1')
+    s.line(0,158,920,158,stroke='n4')
+    s.text(0,185,'開いたモデル',size=18,weight=700,color='lightblue')
+    s.text(150,185,'constant-arrival-rate',font='mono',size=15,color='n2')
+    for x,w,label in [(0,250,'反復の開始時刻が来る'),(330,250,'使えるVUを確保する'),(680,240,'リクエストを送る')]:
+        s.box(x,211,w,56,label,stroke='lightblue',size=16)
+    s.arrow(256,239,324,239)
+    s.arrow(586,239,674,239)
+    s.text(630,218,'確保できる',size=14,color='n2',anchor='middle')
+    s.line(10,301,240,301,stroke='lightblue')
+    for x in range(10,241,46): s.line(x,294,x,308,stroke='lightblue')
+    s.text(0,333,'応答と無関係に、一定間隔で予定',size=14,color='n1')
+    s.arrow(455,272,455,305,stroke='pink',dash=[6,5],head=9)
+    s.text(474,291,'確保できない',size=14.5,color='pink')
+    s.box(330,310,250,50,[dict(text='dropped_iterations',font='mono',size=15.5,color='pink',weight=600),dict(text='反復を開始せず、件数に数える',size=14,color='n1')],stroke='pink',row_gap=21)
     return s
 
 
@@ -139,72 +123,26 @@ def build_closed_vs_open() -> Scene:
 # 3. 20261118-request-path (7章: 1件のリクエストが通る区間とスパン)
 # ---------------------------------------------------------------------------
 def build_request_path() -> Scene:
-    s = Scene(920, 268)
-    y = 134
-    h = 78
-    m = y + h / 2
-
-    # catalog-api のサーバースパン（外枠）
-    s.rect(0, 0, 920, 268, stroke="n2", width=1.8, radius=16, role="frame")
-    s.rich_text(20, 25, [[
-        {"text": "catalog-api", "font": "mono", "size": 16, "weight": 600, "color": "n1"},
-        {"text": " のサーバースパン  ", "font": "heading", "size": 16, "weight": 600, "color": "n1"},
-        {"text": "GET /items/{id}", "font": "mono", "size": 14.5, "weight": 500, "color": "n2"},
-    ]])
-
-    # クライアントスパン（入れ子1）
-    s.rect(480, 48, 422, 192, stroke="n2", width=1.6, radius=14, role="frame")
-    s.rich_text(498, 70, [[
-        {"text": "クライアントスパン  ", "font": "heading", "size": 15.5, "weight": 600, "color": "n1"},
-        {"text": "HTTP GET", "font": "mono", "size": 14.5, "weight": 500, "color": "n2"},
-    ]])
-
-    # inventory のサーバースパン（入れ子2）
-    s.rect(494, 92, 394, 134, stroke="n2", width=1.6, radius=12, role="frame")
-    s.rich_text(512, 113, [[
-        {"text": "inventory", "font": "mono", "size": 15.5, "weight": 600, "color": "n1"},
-        {"text": " のサーバースパン  ", "font": "heading", "size": 15.5, "weight": 600, "color": "n1"},
-        {"text": "GET /stock/{id}", "font": "mono", "size": 14.5, "weight": 500, "color": "n2"},
-    ]])
-
-    # 区間1: catalog-api内の処理（スパンなし: n3 灰色）
-    s.box(20, y, 190, h, [
-        [
-            {"text": "catalog-api", "font": "mono", "size": 14.5, "weight": 600, "color": "white"},
-            {"text": "内の処理", "font": "body", "size": 15, "weight": 600, "color": "white"},
-        ],
-        {"text": "約5ms・スパンなし", "font": "body", "size": 14.5, "weight": 500, "color": "white"},
-    ], fill="n3", stroke="n3", width=1.6, row_gap=23)
-
-    s.arrow(214, m, 242, m, stroke="n2", width=2, head=9)
-
-    # 区間2: 空きを待つ（7章で足すスパン: orange 焦点）
-    s.box(246, y, 200, h, [
-        {"text": "空きを待つ", "font": "heading", "size": 16, "weight": 700, "color": "white"},
-        {"text": "wait for backend slot", "font": "mono", "size": 14.5, "weight": 600, "color": "white"},
-    ], fill="orange", stroke="orange", width=2.2, row_gap=23)
-
-    s.line(246, y - 10, 246, y + h + 10, stroke="orange", width=2.5)
-    s.line(446, y - 10, 446, y + h + 10, stroke="orange", width=2.5)
-    s.text(246, y + h + 28, "始まり：空きを要求", font="body", size=14.5, weight=600, color="orange", anchor="start")
-    s.text(446, y - 26, "終わり：空きを得た", font="body", size=14.5, weight=600, color="orange", anchor="end")
-
-    s.arrow(450, m, 476, m, stroke="n2", width=2, head=9)
-
-    # 区間3: inventory の処理枠の空きを待つ（スパンなし: n3 灰色）
-    s.box(508, y, 166, h, [
-        {"text": "処理枠の空きを待つ", "font": "body", "size": 15, "weight": 600, "color": "white"},
-        {"text": "スパンなし", "font": "body", "size": 14.5, "weight": 500, "color": "white"},
-    ], fill="n3", stroke="n3", width=1.6, row_gap=23)
-
-    s.arrow(678, m, 698, m, stroke="n2", width=2, head=9)
-
-    # 区間4: 在庫を調べる (lookup stock)
-    s.box(702, y, 172, h, [
-        {"text": "在庫を調べる", "font": "body", "size": 15, "weight": 600, "color": "n1"},
-        {"text": "lookup stock", "font": "mono", "size": 14.5, "weight": 500, "color": "n1"},
-        {"text": "約50ms", "font": "body", "size": 14, "weight": 500, "color": "n2"},
-    ], fill="n4", stroke="n1", width=1.8, row_gap=21)
+    s=Scene(920,310)
+    s.rect(0,0,920,310,stroke='n2',radius=14,role='frame')
+    s.rich_text(18,25,[[dict(text='catalog-api',font='mono',size=16,weight=600),dict(text=' のサーバースパン',font='heading',size=16,weight=600)]])
+    s.text(18,49,'GET /items/{id}',font='mono',size=14.5,color='n2')
+    s.rect(478,64,424,228,stroke='n2',radius=12,role='frame')
+    s.text(492,86,'クライアントスパン',size=16,weight=600)
+    s.text(492,108,'HTTP GET',font='mono',size=14.5,color='n2')
+    s.rect(492,121,396,157,stroke='n2',radius=10,role='frame')
+    s.rich_text(506,143,[[dict(text='inventory',font='mono',size=15.5,weight=600),dict(text=' のサーバースパン',size=15.5,weight=600)]])
+    s.text(506,165,'GET /stock/{id}',font='mono',size=14.5,color='n2')
+    y=185; h=72; cy=y+h/2
+    s.box(18,y,192,h,[[dict(text='catalog-api',font='mono',size=14.5,weight=600),dict(text='内の処理',size=15,weight=600)],dict(text='約5ms・スパンなし',size=14.5)],fill='n3',stroke='n3',row_gap=23)
+    s.box(244,y,204,h,[dict(text='空きを待つ',size=17,weight=700),dict(text='wait for backend slot',font='mono',size=14.5,weight=600)],fill='orange',stroke='orange',row_gap=24)
+    s.line(244,y-10,244,y+h+12,stroke='orange',width=2.5)
+    s.line(448,y-10,448,y+h+12,stroke='orange',width=2.5)
+    s.text(244,289,'始まり：空きを要求',size=14.5,weight=600,color='orange-80')
+    s.text(448,159,'終わり：空きを得た',size=14.5,weight=600,color='orange-80',anchor='end')
+    s.box(506,y,166,h,[dict(text='処理枠の空きを待つ',size=15,weight=600),dict(text='スパンなし',size=14.5)],fill='n3',stroke='n3',row_gap=23)
+    s.box(704,y,170,h,[dict(text='在庫を調べる',size=15,weight=600),dict(text='lookup stock',font='mono',size=14.5),dict(text='約50ms',size=14,color='n2')],row_gap=20)
+    for x1,x2 in [(215,239),(453,473),(677,699)]: s.arrow(x1,cy,x2,cy,head=8)
     return s
 
 
@@ -212,42 +150,14 @@ def build_request_path() -> Scene:
 # 4. 20261118-retest-flow (9章: 変更を評価する手順)
 # ---------------------------------------------------------------------------
 def build_retest_flow() -> Scene:
-    s = Scene(920, 138)
-    steps = [
-        ("仮説を立てる", "測る区間を決める", "yellow", 162),
-        ("計装を足す", "その区間だけ", "blue", 151),
-        ("変更する", "1つずつ", "purple", 139),
-        ("再テストする", "同じ負荷と条件で", "purple", 163),
-        ("記録を残す", "改善しなかった結果も", "green", 196),
-    ]
-    gap = 26
-    y = 8
-    h = 80
-
-    xs: list[int] = []
-    cur = 0
-    for _, _, _, w in steps:
-        xs.append(cur)
-        cur += w + gap
-
-    for i, (label, sub, band, w) in enumerate(steps):
-        x = xs[i]
-        s.card_band(x, y, w, h, label, sub, band=band)
-        if i < len(steps) - 1:
-            s.arrow(x + w + 4, y + h / 2, xs[i + 1] - 4, y + h / 2, stroke="n2", width=2, head=9)
-
-    last_x = xs[4]
-    last_w = steps[4][3]
-    s.rect(last_x - 5, y - 5, last_w + 10, h + 10, stroke="orange", width=2.8, radius=13, role="frame")
-
-    from_x = last_x + last_w / 2
-    to_x = xs[0] + steps[0][3] / 2
-    s.route(
-        [[from_x, y + h + 7], [from_x, 128], [to_x, 128], [to_x, y + h + 5]],
-        stroke="orange",
-        width=2.6,
-        head=10,
-    )
+    s=Scene(920,152)
+    steps=[(0,166,'仮説を立てる','測る区間を決める','yellow'),(190,154,'計装を足す','その区間だけ','blue'),(368,140,'変更する','1つずつ','purple'),(532,166,'再テストする','同じ負荷と条件で','purple'),(722,198,'記録を残す','コードと設定に紐付けて','green')]
+    for i,(x,w,a,b,c) in enumerate(steps):
+        s.card_band(x,8,w,80,a,b,band=c,title_size=16,sub_size=14)
+        if i<4: s.arrow(x+w+4,48,steps[i+1][0]-(10 if i==3 else 4),48,head=8)
+    s.rect(717,3,208,90,stroke='orange',width=2.8,radius=13,role='frame')
+    s.route([[821,98],[821,145],[83,145],[83,94]],stroke='orange',width=2.4,head=10)
+    s.text(460,126,'記録を次の仮説に使う',anchor='middle',size=15,weight=600,color='orange-80')
     return s
 
 

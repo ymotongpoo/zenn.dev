@@ -1,46 +1,48 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 976 408" width="976" height="408">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 976 412" width="976" height="412">
   <style>
     text { font-feature-settings: 'palt' 1; }
     .mono { font-variant-ligatures: none; font-feature-settings: 'liga' 0, 'calt' 0; }
   </style>
-  <rect data-bg="canvas" x="0" y="0" width="976" height="408" fill="#171717" />
+  <rect data-bg="canvas" x="0" y="0" width="976" height="412" fill="#171717" />
   <g transform="translate(28, 26)">
-    <text text-anchor="start" dominant-baseline="central"><tspan x="0" y="12"><tspan font-family="Poppins, 'IBM Plex Sans JP', sans-serif" font-size="18" font-weight="700" fill="#FFED23">閉じたモデル</tspan></tspan></text>
-    <text text-anchor="start" dominant-baseline="central"><tspan x="132" y="12"><tspan font-family="'IBM Plex Mono', ui-monospace, monospace" font-size="15" font-weight="500" fill="#AFAFAF" class="mono">constant-vus</tspan></tspan></text>
-    <rect data-role="node" x="0" y="36" width="212" height="56" rx="10" stroke="#FFED23" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="#3A3A3A" />
-    <text text-anchor="middle" dominant-baseline="central" data-box="0,36,212,56"><tspan x="106" y="64"><tspan font-family="Inter, 'IBM Plex Sans JP', sans-serif" font-size="17" font-weight="600" fill="#F4F4F4">前の応答が返る</tspan></tspan></text>
-    <line x1="218" y1="64" x2="265.2" y2="64" stroke="#AFAFAF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none" />
-    <polygon points="274,64 264.1,68.78 264.1,59.22" stroke="#AFAFAF" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" fill="#AFAFAF" />
-    <rect data-role="node" x="280" y="36" width="248" height="56" rx="10" stroke="#FFED23" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="#3A3A3A" />
-    <text text-anchor="middle" dominant-baseline="central" data-box="280,36,248,56"><tspan x="404" y="64"><tspan font-family="Inter, 'IBM Plex Sans JP', sans-serif" font-size="17" font-weight="600" fill="#F4F4F4">次のリクエストを送る</tspan></tspan></text>
-    <polyline points="404,96 404,120 106,120 106,105" stroke="#FFED23" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none" />
-    <polygon points="106,97 110.35,106 101.65,106" stroke="#FFED23" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" fill="#FFED23" />
-    <text text-anchor="start" dominant-baseline="central"><tspan x="556" y="64"><tspan font-family="Inter, 'IBM Plex Sans JP', sans-serif" font-size="15.5" font-weight="700" fill="#FFED23">前の応答が返ってから次を送る</tspan></tspan></text>
-    <line x1="0" y1="148" x2="920" y2="148" stroke="#3A3A3A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none" />
-    <text text-anchor="start" dominant-baseline="central"><tspan x="0" y="178"><tspan font-family="Poppins, 'IBM Plex Sans JP', sans-serif" font-size="18" font-weight="700" fill="#3FC6EB">開いたモデル</tspan></tspan></text>
-    <text text-anchor="start" dominant-baseline="central"><tspan x="132" y="178"><tspan font-family="'IBM Plex Mono', ui-monospace, monospace" font-size="15" font-weight="500" fill="#AFAFAF" class="mono">constant-arrival-rate</tspan></tspan></text>
-    <rect data-role="node" x="0" y="202" width="212" height="56" rx="10" stroke="#3FC6EB" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="#3A3A3A" />
-    <text text-anchor="middle" dominant-baseline="central" data-box="0,202,212,56"><tspan x="106" y="230"><tspan font-family="Inter, 'IBM Plex Sans JP', sans-serif" font-size="17" font-weight="600" fill="#F4F4F4">決めた間隔が経つ</tspan></tspan></text>
-    <line x1="218" y1="230" x2="265.2" y2="230" stroke="#AFAFAF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none" />
-    <polygon points="274,230 264.1,234.78 264.1,225.22" stroke="#AFAFAF" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" fill="#AFAFAF" />
-    <rect data-role="node" x="280" y="202" width="236" height="56" rx="10" stroke="#3FC6EB" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="#3A3A3A" />
-    <text text-anchor="middle" dominant-baseline="central" data-box="280,202,236,56"><tspan x="398" y="230"><tspan font-family="Inter, 'IBM Plex Sans JP', sans-serif" font-size="17" font-weight="600" fill="#F4F4F4">空いているVUに渡す</tspan></tspan></text>
-    <line x1="522" y1="230" x2="569.2" y2="230" stroke="#AFAFAF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none" />
-    <polygon points="578,230 568.1,234.78 568.1,225.22" stroke="#AFAFAF" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" fill="#AFAFAF" />
-    <rect data-role="node" x="584" y="202" width="216" height="56" rx="10" stroke="#3FC6EB" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="#3A3A3A" />
-    <text text-anchor="middle" dominant-baseline="central" data-box="584,202,216,56"><tspan x="692" y="230"><tspan font-family="Inter, 'IBM Plex Sans JP', sans-serif" font-size="17" font-weight="600" fill="#F4F4F4">リクエストを送る</tspan></tspan></text>
-    <line x1="24" y1="276" x2="24" y2="290" stroke="#3FC6EB" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none" />
-    <line x1="57" y1="276" x2="57" y2="290" stroke="#3FC6EB" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none" />
-    <line x1="90" y1="276" x2="90" y2="290" stroke="#3FC6EB" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none" />
-    <line x1="123" y1="276" x2="123" y2="290" stroke="#3FC6EB" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none" />
-    <line x1="156" y1="276" x2="156" y2="290" stroke="#3FC6EB" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none" />
-    <line x1="189" y1="276" x2="189" y2="290" stroke="#3FC6EB" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none" />
-    <line x1="12" y1="283" x2="201" y2="283" stroke="#3FC6EB" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none" />
-    <text text-anchor="start" dominant-baseline="central"><tspan x="0" y="309"><tspan font-family="Inter, 'IBM Plex Sans JP', sans-serif" font-size="14.5" font-weight="700" fill="#FF671D">応答と関係なく、決めた頻度で送る</tspan></tspan></text>
-    <line x1="398" y1="262" x2="398" y2="285" stroke="#F35998" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none" stroke-dasharray="6 5" />
-    <polygon points="398,293 393.65,284 402.35,284" stroke="#F35998" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" fill="#F35998" />
-    <text text-anchor="start" dominant-baseline="central"><tspan x="412" y="277"><tspan font-family="Inter, 'IBM Plex Sans JP', sans-serif" font-size="14.5" font-weight="600" fill="#F35998">空いているVUがない</tspan></tspan></text>
-    <rect data-role="node" x="280" y="298" width="236" height="58" rx="10" stroke="#F35998" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="#3A3A3A" />
-    <text text-anchor="middle" dominant-baseline="central" data-box="280,298,236,58"><tspan x="398" y="317.2"><tspan font-family="'IBM Plex Mono', ui-monospace, monospace" font-size="15.5" font-weight="600" fill="#F35998" class="mono">dropped_iterations</tspan></tspan><tspan x="398" y="339.2"><tspan font-family="Inter, 'IBM Plex Sans JP', sans-serif" font-size="14.5" font-weight="500" fill="#F4F4F4">に数える</tspan></tspan></text>
+    <text text-anchor="start" dominant-baseline="central"><tspan x="0" y="12"><tspan font-family="'IBM Plex Sans', 'IBM Plex Sans JP', sans-serif" font-size="18" font-weight="700" fill="#FFED23">閉じたモデル</tspan></tspan></text>
+    <text text-anchor="start" dominant-baseline="central"><tspan x="150" y="12"><tspan font-family="'IBM Plex Mono', ui-monospace, monospace" font-size="15" font-weight="500" fill="#AFAFAF" class="mono">constant-vus</tspan></tspan></text>
+    <rect data-role="node" x="0" y="40" width="250" height="56" rx="10" stroke="#FFED23" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="#3A3A3A" />
+    <text text-anchor="middle" dominant-baseline="central" data-box="0,40,250,56"><tspan x="125" y="68"><tspan font-family="'IBM Plex Sans', 'IBM Plex Sans JP', sans-serif" font-size="17" font-weight="600" fill="#FFFFFF">リクエストを送る</tspan></tspan></text>
+    <rect data-role="node" x="330" y="40" width="250" height="56" rx="10" stroke="#FFED23" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="#3A3A3A" />
+    <text text-anchor="middle" dominant-baseline="central" data-box="330,40,250,56"><tspan x="455" y="68"><tspan font-family="'IBM Plex Sans', 'IBM Plex Sans JP', sans-serif" font-size="17" font-weight="600" fill="#FFFFFF">応答が返る</tspan></tspan></text>
+    <line x1="256" y1="68" x2="315.2" y2="68" stroke="#F4F4F4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+    <polygon points="324,68 314.1,72.78 314.1,63.22" stroke="#F4F4F4" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" fill="#F4F4F4" />
+    <polyline points="455,101 455,133 125,133 125,109" stroke="#FFED23" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+    <polygon points="125,101 129.35,110 120.65,110" stroke="#FFED23" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" fill="#FFED23" />
+    <text text-anchor="start" dominant-baseline="central"><tspan x="620" y="63"><tspan font-family="'IBM Plex Sans', 'IBM Plex Sans JP', sans-serif" font-size="16" font-weight="600" fill="#FFED23">VUごとに応答を待つ</tspan></tspan></text>
+    <text text-anchor="start" dominant-baseline="central"><tspan x="620" y="88"><tspan font-family="'IBM Plex Sans', 'IBM Plex Sans JP', sans-serif" font-size="14.5" font-weight="500" fill="#F4F4F4">遅くなると、送る頻度も下がる</tspan></tspan></text>
+    <line x1="0" y1="158" x2="920" y2="158" stroke="#3A3A3A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+    <text text-anchor="start" dominant-baseline="central"><tspan x="0" y="185"><tspan font-family="'IBM Plex Sans', 'IBM Plex Sans JP', sans-serif" font-size="18" font-weight="700" fill="#3FC6EB">開いたモデル</tspan></tspan></text>
+    <text text-anchor="start" dominant-baseline="central"><tspan x="150" y="185"><tspan font-family="'IBM Plex Mono', ui-monospace, monospace" font-size="15" font-weight="500" fill="#AFAFAF" class="mono">constant-arrival-rate</tspan></tspan></text>
+    <rect data-role="node" x="0" y="211" width="250" height="56" rx="10" stroke="#3FC6EB" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="#3A3A3A" />
+    <text text-anchor="middle" dominant-baseline="central" data-box="0,211,250,56"><tspan x="125" y="239"><tspan font-family="'IBM Plex Sans', 'IBM Plex Sans JP', sans-serif" font-size="16" font-weight="600" fill="#FFFFFF">反復の開始時刻が来る</tspan></tspan></text>
+    <rect data-role="node" x="330" y="211" width="250" height="56" rx="10" stroke="#3FC6EB" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="#3A3A3A" />
+    <text text-anchor="middle" dominant-baseline="central" data-box="330,211,250,56"><tspan x="455" y="239"><tspan font-family="'IBM Plex Sans', 'IBM Plex Sans JP', sans-serif" font-size="16" font-weight="600" fill="#FFFFFF">使えるVUを確保する</tspan></tspan></text>
+    <rect data-role="node" x="680" y="211" width="240" height="56" rx="10" stroke="#3FC6EB" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="#3A3A3A" />
+    <text text-anchor="middle" dominant-baseline="central" data-box="680,211,240,56"><tspan x="800" y="239"><tspan font-family="'IBM Plex Sans', 'IBM Plex Sans JP', sans-serif" font-size="16" font-weight="600" fill="#FFFFFF">リクエストを送る</tspan></tspan></text>
+    <line x1="256" y1="239" x2="315.2" y2="239" stroke="#F4F4F4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+    <polygon points="324,239 314.1,243.78 314.1,234.22" stroke="#F4F4F4" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" fill="#F4F4F4" />
+    <line x1="586" y1="239" x2="665.2" y2="239" stroke="#F4F4F4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+    <polygon points="674,239 664.1,243.78 664.1,234.22" stroke="#F4F4F4" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" fill="#F4F4F4" />
+    <text text-anchor="middle" dominant-baseline="central"><tspan x="630" y="218"><tspan font-family="'IBM Plex Sans', 'IBM Plex Sans JP', sans-serif" font-size="14" font-weight="500" fill="#AFAFAF">確保できる</tspan></tspan></text>
+    <line x1="10" y1="301" x2="240" y2="301" stroke="#3FC6EB" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+    <line x1="10" y1="294" x2="10" y2="308" stroke="#3FC6EB" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+    <line x1="56" y1="294" x2="56" y2="308" stroke="#3FC6EB" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+    <line x1="102" y1="294" x2="102" y2="308" stroke="#3FC6EB" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+    <line x1="148" y1="294" x2="148" y2="308" stroke="#3FC6EB" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+    <line x1="194" y1="294" x2="194" y2="308" stroke="#3FC6EB" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+    <line x1="240" y1="294" x2="240" y2="308" stroke="#3FC6EB" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+    <text text-anchor="start" dominant-baseline="central"><tspan x="0" y="333"><tspan font-family="'IBM Plex Sans', 'IBM Plex Sans JP', sans-serif" font-size="14" font-weight="500" fill="#F4F4F4">応答と無関係に、一定間隔で予定</tspan></tspan></text>
+    <line x1="455" y1="272" x2="455" y2="297.8" stroke="#F35998" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none" stroke-dasharray="6 5" />
+    <polygon points="455,305 451.09,296.9 458.91,296.9" stroke="#F35998" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" fill="#F35998" />
+    <text text-anchor="start" dominant-baseline="central"><tspan x="474" y="291"><tspan font-family="'IBM Plex Sans', 'IBM Plex Sans JP', sans-serif" font-size="14.5" font-weight="500" fill="#F35998">確保できない</tspan></tspan></text>
+    <rect data-role="node" x="330" y="310" width="250" height="50" rx="10" stroke="#F35998" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="#3A3A3A" />
+    <text text-anchor="middle" dominant-baseline="central" data-box="330,310,250,50"><tspan x="455" y="325.7"><tspan font-family="'IBM Plex Mono', ui-monospace, monospace" font-size="15.5" font-weight="600" fill="#F35998" class="mono">dropped_iterations</tspan></tspan><tspan x="455" y="346.7"><tspan font-family="'IBM Plex Sans', 'IBM Plex Sans JP', sans-serif" font-size="14" font-weight="600" fill="#F4F4F4">反復を開始せず、件数に数える</tspan></tspan></text>
   </g>
 </svg>
